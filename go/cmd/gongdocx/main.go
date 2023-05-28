@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	gongdocx_go "github.com/fullstack-lang/gongdocx/go"
 	gongdocx_fullstack "github.com/fullstack-lang/gongdocx/go/fullstack"
@@ -36,6 +37,22 @@ func main() {
 
 	// parse program arguments
 	flag.Parse()
+
+	var embed bool
+	var showVersion bool
+	flag.BoolVar(&embed, "embed", false, "embed resources")
+	flag.BoolVar(&showVersion, "v", false, "Print the version")
+	flag.Parse()
+
+	if flag.NArg() == 0 {
+		flag.Usage()
+		os.Exit(1)
+	}
+	for _, arg := range flag.Args() {
+		if err := gongdocx_models.Docx2md(arg, embed); err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	// setup the static file server and get the controller
 	r := gongdocx_static.ServeStaticFiles(*logGINFlag)
