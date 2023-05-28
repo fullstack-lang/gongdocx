@@ -48,19 +48,17 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	for _, arg := range flag.Args() {
-		if err := gongdocx_models.Docx2md(arg, embed); err != nil {
-			log.Fatal(err)
-		}
-	}
 
 	// setup the static file server and get the controller
 	r := gongdocx_static.ServeStaticFiles(*logGINFlag)
 
 	// setup stack
-	var stage *gongdocx_models.StageStruct
+	stage := gongdocx_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongdocx/go/models")
 
-	stage = gongdocx_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongdocx/go/models")
+	for _, arg := range flag.Args() {
+		gongdocx_models.NewDocx(stage, arg, embed)
+	}
+	stage.Commit()
 
 	gongdoc_load.Load(
 		"gongdocx",
