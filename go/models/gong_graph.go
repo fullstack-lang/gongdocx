@@ -5,6 +5,9 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 
 	switch target := any(instance).(type) {
 	// insertion point for stage
+	case *Document:
+		ok = stage.IsStagedDocument(target)
+
 	case *Docx:
 		ok = stage.IsStagedDocx(target)
 
@@ -18,6 +21,13 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 }
 
 // insertion point for stage per struct
+	func (stage *StageStruct) IsStagedDocument(document *Document) (ok bool) {
+
+		_, ok = stage.Documents[document]
+	
+		return
+	}
+
 	func (stage *StageStruct) IsStagedDocx(docx *Docx) (ok bool) {
 
 		_, ok = stage.Docxs[docx]
@@ -41,6 +51,9 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point for stage branch
+	case *Document:
+		stage.StageBranchDocument(target)
+
 	case *Docx:
 		stage.StageBranchDocx(target)
 
@@ -53,6 +66,24 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 }
 
 // insertion point for stage branch per struct
+func (stage *StageStruct) StageBranchDocument(document *Document) {
+
+	// check if instance is already staged
+	if IsStaged(stage, document) {
+		return
+	}
+
+	document.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if document.File != nil {
+		StageBranch(stage, document.File)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
 func (stage *StageStruct) StageBranchDocx(docx *Docx) {
 
 	// check if instance is already staged
@@ -95,6 +126,9 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point for unstage branch
+	case *Document:
+		stage.UnstageBranchDocument(target)
+
 	case *Docx:
 		stage.UnstageBranchDocx(target)
 
@@ -107,6 +141,24 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 }
 
 // insertion point for unstage branch per struct
+func (stage *StageStruct) UnstageBranchDocument(document *Document) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, document) {
+		return
+	}
+
+	document.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if document.File != nil {
+		UnstageBranch(stage, document.File)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
 func (stage *StageStruct) UnstageBranchDocx(docx *Docx) {
 
 	// check if instance is already staged

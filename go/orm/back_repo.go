@@ -21,6 +21,8 @@ import (
 // BackRepoStruct supports callback functions
 type BackRepoStruct struct {
 	// insertion point for per struct back repo declarations
+	BackRepoDocument BackRepoDocumentStruct
+
 	BackRepoDocx BackRepoDocxStruct
 
 	BackRepoFile BackRepoFileStruct
@@ -61,6 +63,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 	}
 
 	err = db.AutoMigrate( // insertion point for reference to structs
+		&DocumentDB{},
 		&DocxDB{},
 		&FileDB{},
 	)
@@ -73,6 +76,14 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 	backRepo = new(BackRepoStruct)
 
 	// insertion point for per struct back repo declarations
+	backRepo.BackRepoDocument = BackRepoDocumentStruct{
+		Map_DocumentDBID_DocumentPtr: make(map[uint]*models.Document, 0),
+		Map_DocumentDBID_DocumentDB:  make(map[uint]*DocumentDB, 0),
+		Map_DocumentPtr_DocumentDBID: make(map[*models.Document]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
 	backRepo.BackRepoDocx = BackRepoDocxStruct{
 		Map_DocxDBID_DocxPtr: make(map[uint]*models.Docx, 0),
 		Map_DocxDBID_DocxDB:  make(map[uint]*DocxDB, 0),
@@ -134,10 +145,12 @@ func (backRepo *BackRepoStruct) IncrementPushFromFrontNb() uint {
 // Commit the BackRepoStruct inner variables and link to the database
 func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
+	backRepo.BackRepoDocument.CommitPhaseOne(stage)
 	backRepo.BackRepoDocx.CommitPhaseOne(stage)
 	backRepo.BackRepoFile.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
+	backRepo.BackRepoDocument.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoDocx.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoFile.CommitPhaseTwo(backRepo)
 
@@ -147,10 +160,12 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 // Checkout the database into the stage
 func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	// insertion point for per struct back repo phase one commit
+	backRepo.BackRepoDocument.CheckoutPhaseOne()
 	backRepo.BackRepoDocx.CheckoutPhaseOne()
 	backRepo.BackRepoFile.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
+	backRepo.BackRepoDocument.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoDocx.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoFile.CheckoutPhaseTwo(backRepo)
 }
@@ -179,6 +194,7 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	os.MkdirAll(dirPath, os.ModePerm)
 
 	// insertion point for per struct backup
+	backRepo.BackRepoDocument.Backup(dirPath)
 	backRepo.BackRepoDocx.Backup(dirPath)
 	backRepo.BackRepoFile.Backup(dirPath)
 }
@@ -191,6 +207,7 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	file := xlsx.NewFile()
 
 	// insertion point for per struct backup
+	backRepo.BackRepoDocument.BackupXL(file)
 	backRepo.BackRepoDocx.BackupXL(file)
 	backRepo.BackRepoFile.BackupXL(file)
 
@@ -217,6 +234,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	//
 
 	// insertion point for per struct backup
+	backRepo.BackRepoDocument.RestorePhaseOne(dirPath)
 	backRepo.BackRepoDocx.RestorePhaseOne(dirPath)
 	backRepo.BackRepoFile.RestorePhaseOne(dirPath)
 
@@ -225,6 +243,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	//
 
 	// insertion point for per struct backup
+	backRepo.BackRepoDocument.RestorePhaseTwo()
 	backRepo.BackRepoDocx.RestorePhaseTwo()
 	backRepo.BackRepoFile.RestorePhaseTwo()
 
@@ -254,6 +273,7 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	//
 
 	// insertion point for per struct backup
+	backRepo.BackRepoDocument.RestoreXLPhaseOne(file)
 	backRepo.BackRepoDocx.RestoreXLPhaseOne(file)
 	backRepo.BackRepoFile.RestoreXLPhaseOne(file)
 

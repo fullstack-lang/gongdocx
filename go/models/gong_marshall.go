@@ -110,6 +110,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	_ = setValueField 
 
 	// insertion initialization of objects to stage
+	map_Document_Identifiers := make(map[*Document]string)
+	_ = map_Document_Identifiers
+
+	documentOrdered := []*Document{}
+	for document := range stage.Documents {
+		documentOrdered = append(documentOrdered, document)
+	}
+	sort.Slice(documentOrdered[:], func(i, j int) bool {
+		return documentOrdered[i].Name < documentOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of Document"
+	for idx, document := range documentOrdered {
+
+		id = generatesIdentifier("Document", idx, document.Name)
+		map_Document_Identifiers[document] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Document")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", document.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// Document values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(document.Name))
+		initializerStatements += setValueField
+
+	}
+
 	map_Docx_Identifiers := make(map[*Docx]string)
 	_ = map_Docx_Identifiers
 
@@ -175,6 +207,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	}
 
 	// insertion initialization of objects to stage
+	for idx, document := range documentOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("Document", idx, document.Name)
+		map_Document_Identifiers[document] = id
+
+		// Initialisation of values
+		if document.File != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "File")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_File_Identifiers[document.File])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
 	for idx, docx := range docxOrdered {
 		var setPointerField string
 		_ = setPointerField

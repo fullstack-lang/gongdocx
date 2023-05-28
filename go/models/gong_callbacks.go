@@ -5,6 +5,10 @@ func AfterCreateFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point
+	case *Document:
+		if stage.OnAfterDocumentCreateCallback != nil {
+			stage.OnAfterDocumentCreateCallback.OnAfterCreate(stage, target)
+		}
 	case *Docx:
 		if stage.OnAfterDocxCreateCallback != nil {
 			stage.OnAfterDocxCreateCallback.OnAfterCreate(stage, target)
@@ -23,6 +27,11 @@ func AfterUpdateFromFront[Type Gongstruct](stage *StageStruct, old, new *Type) {
 
 	switch oldTarget := any(old).(type) {
 	// insertion point
+	case *Document:
+		newTarget := any(new).(*Document)
+		if stage.OnAfterDocumentUpdateCallback != nil {
+			stage.OnAfterDocumentUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+		}
 	case *Docx:
 		newTarget := any(new).(*Docx)
 		if stage.OnAfterDocxUpdateCallback != nil {
@@ -43,6 +52,11 @@ func AfterDeleteFromFront[Type Gongstruct](stage *StageStruct, staged, front *Ty
 
 	switch front := any(front).(type) {
 	// insertion point
+	case *Document:
+		if stage.OnAfterDocumentDeleteCallback != nil {
+			staged := any(staged).(*Document)
+			stage.OnAfterDocumentDeleteCallback.OnAfterDelete(stage, staged, front)
+		}
 	case *Docx:
 		if stage.OnAfterDocxDeleteCallback != nil {
 			staged := any(staged).(*Docx)
@@ -63,6 +77,10 @@ func AfterReadFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point
+	case *Document:
+		if stage.OnAfterDocumentReadCallback != nil {
+			stage.OnAfterDocumentReadCallback.OnAfterRead(stage, target)
+		}
 	case *Docx:
 		if stage.OnAfterDocxReadCallback != nil {
 			stage.OnAfterDocxReadCallback.OnAfterRead(stage, target)
@@ -82,6 +100,9 @@ func SetCallbackAfterUpdateFromFront[Type Gongstruct](stage *StageStruct, callba
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Document:
+		stage.OnAfterDocumentUpdateCallback = any(callback).(OnAfterUpdateInterface[Document])
+	
 	case *Docx:
 		stage.OnAfterDocxUpdateCallback = any(callback).(OnAfterUpdateInterface[Docx])
 	
@@ -95,6 +116,9 @@ func SetCallbackAfterCreateFromFront[Type Gongstruct](stage *StageStruct, callba
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Document:
+		stage.OnAfterDocumentCreateCallback = any(callback).(OnAfterCreateInterface[Document])
+	
 	case *Docx:
 		stage.OnAfterDocxCreateCallback = any(callback).(OnAfterCreateInterface[Docx])
 	
@@ -108,6 +132,9 @@ func SetCallbackAfterDeleteFromFront[Type Gongstruct](stage *StageStruct, callba
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Document:
+		stage.OnAfterDocumentDeleteCallback = any(callback).(OnAfterDeleteInterface[Document])
+	
 	case *Docx:
 		stage.OnAfterDocxDeleteCallback = any(callback).(OnAfterDeleteInterface[Docx])
 	
@@ -121,6 +148,9 @@ func SetCallbackAfterReadFromFront[Type Gongstruct](stage *StageStruct, callback
 	var instance Type
 	switch any(instance).(type) {
 		// insertion point
+	case *Document:
+		stage.OnAfterDocumentReadCallback = any(callback).(OnAfterReadInterface[Document])
+	
 	case *Docx:
 		stage.OnAfterDocxReadCallback = any(callback).(OnAfterReadInterface[Docx])
 	

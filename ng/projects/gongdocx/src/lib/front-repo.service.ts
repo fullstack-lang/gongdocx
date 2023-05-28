@@ -4,6 +4,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 
 // insertion point sub template for services imports 
+import { DocumentDB } from './document-db'
+import { DocumentService } from './document.service'
+
 import { DocxDB } from './docx-db'
 import { DocxService } from './docx.service'
 
@@ -13,6 +16,9 @@ import { FileService } from './file.service'
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
 export class FrontRepo { // insertion point sub template 
+  Documents_array = new Array<DocumentDB>(); // array of repo instances
+  Documents = new Map<number, DocumentDB>(); // map of repo instances
+  Documents_batch = new Map<number, DocumentDB>(); // same but only in last GET (for finding repo instances to delete)
   Docxs_array = new Array<DocxDB>(); // array of repo instances
   Docxs = new Map<number, DocxDB>(); // map of repo instances
   Docxs_batch = new Map<number, DocxDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -81,6 +87,7 @@ export class FrontRepoService {
 
   constructor(
     private http: HttpClient, // insertion point sub template 
+    private documentService: DocumentService,
     private docxService: DocxService,
     private fileService: FileService,
   ) { }
@@ -113,9 +120,11 @@ export class FrontRepoService {
 
   // typing of observable can be messy in typescript. Therefore, one force the type
   observableFrontRepo: [ // insertion point sub template 
+    Observable<DocumentDB[]>,
     Observable<DocxDB[]>,
     Observable<FileDB[]>,
   ] = [ // insertion point sub template
+      this.documentService.getDocuments(this.GONG__StackPath),
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
     ];
@@ -131,6 +140,7 @@ export class FrontRepoService {
     this.GONG__StackPath = GONG__StackPath
 
     this.observableFrontRepo = [ // insertion point sub template
+      this.documentService.getDocuments(this.GONG__StackPath),
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
     ]
@@ -141,11 +151,14 @@ export class FrontRepoService {
           this.observableFrontRepo
         ).subscribe(
           ([ // insertion point sub template for declarations 
+            documents_,
             docxs_,
             files_,
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
             // insertion point sub template for type casting 
+            var documents: DocumentDB[]
+            documents = documents_ as DocumentDB[]
             var docxs: DocxDB[]
             docxs = docxs_ as DocxDB[]
             var files: FileDB[]
@@ -154,6 +167,39 @@ export class FrontRepoService {
             // 
             // First Step: init map of instances
             // insertion point sub template for init 
+            // init the array
+            this.frontRepo.Documents_array = documents
+
+            // clear the map that counts Document in the GET
+            this.frontRepo.Documents_batch.clear()
+
+            documents.forEach(
+              document => {
+                this.frontRepo.Documents.set(document.ID, document)
+                this.frontRepo.Documents_batch.set(document.ID, document)
+              }
+            )
+
+            // clear documents that are absent from the batch
+            this.frontRepo.Documents.forEach(
+              document => {
+                if (this.frontRepo.Documents_batch.get(document.ID) == undefined) {
+                  this.frontRepo.Documents.delete(document.ID)
+                }
+              }
+            )
+
+            // sort Documents_array array
+            this.frontRepo.Documents_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
             // init the array
             this.frontRepo.Docxs_array = docxs
 
@@ -224,6 +270,20 @@ export class FrontRepoService {
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)
             // insertion point sub template for redeem 
+            documents.forEach(
+              document => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field File redeeming
+                {
+                  let _file = this.frontRepo.Files.get(document.FileID.Int64)
+                  if (_file) {
+                    document.File = _file
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
             docxs.forEach(
               docx => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
@@ -261,6 +321,64 @@ export class FrontRepoService {
   }
 
   // insertion point for pull per struct 
+
+  // DocumentPull performs a GET on Document of the stack and redeem association pointers 
+  DocumentPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.documentService.getDocuments(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            documents,
+          ]) => {
+            // init the array
+            this.frontRepo.Documents_array = documents
+
+            // clear the map that counts Document in the GET
+            this.frontRepo.Documents_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            documents.forEach(
+              document => {
+                this.frontRepo.Documents.set(document.ID, document)
+                this.frontRepo.Documents_batch.set(document.ID, document)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field File redeeming
+                {
+                  let _file = this.frontRepo.Files.get(document.FileID.Int64)
+                  if (_file) {
+                    document.File = _file
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear documents that are absent from the GET
+            this.frontRepo.Documents.forEach(
+              document => {
+                if (this.frontRepo.Documents_batch.get(document.ID) == undefined) {
+                  this.frontRepo.Documents.delete(document.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
 
   // DocxPull performs a GET on Docx of the stack and redeem association pointers 
   DocxPull(): Observable<FrontRepo> {
@@ -379,9 +497,12 @@ export class FrontRepoService {
 }
 
 // insertion point for get unique ID per struct 
-export function getDocxUniqueID(id: number): number {
+export function getDocumentUniqueID(id: number): number {
   return 31 * id
 }
-export function getFileUniqueID(id: number): number {
+export function getDocxUniqueID(id: number): number {
   return 37 * id
+}
+export function getFileUniqueID(id: number): number {
+  return 41 * id
 }

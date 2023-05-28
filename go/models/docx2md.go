@@ -528,6 +528,13 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 	if f == nil {
 		return errors.New("incorrect document")
 	}
+
+	// match to the File
+	document := (&Document{Name: f.Name}).Stage(gongdocx_stage)
+
+	file_ := (*GetGongstructInstancesMap[File](gongdocx_stage))["word/document.xml"]
+	document.File = file_
+
 	node, err := readFile(f)
 	if err != nil {
 		return err

@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Route, Router, Routes } from '@angular/router';
 
 // insertion point for imports
+import { DocumentsTableComponent } from './documents-table/documents-table.component'
+import { DocumentDetailComponent } from './document-detail/document-detail.component'
+
 import { DocxsTableComponent } from './docxs-table/docxs-table.component'
 import { DocxDetailComponent } from './docx-detail/docx-detail.component'
 
@@ -39,6 +42,39 @@ export class RouteService {
         return this.getPathRoot() + '_editor' + '_' + stackPath
     }
     // insertion point for per gongstruct route/path getters
+    getDocumentTablePath(): string {
+        return this.getPathRoot() + '-documents/:GONG__StackPath'
+    }
+    getDocumentTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getDocumentTablePath(), component: DocumentsTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getDocumentAdderPath(): string {
+        return this.getPathRoot() + '-document-adder/:GONG__StackPath'
+    }
+    getDocumentAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getDocumentAdderPath(), component: DocumentDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getDocumentAdderForUsePath(): string {
+        return this.getPathRoot() + '-document-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getDocumentAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getDocumentAdderForUsePath(), component: DocumentDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getDocumentDetailPath(): string {
+        return this.getPathRoot() + '-document-detail/:id/:GONG__StackPath'
+    }
+    getDocumentDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getDocumentDetailPath(), component: DocumentDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
     getDocxTablePath(): string {
         return this.getPathRoot() + '-docxs/:GONG__StackPath'
     }
@@ -111,6 +147,11 @@ export class RouteService {
 
         this.addRoutes([
             // insertion point for all routes getter
+            this.getDocumentTableRoute(stackPath),
+            this.getDocumentAdderRoute(stackPath),
+            this.getDocumentAdderForUseRoute(stackPath),
+            this.getDocumentDetailRoute(stackPath),
+
             this.getDocxTableRoute(stackPath),
             this.getDocxAdderRoute(stackPath),
             this.getDocxAdderForUseRoute(stackPath),

@@ -11,6 +11,8 @@ import { CommitNbFromBackService } from '../commitnbfromback.service'
 import { GongstructSelectionService } from '../gongstruct-selection.service'
 
 // insertion point for per struct import code
+import { DocumentService } from '../document.service'
+import { getDocumentUniqueID } from '../front-repo.service'
 import { DocxService } from '../docx.service'
 import { getDocxUniqueID } from '../front-repo.service'
 import { FileService } from '../file.service'
@@ -160,6 +162,7 @@ export class SidebarComponent implements OnInit {
     private gongstructSelectionService: GongstructSelectionService,
 
     // insertion point for per struct service declaration
+    private documentService: DocumentService,
     private docxService: DocxService,
     private fileService: FileService,
 
@@ -197,6 +200,14 @@ export class SidebarComponent implements OnInit {
     )
 
     // insertion point for per struct observable for refresh trigger
+    // observable for changes in structs
+    this.documentService.DocumentServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
     // observable for changes in structs
     this.docxService.DocxServiceChanged.subscribe(
       message => {
@@ -237,6 +248,85 @@ export class SidebarComponent implements OnInit {
       this.gongNodeTree = new Array<GongNode>();
 
       // insertion point for per struct tree construction
+      /**
+      * fill up the Document part of the mat tree
+      */
+      let documentGongNodeStruct: GongNode = {
+        name: "Document",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Document",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(documentGongNodeStruct)
+
+      this.frontRepo.Documents_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Documents_array.forEach(
+        documentDB => {
+          let documentGongNodeInstance: GongNode = {
+            name: documentDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: documentDB.ID,
+            uniqueIdPerStack: getDocumentUniqueID(documentDB.ID),
+            structName: "Document",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          documentGongNodeStruct.children!.push(documentGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association File
+          */
+          let FileGongNodeAssociation: GongNode = {
+            name: "(File) File",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: documentDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Document",
+            associationField: "File",
+            associatedStructName: "File",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          documentGongNodeInstance.children!.push(FileGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation File
+            */
+          if (documentDB.File != undefined) {
+            let documentGongNodeInstance_File: GongNode = {
+              name: documentDB.File.Name,
+              type: GongNodeType.INSTANCE,
+              id: documentDB.File.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getDocumentUniqueID(documentDB.ID)
+                + 5 * getFileUniqueID(documentDB.File.ID),
+              structName: "File",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            FileGongNodeAssociation.children.push(documentGongNodeInstance_File)
+          }
+
+        }
+      )
+
       /**
       * fill up the Docx part of the mat tree
       */

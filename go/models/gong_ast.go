@@ -303,6 +303,7 @@ func ParseAstFileFromAst(stage *StageStruct, inFile *ast.File, fset *token.FileS
 var __gong__map_Indentifiers_gongstructName = make(map[string]string)
 
 // insertion point for identifiers maps
+var __gong__map_Document = make(map[string]*Document)
 var __gong__map_Docx = make(map[string]*Docx)
 var __gong__map_File = make(map[string]*File)
 
@@ -477,6 +478,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 									// this is the place where an instance is created
 									switch gongstructName {
 									// insertion point for identifiers
+									case "Document":
+										instanceDocument := (&Document{Name: instanceName}).Stage(stage)
+										instance = any(instanceDocument)
+										__gong__map_Document[identifier] = instanceDocument
 									case "Docx":
 										instanceDocx := (&Docx{Name: instanceName}).Stage(stage)
 										instance = any(instanceDocx)
@@ -521,6 +526,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 						}
 						switch gongstructName {
 						// insertion point for basic lit assignments
+						case "Document":
+							switch fieldName {
+							// insertion point for date assign code
+							}
 						case "Docx":
 							switch fieldName {
 							// insertion point for date assign code
@@ -554,6 +563,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					}
 					switch gongstructName {
 					// insertion point for slice of pointers assignments
+					case "Document":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						}
 					case "Docx":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
@@ -617,6 +630,14 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 
 			switch gongstructName {
 			// insertion point for basic lit assignments
+			case "Document":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_Document[identifier].Name = fielValue
+				}
 			case "Docx":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -647,6 +668,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 			}
 			switch gongstructName {
 			// insertion point for bool & pointers assignments
+			case "Document":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "File":
+					targetIdentifier := ident.Name
+					__gong__map_Document[identifier].File = __gong__map_File[targetIdentifier]
+				}
 			case "Docx":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -683,6 +711,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				_ = enumValue
 				switch gongstructName {
 				// insertion point for enums assignments
+				case "Document":
+					switch fieldName {
+					// insertion point for enum assign code
+					}
 				case "Docx":
 					switch fieldName {
 					// insertion point for enum assign code
