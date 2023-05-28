@@ -270,6 +270,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_ParagraphProperties_Identifiers := make(map[*ParagraphProperties]string)
+	_ = map_ParagraphProperties_Identifiers
+
+	paragraphpropertiesOrdered := []*ParagraphProperties{}
+	for paragraphproperties := range stage.ParagraphPropertiess {
+		paragraphpropertiesOrdered = append(paragraphpropertiesOrdered, paragraphproperties)
+	}
+	sort.Slice(paragraphpropertiesOrdered[:], func(i, j int) bool {
+		return paragraphpropertiesOrdered[i].Name < paragraphpropertiesOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of ParagraphProperties"
+	for idx, paragraphproperties := range paragraphpropertiesOrdered {
+
+		id = generatesIdentifier("ParagraphProperties", idx, paragraphproperties.Name)
+		map_ParagraphProperties_Identifiers[paragraphproperties] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "ParagraphProperties")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", paragraphproperties.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// ParagraphProperties values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(paragraphproperties.Name))
+		initializerStatements += setValueField
+
+	}
+
 	map_Rune_Identifiers := make(map[*Rune]string)
 	_ = map_Rune_Identifiers
 
@@ -434,6 +466,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[paragraph.Node])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, paragraphproperties := range paragraphpropertiesOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("ParagraphProperties", idx, paragraphproperties.Name)
+		map_ParagraphProperties_Identifiers[paragraphproperties] = id
+
+		// Initialisation of values
+		if paragraphproperties.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[paragraphproperties.Node])
 			pointersInitializesStatements += setPointerField
 		}
 

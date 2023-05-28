@@ -70,6 +70,14 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterParagraphDeleteCallback OnAfterDeleteInterface[Paragraph]
 	OnAfterParagraphReadCallback   OnAfterReadInterface[Paragraph]
 
+	ParagraphPropertiess           map[*ParagraphProperties]any
+	ParagraphPropertiess_mapString map[string]*ParagraphProperties
+
+	OnAfterParagraphPropertiesCreateCallback OnAfterCreateInterface[ParagraphProperties]
+	OnAfterParagraphPropertiesUpdateCallback OnAfterUpdateInterface[ParagraphProperties]
+	OnAfterParagraphPropertiesDeleteCallback OnAfterDeleteInterface[ParagraphProperties]
+	OnAfterParagraphPropertiesReadCallback   OnAfterReadInterface[ParagraphProperties]
+
 	Runes           map[*Rune]any
 	Runes_mapString map[string]*Rune
 
@@ -160,6 +168,8 @@ type BackRepoInterface interface {
 	CheckoutNode(node *Node)
 	CommitParagraph(paragraph *Paragraph)
 	CheckoutParagraph(paragraph *Paragraph)
+	CommitParagraphProperties(paragraphproperties *ParagraphProperties)
+	CheckoutParagraphProperties(paragraphproperties *ParagraphProperties)
 	CommitRune(rune *Rune)
 	CheckoutRune(rune *Rune)
 	CommitText(text *Text)
@@ -197,6 +207,9 @@ func NewStage() (stage *StageStruct) {
 		Paragraphs:           make(map[*Paragraph]any),
 		Paragraphs_mapString: make(map[string]*Paragraph),
 
+		ParagraphPropertiess:           make(map[*ParagraphProperties]any),
+		ParagraphPropertiess_mapString: make(map[string]*ParagraphProperties),
+
 		Runes:           make(map[*Rune]any),
 		Runes_mapString: make(map[string]*Rune),
 
@@ -225,6 +238,7 @@ func (stage *StageStruct) Commit() {
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
 	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
 	stage.Map_GongStructName_InstancesNb["Paragraph"] = len(stage.Paragraphs)
+	stage.Map_GongStructName_InstancesNb["ParagraphProperties"] = len(stage.ParagraphPropertiess)
 	stage.Map_GongStructName_InstancesNb["Rune"] = len(stage.Runes)
 	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
 
@@ -241,6 +255,7 @@ func (stage *StageStruct) Checkout() {
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
 	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
 	stage.Map_GongStructName_InstancesNb["Paragraph"] = len(stage.Paragraphs)
+	stage.Map_GongStructName_InstancesNb["ParagraphProperties"] = len(stage.ParagraphPropertiess)
 	stage.Map_GongStructName_InstancesNb["Rune"] = len(stage.Runes)
 	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
 
@@ -475,6 +490,46 @@ func (paragraph *Paragraph) GetName() (res string) {
 	return paragraph.Name
 }
 
+// Stage puts paragraphproperties to the model stage
+func (paragraphproperties *ParagraphProperties) Stage(stage *StageStruct) *ParagraphProperties {
+	stage.ParagraphPropertiess[paragraphproperties] = __member
+	stage.ParagraphPropertiess_mapString[paragraphproperties.Name] = paragraphproperties
+
+	return paragraphproperties
+}
+
+// Unstage removes paragraphproperties off the model stage
+func (paragraphproperties *ParagraphProperties) Unstage(stage *StageStruct) *ParagraphProperties {
+	delete(stage.ParagraphPropertiess, paragraphproperties)
+	delete(stage.ParagraphPropertiess_mapString, paragraphproperties.Name)
+	return paragraphproperties
+}
+
+// commit paragraphproperties to the back repo (if it is already staged)
+func (paragraphproperties *ParagraphProperties) Commit(stage *StageStruct) *ParagraphProperties {
+	if _, ok := stage.ParagraphPropertiess[paragraphproperties]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitParagraphProperties(paragraphproperties)
+		}
+	}
+	return paragraphproperties
+}
+
+// Checkout paragraphproperties to the back repo (if it is already staged)
+func (paragraphproperties *ParagraphProperties) Checkout(stage *StageStruct) *ParagraphProperties {
+	if _, ok := stage.ParagraphPropertiess[paragraphproperties]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutParagraphProperties(paragraphproperties)
+		}
+	}
+	return paragraphproperties
+}
+
+// for satisfaction of GongStruct interface
+func (paragraphproperties *ParagraphProperties) GetName() (res string) {
+	return paragraphproperties.Name
+}
+
 // Stage puts rune to the model stage
 func (rune *Rune) Stage(stage *StageStruct) *Rune {
 	stage.Runes[rune] = __member
@@ -562,6 +617,7 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 	CreateORMFile(File *File)
 	CreateORMNode(Node *Node)
 	CreateORMParagraph(Paragraph *Paragraph)
+	CreateORMParagraphProperties(ParagraphProperties *ParagraphProperties)
 	CreateORMRune(Rune *Rune)
 	CreateORMText(Text *Text)
 }
@@ -572,6 +628,7 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 	DeleteORMFile(File *File)
 	DeleteORMNode(Node *Node)
 	DeleteORMParagraph(Paragraph *Paragraph)
+	DeleteORMParagraphProperties(ParagraphProperties *ParagraphProperties)
 	DeleteORMRune(Rune *Rune)
 	DeleteORMText(Text *Text)
 }
@@ -591,6 +648,9 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 
 	stage.Paragraphs = make(map[*Paragraph]any)
 	stage.Paragraphs_mapString = make(map[string]*Paragraph)
+
+	stage.ParagraphPropertiess = make(map[*ParagraphProperties]any)
+	stage.ParagraphPropertiess_mapString = make(map[string]*ParagraphProperties)
 
 	stage.Runes = make(map[*Rune]any)
 	stage.Runes_mapString = make(map[string]*Rune)
@@ -615,6 +675,9 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 
 	stage.Paragraphs = nil
 	stage.Paragraphs_mapString = nil
+
+	stage.ParagraphPropertiess = nil
+	stage.ParagraphPropertiess_mapString = nil
 
 	stage.Runes = nil
 	stage.Runes_mapString = nil
@@ -645,6 +708,10 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 		paragraph.Unstage(stage)
 	}
 
+	for paragraphproperties := range stage.ParagraphPropertiess {
+		paragraphproperties.Unstage(stage)
+	}
+
 	for rune := range stage.Runes {
 		rune.Unstage(stage)
 	}
@@ -661,7 +728,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	Document | Docx | File | Node | Paragraph | Rune | Text
+	Document | Docx | File | Node | Paragraph | ParagraphProperties | Rune | Text
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -670,7 +737,7 @@ type Gongstruct interface {
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
 	// insertion point for generic types
-	*Document | *Docx | *File | *Node | *Paragraph | *Rune | *Text
+	*Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *Rune | *Text
 	GetName() string
 }
 
@@ -682,6 +749,7 @@ type GongstructSet interface {
 		map[*File]any |
 		map[*Node]any |
 		map[*Paragraph]any |
+		map[*ParagraphProperties]any |
 		map[*Rune]any |
 		map[*Text]any |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
@@ -695,6 +763,7 @@ type GongstructMapString interface {
 		map[string]*File |
 		map[string]*Node |
 		map[string]*Paragraph |
+		map[string]*ParagraphProperties |
 		map[string]*Rune |
 		map[string]*Text |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
@@ -717,6 +786,8 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 		return any(&stage.Nodes).(*Type)
 	case map[*Paragraph]any:
 		return any(&stage.Paragraphs).(*Type)
+	case map[*ParagraphProperties]any:
+		return any(&stage.ParagraphPropertiess).(*Type)
 	case map[*Rune]any:
 		return any(&stage.Runes).(*Type)
 	case map[*Text]any:
@@ -743,6 +814,8 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 		return any(&stage.Nodes_mapString).(*Type)
 	case map[string]*Paragraph:
 		return any(&stage.Paragraphs_mapString).(*Type)
+	case map[string]*ParagraphProperties:
+		return any(&stage.ParagraphPropertiess_mapString).(*Type)
 	case map[string]*Rune:
 		return any(&stage.Runes_mapString).(*Type)
 	case map[string]*Text:
@@ -769,6 +842,8 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 		return any(&stage.Nodes).(*map[*Type]any)
 	case Paragraph:
 		return any(&stage.Paragraphs).(*map[*Type]any)
+	case ParagraphProperties:
+		return any(&stage.ParagraphPropertiess).(*map[*Type]any)
 	case Rune:
 		return any(&stage.Runes).(*map[*Type]any)
 	case Text:
@@ -795,6 +870,8 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 		return any(&stage.Nodes_mapString).(*map[string]*Type)
 	case Paragraph:
 		return any(&stage.Paragraphs_mapString).(*map[string]*Type)
+	case ParagraphProperties:
+		return any(&stage.ParagraphPropertiess_mapString).(*map[string]*Type)
 	case Rune:
 		return any(&stage.Runes_mapString).(*map[string]*Type)
 	case Text:
@@ -839,6 +916,12 @@ func GetAssociationName[Type Gongstruct]() *Type {
 		}).(*Type)
 	case Paragraph:
 		return any(&Paragraph{
+			// Initialisation of associations
+			// field is initialized with an instance of Node with the name of the field
+			Node: &Node{Name: "Node"},
+		}).(*Type)
+	case ParagraphProperties:
+		return any(&ParagraphProperties{
 			// Initialisation of associations
 			// field is initialized with an instance of Node with the name of the field
 			Node: &Node{Name: "Node"},
@@ -949,6 +1032,28 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 			}
 			return any(res).(map[*End][]*Start)
 		}
+	// reverse maps of direct associations of ParagraphProperties
+	case ParagraphProperties:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Node":
+			res := make(map[*Node][]*ParagraphProperties)
+			for paragraphproperties := range stage.ParagraphPropertiess {
+				if paragraphproperties.Node != nil {
+					node_ := paragraphproperties.Node
+					var paragraphpropertiess []*ParagraphProperties
+					_, ok := res[node_]
+					if ok {
+						paragraphpropertiess = res[node_]
+					} else {
+						paragraphpropertiess = make([]*ParagraphProperties, 0)
+					}
+					paragraphpropertiess = append(paragraphpropertiess, paragraphproperties)
+					res[node_] = paragraphpropertiess
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		}
 	// reverse maps of direct associations of Rune
 	case Rune:
 		switch fieldname {
@@ -1050,6 +1155,11 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 		switch fieldname {
 		// insertion point for per direct association field
 		}
+	// reverse maps of direct associations of ParagraphProperties
+	case ParagraphProperties:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
 	// reverse maps of direct associations of Rune
 	case Rune:
 		switch fieldname {
@@ -1082,6 +1192,8 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 		res = "Node"
 	case Paragraph:
 		res = "Paragraph"
+	case ParagraphProperties:
+		res = "ParagraphProperties"
 	case Rune:
 		res = "Rune"
 	case Text:
@@ -1106,6 +1218,8 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Node:
 		res = []string{"Name", "Nodes"}
 	case Paragraph:
+		res = []string{"Name", "Node"}
+	case ParagraphProperties:
 		res = []string{"Name", "Node"}
 	case Rune:
 		res = []string{"Name", "RuneStyle", "Node"}
@@ -1174,6 +1288,16 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "Node":
 			if any(instance).(Paragraph).Node != nil {
 				res = any(instance).(Paragraph).Node.Name
+			}
+		}
+	case ParagraphProperties:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(ParagraphProperties).Name
+		case "Node":
+			if any(instance).(ParagraphProperties).Node != nil {
+				res = any(instance).(ParagraphProperties).Node.Name
 			}
 		}
 	case Rune:

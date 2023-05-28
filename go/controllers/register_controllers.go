@@ -76,6 +76,13 @@ func registerControllers(r *gin.Engine) {
 		v1.PUT("/v1/paragraphs/:id", GetController().UpdateParagraph)
 		v1.DELETE("/v1/paragraphs/:id", GetController().DeleteParagraph)
 
+		v1.GET("/v1/paragraphpropertiess", GetController().GetParagraphPropertiess)
+		v1.GET("/v1/paragraphpropertiess/:id", GetController().GetParagraphProperties)
+		v1.POST("/v1/paragraphpropertiess", GetController().PostParagraphProperties)
+		v1.PATCH("/v1/paragraphpropertiess/:id", GetController().UpdateParagraphProperties)
+		v1.PUT("/v1/paragraphpropertiess/:id", GetController().UpdateParagraphProperties)
+		v1.DELETE("/v1/paragraphpropertiess/:id", GetController().DeleteParagraphProperties)
+
 		v1.GET("/v1/runes", GetController().GetRunes)
 		v1.GET("/v1/runes/:id", GetController().GetRune)
 		v1.POST("/v1/runes", GetController().PostRune)

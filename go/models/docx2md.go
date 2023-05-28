@@ -230,6 +230,14 @@ func (zf *file) walk(
 		fmt.Fprint(w, string(node_.Content))
 	case "pPr":
 		code := false
+
+		node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		node.Nodes = append(node.Nodes, node__)
+		nodeCounter = nodeCounter + 1
+
+		paragraphproperties_ := (&ParagraphProperties{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		paragraphproperties_.Node = node__
+
 		for _, n := range node_.Nodes {
 			switch n.XMLName.Local {
 			case "ind":
@@ -316,7 +324,7 @@ func (zf *file) walk(
 			fmt.Fprint(w, "`")
 		}
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node, gongdocxStage, &n, w); err != nil {
+			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}

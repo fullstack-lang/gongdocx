@@ -59,6 +59,10 @@ import { ParagraphsTableComponent } from './paragraphs-table/paragraphs-table.co
 import { ParagraphSortingComponent } from './paragraph-sorting/paragraph-sorting.component'
 import { ParagraphDetailComponent } from './paragraph-detail/paragraph-detail.component'
 
+import { ParagraphPropertiessTableComponent } from './paragraphpropertiess-table/paragraphpropertiess-table.component'
+import { ParagraphPropertiesSortingComponent } from './paragraphproperties-sorting/paragraphproperties-sorting.component'
+import { ParagraphPropertiesDetailComponent } from './paragraphproperties-detail/paragraphproperties-detail.component'
+
 import { RunesTableComponent } from './runes-table/runes-table.component'
 import { RuneSortingComponent } from './rune-sorting/rune-sorting.component'
 import { RuneDetailComponent } from './rune-detail/rune-detail.component'
@@ -90,6 +94,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		ParagraphsTableComponent,
 		ParagraphSortingComponent,
 		ParagraphDetailComponent,
+
+		ParagraphPropertiessTableComponent,
+		ParagraphPropertiesSortingComponent,
+		ParagraphPropertiesDetailComponent,
 
 		RunesTableComponent,
 		RuneSortingComponent,
@@ -157,6 +165,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		ParagraphsTableComponent,
 		ParagraphSortingComponent,
 		ParagraphDetailComponent,
+
+		ParagraphPropertiessTableComponent,
+		ParagraphPropertiesSortingComponent,
+		ParagraphPropertiesDetailComponent,
 
 		RunesTableComponent,
 		RuneSortingComponent,

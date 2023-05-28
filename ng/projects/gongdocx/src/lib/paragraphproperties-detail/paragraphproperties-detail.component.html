@@ -1,0 +1,39 @@
+<form *ngIf="paragraphproperties" class="details">
+    <h2 class="details__title">paragraphproperties</h2>
+    <!-- insertion point for fields specific code -->
+    <mat-grid-list *ngIf='!isATextArea("Name")' cols="5" rowHeight="1:1">
+        <mat-grid-tile [colspan]="3">
+            <mat-form-field mat-form-field class="detail-full-width">
+                <mat-label>Name</mat-label>
+                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="paragraphproperties.Name">
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <button mat-raised-button (click)="toggleTextArea('Name')">
+                <mat-icon>
+                    expand_more
+                </mat-icon>
+            </button>
+        </mat-grid-tile>
+    </mat-grid-list>
+    <mat-form-field *ngIf='isATextArea("Name")' mat-form-field class="detail-full-width">
+        <mat-label>Name</mat-label>
+        <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="paragraphproperties.Name"></textarea>
+    </mat-form-field>
+
+    <mat-form-field class="detail-full-width">
+        <mat-label>Node</mat-label>
+        <mat-select [compareWith]="compareObjects" [(value)]="paragraphproperties.Node" (selectionChange)="fillUpNameIfEmpty($event)">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let node of frontRepo.Nodes_array" [value]="node">
+                {{node.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <div class="details__save">
+        <button mat-raised-button color="primary" (click)="save()">
+            Save paragraphproperties
+        </button>
+    </div>
+</form>
