@@ -16,6 +16,9 @@ import { FileService } from './file.service'
 import { NodeDB } from './node-db'
 import { NodeService } from './node.service'
 
+import { TextDB } from './text-db'
+import { TextService } from './text.service'
+
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
 export class FrontRepo { // insertion point sub template 
@@ -31,6 +34,9 @@ export class FrontRepo { // insertion point sub template
   Nodes_array = new Array<NodeDB>(); // array of repo instances
   Nodes = new Map<number, NodeDB>(); // map of repo instances
   Nodes_batch = new Map<number, NodeDB>(); // same but only in last GET (for finding repo instances to delete)
+  Texts_array = new Array<TextDB>(); // array of repo instances
+  Texts = new Map<number, TextDB>(); // map of repo instances
+  Texts_batch = new Map<number, TextDB>(); // same but only in last GET (for finding repo instances to delete)
 }
 
 // the table component is called in different ways
@@ -97,6 +103,7 @@ export class FrontRepoService {
     private docxService: DocxService,
     private fileService: FileService,
     private nodeService: NodeService,
+    private textService: TextService,
   ) { }
 
   // postService provides a post function for each struct name
@@ -131,11 +138,13 @@ export class FrontRepoService {
     Observable<DocxDB[]>,
     Observable<FileDB[]>,
     Observable<NodeDB[]>,
+    Observable<TextDB[]>,
   ] = [ // insertion point sub template
       this.documentService.getDocuments(this.GONG__StackPath),
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
       this.nodeService.getNodes(this.GONG__StackPath),
+      this.textService.getTexts(this.GONG__StackPath),
     ];
 
   //
@@ -153,6 +162,7 @@ export class FrontRepoService {
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
       this.nodeService.getNodes(this.GONG__StackPath),
+      this.textService.getTexts(this.GONG__StackPath),
     ]
 
     return new Observable<FrontRepo>(
@@ -165,6 +175,7 @@ export class FrontRepoService {
             docxs_,
             files_,
             nodes_,
+            texts_,
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
             // insertion point sub template for type casting 
@@ -176,6 +187,8 @@ export class FrontRepoService {
             files = files_ as FileDB[]
             var nodes: NodeDB[]
             nodes = nodes_ as NodeDB[]
+            var texts: TextDB[]
+            texts = texts_ as TextDB[]
 
             // 
             // First Step: init map of instances
@@ -312,6 +325,39 @@ export class FrontRepoService {
               return 0;
             });
 
+            // init the array
+            this.frontRepo.Texts_array = texts
+
+            // clear the map that counts Text in the GET
+            this.frontRepo.Texts_batch.clear()
+
+            texts.forEach(
+              text => {
+                this.frontRepo.Texts.set(text.ID, text)
+                this.frontRepo.Texts_batch.set(text.ID, text)
+              }
+            )
+
+            // clear texts that are absent from the batch
+            this.frontRepo.Texts.forEach(
+              text => {
+                if (this.frontRepo.Texts_batch.get(text.ID) == undefined) {
+                  this.frontRepo.Texts.delete(text.ID)
+                }
+              }
+            )
+
+            // sort Texts_array array
+            this.frontRepo.Texts_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
 
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)
@@ -382,6 +428,20 @@ export class FrontRepoService {
                     }
                   }
                 }
+              }
+            )
+            texts.forEach(
+              text => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(text.NodeID.Int64)
+                  if (_node) {
+                    text.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
               }
             )
 
@@ -638,6 +698,64 @@ export class FrontRepoService {
       }
     )
   }
+
+  // TextPull performs a GET on Text of the stack and redeem association pointers 
+  TextPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.textService.getTexts(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            texts,
+          ]) => {
+            // init the array
+            this.frontRepo.Texts_array = texts
+
+            // clear the map that counts Text in the GET
+            this.frontRepo.Texts_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            texts.forEach(
+              text => {
+                this.frontRepo.Texts.set(text.ID, text)
+                this.frontRepo.Texts_batch.set(text.ID, text)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(text.NodeID.Int64)
+                  if (_node) {
+                    text.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear texts that are absent from the GET
+            this.frontRepo.Texts.forEach(
+              text => {
+                if (this.frontRepo.Texts_batch.get(text.ID) == undefined) {
+                  this.frontRepo.Texts.delete(text.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
 }
 
 // insertion point for get unique ID per struct 
@@ -652,4 +770,7 @@ export function getFileUniqueID(id: number): number {
 }
 export function getNodeUniqueID(id: number): number {
   return 43 * id
+}
+export function getTextUniqueID(id: number): number {
+  return 47 * id
 }

@@ -62,6 +62,14 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterNodeDeleteCallback OnAfterDeleteInterface[Node]
 	OnAfterNodeReadCallback   OnAfterReadInterface[Node]
 
+	Texts           map[*Text]any
+	Texts_mapString map[string]*Text
+
+	OnAfterTextCreateCallback OnAfterCreateInterface[Text]
+	OnAfterTextUpdateCallback OnAfterUpdateInterface[Text]
+	OnAfterTextDeleteCallback OnAfterDeleteInterface[Text]
+	OnAfterTextReadCallback   OnAfterReadInterface[Text]
+
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
 	AllModelsStructDeleteCallback AllModelsStructDeleteInterface
@@ -134,6 +142,8 @@ type BackRepoInterface interface {
 	CheckoutFile(file *File)
 	CommitNode(node *Node)
 	CheckoutNode(node *Node)
+	CommitText(text *Text)
+	CheckoutText(text *Text)
 	GetLastCommitFromBackNb() uint
 	GetLastPushFromFrontNb() uint
 }
@@ -164,6 +174,9 @@ func NewStage() (stage *StageStruct) {
 		Nodes:           make(map[*Node]any),
 		Nodes_mapString: make(map[string]*Node),
 
+		Texts:           make(map[*Text]any),
+		Texts_mapString: make(map[string]*Text),
+
 		// end of insertion point
 		Map_GongStructName_InstancesNb: make(map[string]int),
 
@@ -185,6 +198,7 @@ func (stage *StageStruct) Commit() {
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
 	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
+	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
 
 }
 
@@ -198,6 +212,7 @@ func (stage *StageStruct) Checkout() {
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
 	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
+	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
 
 }
 
@@ -390,12 +405,53 @@ func (node *Node) GetName() (res string) {
 	return node.Name
 }
 
+// Stage puts text to the model stage
+func (text *Text) Stage(stage *StageStruct) *Text {
+	stage.Texts[text] = __member
+	stage.Texts_mapString[text.Name] = text
+
+	return text
+}
+
+// Unstage removes text off the model stage
+func (text *Text) Unstage(stage *StageStruct) *Text {
+	delete(stage.Texts, text)
+	delete(stage.Texts_mapString, text.Name)
+	return text
+}
+
+// commit text to the back repo (if it is already staged)
+func (text *Text) Commit(stage *StageStruct) *Text {
+	if _, ok := stage.Texts[text]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitText(text)
+		}
+	}
+	return text
+}
+
+// Checkout text to the back repo (if it is already staged)
+func (text *Text) Checkout(stage *StageStruct) *Text {
+	if _, ok := stage.Texts[text]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutText(text)
+		}
+	}
+	return text
+}
+
+// for satisfaction of GongStruct interface
+func (text *Text) GetName() (res string) {
+	return text.Name
+}
+
 // swagger:ignore
 type AllModelsStructCreateInterface interface { // insertion point for Callbacks on creation
 	CreateORMDocument(Document *Document)
 	CreateORMDocx(Docx *Docx)
 	CreateORMFile(File *File)
 	CreateORMNode(Node *Node)
+	CreateORMText(Text *Text)
 }
 
 type AllModelsStructDeleteInterface interface { // insertion point for Callbacks on deletion
@@ -403,6 +459,7 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 	DeleteORMDocx(Docx *Docx)
 	DeleteORMFile(File *File)
 	DeleteORMNode(Node *Node)
+	DeleteORMText(Text *Text)
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
@@ -418,6 +475,9 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 	stage.Nodes = make(map[*Node]any)
 	stage.Nodes_mapString = make(map[string]*Node)
 
+	stage.Texts = make(map[*Text]any)
+	stage.Texts_mapString = make(map[string]*Text)
+
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil
@@ -432,6 +492,9 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 
 	stage.Nodes = nil
 	stage.Nodes_mapString = nil
+
+	stage.Texts = nil
+	stage.Texts_mapString = nil
 
 }
 
@@ -452,6 +515,10 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 		node.Unstage(stage)
 	}
 
+	for text := range stage.Texts {
+		text.Unstage(stage)
+	}
+
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -460,7 +527,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	Document | Docx | File | Node
+	Document | Docx | File | Node | Text
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -469,7 +536,7 @@ type Gongstruct interface {
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
 	// insertion point for generic types
-	*Document | *Docx | *File | *Node
+	*Document | *Docx | *File | *Node | *Text
 	GetName() string
 }
 
@@ -480,6 +547,7 @@ type GongstructSet interface {
 		map[*Docx]any |
 		map[*File]any |
 		map[*Node]any |
+		map[*Text]any |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -490,6 +558,7 @@ type GongstructMapString interface {
 		map[string]*Docx |
 		map[string]*File |
 		map[string]*Node |
+		map[string]*Text |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -508,6 +577,8 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 		return any(&stage.Files).(*Type)
 	case map[*Node]any:
 		return any(&stage.Nodes).(*Type)
+	case map[*Text]any:
+		return any(&stage.Texts).(*Type)
 	default:
 		return nil
 	}
@@ -528,6 +599,8 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 		return any(&stage.Files_mapString).(*Type)
 	case map[string]*Node:
 		return any(&stage.Nodes_mapString).(*Type)
+	case map[string]*Text:
+		return any(&stage.Texts_mapString).(*Type)
 	default:
 		return nil
 	}
@@ -548,6 +621,8 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 		return any(&stage.Files).(*map[*Type]any)
 	case Node:
 		return any(&stage.Nodes).(*map[*Type]any)
+	case Text:
+		return any(&stage.Texts).(*map[*Type]any)
 	default:
 		return nil
 	}
@@ -568,6 +643,8 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 		return any(&stage.Files_mapString).(*map[string]*Type)
 	case Node:
 		return any(&stage.Nodes_mapString).(*map[string]*Type)
+	case Text:
+		return any(&stage.Texts_mapString).(*map[string]*Type)
 	default:
 		return nil
 	}
@@ -605,6 +682,12 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			// Initialisation of associations
 			// field is initialized with an instance of Node with the name of the field
 			Nodes: []*Node{{Name: "Nodes"}},
+		}).(*Type)
+	case Text:
+		return any(&Text{
+			// Initialisation of associations
+			// field is initialized with an instance of Node with the name of the field
+			Node: &Node{Name: "Node"},
 		}).(*Type)
 	default:
 		return nil
@@ -678,6 +761,28 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 		switch fieldname {
 		// insertion point for per direct association field
 		}
+	// reverse maps of direct associations of Text
+	case Text:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Node":
+			res := make(map[*Node][]*Text)
+			for text := range stage.Texts {
+				if text.Node != nil {
+					node_ := text.Node
+					var texts []*Text
+					_, ok := res[node_]
+					if ok {
+						texts = res[node_]
+					} else {
+						texts = make([]*Text, 0)
+					}
+					texts = append(texts, text)
+					res[node_] = texts
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		}
 	}
 	return nil
 }
@@ -730,6 +835,11 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 			}
 			return any(res).(map[*End]*Start)
 		}
+	// reverse maps of direct associations of Text
+	case Text:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
 	}
 	return nil
 }
@@ -750,6 +860,8 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 		res = "File"
 	case Node:
 		res = "Node"
+	case Text:
+		res = "Text"
 	}
 	return res
 }
@@ -769,6 +881,8 @@ func GetFields[Type Gongstruct]() (res []string) {
 		res = []string{"Name"}
 	case Node:
 		res = []string{"Name", "Nodes"}
+	case Text:
+		res = []string{"Name", "Node"}
 	}
 	return
 }
@@ -822,6 +936,16 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 					res += "\n"
 				}
 				res += __instance__.Name
+			}
+		}
+	case Text:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(Text).Name
+		case "Node":
+			if any(instance).(Text).Node != nil {
+				res = any(instance).(Text).Node.Name
 			}
 		}
 	}

@@ -238,6 +238,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_Text_Identifiers := make(map[*Text]string)
+	_ = map_Text_Identifiers
+
+	textOrdered := []*Text{}
+	for text := range stage.Texts {
+		textOrdered = append(textOrdered, text)
+	}
+	sort.Slice(textOrdered[:], func(i, j int) bool {
+		return textOrdered[i].Name < textOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of Text"
+	for idx, text := range textOrdered {
+
+		id = generatesIdentifier("Text", idx, text.Name)
+		map_Text_Identifiers[text] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Text")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", text.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// Text values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(text.Name))
+		initializerStatements += setValueField
+
+	}
+
 	// insertion initialization of objects to stage
 	for idx, document := range documentOrdered {
 		var setPointerField string
@@ -306,6 +338,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Nodes")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[_node])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, text := range textOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("Text", idx, text.Name)
+		map_Text_Identifiers[text] = id
+
+		// Initialisation of values
+		if text.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[text.Node])
 			pointersInitializesStatements += setPointerField
 		}
 

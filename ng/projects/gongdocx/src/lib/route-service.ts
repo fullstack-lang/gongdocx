@@ -14,6 +14,9 @@ import { FileDetailComponent } from './file-detail/file-detail.component'
 import { NodesTableComponent } from './nodes-table/nodes-table.component'
 import { NodeDetailComponent } from './node-detail/node-detail.component'
 
+import { TextsTableComponent } from './texts-table/texts-table.component'
+import { TextDetailComponent } from './text-detail/text-detail.component'
+
 
 @Injectable({
     providedIn: 'root'
@@ -177,6 +180,39 @@ export class RouteService {
         return route
     }
 
+    getTextTablePath(): string {
+        return this.getPathRoot() + '-texts/:GONG__StackPath'
+    }
+    getTextTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTextTablePath(), component: TextsTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getTextAdderPath(): string {
+        return this.getPathRoot() + '-text-adder/:GONG__StackPath'
+    }
+    getTextAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTextAdderPath(), component: TextDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTextAdderForUsePath(): string {
+        return this.getPathRoot() + '-text-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getTextAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTextAdderForUsePath(), component: TextDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTextDetailPath(): string {
+        return this.getPathRoot() + '-text-detail/:id/:GONG__StackPath'
+    }
+    getTextDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTextDetailPath(), component: TextDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
 
 
     addDataPanelRoutes(stackPath: string) {
@@ -202,6 +238,11 @@ export class RouteService {
             this.getNodeAdderRoute(stackPath),
             this.getNodeAdderForUseRoute(stackPath),
             this.getNodeDetailRoute(stackPath),
+
+            this.getTextTableRoute(stackPath),
+            this.getTextAdderRoute(stackPath),
+            this.getTextAdderForUseRoute(stackPath),
+            this.getTextDetailRoute(stackPath),
 
         ])
     }

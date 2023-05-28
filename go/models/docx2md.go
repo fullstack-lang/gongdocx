@@ -217,6 +217,12 @@ func (zf *file) walk(
 		}
 		fmt.Fprint(w, ")")
 	case "t":
+		node__ := (&Node{Name: string(node_.Content)}).Stage(gongdocxStage)
+		node.Nodes = append(node.Nodes, node__)
+
+		text := (&Text{Name: string(node_.Content)}).Stage(gongdocxStage)
+		text.Node = node__
+
 		fmt.Fprint(w, string(node_.Content))
 	case "pPr":
 		code := false

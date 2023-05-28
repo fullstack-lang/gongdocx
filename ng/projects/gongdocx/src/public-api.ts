@@ -40,4 +40,10 @@ export * from './lib/nodes-table/nodes-table.component'
 export * from './lib/node-db'
 export * from './lib/node.service'
 
+export * from './lib/text-detail/text-detail.component'
+export * from './lib/text-sorting/text-sorting.component'
+export * from './lib/texts-table/texts-table.component'
+export * from './lib/text-db'
+export * from './lib/text.service'
+
 

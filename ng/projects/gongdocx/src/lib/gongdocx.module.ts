@@ -55,6 +55,10 @@ import { NodesTableComponent } from './nodes-table/nodes-table.component'
 import { NodeSortingComponent } from './node-sorting/node-sorting.component'
 import { NodeDetailComponent } from './node-detail/node-detail.component'
 
+import { TextsTableComponent } from './texts-table/texts-table.component'
+import { TextSortingComponent } from './text-sorting/text-sorting.component'
+import { TextDetailComponent } from './text-detail/text-detail.component'
+
 
 @NgModule({
 	declarations: [
@@ -74,6 +78,10 @@ import { NodeDetailComponent } from './node-detail/node-detail.component'
 		NodesTableComponent,
 		NodeSortingComponent,
 		NodeDetailComponent,
+
+		TextsTableComponent,
+		TextSortingComponent,
+		TextDetailComponent,
 
 
 		SplitterComponent,
@@ -129,6 +137,10 @@ import { NodeDetailComponent } from './node-detail/node-detail.component'
 		NodesTableComponent,
 		NodeSortingComponent,
 		NodeDetailComponent,
+
+		TextsTableComponent,
+		TextSortingComponent,
+		TextDetailComponent,
 
 
 		SplitterComponent,

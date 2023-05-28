@@ -19,6 +19,8 @@ import { FileService } from '../file.service'
 import { getFileUniqueID } from '../front-repo.service'
 import { NodeService } from '../node.service'
 import { getNodeUniqueID } from '../front-repo.service'
+import { TextService } from '../text.service'
+import { getTextUniqueID } from '../front-repo.service'
 
 import { RouteService } from '../route-service';
 
@@ -168,6 +170,7 @@ export class SidebarComponent implements OnInit {
     private docxService: DocxService,
     private fileService: FileService,
     private nodeService: NodeService,
+    private textService: TextService,
 
     private routeService: RouteService,
   ) { }
@@ -229,6 +232,14 @@ export class SidebarComponent implements OnInit {
     )
     // observable for changes in structs
     this.nodeService.NodeServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.textService.TextServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -565,6 +576,85 @@ export class SidebarComponent implements OnInit {
             }
             NodesGongNodeAssociation.children.push(nodeNode)
           })
+
+        }
+      )
+
+      /**
+      * fill up the Text part of the mat tree
+      */
+      let textGongNodeStruct: GongNode = {
+        name: "Text",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Text",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(textGongNodeStruct)
+
+      this.frontRepo.Texts_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Texts_array.forEach(
+        textDB => {
+          let textGongNodeInstance: GongNode = {
+            name: textDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: textDB.ID,
+            uniqueIdPerStack: getTextUniqueID(textDB.ID),
+            structName: "Text",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          textGongNodeStruct.children!.push(textGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Node
+          */
+          let NodeGongNodeAssociation: GongNode = {
+            name: "(Node) Node",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: textDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Text",
+            associationField: "Node",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          textGongNodeInstance.children!.push(NodeGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Node
+            */
+          if (textDB.Node != undefined) {
+            let textGongNodeInstance_Node: GongNode = {
+              name: textDB.Node.Name,
+              type: GongNodeType.INSTANCE,
+              id: textDB.Node.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getTextUniqueID(textDB.ID)
+                + 5 * getNodeUniqueID(textDB.Node.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodeGongNodeAssociation.children.push(textGongNodeInstance_Node)
+          }
 
         }
       )
