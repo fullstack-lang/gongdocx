@@ -20,8 +20,17 @@ export function mouseCoordInComponentRef(event: MouseEvent): gongsvg.PointDB {
         let res = createPoint(localPoint.x, localPoint.y)
         return res
     } else {
-        console.log("mouseCoorInComponentRef: no svg found in event")
-        let res = createPoint(0, 0)
+        var boundingClientRect = targetElement.getBoundingClientRect();
+        var offsetX = event.clientX - boundingClientRect.left;
+        var offsetY = event.clientY - boundingClientRect.top;
+
+        // console.log("event.client X", event.clientX, "Y", event.clientY)
+        // console.log("window.scroll X", window.scrollX, "Y", window.scrollY)
+        // console.log("event.page X", event.pageX, "Y", event.pageY)
+        // console.log("offset X", offsetX, "Y", offsetY)
+        // console.log("")
+
+        let res = createPoint(offsetX, offsetY)
         return res
     }
 }

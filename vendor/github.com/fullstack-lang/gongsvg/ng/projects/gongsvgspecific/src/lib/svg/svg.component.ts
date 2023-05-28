@@ -265,21 +265,21 @@ export class SvgComponent implements OnInit, OnDestroy, AfterViewInit {
       // console.log("page X, Y", this.pageX, this.pageY)
 
       this.selectionRectDrawing = true
-      this.startX = event.clientX - this.pageX
-      this.startY = event.clientY - this.pageY
+
+      let point = mouseCoordInComponentRef(event)
+
+      this.startX = point.X
+      this.startY = point.Y
     }
   }
 
   mousemove(event: MouseEvent): void {
     this.updateSvgTopLeftCoordinates()
 
-    const x = event.clientX - this.pageX
-    const y = event.clientY - this.pageY
-
     let shapeMouseEvent: ShapeMouseEvent = {
       ShapeID: 0,
       ShapeType: "",
-      Point: createPoint(x, y),
+      Point: mouseCoordInComponentRef(event),
     }
 
     // we want this event to bubble to the SVG element
@@ -295,13 +295,6 @@ export class SvgComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (!event.shiftKey && !event.altKey) {
-      // in case of dragging something, when the mouse moves fast, it can reach the SVG background
-      // in this case, one forward the mouse event on the event bus
-      let shapeMouseEvent: ShapeMouseEvent = {
-        ShapeID: 0,
-        ShapeType: "",
-        Point: createPoint(x, y),
-      }
       this.mouseEventService.emitMouseMoveEvent(shapeMouseEvent)
       // console.log("svg background, mouse move", x, y)
     }
@@ -311,13 +304,11 @@ export class SvgComponent implements OnInit, OnDestroy, AfterViewInit {
   onmouseup(event: MouseEvent): void {
 
     this.updateSvgTopLeftCoordinates()
-    const x = event.clientX - this.pageX
-    const y = event.clientY - this.pageY
 
     let shapeMouseEvent: ShapeMouseEvent = {
       ShapeID: 0,
       ShapeType: "",
-      Point: createPoint(x, y),
+      Point: mouseCoordInComponentRef(event),
     }
 
     if (event.shiftKey) {

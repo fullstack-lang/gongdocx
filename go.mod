@@ -3,7 +3,7 @@ module github.com/fullstack-lang/gongdocx
 go 1.20
 
 require (
-	github.com/fullstack-lang/gongdoc v0.0.0-20230525132632-7c0457a848a7
+	github.com/fullstack-lang/gongdoc v0.0.0-20230528083722-f3d42ca856ba
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.0
@@ -20,7 +20,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/frankban/quicktest v1.14.5 // indirect
 	github.com/fullstack-lang/gong v0.0.0-20230523071117-7f9768fe0a14 // indirect
-	github.com/fullstack-lang/gongsvg v0.0.0-20230525125740-ad6bd223b028 // indirect
+	github.com/fullstack-lang/gongsvg v0.0.0-20230527044532-1d13eed2c96d // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.21.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

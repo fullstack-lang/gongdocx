@@ -123,6 +123,11 @@ export class LinkComponent implements OnInit, AfterViewInit, DoCheck, AfterViewC
           const offsetFromBorderForNewMidlleSegment = 50
 
           if (this.dragging) {
+
+            if (this.draggedSegment >= this.segments!.length) {
+              this.draggedSegment = this.segments!.length - 1
+            }
+
             let segment = this.segments![this.draggedSegment]
 
             if (segment.Orientation == gongsvg.OrientationType.ORIENTATION_HORIZONTAL) {
