@@ -34,4 +34,10 @@ export * from './lib/files-table/files-table.component'
 export * from './lib/file-db'
 export * from './lib/file.service'
 
+export * from './lib/node-detail/node-detail.component'
+export * from './lib/node-sorting/node-sorting.component'
+export * from './lib/nodes-table/nodes-table.component'
+export * from './lib/node-db'
+export * from './lib/node.service'
+
 

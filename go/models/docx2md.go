@@ -120,18 +120,18 @@ type file struct {
 	list  map[string]int
 }
 
-// Node is
-type Node struct {
+// Node_ is
+type Node_ struct {
 	XMLName xml.Name
 	Attrs   []xml.Attr `xml:"-"`
 	Content []byte     `xml:",innerxml"`
-	Nodes   []Node     `xml:",any"`
+	Nodes   []Node_    `xml:",any"`
 }
 
 // UnmarshalXML is
-func (n *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (n *Node_) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	n.Attrs = start.Attr
-	type node Node
+	type node Node_
 
 	return d.DecodeElement((*node)(n), &start)
 }
@@ -189,13 +189,17 @@ func attr(attrs []xml.Attr, name string) (string, bool) {
 	return "", false
 }
 
-func (zf *file) walk(node *Node, w io.Writer) error {
-	switch node.XMLName.Local {
+func (zf *file) walk(
+	node *Node,
+	gongdocxStage *StageStruct,
+	node_ *Node_,
+	w io.Writer) error {
+	switch node_.XMLName.Local {
 	case "hyperlink":
 		fmt.Fprint(w, "[")
 		var cbuf bytes.Buffer
-		for _, n := range node.Nodes {
-			if err := zf.walk(&n, &cbuf); err != nil {
+		for _, n := range node_.Nodes {
+			if err := zf.walk(node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
@@ -203,7 +207,7 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 		fmt.Fprint(w, "]")
 
 		fmt.Fprint(w, "(")
-		if id, ok := attr(node.Attrs, "id"); ok {
+		if id, ok := attr(node_.Attrs, "id"); ok {
 			for _, rel := range zf.rels.Relationship {
 				if id == rel.ID {
 					fmt.Fprint(w, escape(rel.Target, "()"))
@@ -213,10 +217,10 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 		}
 		fmt.Fprint(w, ")")
 	case "t":
-		fmt.Fprint(w, string(node.Content))
+		fmt.Fprint(w, string(node_.Content))
 	case "pPr":
 		code := false
-		for _, n := range node.Nodes {
+		for _, n := range node_.Nodes {
 			switch n.XMLName.Local {
 			case "ind":
 				if left, ok := attr(n.Attrs, "left"); ok {
@@ -301,8 +305,8 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 		if code {
 			fmt.Fprint(w, "`")
 		}
-		for _, n := range node.Nodes {
-			if err := zf.walk(&n, w); err != nil {
+		for _, n := range node_.Nodes {
+			if err := zf.walk(node, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
@@ -311,7 +315,7 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 		}
 	case "tbl":
 		var rows [][]string
-		for _, tr := range node.Nodes {
+		for _, tr := range node_.Nodes {
 			if tr.XMLName.Local != "tr" {
 				continue
 			}
@@ -321,7 +325,7 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 					continue
 				}
 				var cbuf bytes.Buffer
-				if err := zf.walk(&tc, &cbuf); err != nil {
+				if err := zf.walk(node, gongdocxStage, &tc, &cbuf); err != nil {
 					return err
 				}
 				cols = append(cols, strings.Replace(cbuf.String(), "\n", "", -1))
@@ -375,7 +379,7 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 		bold := false
 		italic := false
 		strike := false
-		for _, n := range node.Nodes {
+		for _, n := range node_.Nodes {
 			if n.XMLName.Local != "rPr" {
 				continue
 			}
@@ -400,8 +404,8 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 			fmt.Fprint(w, "*")
 		}
 		var cbuf bytes.Buffer
-		for _, n := range node.Nodes {
-			if err := zf.walk(&n, &cbuf); err != nil {
+		for _, n := range node_.Nodes {
+			if err := zf.walk(node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
@@ -416,14 +420,14 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 			fmt.Fprint(w, "~~")
 		}
 	case "p":
-		for _, n := range node.Nodes {
-			if err := zf.walk(&n, w); err != nil {
+		for _, n := range node_.Nodes {
+			if err := zf.walk(node, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
 		fmt.Fprintln(w)
 	case "blip":
-		if id, ok := attr(node.Attrs, "embed"); ok {
+		if id, ok := attr(node_.Attrs, "embed"); ok {
 			for _, rel := range zf.rels.Relationship {
 				if id != rel.ID {
 					continue
@@ -436,15 +440,15 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 	case "Fallback":
 	case "txbxContent":
 		var cbuf bytes.Buffer
-		for _, n := range node.Nodes {
-			if err := zf.walk(&n, &cbuf); err != nil {
+		for _, n := range node_.Nodes {
+			if err := zf.walk(node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
 		fmt.Fprintln(w, "\n```\n"+cbuf.String()+"```")
 	default:
-		for _, n := range node.Nodes {
-			if err := zf.walk(&n, w); err != nil {
+		for _, n := range node_.Nodes {
+			if err := zf.walk(node, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
@@ -453,7 +457,7 @@ func (zf *file) walk(node *Node, w io.Writer) error {
 	return nil
 }
 
-func readFile(f *zip.File) (*Node, error) {
+func readFile(f *zip.File) (*Node_, error) {
 	rc, err := f.Open()
 	defer rc.Close()
 
@@ -462,7 +466,7 @@ func readFile(f *zip.File) (*Node, error) {
 		return nil, err
 	}
 
-	var node Node
+	var node Node_
 	err = xml.Unmarshal(b, &node)
 	if err != nil {
 		return nil, err
@@ -535,10 +539,12 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 	file_ := (*GetGongstructInstancesMap[File](gongdocx_stage))["word/document.xml"]
 	document.File = file_
 
-	node, err := readFile(f)
+	node_, err := readFile(f)
 	if err != nil {
 		return err
 	}
+	node := (&Node{Name: "Root node"}).Stage(gongdocx_stage)
+	document.Root = node
 
 	var buf bytes.Buffer
 	zf := &file{
@@ -548,7 +554,7 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 		embed: embed,
 		list:  make(map[string]int),
 	}
-	err = zf.walk(node, &buf)
+	err = zf.walk(node, gongdocx_stage, node_, &buf)
 	if err != nil {
 		return err
 	}

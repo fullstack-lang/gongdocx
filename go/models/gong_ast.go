@@ -306,6 +306,7 @@ var __gong__map_Indentifiers_gongstructName = make(map[string]string)
 var __gong__map_Document = make(map[string]*Document)
 var __gong__map_Docx = make(map[string]*Docx)
 var __gong__map_File = make(map[string]*File)
+var __gong__map_Node = make(map[string]*Node)
 
 // Parser needs to be configured for having the [Name1.Name2] or [pkg.Name1] ...
 // to be recognized as a proper identifier.
@@ -490,6 +491,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 										instanceFile := (&File{Name: instanceName}).Stage(stage)
 										instance = any(instanceFile)
 										__gong__map_File[identifier] = instanceFile
+									case "Node":
+										instanceNode := (&Node{Name: instanceName}).Stage(stage)
+										instance = any(instanceNode)
+										__gong__map_Node[identifier] = instanceNode
 									}
 									__gong__map_Indentifiers_gongstructName[identifier] = gongstructName
 									return
@@ -538,6 +543,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 							switch fieldName {
 							// insertion point for date assign code
 							}
+						case "Node":
+							switch fieldName {
+							// insertion point for date assign code
+							}
 						}
 					}
 				}
@@ -580,6 +589,16 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					case "File":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
+						}
+					case "Node":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						case "Nodes":
+							// remove first and last char
+							targetIdentifier := ident.Name
+							target := __gong__map_Node[targetIdentifier]
+							__gong__map_Node[identifier].Nodes =
+								append(__gong__map_Node[identifier].Nodes, target)
 						}
 					}
 				case *ast.SelectorExpr:
@@ -654,6 +673,14 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_File[identifier].Name = fielValue
 				}
+			case "Node":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_Node[identifier].Name = fielValue
+				}
 			}
 		case *ast.Ident:
 			// assignment to boolean field ?
@@ -674,12 +701,19 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "File":
 					targetIdentifier := ident.Name
 					__gong__map_Document[identifier].File = __gong__map_File[targetIdentifier]
+				case "Root":
+					targetIdentifier := ident.Name
+					__gong__map_Document[identifier].Root = __gong__map_Node[targetIdentifier]
 				}
 			case "Docx":
 				switch fieldName {
 				// insertion point for field dependant code
 				}
 			case "File":
+				switch fieldName {
+				// insertion point for field dependant code
+				}
+			case "Node":
 				switch fieldName {
 				// insertion point for field dependant code
 				}
@@ -720,6 +754,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					// insertion point for enum assign code
 					}
 				case "File":
+					switch fieldName {
+					// insertion point for enum assign code
+					}
+				case "Node":
 					switch fieldName {
 					// insertion point for enum assign code
 					}

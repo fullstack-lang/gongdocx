@@ -1,13 +1,11 @@
 // insertion point for imports
-import { FileDB } from './file-db'
-import { NodeDB } from './node-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class DocumentDB {
+export class NodeDB {
 
-	static GONGSTRUCT_NAME = "Document"
+	static GONGSTRUCT_NAME = "Node"
 
 	CreatedAt?: string
 	DeletedAt?: string
@@ -17,10 +15,9 @@ export class DocumentDB {
 	Name: string = ""
 
 	// insertion point for other declarations
-	File?: FileDB
-	FileID: NullInt64 = new NullInt64 // if pointer is null, File.ID = 0
-
-	Root?: NodeDB
-	RootID: NullInt64 = new NullInt64 // if pointer is null, Root.ID = 0
+	Nodes?: Array<NodeDB>
+	Node_NodesDBID: NullInt64 = new NullInt64
+	Node_NodesDBID_Index: NullInt64  = new NullInt64 // store the index of the node instance in Node.Nodes
+	Node_Nodes_reverse?: NodeDB 
 
 }

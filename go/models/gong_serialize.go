@@ -16,6 +16,7 @@ func SerializeStage(stage *StageStruct, filename string) {
 		SerializeExcelize[Document](stage, f)
 		SerializeExcelize[Docx](stage, f)
 		SerializeExcelize[File](stage, f)
+		SerializeExcelize[Node](stage, f)
 	}
 
 	var tab ExcelizeTabulator

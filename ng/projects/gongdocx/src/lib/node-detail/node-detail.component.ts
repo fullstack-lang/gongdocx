@@ -2,8 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 
-import { DocumentDB } from '../document-db'
-import { DocumentService } from '../document.service'
+import { NodeDB } from '../node-db'
+import { NodeService } from '../node.service'
 
 import { FrontRepoService, FrontRepo, SelectionMode, DialogData } from '../front-repo.service'
 import { MapOfComponents } from '../map-components'
@@ -17,25 +17,26 @@ import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from '@angu
 
 import { NullInt64 } from '../null-int64'
 
-// DocumentDetailComponent is initilizaed from different routes
-// DocumentDetailComponentState detail different cases 
-enum DocumentDetailComponentState {
+// NodeDetailComponent is initilizaed from different routes
+// NodeDetailComponentState detail different cases 
+enum NodeDetailComponentState {
 	CREATE_INSTANCE,
 	UPDATE_INSTANCE,
 	// insertion point for declarations of enum values of state
+	CREATE_INSTANCE_WITH_ASSOCIATION_Node_Nodes_SET,
 }
 
 @Component({
-	selector: 'app-document-detail',
-	templateUrl: './document-detail.component.html',
-	styleUrls: ['./document-detail.component.css'],
+	selector: 'app-node-detail',
+	templateUrl: './node-detail.component.html',
+	styleUrls: ['./node-detail.component.css'],
 })
-export class DocumentDetailComponent implements OnInit {
+export class NodeDetailComponent implements OnInit {
 
 	// insertion point for declarations
 
-	// the DocumentDB of interest
-	document: DocumentDB = new DocumentDB
+	// the NodeDB of interest
+	node: NodeDB = new NodeDB
 
 	// front repo
 	frontRepo: FrontRepo = new FrontRepo
@@ -46,7 +47,7 @@ export class DocumentDetailComponent implements OnInit {
 	mapFields_displayAsTextArea = new Map<string, boolean>()
 
 	// the state at initialization (CREATION, UPDATE or CREATE with one association set)
-	state: DocumentDetailComponentState = DocumentDetailComponentState.CREATE_INSTANCE
+	state: NodeDetailComponentState = NodeDetailComponentState.CREATE_INSTANCE
 
 	// in UDPATE state, if is the id of the instance to update
 	// in CREATE state with one association set, this is the id of the associated instance
@@ -59,7 +60,7 @@ export class DocumentDetailComponent implements OnInit {
 	GONG__StackPath: string = ""
 
 	constructor(
-		private documentService: DocumentService,
+		private nodeService: NodeService,
 		private frontRepoService: FrontRepoService,
 		public dialog: MatDialog,
 		private activatedRoute: ActivatedRoute,
@@ -85,26 +86,30 @@ export class DocumentDetailComponent implements OnInit {
 
 		const association = this.activatedRoute.snapshot.paramMap.get('association');
 		if (this.id == 0) {
-			this.state = DocumentDetailComponentState.CREATE_INSTANCE
+			this.state = NodeDetailComponentState.CREATE_INSTANCE
 		} else {
 			if (this.originStruct == undefined) {
-				this.state = DocumentDetailComponentState.UPDATE_INSTANCE
+				this.state = NodeDetailComponentState.UPDATE_INSTANCE
 			} else {
 				switch (this.originStructFieldName) {
 					// insertion point for state computation
+					case "Nodes":
+						// console.log("Node" + " is instanciated with back pointer to instance " + this.id + " Node association Nodes")
+						this.state = NodeDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Node_Nodes_SET
+						break;
 					default:
 						console.log(this.originStructFieldName + " is unkown association")
 				}
 			}
 		}
 
-		this.getDocument()
+		this.getNode()
 
 		// observable for changes in structs
-		this.documentService.DocumentServiceChanged.subscribe(
+		this.nodeService.NodeServiceChanged.subscribe(
 			message => {
 				if (message == "post" || message == "update" || message == "delete") {
-					this.getDocument()
+					this.getNode()
 				}
 			}
 		)
@@ -112,22 +117,26 @@ export class DocumentDetailComponent implements OnInit {
 		// insertion point for initialisation of enums list
 	}
 
-	getDocument(): void {
+	getNode(): void {
 
 		this.frontRepoService.pull(this.GONG__StackPath).subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
 				switch (this.state) {
-					case DocumentDetailComponentState.CREATE_INSTANCE:
-						this.document = new (DocumentDB)
+					case NodeDetailComponentState.CREATE_INSTANCE:
+						this.node = new (NodeDB)
 						break;
-					case DocumentDetailComponentState.UPDATE_INSTANCE:
-						let document = frontRepo.Documents.get(this.id)
-						console.assert(document != undefined, "missing document with id:" + this.id)
-						this.document = document!
+					case NodeDetailComponentState.UPDATE_INSTANCE:
+						let node = frontRepo.Nodes.get(this.id)
+						console.assert(node != undefined, "missing node with id:" + this.id)
+						this.node = node!
 						break;
 					// insertion point for init of association field
+					case NodeDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Node_Nodes_SET:
+						this.node = new (NodeDB)
+						this.node.Node_Nodes_reverse = frontRepo.Nodes.get(this.id)!
+						break;
 					default:
 						console.log(this.state + " is unkown state")
 				}
@@ -145,42 +154,34 @@ export class DocumentDetailComponent implements OnInit {
 		// pointers fields, after the translation, are nulled in order to perform serialization
 
 		// insertion point for translation/nullation of each field
-		if (this.document.FileID == undefined) {
-			this.document.FileID = new NullInt64
-		}
-		if (this.document.File != undefined) {
-			this.document.FileID.Int64 = this.document.File.ID
-			this.document.FileID.Valid = true
-		} else {
-			this.document.FileID.Int64 = 0
-			this.document.FileID.Valid = true
-		}
-		if (this.document.RootID == undefined) {
-			this.document.RootID = new NullInt64
-		}
-		if (this.document.Root != undefined) {
-			this.document.RootID.Int64 = this.document.Root.ID
-			this.document.RootID.Valid = true
-		} else {
-			this.document.RootID.Int64 = 0
-			this.document.RootID.Valid = true
-		}
 
 		// save from the front pointer space to the non pointer space for serialization
 
 		// insertion point for translation/nullation of each pointers
+		if (this.node.Node_Nodes_reverse != undefined) {
+			if (this.node.Node_NodesDBID == undefined) {
+				this.node.Node_NodesDBID = new NullInt64
+			}
+			this.node.Node_NodesDBID.Int64 = this.node.Node_Nodes_reverse.ID
+			this.node.Node_NodesDBID.Valid = true
+			if (this.node.Node_NodesDBID_Index == undefined) {
+				this.node.Node_NodesDBID_Index = new NullInt64
+			}
+			this.node.Node_NodesDBID_Index.Valid = true
+			this.node.Node_Nodes_reverse = new NodeDB // very important, otherwise, circular JSON
+		}
 
 		switch (this.state) {
-			case DocumentDetailComponentState.UPDATE_INSTANCE:
-				this.documentService.updateDocument(this.document, this.GONG__StackPath)
-					.subscribe(document => {
-						this.documentService.DocumentServiceChanged.next("update")
+			case NodeDetailComponentState.UPDATE_INSTANCE:
+				this.nodeService.updateNode(this.node, this.GONG__StackPath)
+					.subscribe(node => {
+						this.nodeService.NodeServiceChanged.next("update")
 					});
 				break;
 			default:
-				this.documentService.postDocument(this.document, this.GONG__StackPath).subscribe(document => {
-					this.documentService.DocumentServiceChanged.next("post")
-					this.document = new (DocumentDB) // reset fields
+				this.nodeService.postNode(this.node, this.GONG__StackPath).subscribe(node => {
+					this.nodeService.NodeServiceChanged.next("post")
+					this.node = new (NodeDB) // reset fields
 				});
 		}
 	}
@@ -203,7 +204,7 @@ export class DocumentDetailComponent implements OnInit {
 		dialogConfig.height = "50%"
 		if (selectionMode == SelectionMode.ONE_MANY_ASSOCIATION_MODE) {
 
-			dialogData.ID = this.document.ID!
+			dialogData.ID = this.node.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
@@ -220,14 +221,14 @@ export class DocumentDetailComponent implements OnInit {
 			});
 		}
 		if (selectionMode == SelectionMode.MANY_MANY_ASSOCIATION_MODE) {
-			dialogData.ID = this.document.ID!
+			dialogData.ID = this.node.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
 			dialogData.GONG__StackPath = this.GONG__StackPath
 
 			// set up the source
-			dialogData.SourceStruct = "Document"
+			dialogData.SourceStruct = "Node"
 			dialogData.SourceField = sourceField
 
 			// set up the intermediate struct
@@ -257,7 +258,7 @@ export class DocumentDetailComponent implements OnInit {
 		// dialogConfig.disableClose = true;
 		dialogConfig.autoFocus = true;
 		dialogConfig.data = {
-			ID: this.document.ID,
+			ID: this.node.ID,
 			ReversePointer: reverseField,
 			OrderingMode: true,
 			GONG__StackPath: this.GONG__StackPath,
@@ -274,8 +275,8 @@ export class DocumentDetailComponent implements OnInit {
 	}
 
 	fillUpNameIfEmpty(event: { value: { Name: string; }; }) {
-		if (this.document.Name == "") {
-			this.document.Name = event.value.Name
+		if (this.node.Name == "") {
+			this.node.Name = event.value.Name
 		}
 	}
 

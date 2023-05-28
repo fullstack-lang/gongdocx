@@ -33,6 +33,8 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 
 	"ref_models.Document.Name": (ref_models.Document{}).Name,
 
+	"ref_models.Document.Root": (ref_models.Document{}).Root,
+
 	"ref_models.Docx": &(ref_models.Docx{}),
 
 	"ref_models.Docx.Files": (ref_models.Docx{}).Files,
@@ -42,6 +44,12 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 	"ref_models.File": &(ref_models.File{}),
 
 	"ref_models.File.Name": (ref_models.File{}).Name,
+
+	"ref_models.Node": &(ref_models.Node{}),
+
+	"ref_models.Node.Nodes": (ref_models.Node{}).Nodes,
+
+	"ref_models.Node.Name": (ref_models.Node{}).Name,
 
 	"ref_models.NoteOnDocument": ref_models.NoteOnDocument,
 }
@@ -67,6 +75,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Field__000000_Name := (&models.Field{Name: `Name`}).Stage(stage)
 	__Field__000001_Name := (&models.Field{Name: `Name`}).Stage(stage)
 	__Field__000002_Name := (&models.Field{Name: `Name`}).Stage(stage)
+	__Field__000003_Name := (&models.Field{Name: `Name`}).Stage(stage)
 
 	// Declarations of staged instances of GongEnumShape
 
@@ -76,10 +85,13 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000000_NewDiagram_Document := (&models.GongStructShape{Name: `NewDiagram-Document`}).Stage(stage)
 	__GongStructShape__000001_NewDiagram_Docx := (&models.GongStructShape{Name: `NewDiagram-Docx`}).Stage(stage)
 	__GongStructShape__000002_NewDiagram_File := (&models.GongStructShape{Name: `NewDiagram-File`}).Stage(stage)
+	__GongStructShape__000003_NewDiagram_Node := (&models.GongStructShape{Name: `NewDiagram-Node`}).Stage(stage)
 
 	// Declarations of staged instances of Link
-	__Link__000000_File := (&models.Link{Name: `File`}).Stage(stage)
-	__Link__000001_Files := (&models.Link{Name: `Files`}).Stage(stage)
+	__Link__000000_Nodes := (&models.Link{Name: `Nodes`}).Stage(stage)
+	__Link__000001_File := (&models.Link{Name: `File`}).Stage(stage)
+	__Link__000002_Files := (&models.Link{Name: `Files`}).Stage(stage)
+	__Link__000003_Root := (&models.Link{Name: `Root`}).Stage(stage)
 
 	// Declarations of staged instances of Node
 
@@ -91,6 +103,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Position__000000_Pos_NewDiagram_Document := (&models.Position{Name: `Pos-NewDiagram-Document`}).Stage(stage)
 	__Position__000001_Pos_NewDiagram_Docx := (&models.Position{Name: `Pos-NewDiagram-Docx`}).Stage(stage)
 	__Position__000002_Pos_NewDiagram_File := (&models.Position{Name: `Pos-NewDiagram-File`}).Stage(stage)
+	__Position__000003_Pos_NewDiagram_Node := (&models.Position{Name: `Pos-NewDiagram-Node`}).Stage(stage)
 
 	// Declarations of staged instances of Tree
 
@@ -100,7 +113,9 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// Declarations of staged instances of Vertice
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-File`}).Stage(stage)
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Docx and NewDiagram-File`}).Stage(stage)
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-Node`}).Stage(stage)
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Docx and NewDiagram-File`}).Stage(stage)
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Node and NewDiagram-Node`}).Stage(stage)
 
 	// Setup of values
 
@@ -113,10 +128,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.File.Name]
-	__Field__000000_Name.Identifier = `ref_models.File.Name`
+	//gong:ident [ref_models.Docx.Name]
+	__Field__000000_Name.Identifier = `ref_models.Docx.Name`
 	__Field__000000_Name.FieldTypeAsString = ``
-	__Field__000000_Name.Structname = `File`
+	__Field__000000_Name.Structname = `Docx`
 	__Field__000000_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -124,10 +139,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Document.Name]
-	__Field__000001_Name.Identifier = `ref_models.Document.Name`
+	//gong:ident [ref_models.File.Name]
+	__Field__000001_Name.Identifier = `ref_models.File.Name`
 	__Field__000001_Name.FieldTypeAsString = ``
-	__Field__000001_Name.Structname = `Document`
+	__Field__000001_Name.Structname = `File`
 	__Field__000001_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -135,11 +150,22 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Docx.Name]
-	__Field__000002_Name.Identifier = `ref_models.Docx.Name`
+	//gong:ident [ref_models.Document.Name]
+	__Field__000002_Name.Identifier = `ref_models.Document.Name`
 	__Field__000002_Name.FieldTypeAsString = ``
-	__Field__000002_Name.Structname = `Docx`
+	__Field__000002_Name.Structname = `Document`
 	__Field__000002_Name.Fieldtypename = `string`
+
+	// Field values setup
+	__Field__000003_Name.Name = `Name`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Node.Name]
+	__Field__000003_Name.Identifier = `ref_models.Node.Name`
+	__Field__000003_Name.FieldTypeAsString = ``
+	__Field__000003_Name.Structname = `Node`
+	__Field__000003_Name.Fieldtypename = `string`
 
 	// GongStructShape values setup
 	__GongStructShape__000000_NewDiagram_Document.Name = `NewDiagram-Document`
@@ -148,8 +174,8 @@ func NewDiagramInjection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.Document]
 	__GongStructShape__000000_NewDiagram_Document.Identifier = `ref_models.Document`
-	__GongStructShape__000000_NewDiagram_Document.ShowNbInstances = false
-	__GongStructShape__000000_NewDiagram_Document.NbInstances = 0
+	__GongStructShape__000000_NewDiagram_Document.ShowNbInstances = true
+	__GongStructShape__000000_NewDiagram_Document.NbInstances = 1
 	__GongStructShape__000000_NewDiagram_Document.Width = 240.000000
 	__GongStructShape__000000_NewDiagram_Document.Heigth = 78.000000
 	__GongStructShape__000000_NewDiagram_Document.IsSelected = false
@@ -176,76 +202,146 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000002_NewDiagram_File.Identifier = `ref_models.File`
 	__GongStructShape__000002_NewDiagram_File.ShowNbInstances = true
 	__GongStructShape__000002_NewDiagram_File.NbInstances = 11
-	__GongStructShape__000002_NewDiagram_File.Width = 240.000000
+	__GongStructShape__000002_NewDiagram_File.Width = 1140.000000
 	__GongStructShape__000002_NewDiagram_File.Heigth = 78.000000
 	__GongStructShape__000002_NewDiagram_File.IsSelected = false
 
+	// GongStructShape values setup
+	__GongStructShape__000003_NewDiagram_Node.Name = `NewDiagram-Node`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Node]
+	__GongStructShape__000003_NewDiagram_Node.Identifier = `ref_models.Node`
+	__GongStructShape__000003_NewDiagram_Node.ShowNbInstances = false
+	__GongStructShape__000003_NewDiagram_Node.NbInstances = 0
+	__GongStructShape__000003_NewDiagram_Node.Width = 240.000000
+	__GongStructShape__000003_NewDiagram_Node.Heigth = 131.000000
+	__GongStructShape__000003_NewDiagram_Node.IsSelected = false
+
 	// Link values setup
-	__Link__000000_File.Name = `File`
+	__Link__000000_Nodes.Name = `Nodes`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Node.Nodes]
+	__Link__000000_Nodes.Identifier = `ref_models.Node.Nodes`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Node]
+	__Link__000000_Nodes.Fieldtypename = `ref_models.Node`
+	__Link__000000_Nodes.FieldOffsetX = -78.000000
+	__Link__000000_Nodes.FieldOffsetY = -16.000000
+	__Link__000000_Nodes.TargetMultiplicity = models.MANY
+	__Link__000000_Nodes.TargetMultiplicityOffsetX = -26.000000
+	__Link__000000_Nodes.TargetMultiplicityOffsetY = 22.000000
+	__Link__000000_Nodes.SourceMultiplicity = models.ZERO_ONE
+	__Link__000000_Nodes.SourceMultiplicityOffsetX = -42.000000
+	__Link__000000_Nodes.SourceMultiplicityOffsetY = 23.000000
+	__Link__000000_Nodes.StartOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000000_Nodes.StartRatio = 0.692308
+	__Link__000000_Nodes.EndOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000000_Nodes.EndRatio = 0.217949
+	__Link__000000_Nodes.CornerOffsetRatio = -0.545833
+
+	// Link values setup
+	__Link__000001_File.Name = `File`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Document.File]
-	__Link__000000_File.Identifier = `ref_models.Document.File`
+	__Link__000001_File.Identifier = `ref_models.Document.File`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.File]
-	__Link__000000_File.Fieldtypename = `ref_models.File`
-	__Link__000000_File.FieldOffsetX = -48.000000
-	__Link__000000_File.FieldOffsetY = 20.000000
-	__Link__000000_File.TargetMultiplicity = models.ZERO_ONE
-	__Link__000000_File.TargetMultiplicityOffsetX = 12.000000
-	__Link__000000_File.TargetMultiplicityOffsetY = 20.000000
-	__Link__000000_File.SourceMultiplicity = models.MANY
-	__Link__000000_File.SourceMultiplicityOffsetX = 13.000000
-	__Link__000000_File.SourceMultiplicityOffsetY = -6.000000
-	__Link__000000_File.StartOrientation = models.ORIENTATION_VERTICAL
-	__Link__000000_File.StartRatio = 0.612500
-	__Link__000000_File.EndOrientation = models.ORIENTATION_VERTICAL
-	__Link__000000_File.EndRatio = 0.629167
-	__Link__000000_File.CornerOffsetRatio = -0.141026
+	__Link__000001_File.Fieldtypename = `ref_models.File`
+	__Link__000001_File.FieldOffsetX = -48.000000
+	__Link__000001_File.FieldOffsetY = 20.000000
+	__Link__000001_File.TargetMultiplicity = models.ZERO_ONE
+	__Link__000001_File.TargetMultiplicityOffsetX = 12.000000
+	__Link__000001_File.TargetMultiplicityOffsetY = 20.000000
+	__Link__000001_File.SourceMultiplicity = models.MANY
+	__Link__000001_File.SourceMultiplicityOffsetX = 13.000000
+	__Link__000001_File.SourceMultiplicityOffsetY = -6.000000
+	__Link__000001_File.StartOrientation = models.ORIENTATION_VERTICAL
+	__Link__000001_File.StartRatio = 0.516667
+	__Link__000001_File.EndOrientation = models.ORIENTATION_VERTICAL
+	__Link__000001_File.EndRatio = 0.110526
+	__Link__000001_File.CornerOffsetRatio = -0.538462
 
 	// Link values setup
-	__Link__000001_Files.Name = `Files`
+	__Link__000002_Files.Name = `Files`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Docx.Files]
-	__Link__000001_Files.Identifier = `ref_models.Docx.Files`
+	__Link__000002_Files.Identifier = `ref_models.Docx.Files`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.File]
-	__Link__000001_Files.Fieldtypename = `ref_models.File`
-	__Link__000001_Files.FieldOffsetX = -50.000000
-	__Link__000001_Files.FieldOffsetY = -16.000000
-	__Link__000001_Files.TargetMultiplicity = models.MANY
-	__Link__000001_Files.TargetMultiplicityOffsetX = -50.000000
-	__Link__000001_Files.TargetMultiplicityOffsetY = 16.000000
-	__Link__000001_Files.SourceMultiplicity = models.ZERO_ONE
-	__Link__000001_Files.SourceMultiplicityOffsetX = 17.000000
-	__Link__000001_Files.SourceMultiplicityOffsetY = 25.000000
-	__Link__000001_Files.StartOrientation = models.ORIENTATION_HORIZONTAL
-	__Link__000001_Files.StartRatio = 0.500000
-	__Link__000001_Files.EndOrientation = models.ORIENTATION_HORIZONTAL
-	__Link__000001_Files.EndRatio = 0.500000
-	__Link__000001_Files.CornerOffsetRatio = 1.433333
+	__Link__000002_Files.Fieldtypename = `ref_models.File`
+	__Link__000002_Files.FieldOffsetX = -50.000000
+	__Link__000002_Files.FieldOffsetY = -16.000000
+	__Link__000002_Files.TargetMultiplicity = models.MANY
+	__Link__000002_Files.TargetMultiplicityOffsetX = 20.000000
+	__Link__000002_Files.TargetMultiplicityOffsetY = -10.000000
+	__Link__000002_Files.SourceMultiplicity = models.ZERO_ONE
+	__Link__000002_Files.SourceMultiplicityOffsetX = 17.000000
+	__Link__000002_Files.SourceMultiplicityOffsetY = 25.000000
+	__Link__000002_Files.StartOrientation = models.ORIENTATION_VERTICAL
+	__Link__000002_Files.StartRatio = 0.512500
+	__Link__000002_Files.EndOrientation = models.ORIENTATION_VERTICAL
+	__Link__000002_Files.EndRatio = 0.115789
+	__Link__000002_Files.CornerOffsetRatio = 1.410256
+
+	// Link values setup
+	__Link__000003_Root.Name = `Root`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Document.Root]
+	__Link__000003_Root.Identifier = `ref_models.Document.Root`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Node]
+	__Link__000003_Root.Fieldtypename = `ref_models.Node`
+	__Link__000003_Root.FieldOffsetX = -50.000000
+	__Link__000003_Root.FieldOffsetY = -16.000000
+	__Link__000003_Root.TargetMultiplicity = models.ZERO_ONE
+	__Link__000003_Root.TargetMultiplicityOffsetX = 13.000000
+	__Link__000003_Root.TargetMultiplicityOffsetY = -12.000000
+	__Link__000003_Root.SourceMultiplicity = models.MANY
+	__Link__000003_Root.SourceMultiplicityOffsetX = 16.000000
+	__Link__000003_Root.SourceMultiplicityOffsetY = 19.000000
+	__Link__000003_Root.StartOrientation = models.ORIENTATION_VERTICAL
+	__Link__000003_Root.StartRatio = 0.520833
+	__Link__000003_Root.EndOrientation = models.ORIENTATION_VERTICAL
+	__Link__000003_Root.EndRatio = 0.516667
+	__Link__000003_Root.CornerOffsetRatio = 1.653846
 
 	// Position values setup
-	__Position__000000_Pos_NewDiagram_Document.X = 599.000000
-	__Position__000000_Pos_NewDiagram_Document.Y = 287.000000
+	__Position__000000_Pos_NewDiagram_Document.X = 192.000000
+	__Position__000000_Pos_NewDiagram_Document.Y = 391.000000
 	__Position__000000_Pos_NewDiagram_Document.Name = `Pos-NewDiagram-Document`
 
 	// Position values setup
-	__Position__000001_Pos_NewDiagram_Docx.X = 105.000000
-	__Position__000001_Pos_NewDiagram_Docx.Y = 73.000000
+	__Position__000001_Pos_NewDiagram_Docx.X = 196.000000
+	__Position__000001_Pos_NewDiagram_Docx.Y = 77.000000
 	__Position__000001_Pos_NewDiagram_Docx.Name = `Pos-NewDiagram-Docx`
 
 	// Position values setup
-	__Position__000002_Pos_NewDiagram_File.X = 595.000000
-	__Position__000002_Pos_NewDiagram_File.Y = 72.000000
+	__Position__000002_Pos_NewDiagram_File.X = 192.000000
+	__Position__000002_Pos_NewDiagram_File.Y = 239.000000
 	__Position__000002_Pos_NewDiagram_File.Name = `Pos-NewDiagram-File`
+
+	// Position values setup
+	__Position__000003_Pos_NewDiagram_Node.X = 194.000000
+	__Position__000003_Pos_NewDiagram_Node.Y = 554.000000
+	__Position__000003_Pos_NewDiagram_Node.Name = `Pos-NewDiagram-Node`
 
 	// Vertice values setup
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File.X = 957.000000
@@ -253,24 +349,39 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-File`
 
 	// Vertice values setup
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.X = 465.000000
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.Y = 109.000000
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Docx and NewDiagram-File`
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node.X = 961.500000
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node.Y = 419.000000
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-Node`
+
+	// Vertice values setup
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.X = 465.000000
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.Y = 109.000000
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Docx and NewDiagram-File`
+
+	// Vertice values setup
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node.X = 941.000000
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node.Y = 503.500000
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Node and NewDiagram-Node`
 
 	// Setup of pointers
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000001_NewDiagram_Docx)
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000002_NewDiagram_File)
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000000_NewDiagram_Document)
+	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000003_NewDiagram_Node)
 	__GongStructShape__000000_NewDiagram_Document.Position = __Position__000000_Pos_NewDiagram_Document
-	__GongStructShape__000000_NewDiagram_Document.Fields = append(__GongStructShape__000000_NewDiagram_Document.Fields, __Field__000001_Name)
-	__GongStructShape__000000_NewDiagram_Document.Links = append(__GongStructShape__000000_NewDiagram_Document.Links, __Link__000000_File)
+	__GongStructShape__000000_NewDiagram_Document.Fields = append(__GongStructShape__000000_NewDiagram_Document.Fields, __Field__000002_Name)
+	__GongStructShape__000000_NewDiagram_Document.Links = append(__GongStructShape__000000_NewDiagram_Document.Links, __Link__000001_File)
+	__GongStructShape__000000_NewDiagram_Document.Links = append(__GongStructShape__000000_NewDiagram_Document.Links, __Link__000003_Root)
 	__GongStructShape__000001_NewDiagram_Docx.Position = __Position__000001_Pos_NewDiagram_Docx
-	__GongStructShape__000001_NewDiagram_Docx.Fields = append(__GongStructShape__000001_NewDiagram_Docx.Fields, __Field__000002_Name)
-	__GongStructShape__000001_NewDiagram_Docx.Links = append(__GongStructShape__000001_NewDiagram_Docx.Links, __Link__000001_Files)
+	__GongStructShape__000001_NewDiagram_Docx.Fields = append(__GongStructShape__000001_NewDiagram_Docx.Fields, __Field__000000_Name)
+	__GongStructShape__000001_NewDiagram_Docx.Links = append(__GongStructShape__000001_NewDiagram_Docx.Links, __Link__000002_Files)
 	__GongStructShape__000002_NewDiagram_File.Position = __Position__000002_Pos_NewDiagram_File
-	__GongStructShape__000002_NewDiagram_File.Fields = append(__GongStructShape__000002_NewDiagram_File.Fields, __Field__000000_Name)
-	__Link__000000_File.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File
-	__Link__000001_Files.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File
+	__GongStructShape__000002_NewDiagram_File.Fields = append(__GongStructShape__000002_NewDiagram_File.Fields, __Field__000001_Name)
+	__GongStructShape__000003_NewDiagram_Node.Position = __Position__000003_Pos_NewDiagram_Node
+	__GongStructShape__000003_NewDiagram_Node.Fields = append(__GongStructShape__000003_NewDiagram_Node.Fields, __Field__000003_Name)
+	__GongStructShape__000003_NewDiagram_Node.Links = append(__GongStructShape__000003_NewDiagram_Node.Links, __Link__000000_Nodes)
+	__Link__000000_Nodes.Middlevertice = __Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node
+	__Link__000001_File.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File
+	__Link__000002_Files.Middlevertice = __Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File
+	__Link__000003_Root.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node
 }
-
-

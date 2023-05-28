@@ -5,6 +5,8 @@
   import { DocxSortingComponent } from './docx-sorting/docx-sorting.component'
   import { FilesTableComponent } from './files-table/files-table.component'
   import { FileSortingComponent } from './file-sorting/file-sorting.component'
+  import { NodesTableComponent } from './nodes-table/nodes-table.component'
+  import { NodeSortingComponent } from './node-sorting/node-sorting.component'
 
 // insertion point sub template for map of components per struct 
   export const MapOfDocumentsComponents: Map<string, any> = new Map([["DocumentsTableComponent", DocumentsTableComponent],])
@@ -13,6 +15,8 @@
   export const MapOfDocxSortingComponents: Map<string, any> = new Map([["DocxSortingComponent", DocxSortingComponent],])
   export const MapOfFilesComponents: Map<string, any> = new Map([["FilesTableComponent", FilesTableComponent],])
   export const MapOfFileSortingComponents: Map<string, any> = new Map([["FileSortingComponent", FileSortingComponent],])
+  export const MapOfNodesComponents: Map<string, any> = new Map([["NodesTableComponent", NodesTableComponent],])
+  export const MapOfNodeSortingComponents: Map<string, any> = new Map([["NodeSortingComponent", NodeSortingComponent],])
 
 // map of all ng components of the stacks
 export const MapOfComponents: Map<string, any> =
@@ -22,6 +26,7 @@ export const MapOfComponents: Map<string, any> =
       ["Document", MapOfDocumentsComponents],
       ["Docx", MapOfDocxsComponents],
       ["File", MapOfFilesComponents],
+      ["Node", MapOfNodesComponents],
     ]
   )
 
@@ -33,5 +38,6 @@ export const MapOfSortingComponents: Map<string, any> =
       ["Document", MapOfDocumentSortingComponents],
       ["Docx", MapOfDocxSortingComponents],
       ["File", MapOfFileSortingComponents],
+      ["Node", MapOfNodeSortingComponents],
     ]
   )

@@ -51,6 +51,10 @@ import { FilesTableComponent } from './files-table/files-table.component'
 import { FileSortingComponent } from './file-sorting/file-sorting.component'
 import { FileDetailComponent } from './file-detail/file-detail.component'
 
+import { NodesTableComponent } from './nodes-table/nodes-table.component'
+import { NodeSortingComponent } from './node-sorting/node-sorting.component'
+import { NodeDetailComponent } from './node-detail/node-detail.component'
+
 
 @NgModule({
 	declarations: [
@@ -66,6 +70,10 @@ import { FileDetailComponent } from './file-detail/file-detail.component'
 		FilesTableComponent,
 		FileSortingComponent,
 		FileDetailComponent,
+
+		NodesTableComponent,
+		NodeSortingComponent,
+		NodeDetailComponent,
 
 
 		SplitterComponent,
@@ -117,6 +125,10 @@ import { FileDetailComponent } from './file-detail/file-detail.component'
 		FilesTableComponent,
 		FileSortingComponent,
 		FileDetailComponent,
+
+		NodesTableComponent,
+		NodeSortingComponent,
+		NodeDetailComponent,
 
 
 		SplitterComponent,

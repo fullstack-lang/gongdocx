@@ -49,6 +49,10 @@ type DocumentPointersEnconding struct {
 	// field File is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	FileID sql.NullInt64
+
+	// field Root is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	RootID sql.NullInt64
 }
 
 // DocumentDB describes a document in the database
@@ -221,6 +225,15 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 			}
 		}
 
+		// commit pointer value document.Root translates to updating the document.RootID
+		documentDB.RootID.Valid = true // allow for a 0 value (nil association)
+		if document.Root != nil {
+			if RootId, ok := backRepo.BackRepoNode.Map_NodePtr_NodeDBID[document.Root]; ok {
+				documentDB.RootID.Int64 = int64(RootId)
+				documentDB.RootID.Valid = true
+			}
+		}
+
 		query := backRepoDocument.db.Save(&documentDB)
 		if query.Error != nil {
 			return query.Error
@@ -331,6 +344,10 @@ func (backRepoDocument *BackRepoDocumentStruct) CheckoutPhaseTwoInstance(backRep
 	// File field
 	if documentDB.FileID.Int64 != 0 {
 		document.File = backRepo.BackRepoFile.Map_FileDBID_FilePtr[uint(documentDB.FileID.Int64)]
+	}
+	// Root field
+	if documentDB.RootID.Int64 != 0 {
+		document.Root = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(documentDB.RootID.Int64)]
 	}
 	return
 }
@@ -550,6 +567,12 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseTwo() {
 		if documentDB.FileID.Int64 != 0 {
 			documentDB.FileID.Int64 = int64(BackRepoFileid_atBckpTime_newID[uint(documentDB.FileID.Int64)])
 			documentDB.FileID.Valid = true
+		}
+
+		// reindexing Root field
+		if documentDB.RootID.Int64 != 0 {
+			documentDB.RootID.Int64 = int64(BackRepoNodeid_atBckpTime_newID[uint(documentDB.RootID.Int64)])
+			documentDB.RootID.Valid = true
 		}
 
 		// update databse with new index encoding

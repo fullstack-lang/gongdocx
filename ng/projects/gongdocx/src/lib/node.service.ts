@@ -11,22 +11,20 @@ import { BehaviorSubject } from 'rxjs';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
-import { DocumentDB } from './document-db';
+import { NodeDB } from './node-db';
 
 // insertion point for imports
-import { FileDB } from './file-db'
-import { NodeDB } from './node-db'
 
 @Injectable({
   providedIn: 'root'
 })
-export class DocumentService {
+export class NodeService {
 
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
-  DocumentServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
+  NodeServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
 
-  private documentsUrl: string
+  private nodesUrl: string
 
   constructor(
     private http: HttpClient,
@@ -40,40 +38,41 @@ export class DocumentService {
     origin = origin.replace("4200", "8080")
 
     // compute path to the service
-    this.documentsUrl = origin + '/api/github.com/fullstack-lang/gongdocx/go/v1/documents';
+    this.nodesUrl = origin + '/api/github.com/fullstack-lang/gongdocx/go/v1/nodes';
   }
 
-  /** GET documents from the server */
-  getDocuments(GONG__StackPath: string): Observable<DocumentDB[]> {
+  /** GET nodes from the server */
+  getNodes(GONG__StackPath: string): Observable<NodeDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
-    return this.http.get<DocumentDB[]>(this.documentsUrl, { params: params })
+    return this.http.get<NodeDB[]>(this.nodesUrl, { params: params })
       .pipe(
         tap(),
-		// tap(_ => this.log('fetched documents')),
-        catchError(this.handleError<DocumentDB[]>('getDocuments', []))
+		// tap(_ => this.log('fetched nodes')),
+        catchError(this.handleError<NodeDB[]>('getNodes', []))
       );
   }
 
-  /** GET document by id. Will 404 if id not found */
-  getDocument(id: number, GONG__StackPath: string): Observable<DocumentDB> {
+  /** GET node by id. Will 404 if id not found */
+  getNode(id: number, GONG__StackPath: string): Observable<NodeDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
-    const url = `${this.documentsUrl}/${id}`;
-    return this.http.get<DocumentDB>(url, { params: params }).pipe(
-      // tap(_ => this.log(`fetched document id=${id}`)),
-      catchError(this.handleError<DocumentDB>(`getDocument id=${id}`))
+    const url = `${this.nodesUrl}/${id}`;
+    return this.http.get<NodeDB>(url, { params: params }).pipe(
+      // tap(_ => this.log(`fetched node id=${id}`)),
+      catchError(this.handleError<NodeDB>(`getNode id=${id}`))
     );
   }
 
-  /** POST: add a new document to the server */
-  postDocument(documentdb: DocumentDB, GONG__StackPath: string): Observable<DocumentDB> {
+  /** POST: add a new node to the server */
+  postNode(nodedb: NodeDB, GONG__StackPath: string): Observable<NodeDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    documentdb.File = new FileDB
-    documentdb.Root = new NodeDB
+    nodedb.Nodes = []
+    let _Node_Nodes_reverse = nodedb.Node_Nodes_reverse
+    nodedb.Node_Nodes_reverse = new NodeDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -81,19 +80,20 @@ export class DocumentService {
       params: params
     }
 
-    return this.http.post<DocumentDB>(this.documentsUrl, documentdb, httpOptions).pipe(
+    return this.http.post<NodeDB>(this.nodesUrl, nodedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        // this.log(`posted documentdb id=${documentdb.ID}`)
+        nodedb.Node_Nodes_reverse = _Node_Nodes_reverse
+        // this.log(`posted nodedb id=${nodedb.ID}`)
       }),
-      catchError(this.handleError<DocumentDB>('postDocument'))
+      catchError(this.handleError<NodeDB>('postNode'))
     );
   }
 
-  /** DELETE: delete the documentdb from the server */
-  deleteDocument(documentdb: DocumentDB | number, GONG__StackPath: string): Observable<DocumentDB> {
-    const id = typeof documentdb === 'number' ? documentdb : documentdb.ID;
-    const url = `${this.documentsUrl}/${id}`;
+  /** DELETE: delete the nodedb from the server */
+  deleteNode(nodedb: NodeDB | number, GONG__StackPath: string): Observable<NodeDB> {
+    const id = typeof nodedb === 'number' ? nodedb : nodedb.ID;
+    const url = `${this.nodesUrl}/${id}`;
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -101,20 +101,21 @@ export class DocumentService {
       params: params
     };
 
-    return this.http.delete<DocumentDB>(url, httpOptions).pipe(
-      tap(_ => this.log(`deleted documentdb id=${id}`)),
-      catchError(this.handleError<DocumentDB>('deleteDocument'))
+    return this.http.delete<NodeDB>(url, httpOptions).pipe(
+      tap(_ => this.log(`deleted nodedb id=${id}`)),
+      catchError(this.handleError<NodeDB>('deleteNode'))
     );
   }
 
-  /** PUT: update the documentdb on the server */
-  updateDocument(documentdb: DocumentDB, GONG__StackPath: string): Observable<DocumentDB> {
-    const id = typeof documentdb === 'number' ? documentdb : documentdb.ID;
-    const url = `${this.documentsUrl}/${id}`;
+  /** PUT: update the nodedb on the server */
+  updateNode(nodedb: NodeDB, GONG__StackPath: string): Observable<NodeDB> {
+    const id = typeof nodedb === 'number' ? nodedb : nodedb.ID;
+    const url = `${this.nodesUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    documentdb.File = new FileDB
-    documentdb.Root = new NodeDB
+    nodedb.Nodes = []
+    let _Node_Nodes_reverse = nodedb.Node_Nodes_reverse
+    nodedb.Node_Nodes_reverse = new NodeDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -122,12 +123,13 @@ export class DocumentService {
       params: params
     };
 
-    return this.http.put<DocumentDB>(url, documentdb, httpOptions).pipe(
+    return this.http.put<NodeDB>(url, nodedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        // this.log(`updated documentdb id=${documentdb.ID}`)
+        nodedb.Node_Nodes_reverse = _Node_Nodes_reverse
+        // this.log(`updated nodedb id=${nodedb.ID}`)
       }),
-      catchError(this.handleError<DocumentDB>('updateDocument'))
+      catchError(this.handleError<NodeDB>('updateNode'))
     );
   }
 
@@ -137,11 +139,11 @@ export class DocumentService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation in DocumentService', result?: T) {
+  private handleError<T>(operation = 'operation in NodeService', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
-      console.error("DocumentService" + error); // log to console instead
+      console.error("NodeService" + error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);

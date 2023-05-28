@@ -1,11 +1,11 @@
-<form *ngIf="document" class="details">
-    <h2 class="details__title">document</h2>
+<form *ngIf="node" class="details">
+    <h2 class="details__title">node</h2>
     <!-- insertion point for fields specific code -->
     <mat-grid-list *ngIf='!isATextArea("Name")' cols="5" rowHeight="1:1">
         <mat-grid-tile [colspan]="3">
             <mat-form-field mat-form-field class="detail-full-width">
                 <mat-label>Name</mat-label>
-                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="document.Name">
+                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="node.Name">
             </mat-form-field>
         </mat-grid-tile>
         <mat-grid-tile>
@@ -18,32 +18,34 @@
     </mat-grid-list>
     <mat-form-field *ngIf='isATextArea("Name")' mat-form-field class="detail-full-width">
         <mat-label>Name</mat-label>
-        <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="document.Name"></textarea>
+        <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="node.Name"></textarea>
     </mat-form-field>
 
+    <mat-grid-list cols="5" rowHeight="2:1">
+        <mat-grid-tile [colspan]="3">
+            <button mat-raised-button (click)="openReverseSelection('Node', 'Node_NodesDBID', 'ONE_MANY_ASSOCIATION_MODE', '', '', '')">Nodes</button>
+        </mat-grid-tile>
+        <!-- insertion point for the button of the MANY_MANY association-->
+        <mat-grid-tile>
+            <button mat-raised-button (click)="openDragAndDropOrdering('Node', 'Node_NodesDBID')">
+                <mat-icon>
+                    shuffle
+                </mat-icon>
+            </button>
+        </mat-grid-tile>
+    </mat-grid-list>
     <mat-form-field class="detail-full-width">
-        <mat-label>File</mat-label>
-        <mat-select [compareWith]="compareObjects" [(value)]="document.File" (selectionChange)="fillUpNameIfEmpty($event)">
-            <mat-option>None</mat-option>
-            <mat-option *ngFor="let file of frontRepo.Files_array" [value]="file">
-                {{file.Name}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
-
-    <mat-form-field class="detail-full-width">
-        <mat-label>Root</mat-label>
-        <mat-select [compareWith]="compareObjects" [(value)]="document.Root" (selectionChange)="fillUpNameIfEmpty($event)">
+        <mat-label>(Node) Nodes</mat-label>
+        <mat-select [compareWith]="compareObjects" [(ngModel)]="node.Node_Nodes_reverse" [ngModelOptions]="{standalone: true}">
             <mat-option>None</mat-option>
             <mat-option *ngFor="let node of frontRepo.Nodes_array" [value]="node">
                 {{node.Name}}
             </mat-option>
         </mat-select>
     </mat-form-field>
-
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
-            Save document
+            Save node
         </button>
     </div>
 </form>

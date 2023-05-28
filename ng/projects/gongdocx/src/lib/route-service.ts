@@ -11,6 +11,9 @@ import { DocxDetailComponent } from './docx-detail/docx-detail.component'
 import { FilesTableComponent } from './files-table/files-table.component'
 import { FileDetailComponent } from './file-detail/file-detail.component'
 
+import { NodesTableComponent } from './nodes-table/nodes-table.component'
+import { NodeDetailComponent } from './node-detail/node-detail.component'
+
 
 @Injectable({
     providedIn: 'root'
@@ -141,6 +144,39 @@ export class RouteService {
         return route
     }
 
+    getNodeTablePath(): string {
+        return this.getPathRoot() + '-nodes/:GONG__StackPath'
+    }
+    getNodeTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getNodeTablePath(), component: NodesTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getNodeAdderPath(): string {
+        return this.getPathRoot() + '-node-adder/:GONG__StackPath'
+    }
+    getNodeAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getNodeAdderPath(), component: NodeDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getNodeAdderForUsePath(): string {
+        return this.getPathRoot() + '-node-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getNodeAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getNodeAdderForUsePath(), component: NodeDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getNodeDetailPath(): string {
+        return this.getPathRoot() + '-node-detail/:id/:GONG__StackPath'
+    }
+    getNodeDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getNodeDetailPath(), component: NodeDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
 
 
     addDataPanelRoutes(stackPath: string) {
@@ -161,6 +197,11 @@ export class RouteService {
             this.getFileAdderRoute(stackPath),
             this.getFileAdderForUseRoute(stackPath),
             this.getFileDetailRoute(stackPath),
+
+            this.getNodeTableRoute(stackPath),
+            this.getNodeAdderRoute(stackPath),
+            this.getNodeAdderForUseRoute(stackPath),
+            this.getNodeDetailRoute(stackPath),
 
         ])
     }

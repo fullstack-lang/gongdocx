@@ -14,8 +14,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 const allowMultiSelect = true;
 
 import { ActivatedRoute, Router, RouterState } from '@angular/router';
-import { DocumentDB } from '../document-db'
-import { DocumentService } from '../document.service'
+import { NodeDB } from '../node-db'
+import { NodeService } from '../node.service'
 
 // insertion point for additional imports
 
@@ -31,26 +31,26 @@ enum TableComponentMode {
 
 // generated table component
 @Component({
-  selector: 'app-documentstable',
-  templateUrl: './documents-table.component.html',
-  styleUrls: ['./documents-table.component.css'],
+  selector: 'app-nodestable',
+  templateUrl: './nodes-table.component.html',
+  styleUrls: ['./nodes-table.component.css'],
 })
-export class DocumentsTableComponent implements OnInit {
+export class NodesTableComponent implements OnInit {
 
   @Input() GONG__StackPath: string = ""
 
   // mode at invocation
   mode: TableComponentMode = TableComponentMode.DISPLAY_MODE
 
-  // used if the component is called as a selection component of Document instances
-  selection: SelectionModel<DocumentDB> = new (SelectionModel)
-  initialSelection = new Array<DocumentDB>()
+  // used if the component is called as a selection component of Node instances
+  selection: SelectionModel<NodeDB> = new (SelectionModel)
+  initialSelection = new Array<NodeDB>()
 
   // the data source for the table
-  documents: DocumentDB[] = []
-  matTableDataSource: MatTableDataSource<DocumentDB> = new (MatTableDataSource)
+  nodes: NodeDB[] = []
+  matTableDataSource: MatTableDataSource<NodeDB> = new (MatTableDataSource)
 
-  // front repo, that will be referenced by this.documents
+  // front repo, that will be referenced by this.nodes
   frontRepo: FrontRepo = new (FrontRepo)
 
   // displayedColumns is referenced by the MatTable component for specify what columns
@@ -66,20 +66,21 @@ export class DocumentsTableComponent implements OnInit {
   ngAfterViewInit() {
 
     // enable sorting on all fields (including pointers and reverse pointer)
-    this.matTableDataSource.sortingDataAccessor = (documentDB: DocumentDB, property: string) => {
+    this.matTableDataSource.sortingDataAccessor = (nodeDB: NodeDB, property: string) => {
       switch (property) {
         case 'ID':
-          return documentDB.ID
+          return nodeDB.ID
 
         // insertion point for specific sorting accessor
         case 'Name':
-          return documentDB.Name;
+          return nodeDB.Name;
 
-        case 'File':
-          return (documentDB.File ? documentDB.File.Name : '');
-
-        case 'Root':
-          return (documentDB.Root ? documentDB.Root.Name : '');
+        case 'Node_Nodes':
+          if (this.frontRepo.Nodes.get(nodeDB.Node_NodesDBID.Int64) != undefined) {
+            return this.frontRepo.Nodes.get(nodeDB.Node_NodesDBID.Int64)!.Name
+          } else {
+            return ""
+          }
 
         default:
           console.assert(false, "Unknown field")
@@ -88,20 +89,18 @@ export class DocumentsTableComponent implements OnInit {
     };
 
     // enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
-    this.matTableDataSource.filterPredicate = (documentDB: DocumentDB, filter: string) => {
+    this.matTableDataSource.filterPredicate = (nodeDB: NodeDB, filter: string) => {
 
       // filtering is based on finding a lower case filter into a concatenated string
-      // the documentDB properties
+      // the nodeDB properties
       let mergedContent = ""
 
       // insertion point for merging of fields
-      mergedContent += documentDB.Name.toLowerCase()
-      if (documentDB.File) {
-        mergedContent += documentDB.File.Name.toLowerCase()
+      mergedContent += nodeDB.Name.toLowerCase()
+      if (nodeDB.Node_NodesDBID.Int64 != 0) {
+        mergedContent += this.frontRepo.Nodes.get(nodeDB.Node_NodesDBID.Int64)!.Name.toLowerCase()
       }
-      if (documentDB.Root) {
-        mergedContent += documentDB.Root.Name.toLowerCase()
-      }
+
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
       return isSelected
@@ -117,11 +116,11 @@ export class DocumentsTableComponent implements OnInit {
   }
 
   constructor(
-    private documentService: DocumentService,
+    private nodeService: NodeService,
     private frontRepoService: FrontRepoService,
 
-    // not null if the component is called as a selection component of document instances
-    public dialogRef: MatDialogRef<DocumentsTableComponent>,
+    // not null if the component is called as a selection component of node instances
+    public dialogRef: MatDialogRef<NodesTableComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: DialogData,
 
     private router: Router,
@@ -147,26 +146,24 @@ export class DocumentsTableComponent implements OnInit {
     }
 
     // observable for changes in structs
-    this.documentService.DocumentServiceChanged.subscribe(
+    this.nodeService.NodeServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
-          this.getDocuments()
+          this.getNodes()
         }
       }
     )
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Delete', // insertion point for columns to display
         "Name",
-        "File",
-        "Root",
+        "Node_Nodes",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
-        "File",
-        "Root",
+        "Node_Nodes",
       ]
-      this.selection = new SelectionModel<DocumentDB>(allowMultiSelect, this.initialSelection);
+      this.selection = new SelectionModel<NodeDB>(allowMultiSelect, this.initialSelection);
     }
 
   }
@@ -177,84 +174,84 @@ export class DocumentsTableComponent implements OnInit {
       this.GONG__StackPath = stackPath
     }
 
-    this.getDocuments()
+    this.getNodes()
 
-    this.matTableDataSource = new MatTableDataSource(this.documents)
+    this.matTableDataSource = new MatTableDataSource(this.nodes)
   }
 
-  getDocuments(): void {
+  getNodes(): void {
     this.frontRepoService.pull(this.GONG__StackPath).subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
 
-        this.documents = this.frontRepo.Documents_array;
+        this.nodes = this.frontRepo.Nodes_array;
 
         // insertion point for time duration Recoveries
         // insertion point for enum int Recoveries
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          for (let document of this.documents) {
+          for (let node of this.nodes) {
             let ID = this.dialogData.ID
-            let revPointer = document[this.dialogData.ReversePointer as keyof DocumentDB] as unknown as NullInt64
+            let revPointer = node[this.dialogData.ReversePointer as keyof NodeDB] as unknown as NullInt64
             if (revPointer.Int64 == ID) {
-              this.initialSelection.push(document)
+              this.initialSelection.push(node)
             }
-            this.selection = new SelectionModel<DocumentDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<NodeDB>(allowMultiSelect, this.initialSelection);
           }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
-          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, DocumentDB>
+          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, NodeDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to DocumentDB
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to NodeDB
           // the field name is sourceField
-          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as DocumentDB[]
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as NodeDB[]
           if (sourceFieldArray != null) {
             for (let associationInstance of sourceFieldArray) {
-              let document = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as DocumentDB
-              this.initialSelection.push(document)
+              let node = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as NodeDB
+              this.initialSelection.push(node)
             }
           }
 
-          this.selection = new SelectionModel<DocumentDB>(allowMultiSelect, this.initialSelection);
+          this.selection = new SelectionModel<NodeDB>(allowMultiSelect, this.initialSelection);
         }
 
         // update the mat table data source
-        this.matTableDataSource.data = this.documents
+        this.matTableDataSource.data = this.nodes
       }
     )
   }
 
-  // newDocument initiate a new document
-  // create a new Document objet
-  newDocument() {
+  // newNode initiate a new node
+  // create a new Node objet
+  newNode() {
   }
 
-  deleteDocument(documentID: number, document: DocumentDB) {
-    // list of documents is truncated of document before the delete
-    this.documents = this.documents.filter(h => h !== document);
+  deleteNode(nodeID: number, node: NodeDB) {
+    // list of nodes is truncated of node before the delete
+    this.nodes = this.nodes.filter(h => h !== node);
 
-    this.documentService.deleteDocument(documentID, this.GONG__StackPath).subscribe(
-      document => {
-        this.documentService.DocumentServiceChanged.next("delete")
+    this.nodeService.deleteNode(nodeID, this.GONG__StackPath).subscribe(
+      node => {
+        this.nodeService.NodeServiceChanged.next("delete")
       }
     );
   }
 
-  editDocument(documentID: number, document: DocumentDB) {
+  editNode(nodeID: number, node: NodeDB) {
 
   }
 
   // set editor outlet
-  setEditorRouterOutlet(documentID: number) {
+  setEditorRouterOutlet(nodeID: number) {
     let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
-    let fullPath = this.routeService.getPathRoot() + "-" + "document" + "-detail"
+    let fullPath = this.routeService.getPathRoot() + "-" + "node" + "-detail"
 
     let outletConf: any = {}
-    outletConf[outletName] = [fullPath, documentID, this.GONG__StackPath]
+    outletConf[outletName] = [fullPath, nodeID, this.GONG__StackPath]
 
     this.router.navigate([{ outlets: outletConf }])
   }
@@ -262,7 +259,7 @@ export class DocumentsTableComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.documents.length;
+    const numRows = this.nodes.length;
     return numSelected === numRows;
   }
 
@@ -270,39 +267,39 @@ export class DocumentsTableComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.documents.forEach(row => this.selection.select(row));
+      this.nodes.forEach(row => this.selection.select(row));
   }
 
   save() {
 
     if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
 
-      let toUpdate = new Set<DocumentDB>()
+      let toUpdate = new Set<NodeDB>()
 
-      // reset all initial selection of document that belong to document
-      for (let document of this.initialSelection) {
-        let index = document[this.dialogData.ReversePointer as keyof DocumentDB] as unknown as NullInt64
+      // reset all initial selection of node that belong to node
+      for (let node of this.initialSelection) {
+        let index = node[this.dialogData.ReversePointer as keyof NodeDB] as unknown as NullInt64
         index.Int64 = 0
         index.Valid = true
-        toUpdate.add(document)
+        toUpdate.add(node)
 
       }
 
-      // from selection, set document that belong to document
-      for (let document of this.selection.selected) {
+      // from selection, set node that belong to node
+      for (let node of this.selection.selected) {
         let ID = this.dialogData.ID as number
-        let reversePointer = document[this.dialogData.ReversePointer as keyof DocumentDB] as unknown as NullInt64
+        let reversePointer = node[this.dialogData.ReversePointer as keyof NodeDB] as unknown as NullInt64
         reversePointer.Int64 = ID
         reversePointer.Valid = true
-        toUpdate.add(document)
+        toUpdate.add(node)
       }
 
 
-      // update all document (only update selection & initial selection)
-      for (let document of toUpdate) {
-        this.documentService.updateDocument(document, this.GONG__StackPath)
-          .subscribe(document => {
-            this.documentService.DocumentServiceChanged.next("update")
+      // update all node (only update selection & initial selection)
+      for (let node of toUpdate) {
+        this.nodeService.updateNode(node, this.GONG__StackPath)
+          .subscribe(node => {
+            this.nodeService.NodeServiceChanged.next("update")
           });
       }
     }
@@ -310,26 +307,26 @@ export class DocumentsTableComponent implements OnInit {
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
       // get the source instance via the map of instances in the front repo
-      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, DocumentDB>
+      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, NodeDB>
       let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
       // First, parse all instance of the association struct and remove the instance
       // that have unselect
-      let unselectedDocument = new Set<number>()
-      for (let document of this.initialSelection) {
-        if (this.selection.selected.includes(document)) {
-          // console.log("document " + document.Name + " is still selected")
+      let unselectedNode = new Set<number>()
+      for (let node of this.initialSelection) {
+        if (this.selection.selected.includes(node)) {
+          // console.log("node " + node.Name + " is still selected")
         } else {
-          console.log("document " + document.Name + " has been unselected")
-          unselectedDocument.add(document.ID)
-          console.log("is unselected " + unselectedDocument.has(document.ID))
+          console.log("node " + node.Name + " has been unselected")
+          unselectedNode.add(node.ID)
+          console.log("is unselected " + unselectedNode.has(node.ID))
         }
       }
 
       // delete the association instance
       let associationInstance = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]
-      let document = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as DocumentDB
-      if (unselectedDocument.has(document.ID)) {
+      let node = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as NodeDB
+      if (unselectedNode.has(node.ID)) {
         this.frontRepoService.deleteService(this.dialogData.IntermediateStruct, associationInstance)
 
 
@@ -337,38 +334,38 @@ export class DocumentsTableComponent implements OnInit {
 
       // is the source array is empty create it
       if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] == undefined) {
-        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<DocumentDB>) = new Array<DocumentDB>()
+        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<NodeDB>) = new Array<NodeDB>()
       }
 
       // second, parse all instance of the selected
       if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]) {
         this.selection.selected.forEach(
-          document => {
-            if (!this.initialSelection.includes(document)) {
-              // console.log("document " + document.Name + " has been added to the selection")
+          node => {
+            if (!this.initialSelection.includes(node)) {
+              // console.log("node " + node.Name + " has been added to the selection")
 
               let associationInstance = {
-                Name: sourceInstance["Name"] + "-" + document.Name,
+                Name: sourceInstance["Name"] + "-" + node.Name,
               }
 
               let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
-              index.Int64 = document.ID
+              index.Int64 = node.ID
               index.Valid = true
 
               let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
-              indexDB.Int64 = document.ID
+              indexDB.Int64 = node.ID
               index.Valid = true
 
               this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
-              // console.log("document " + document.Name + " is still selected")
+              // console.log("node " + node.Name + " is still selected")
             }
           }
         )
       }
 
-      // this.selection = new SelectionModel<DocumentDB>(allowMultiSelect, this.initialSelection);
+      // this.selection = new SelectionModel<NodeDB>(allowMultiSelect, this.initialSelection);
     }
 
     // why pizza ?

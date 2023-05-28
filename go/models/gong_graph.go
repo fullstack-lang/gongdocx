@@ -14,6 +14,9 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	case *File:
 		ok = stage.IsStagedFile(target)
 
+	case *Node:
+		ok = stage.IsStagedNode(target)
+
 	default:
 		_ = target
 	}
@@ -42,6 +45,13 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 		return
 	}
 
+	func (stage *StageStruct) IsStagedNode(node *Node) (ok bool) {
+
+		_, ok = stage.Nodes[node]
+	
+		return
+	}
+
 
 // StageBranch stages instance and apply StageBranch on all gongstruct instances that are
 // referenced by pointers or slices of pointers of the insance
@@ -59,6 +69,9 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *File:
 		stage.StageBranchFile(target)
+
+	case *Node:
+		stage.StageBranchNode(target)
 
 	default:
 		_ = target
@@ -78,6 +91,9 @@ func (stage *StageStruct) StageBranchDocument(document *Document) {
 	//insertion point for the staging of instances referenced by pointers
 	if document.File != nil {
 		StageBranch(stage, document.File)
+	}
+	if document.Root != nil {
+		StageBranch(stage, document.Root)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
@@ -117,6 +133,24 @@ func (stage *StageStruct) StageBranchFile(file *File) {
 
 }
 
+func (stage *StageStruct) StageBranchNode(node *Node) {
+
+	// check if instance is already staged
+	if IsStaged(stage, node) {
+		return
+	}
+
+	node.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _node := range node.Nodes {
+		StageBranch(stage, _node)
+	}
+
+}
+
 
 // UnstageBranch stages instance and apply UnstageBranch on all gongstruct instances that are
 // referenced by pointers or slices of pointers of the insance
@@ -134,6 +168,9 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *File:
 		stage.UnstageBranchFile(target)
+
+	case *Node:
+		stage.UnstageBranchNode(target)
 
 	default:
 		_ = target
@@ -153,6 +190,9 @@ func (stage *StageStruct) UnstageBranchDocument(document *Document) {
 	//insertion point for the staging of instances referenced by pointers
 	if document.File != nil {
 		UnstageBranch(stage, document.File)
+	}
+	if document.Root != nil {
+		UnstageBranch(stage, document.Root)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
@@ -189,6 +229,24 @@ func (stage *StageStruct) UnstageBranchFile(file *File) {
 	//insertion point for the staging of instances referenced by pointers
 
 	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) UnstageBranchNode(node *Node) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, node) {
+		return
+	}
+
+	node.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _node := range node.Nodes {
+		UnstageBranch(stage, _node)
+	}
 
 }
 

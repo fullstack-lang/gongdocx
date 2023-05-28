@@ -54,6 +54,14 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterFileDeleteCallback OnAfterDeleteInterface[File]
 	OnAfterFileReadCallback   OnAfterReadInterface[File]
 
+	Nodes           map[*Node]any
+	Nodes_mapString map[string]*Node
+
+	OnAfterNodeCreateCallback OnAfterCreateInterface[Node]
+	OnAfterNodeUpdateCallback OnAfterUpdateInterface[Node]
+	OnAfterNodeDeleteCallback OnAfterDeleteInterface[Node]
+	OnAfterNodeReadCallback   OnAfterReadInterface[Node]
+
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
 	AllModelsStructDeleteCallback AllModelsStructDeleteInterface
@@ -124,6 +132,8 @@ type BackRepoInterface interface {
 	CheckoutDocx(docx *Docx)
 	CommitFile(file *File)
 	CheckoutFile(file *File)
+	CommitNode(node *Node)
+	CheckoutNode(node *Node)
 	GetLastCommitFromBackNb() uint
 	GetLastPushFromFrontNb() uint
 }
@@ -151,6 +161,9 @@ func NewStage() (stage *StageStruct) {
 		Files:           make(map[*File]any),
 		Files_mapString: make(map[string]*File),
 
+		Nodes:           make(map[*Node]any),
+		Nodes_mapString: make(map[string]*Node),
+
 		// end of insertion point
 		Map_GongStructName_InstancesNb: make(map[string]int),
 
@@ -171,6 +184,7 @@ func (stage *StageStruct) Commit() {
 	stage.Map_GongStructName_InstancesNb["Document"] = len(stage.Documents)
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
+	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
 
 }
 
@@ -183,6 +197,7 @@ func (stage *StageStruct) Checkout() {
 	stage.Map_GongStructName_InstancesNb["Document"] = len(stage.Documents)
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
+	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
 
 }
 
@@ -335,17 +350,59 @@ func (file *File) GetName() (res string) {
 	return file.Name
 }
 
+// Stage puts node to the model stage
+func (node *Node) Stage(stage *StageStruct) *Node {
+	stage.Nodes[node] = __member
+	stage.Nodes_mapString[node.Name] = node
+
+	return node
+}
+
+// Unstage removes node off the model stage
+func (node *Node) Unstage(stage *StageStruct) *Node {
+	delete(stage.Nodes, node)
+	delete(stage.Nodes_mapString, node.Name)
+	return node
+}
+
+// commit node to the back repo (if it is already staged)
+func (node *Node) Commit(stage *StageStruct) *Node {
+	if _, ok := stage.Nodes[node]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitNode(node)
+		}
+	}
+	return node
+}
+
+// Checkout node to the back repo (if it is already staged)
+func (node *Node) Checkout(stage *StageStruct) *Node {
+	if _, ok := stage.Nodes[node]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutNode(node)
+		}
+	}
+	return node
+}
+
+// for satisfaction of GongStruct interface
+func (node *Node) GetName() (res string) {
+	return node.Name
+}
+
 // swagger:ignore
 type AllModelsStructCreateInterface interface { // insertion point for Callbacks on creation
 	CreateORMDocument(Document *Document)
 	CreateORMDocx(Docx *Docx)
 	CreateORMFile(File *File)
+	CreateORMNode(Node *Node)
 }
 
 type AllModelsStructDeleteInterface interface { // insertion point for Callbacks on deletion
 	DeleteORMDocument(Document *Document)
 	DeleteORMDocx(Docx *Docx)
 	DeleteORMFile(File *File)
+	DeleteORMNode(Node *Node)
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
@@ -358,6 +415,9 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 	stage.Files = make(map[*File]any)
 	stage.Files_mapString = make(map[string]*File)
 
+	stage.Nodes = make(map[*Node]any)
+	stage.Nodes_mapString = make(map[string]*Node)
+
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil
@@ -369,6 +429,9 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 
 	stage.Files = nil
 	stage.Files_mapString = nil
+
+	stage.Nodes = nil
+	stage.Nodes_mapString = nil
 
 }
 
@@ -385,6 +448,10 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 		file.Unstage(stage)
 	}
 
+	for node := range stage.Nodes {
+		node.Unstage(stage)
+	}
+
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -393,7 +460,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	Document | Docx | File
+	Document | Docx | File | Node
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -402,7 +469,7 @@ type Gongstruct interface {
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
 	// insertion point for generic types
-	*Document | *Docx | *File
+	*Document | *Docx | *File | *Node
 	GetName() string
 }
 
@@ -412,6 +479,7 @@ type GongstructSet interface {
 		map[*Document]any |
 		map[*Docx]any |
 		map[*File]any |
+		map[*Node]any |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -421,6 +489,7 @@ type GongstructMapString interface {
 		map[string]*Document |
 		map[string]*Docx |
 		map[string]*File |
+		map[string]*Node |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -437,6 +506,8 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 		return any(&stage.Docxs).(*Type)
 	case map[*File]any:
 		return any(&stage.Files).(*Type)
+	case map[*Node]any:
+		return any(&stage.Nodes).(*Type)
 	default:
 		return nil
 	}
@@ -455,6 +526,8 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 		return any(&stage.Docxs_mapString).(*Type)
 	case map[string]*File:
 		return any(&stage.Files_mapString).(*Type)
+	case map[string]*Node:
+		return any(&stage.Nodes_mapString).(*Type)
 	default:
 		return nil
 	}
@@ -473,6 +546,8 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 		return any(&stage.Docxs).(*map[*Type]any)
 	case File:
 		return any(&stage.Files).(*map[*Type]any)
+	case Node:
+		return any(&stage.Nodes).(*map[*Type]any)
 	default:
 		return nil
 	}
@@ -491,6 +566,8 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 		return any(&stage.Docxs_mapString).(*map[string]*Type)
 	case File:
 		return any(&stage.Files_mapString).(*map[string]*Type)
+	case Node:
+		return any(&stage.Nodes_mapString).(*map[string]*Type)
 	default:
 		return nil
 	}
@@ -510,6 +587,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			// Initialisation of associations
 			// field is initialized with an instance of File with the name of the field
 			File: &File{Name: "File"},
+			// field is initialized with an instance of Node with the name of the field
+			Root: &Node{Name: "Root"},
 		}).(*Type)
 	case Docx:
 		return any(&Docx{
@@ -520,6 +599,12 @@ func GetAssociationName[Type Gongstruct]() *Type {
 	case File:
 		return any(&File{
 			// Initialisation of associations
+		}).(*Type)
+	case Node:
+		return any(&Node{
+			// Initialisation of associations
+			// field is initialized with an instance of Node with the name of the field
+			Nodes: []*Node{{Name: "Nodes"}},
 		}).(*Type)
 	default:
 		return nil
@@ -560,6 +645,23 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 				}
 			}
 			return any(res).(map[*End][]*Start)
+		case "Root":
+			res := make(map[*Node][]*Document)
+			for document := range stage.Documents {
+				if document.Root != nil {
+					node_ := document.Root
+					var documents []*Document
+					_, ok := res[node_]
+					if ok {
+						documents = res[node_]
+					} else {
+						documents = make([]*Document, 0)
+					}
+					documents = append(documents, document)
+					res[node_] = documents
+				}
+			}
+			return any(res).(map[*End][]*Start)
 		}
 	// reverse maps of direct associations of Docx
 	case Docx:
@@ -568,6 +670,11 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 		}
 	// reverse maps of direct associations of File
 	case File:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
+	// reverse maps of direct associations of Node
+	case Node:
 		switch fieldname {
 		// insertion point for per direct association field
 		}
@@ -610,6 +717,19 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 		switch fieldname {
 		// insertion point for per direct association field
 		}
+	// reverse maps of direct associations of Node
+	case Node:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Nodes":
+			res := make(map[*Node]*Node)
+			for node := range stage.Nodes {
+				for _, node_ := range node.Nodes {
+					res[node_] = node
+				}
+			}
+			return any(res).(map[*End]*Start)
+		}
 	}
 	return nil
 }
@@ -628,6 +748,8 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 		res = "Docx"
 	case File:
 		res = "File"
+	case Node:
+		res = "Node"
 	}
 	return res
 }
@@ -640,11 +762,13 @@ func GetFields[Type Gongstruct]() (res []string) {
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct name
 	case Document:
-		res = []string{"Name", "File"}
+		res = []string{"Name", "File", "Root"}
 	case Docx:
 		res = []string{"Name", "Files"}
 	case File:
 		res = []string{"Name"}
+	case Node:
+		res = []string{"Name", "Nodes"}
 	}
 	return
 }
@@ -662,6 +786,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "File":
 			if any(instance).(Document).File != nil {
 				res = any(instance).(Document).File.Name
+			}
+		case "Root":
+			if any(instance).(Document).Root != nil {
+				res = any(instance).(Document).Root.Name
 			}
 		}
 	case Docx:
@@ -682,6 +810,19 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		// string value of fields
 		case "Name":
 			res = any(instance).(File).Name
+		}
+	case Node:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(Node).Name
+		case "Nodes":
+			for idx, __instance__ := range any(instance).(Node).Nodes {
+				if idx > 0 {
+					res += "\n"
+				}
+				res += __instance__.Name
+			}
 		}
 	}
 	return

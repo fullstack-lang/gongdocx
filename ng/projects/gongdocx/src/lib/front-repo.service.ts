@@ -13,6 +13,9 @@ import { DocxService } from './docx.service'
 import { FileDB } from './file-db'
 import { FileService } from './file.service'
 
+import { NodeDB } from './node-db'
+import { NodeService } from './node.service'
+
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
 export class FrontRepo { // insertion point sub template 
@@ -25,6 +28,9 @@ export class FrontRepo { // insertion point sub template
   Files_array = new Array<FileDB>(); // array of repo instances
   Files = new Map<number, FileDB>(); // map of repo instances
   Files_batch = new Map<number, FileDB>(); // same but only in last GET (for finding repo instances to delete)
+  Nodes_array = new Array<NodeDB>(); // array of repo instances
+  Nodes = new Map<number, NodeDB>(); // map of repo instances
+  Nodes_batch = new Map<number, NodeDB>(); // same but only in last GET (for finding repo instances to delete)
 }
 
 // the table component is called in different ways
@@ -90,6 +96,7 @@ export class FrontRepoService {
     private documentService: DocumentService,
     private docxService: DocxService,
     private fileService: FileService,
+    private nodeService: NodeService,
   ) { }
 
   // postService provides a post function for each struct name
@@ -123,10 +130,12 @@ export class FrontRepoService {
     Observable<DocumentDB[]>,
     Observable<DocxDB[]>,
     Observable<FileDB[]>,
+    Observable<NodeDB[]>,
   ] = [ // insertion point sub template
       this.documentService.getDocuments(this.GONG__StackPath),
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
+      this.nodeService.getNodes(this.GONG__StackPath),
     ];
 
   //
@@ -143,6 +152,7 @@ export class FrontRepoService {
       this.documentService.getDocuments(this.GONG__StackPath),
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
+      this.nodeService.getNodes(this.GONG__StackPath),
     ]
 
     return new Observable<FrontRepo>(
@@ -154,6 +164,7 @@ export class FrontRepoService {
             documents_,
             docxs_,
             files_,
+            nodes_,
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
             // insertion point sub template for type casting 
@@ -163,6 +174,8 @@ export class FrontRepoService {
             docxs = docxs_ as DocxDB[]
             var files: FileDB[]
             files = files_ as FileDB[]
+            var nodes: NodeDB[]
+            nodes = nodes_ as NodeDB[]
 
             // 
             // First Step: init map of instances
@@ -266,6 +279,39 @@ export class FrontRepoService {
               return 0;
             });
 
+            // init the array
+            this.frontRepo.Nodes_array = nodes
+
+            // clear the map that counts Node in the GET
+            this.frontRepo.Nodes_batch.clear()
+
+            nodes.forEach(
+              node => {
+                this.frontRepo.Nodes.set(node.ID, node)
+                this.frontRepo.Nodes_batch.set(node.ID, node)
+              }
+            )
+
+            // clear nodes that are absent from the batch
+            this.frontRepo.Nodes.forEach(
+              node => {
+                if (this.frontRepo.Nodes_batch.get(node.ID) == undefined) {
+                  this.frontRepo.Nodes.delete(node.ID)
+                }
+              }
+            )
+
+            // sort Nodes_array array
+            this.frontRepo.Nodes_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
 
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)
@@ -278,6 +324,13 @@ export class FrontRepoService {
                   let _file = this.frontRepo.Files.get(document.FileID.Int64)
                   if (_file) {
                     document.File = _file
+                  }
+                }
+                // insertion point for pointer field Root redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(document.RootID.Int64)
+                  if (_node) {
+                    document.Root = _node
                   }
                 }
 
@@ -306,6 +359,26 @@ export class FrontRepoService {
                     _docx.Files.push(file)
                     if (file.Docx_Files_reverse == undefined) {
                       file.Docx_Files_reverse = _docx
+                    }
+                  }
+                }
+              }
+            )
+            nodes.forEach(
+              node => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+
+                // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Node.Nodes redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(node.Node_NodesDBID.Int64)
+                  if (_node) {
+                    if (_node.Nodes == undefined) {
+                      _node.Nodes = new Array<NodeDB>()
+                    }
+                    _node.Nodes.push(node)
+                    if (node.Node_Nodes_reverse == undefined) {
+                      node.Node_Nodes_reverse = _node
                     }
                   }
                 }
@@ -352,6 +425,13 @@ export class FrontRepoService {
                   let _file = this.frontRepo.Files.get(document.FileID.Int64)
                   if (_file) {
                     document.File = _file
+                  }
+                }
+                // insertion point for pointer field Root redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(document.RootID.Int64)
+                  if (_node) {
+                    document.Root = _node
                   }
                 }
 
@@ -494,6 +574,70 @@ export class FrontRepoService {
       }
     )
   }
+
+  // NodePull performs a GET on Node of the stack and redeem association pointers 
+  NodePull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.nodeService.getNodes(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            nodes,
+          ]) => {
+            // init the array
+            this.frontRepo.Nodes_array = nodes
+
+            // clear the map that counts Node in the GET
+            this.frontRepo.Nodes_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            nodes.forEach(
+              node => {
+                this.frontRepo.Nodes.set(node.ID, node)
+                this.frontRepo.Nodes_batch.set(node.ID, node)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+
+                // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Node.Nodes redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(node.Node_NodesDBID.Int64)
+                  if (_node) {
+                    if (_node.Nodes == undefined) {
+                      _node.Nodes = new Array<NodeDB>()
+                    }
+                    _node.Nodes.push(node)
+                    if (node.Node_Nodes_reverse == undefined) {
+                      node.Node_Nodes_reverse = _node
+                    }
+                  }
+                }
+              }
+            )
+
+            // clear nodes that are absent from the GET
+            this.frontRepo.Nodes.forEach(
+              node => {
+                if (this.frontRepo.Nodes_batch.get(node.ID) == undefined) {
+                  this.frontRepo.Nodes.delete(node.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
 }
 
 // insertion point for get unique ID per struct 
@@ -505,4 +649,7 @@ export function getDocxUniqueID(id: number): number {
 }
 export function getFileUniqueID(id: number): number {
   return 41 * id
+}
+export function getNodeUniqueID(id: number): number {
+  return 43 * id
 }

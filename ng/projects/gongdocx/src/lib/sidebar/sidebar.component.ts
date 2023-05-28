@@ -17,6 +17,8 @@ import { DocxService } from '../docx.service'
 import { getDocxUniqueID } from '../front-repo.service'
 import { FileService } from '../file.service'
 import { getFileUniqueID } from '../front-repo.service'
+import { NodeService } from '../node.service'
+import { getNodeUniqueID } from '../front-repo.service'
 
 import { RouteService } from '../route-service';
 
@@ -165,6 +167,7 @@ export class SidebarComponent implements OnInit {
     private documentService: DocumentService,
     private docxService: DocxService,
     private fileService: FileService,
+    private nodeService: NodeService,
 
     private routeService: RouteService,
   ) { }
@@ -218,6 +221,14 @@ export class SidebarComponent implements OnInit {
     )
     // observable for changes in structs
     this.fileService.FileServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.nodeService.NodeServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -322,6 +333,41 @@ export class SidebarComponent implements OnInit {
               children: new Array<GongNode>()
             }
             FileGongNodeAssociation.children.push(documentGongNodeInstance_File)
+          }
+
+          /**
+          * let append a node for the association Root
+          */
+          let RootGongNodeAssociation: GongNode = {
+            name: "(Node) Root",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: documentDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Document",
+            associationField: "Root",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          documentGongNodeInstance.children!.push(RootGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Root
+            */
+          if (documentDB.Root != undefined) {
+            let documentGongNodeInstance_Root: GongNode = {
+              name: documentDB.Root.Name,
+              type: GongNodeType.INSTANCE,
+              id: documentDB.Root.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getDocumentUniqueID(documentDB.ID)
+                + 5 * getNodeUniqueID(documentDB.Root.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            RootGongNodeAssociation.children.push(documentGongNodeInstance_Root)
           }
 
         }
@@ -444,6 +490,82 @@ export class SidebarComponent implements OnInit {
           fileGongNodeStruct.children!.push(fileGongNodeInstance)
 
           // insertion point for per field code
+        }
+      )
+
+      /**
+      * fill up the Node part of the mat tree
+      */
+      let nodeGongNodeStruct: GongNode = {
+        name: "Node",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Node",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(nodeGongNodeStruct)
+
+      this.frontRepo.Nodes_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Nodes_array.forEach(
+        nodeDB => {
+          let nodeGongNodeInstance: GongNode = {
+            name: nodeDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: nodeDB.ID,
+            uniqueIdPerStack: getNodeUniqueID(nodeDB.ID),
+            structName: "Node",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          nodeGongNodeStruct.children!.push(nodeGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the slide of pointer Nodes
+          */
+          let NodesGongNodeAssociation: GongNode = {
+            name: "(Node) Nodes",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: nodeDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "Node",
+            associationField: "Nodes",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          nodeGongNodeInstance.children.push(NodesGongNodeAssociation)
+
+          nodeDB.Nodes?.forEach(nodeDB => {
+            let nodeNode: GongNode = {
+              name: nodeDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: nodeDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getNodeUniqueID(nodeDB.ID)
+                + 11 * getNodeUniqueID(nodeDB.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodesGongNodeAssociation.children.push(nodeNode)
+          })
+
         }
       )
 

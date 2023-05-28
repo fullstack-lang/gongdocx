@@ -206,6 +206,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_Node_Identifiers := make(map[*Node]string)
+	_ = map_Node_Identifiers
+
+	nodeOrdered := []*Node{}
+	for node := range stage.Nodes {
+		nodeOrdered = append(nodeOrdered, node)
+	}
+	sort.Slice(nodeOrdered[:], func(i, j int) bool {
+		return nodeOrdered[i].Name < nodeOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of Node"
+	for idx, node := range nodeOrdered {
+
+		id = generatesIdentifier("Node", idx, node.Name)
+		map_Node_Identifiers[node] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Node")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", node.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// Node values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(node.Name))
+		initializerStatements += setValueField
+
+	}
+
 	// insertion initialization of objects to stage
 	for idx, document := range documentOrdered {
 		var setPointerField string
@@ -220,6 +252,14 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "File")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_File_Identifiers[document.File])
+			pointersInitializesStatements += setPointerField
+		}
+
+		if document.Root != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Root")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[document.Root])
 			pointersInitializesStatements += setPointerField
 		}
 
@@ -251,6 +291,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		map_File_Identifiers[file] = id
 
 		// Initialisation of values
+	}
+
+	for idx, node := range nodeOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("Node", idx, node.Name)
+		map_Node_Identifiers[node] = id
+
+		// Initialisation of values
+		for _, _node := range node.Nodes {
+			setPointerField = SliceOfPointersFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Nodes")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[_node])
+			pointersInitializesStatements += setPointerField
+		}
+
 	}
 
 	res = strings.ReplaceAll(res, "{{Identifiers}}", identifiersDecl)

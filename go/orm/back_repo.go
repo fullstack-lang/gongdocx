@@ -27,6 +27,8 @@ type BackRepoStruct struct {
 
 	BackRepoFile BackRepoFileStruct
 
+	BackRepoNode BackRepoNodeStruct
+
 	CommitFromBackNb uint // records commit increments when performed by the back
 
 	PushFromFrontNb uint // records commit increments when performed by the front
@@ -66,6 +68,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&DocumentDB{},
 		&DocxDB{},
 		&FileDB{},
+		&NodeDB{},
 	)
 
 	if err != nil {
@@ -96,6 +99,14 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_FileDBID_FilePtr: make(map[uint]*models.File, 0),
 		Map_FileDBID_FileDB:  make(map[uint]*FileDB, 0),
 		Map_FilePtr_FileDBID: make(map[*models.File]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
+	backRepo.BackRepoNode = BackRepoNodeStruct{
+		Map_NodeDBID_NodePtr: make(map[uint]*models.Node, 0),
+		Map_NodeDBID_NodeDB:  make(map[uint]*NodeDB, 0),
+		Map_NodePtr_NodeDBID: make(map[*models.Node]uint, 0),
 
 		db:    db,
 		stage: stage,
@@ -148,11 +159,13 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoDocument.CommitPhaseOne(stage)
 	backRepo.BackRepoDocx.CommitPhaseOne(stage)
 	backRepo.BackRepoFile.CommitPhaseOne(stage)
+	backRepo.BackRepoNode.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoDocument.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoDocx.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoFile.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoNode.CommitPhaseTwo(backRepo)
 
 	backRepo.IncrementCommitFromBackNb()
 }
@@ -163,11 +176,13 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoDocument.CheckoutPhaseOne()
 	backRepo.BackRepoDocx.CheckoutPhaseOne()
 	backRepo.BackRepoFile.CheckoutPhaseOne()
+	backRepo.BackRepoNode.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoDocument.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoDocx.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoFile.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoNode.CheckoutPhaseTwo(backRepo)
 }
 
 var _backRepo *BackRepoStruct
@@ -197,6 +212,7 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	backRepo.BackRepoDocument.Backup(dirPath)
 	backRepo.BackRepoDocx.Backup(dirPath)
 	backRepo.BackRepoFile.Backup(dirPath)
+	backRepo.BackRepoNode.Backup(dirPath)
 }
 
 // Backup in XL the BackRepoStruct
@@ -210,6 +226,7 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	backRepo.BackRepoDocument.BackupXL(file)
 	backRepo.BackRepoDocx.BackupXL(file)
 	backRepo.BackRepoFile.BackupXL(file)
+	backRepo.BackRepoNode.BackupXL(file)
 
 	var b bytes.Buffer
 	writer := bufio.NewWriter(&b)
@@ -237,6 +254,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoDocument.RestorePhaseOne(dirPath)
 	backRepo.BackRepoDocx.RestorePhaseOne(dirPath)
 	backRepo.BackRepoFile.RestorePhaseOne(dirPath)
+	backRepo.BackRepoNode.RestorePhaseOne(dirPath)
 
 	//
 	// restauration second phase (reindex pointers with the new ID)
@@ -246,6 +264,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoDocument.RestorePhaseTwo()
 	backRepo.BackRepoDocx.RestorePhaseTwo()
 	backRepo.BackRepoFile.RestorePhaseTwo()
+	backRepo.BackRepoNode.RestorePhaseTwo()
 
 	backRepo.stage.Checkout()
 }
@@ -276,6 +295,7 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.BackRepoDocument.RestoreXLPhaseOne(file)
 	backRepo.BackRepoDocx.RestoreXLPhaseOne(file)
 	backRepo.BackRepoFile.RestoreXLPhaseOne(file)
+	backRepo.BackRepoNode.RestoreXLPhaseOne(file)
 
 	// commit the restored stage
 	backRepo.stage.Commit()
