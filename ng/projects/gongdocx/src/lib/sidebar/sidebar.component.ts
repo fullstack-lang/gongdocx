@@ -13,6 +13,8 @@ import { GongstructSelectionService } from '../gongstruct-selection.service'
 // insertion point for per struct import code
 import { DocxService } from '../docx.service'
 import { getDocxUniqueID } from '../front-repo.service'
+import { FileService } from '../file.service'
+import { getFileUniqueID } from '../front-repo.service'
 
 import { RouteService } from '../route-service';
 
@@ -159,6 +161,7 @@ export class SidebarComponent implements OnInit {
 
     // insertion point for per struct service declaration
     private docxService: DocxService,
+    private fileService: FileService,
 
     private routeService: RouteService,
   ) { }
@@ -196,6 +199,14 @@ export class SidebarComponent implements OnInit {
     // insertion point for per struct observable for refresh trigger
     // observable for changes in structs
     this.docxService.DocxServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.fileService.FileServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -265,6 +276,82 @@ export class SidebarComponent implements OnInit {
             children: new Array<GongNode>()
           }
           docxGongNodeStruct.children!.push(docxGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the slide of pointer Files
+          */
+          let FilesGongNodeAssociation: GongNode = {
+            name: "(File) Files",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: docxDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "Docx",
+            associationField: "Files",
+            associatedStructName: "File",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          docxGongNodeInstance.children.push(FilesGongNodeAssociation)
+
+          docxDB.Files?.forEach(fileDB => {
+            let fileNode: GongNode = {
+              name: fileDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: fileDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getDocxUniqueID(docxDB.ID)
+                + 11 * getFileUniqueID(fileDB.ID),
+              structName: "File",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            FilesGongNodeAssociation.children.push(fileNode)
+          })
+
+        }
+      )
+
+      /**
+      * fill up the File part of the mat tree
+      */
+      let fileGongNodeStruct: GongNode = {
+        name: "File",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "File",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(fileGongNodeStruct)
+
+      this.frontRepo.Files_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Files_array.forEach(
+        fileDB => {
+          let fileGongNodeInstance: GongNode = {
+            name: fileDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: fileDB.ID,
+            uniqueIdPerStack: getFileUniqueID(fileDB.ID),
+            structName: "File",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          fileGongNodeStruct.children!.push(fileGongNodeInstance)
 
           // insertion point for per field code
         }

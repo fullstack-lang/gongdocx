@@ -48,6 +48,13 @@ func registerControllers(r *gin.Engine) {
 		v1.PUT("/v1/docxs/:id", GetController().UpdateDocx)
 		v1.DELETE("/v1/docxs/:id", GetController().DeleteDocx)
 
+		v1.GET("/v1/files", GetController().GetFiles)
+		v1.GET("/v1/files/:id", GetController().GetFile)
+		v1.POST("/v1/files", GetController().PostFile)
+		v1.PATCH("/v1/files/:id", GetController().UpdateFile)
+		v1.PUT("/v1/files/:id", GetController().UpdateFile)
+		v1.DELETE("/v1/files/:id", GetController().DeleteFile)
+
 		v1.GET("/v1/commitfrombacknb", GetController().GetLastCommitFromBackNb)
 		v1.GET("/v1/pushfromfrontnb", GetController().GetLastPushFromFrontNb)
 	}

@@ -142,6 +142,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_File_Identifiers := make(map[*File]string)
+	_ = map_File_Identifiers
+
+	fileOrdered := []*File{}
+	for file := range stage.Files {
+		fileOrdered = append(fileOrdered, file)
+	}
+	sort.Slice(fileOrdered[:], func(i, j int) bool {
+		return fileOrdered[i].Name < fileOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of File"
+	for idx, file := range fileOrdered {
+
+		id = generatesIdentifier("File", idx, file.Name)
+		map_File_Identifiers[file] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "File")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", file.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// File values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(file.Name))
+		initializerStatements += setValueField
+
+	}
+
 	// insertion initialization of objects to stage
 	for idx, docx := range docxOrdered {
 		var setPointerField string
@@ -149,6 +181,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		id = generatesIdentifier("Docx", idx, docx.Name)
 		map_Docx_Identifiers[docx] = id
+
+		// Initialisation of values
+		for _, _file := range docx.Files {
+			setPointerField = SliceOfPointersFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Files")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_File_Identifiers[_file])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, file := range fileOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("File", idx, file.Name)
+		map_File_Identifiers[file] = id
 
 		// Initialisation of values
 	}

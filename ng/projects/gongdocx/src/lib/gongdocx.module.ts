@@ -43,6 +43,10 @@ import { DocxsTableComponent } from './docxs-table/docxs-table.component'
 import { DocxSortingComponent } from './docx-sorting/docx-sorting.component'
 import { DocxDetailComponent } from './docx-detail/docx-detail.component'
 
+import { FilesTableComponent } from './files-table/files-table.component'
+import { FileSortingComponent } from './file-sorting/file-sorting.component'
+import { FileDetailComponent } from './file-detail/file-detail.component'
+
 
 @NgModule({
 	declarations: [
@@ -50,6 +54,10 @@ import { DocxDetailComponent } from './docx-detail/docx-detail.component'
 		DocxsTableComponent,
 		DocxSortingComponent,
 		DocxDetailComponent,
+
+		FilesTableComponent,
+		FileSortingComponent,
+		FileDetailComponent,
 
 
 		SplitterComponent,
@@ -93,6 +101,10 @@ import { DocxDetailComponent } from './docx-detail/docx-detail.component'
 		DocxsTableComponent,
 		DocxSortingComponent,
 		DocxDetailComponent,
+
+		FilesTableComponent,
+		FileSortingComponent,
+		FileDetailComponent,
 
 
 		SplitterComponent,

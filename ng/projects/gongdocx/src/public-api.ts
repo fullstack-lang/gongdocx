@@ -22,4 +22,10 @@ export * from './lib/docxs-table/docxs-table.component'
 export * from './lib/docx-db'
 export * from './lib/docx.service'
 
+export * from './lib/file-detail/file-detail.component'
+export * from './lib/file-sorting/file-sorting.component'
+export * from './lib/files-table/files-table.component'
+export * from './lib/file-db'
+export * from './lib/file.service'
+
 

@@ -38,6 +38,14 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterDocxDeleteCallback OnAfterDeleteInterface[Docx]
 	OnAfterDocxReadCallback   OnAfterReadInterface[Docx]
 
+	Files           map[*File]any
+	Files_mapString map[string]*File
+
+	OnAfterFileCreateCallback OnAfterCreateInterface[File]
+	OnAfterFileUpdateCallback OnAfterUpdateInterface[File]
+	OnAfterFileDeleteCallback OnAfterDeleteInterface[File]
+	OnAfterFileReadCallback   OnAfterReadInterface[File]
+
 	AllModelsStructCreateCallback AllModelsStructCreateInterface
 
 	AllModelsStructDeleteCallback AllModelsStructDeleteInterface
@@ -104,6 +112,8 @@ type BackRepoInterface interface {
 	// insertion point for Commit and Checkout signatures
 	CommitDocx(docx *Docx)
 	CheckoutDocx(docx *Docx)
+	CommitFile(file *File)
+	CheckoutFile(file *File)
 	GetLastCommitFromBackNb() uint
 	GetLastPushFromFrontNb() uint
 }
@@ -125,6 +135,9 @@ func NewStage() (stage *StageStruct) {
 		Docxs:           make(map[*Docx]any),
 		Docxs_mapString: make(map[string]*Docx),
 
+		Files:           make(map[*File]any),
+		Files_mapString: make(map[string]*File),
+
 		// end of insertion point
 		Map_GongStructName_InstancesNb: make(map[string]int),
 
@@ -143,6 +156,7 @@ func (stage *StageStruct) Commit() {
 
 	// insertion point for computing the map of number of instances per gongstruct
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
+	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
 
 }
 
@@ -153,6 +167,7 @@ func (stage *StageStruct) Checkout() {
 
 	// insertion point for computing the map of number of instances per gongstruct
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
+	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
 
 }
 
@@ -225,18 +240,63 @@ func (docx *Docx) GetName() (res string) {
 	return docx.Name
 }
 
+// Stage puts file to the model stage
+func (file *File) Stage(stage *StageStruct) *File {
+	stage.Files[file] = __member
+	stage.Files_mapString[file.Name] = file
+
+	return file
+}
+
+// Unstage removes file off the model stage
+func (file *File) Unstage(stage *StageStruct) *File {
+	delete(stage.Files, file)
+	delete(stage.Files_mapString, file.Name)
+	return file
+}
+
+// commit file to the back repo (if it is already staged)
+func (file *File) Commit(stage *StageStruct) *File {
+	if _, ok := stage.Files[file]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitFile(file)
+		}
+	}
+	return file
+}
+
+// Checkout file to the back repo (if it is already staged)
+func (file *File) Checkout(stage *StageStruct) *File {
+	if _, ok := stage.Files[file]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutFile(file)
+		}
+	}
+	return file
+}
+
+// for satisfaction of GongStruct interface
+func (file *File) GetName() (res string) {
+	return file.Name
+}
+
 // swagger:ignore
 type AllModelsStructCreateInterface interface { // insertion point for Callbacks on creation
 	CreateORMDocx(Docx *Docx)
+	CreateORMFile(File *File)
 }
 
 type AllModelsStructDeleteInterface interface { // insertion point for Callbacks on deletion
 	DeleteORMDocx(Docx *Docx)
+	DeleteORMFile(File *File)
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
 	stage.Docxs = make(map[*Docx]any)
 	stage.Docxs_mapString = make(map[string]*Docx)
+
+	stage.Files = make(map[*File]any)
+	stage.Files_mapString = make(map[string]*File)
 
 }
 
@@ -244,11 +304,18 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 	stage.Docxs = nil
 	stage.Docxs_mapString = nil
 
+	stage.Files = nil
+	stage.Files_mapString = nil
+
 }
 
 func (stage *StageStruct) Unstage() { // insertion point for array nil
 	for docx := range stage.Docxs {
 		docx.Unstage(stage)
+	}
+
+	for file := range stage.Files {
+		file.Unstage(stage)
 	}
 
 }
@@ -259,7 +326,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	Docx
+	Docx | File
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -268,7 +335,7 @@ type Gongstruct interface {
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
 	// insertion point for generic types
-	*Docx
+	*Docx | *File
 	GetName() string
 }
 
@@ -276,6 +343,7 @@ type GongstructSet interface {
 	map[any]any |
 		// insertion point for generic types
 		map[*Docx]any |
+		map[*File]any |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -283,6 +351,7 @@ type GongstructMapString interface {
 	map[any]any |
 		// insertion point for generic types
 		map[string]*Docx |
+		map[string]*File |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
 
@@ -295,6 +364,8 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 	// insertion point for generic get functions
 	case map[*Docx]any:
 		return any(&stage.Docxs).(*Type)
+	case map[*File]any:
+		return any(&stage.Files).(*Type)
 	default:
 		return nil
 	}
@@ -309,6 +380,8 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 	// insertion point for generic get functions
 	case map[string]*Docx:
 		return any(&stage.Docxs_mapString).(*Type)
+	case map[string]*File:
+		return any(&stage.Files_mapString).(*Type)
 	default:
 		return nil
 	}
@@ -323,6 +396,8 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 	// insertion point for generic get functions
 	case Docx:
 		return any(&stage.Docxs).(*map[*Type]any)
+	case File:
+		return any(&stage.Files).(*map[*Type]any)
 	default:
 		return nil
 	}
@@ -337,6 +412,8 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 	// insertion point for generic get functions
 	case Docx:
 		return any(&stage.Docxs_mapString).(*map[string]*Type)
+	case File:
+		return any(&stage.Files_mapString).(*map[string]*Type)
 	default:
 		return nil
 	}
@@ -353,6 +430,12 @@ func GetAssociationName[Type Gongstruct]() *Type {
 	// insertion point for instance with special fields
 	case Docx:
 		return any(&Docx{
+			// Initialisation of associations
+			// field is initialized with an instance of File with the name of the field
+			Files: []*File{{Name: "Files"}},
+		}).(*Type)
+	case File:
+		return any(&File{
 			// Initialisation of associations
 		}).(*Type)
 	default:
@@ -378,6 +461,11 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 		switch fieldname {
 		// insertion point for per direct association field
 		}
+	// reverse maps of direct associations of File
+	case File:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
 	}
 	return nil
 }
@@ -398,6 +486,19 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 	case Docx:
 		switch fieldname {
 		// insertion point for per direct association field
+		case "Files":
+			res := make(map[*File]*Docx)
+			for docx := range stage.Docxs {
+				for _, file_ := range docx.Files {
+					res[file_] = docx
+				}
+			}
+			return any(res).(map[*End]*Start)
+		}
+	// reverse maps of direct associations of File
+	case File:
+		switch fieldname {
+		// insertion point for per direct association field
 		}
 	}
 	return nil
@@ -413,6 +514,8 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 	// insertion point for generic get gongstruct name
 	case Docx:
 		res = "Docx"
+	case File:
+		res = "File"
 	}
 	return res
 }
@@ -425,6 +528,8 @@ func GetFields[Type Gongstruct]() (res []string) {
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct name
 	case Docx:
+		res = []string{"Name", "Files"}
+	case File:
 		res = []string{"Name"}
 	}
 	return
@@ -440,6 +545,19 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		// string value of fields
 		case "Name":
 			res = any(instance).(Docx).Name
+		case "Files":
+			for idx, __instance__ := range any(instance).(Docx).Files {
+				if idx > 0 {
+					res += "\n"
+				}
+				res += __instance__.Name
+			}
+		}
+	case File:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(File).Name
 		}
 	}
 	return

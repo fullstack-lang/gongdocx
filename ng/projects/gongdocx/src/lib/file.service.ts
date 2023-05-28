@@ -11,20 +11,21 @@ import { BehaviorSubject } from 'rxjs';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
-import { DocxDB } from './docx-db';
+import { FileDB } from './file-db';
 
 // insertion point for imports
+import { DocxDB } from './docx-db'
 
 @Injectable({
   providedIn: 'root'
 })
-export class DocxService {
+export class FileService {
 
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
-  DocxServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
+  FileServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
 
-  private docxsUrl: string
+  private filesUrl: string
 
   constructor(
     private http: HttpClient,
@@ -38,39 +39,40 @@ export class DocxService {
     origin = origin.replace("4200", "8080")
 
     // compute path to the service
-    this.docxsUrl = origin + '/api/github.com/fullstack-lang/gongdocx/go/v1/docxs';
+    this.filesUrl = origin + '/api/github.com/fullstack-lang/gongdocx/go/v1/files';
   }
 
-  /** GET docxs from the server */
-  getDocxs(GONG__StackPath: string): Observable<DocxDB[]> {
+  /** GET files from the server */
+  getFiles(GONG__StackPath: string): Observable<FileDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
-    return this.http.get<DocxDB[]>(this.docxsUrl, { params: params })
+    return this.http.get<FileDB[]>(this.filesUrl, { params: params })
       .pipe(
         tap(),
-		// tap(_ => this.log('fetched docxs')),
-        catchError(this.handleError<DocxDB[]>('getDocxs', []))
+		// tap(_ => this.log('fetched files')),
+        catchError(this.handleError<FileDB[]>('getFiles', []))
       );
   }
 
-  /** GET docx by id. Will 404 if id not found */
-  getDocx(id: number, GONG__StackPath: string): Observable<DocxDB> {
+  /** GET file by id. Will 404 if id not found */
+  getFile(id: number, GONG__StackPath: string): Observable<FileDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
-    const url = `${this.docxsUrl}/${id}`;
-    return this.http.get<DocxDB>(url, { params: params }).pipe(
-      // tap(_ => this.log(`fetched docx id=${id}`)),
-      catchError(this.handleError<DocxDB>(`getDocx id=${id}`))
+    const url = `${this.filesUrl}/${id}`;
+    return this.http.get<FileDB>(url, { params: params }).pipe(
+      // tap(_ => this.log(`fetched file id=${id}`)),
+      catchError(this.handleError<FileDB>(`getFile id=${id}`))
     );
   }
 
-  /** POST: add a new docx to the server */
-  postDocx(docxdb: DocxDB, GONG__StackPath: string): Observable<DocxDB> {
+  /** POST: add a new file to the server */
+  postFile(filedb: FileDB, GONG__StackPath: string): Observable<FileDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    docxdb.Files = []
+    let _Docx_Files_reverse = filedb.Docx_Files_reverse
+    filedb.Docx_Files_reverse = new DocxDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -78,19 +80,20 @@ export class DocxService {
       params: params
     }
 
-    return this.http.post<DocxDB>(this.docxsUrl, docxdb, httpOptions).pipe(
+    return this.http.post<FileDB>(this.filesUrl, filedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        // this.log(`posted docxdb id=${docxdb.ID}`)
+        filedb.Docx_Files_reverse = _Docx_Files_reverse
+        // this.log(`posted filedb id=${filedb.ID}`)
       }),
-      catchError(this.handleError<DocxDB>('postDocx'))
+      catchError(this.handleError<FileDB>('postFile'))
     );
   }
 
-  /** DELETE: delete the docxdb from the server */
-  deleteDocx(docxdb: DocxDB | number, GONG__StackPath: string): Observable<DocxDB> {
-    const id = typeof docxdb === 'number' ? docxdb : docxdb.ID;
-    const url = `${this.docxsUrl}/${id}`;
+  /** DELETE: delete the filedb from the server */
+  deleteFile(filedb: FileDB | number, GONG__StackPath: string): Observable<FileDB> {
+    const id = typeof filedb === 'number' ? filedb : filedb.ID;
+    const url = `${this.filesUrl}/${id}`;
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -98,19 +101,20 @@ export class DocxService {
       params: params
     };
 
-    return this.http.delete<DocxDB>(url, httpOptions).pipe(
-      tap(_ => this.log(`deleted docxdb id=${id}`)),
-      catchError(this.handleError<DocxDB>('deleteDocx'))
+    return this.http.delete<FileDB>(url, httpOptions).pipe(
+      tap(_ => this.log(`deleted filedb id=${id}`)),
+      catchError(this.handleError<FileDB>('deleteFile'))
     );
   }
 
-  /** PUT: update the docxdb on the server */
-  updateDocx(docxdb: DocxDB, GONG__StackPath: string): Observable<DocxDB> {
-    const id = typeof docxdb === 'number' ? docxdb : docxdb.ID;
-    const url = `${this.docxsUrl}/${id}`;
+  /** PUT: update the filedb on the server */
+  updateFile(filedb: FileDB, GONG__StackPath: string): Observable<FileDB> {
+    const id = typeof filedb === 'number' ? filedb : filedb.ID;
+    const url = `${this.filesUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    docxdb.Files = []
+    let _Docx_Files_reverse = filedb.Docx_Files_reverse
+    filedb.Docx_Files_reverse = new DocxDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -118,12 +122,13 @@ export class DocxService {
       params: params
     };
 
-    return this.http.put<DocxDB>(url, docxdb, httpOptions).pipe(
+    return this.http.put<FileDB>(url, filedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        // this.log(`updated docxdb id=${docxdb.ID}`)
+        filedb.Docx_Files_reverse = _Docx_Files_reverse
+        // this.log(`updated filedb id=${filedb.ID}`)
       }),
-      catchError(this.handleError<DocxDB>('updateDocx'))
+      catchError(this.handleError<FileDB>('updateFile'))
     );
   }
 
@@ -133,11 +138,11 @@ export class DocxService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation in DocxService', result?: T) {
+  private handleError<T>(operation = 'operation in FileService', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
-      console.error("DocxService" + error); // log to console instead
+      console.error("FileService" + error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);

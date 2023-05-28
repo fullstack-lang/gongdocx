@@ -7,13 +7,15 @@ import (
 
 type Docx struct {
 	Name string
+
+	Files []*File
 }
 
 func NewDocx(gongdocx_stage *StageStruct, path string, embed bool) (docx *Docx) {
 
 	docx = (&Docx{Name: filepath.Base(path)}).Stage(gongdocx_stage)
 
-	if err := Docx2md(path, embed); err != nil {
+	if err := docx2md(docx, gongdocx_stage, path, embed); err != nil {
 		log.Fatal(err)
 	}
 

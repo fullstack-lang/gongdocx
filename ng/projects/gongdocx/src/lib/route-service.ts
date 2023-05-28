@@ -5,6 +5,9 @@ import { Route, Router, Routes } from '@angular/router';
 import { DocxsTableComponent } from './docxs-table/docxs-table.component'
 import { DocxDetailComponent } from './docx-detail/docx-detail.component'
 
+import { FilesTableComponent } from './files-table/files-table.component'
+import { FileDetailComponent } from './file-detail/file-detail.component'
+
 
 @Injectable({
     providedIn: 'root'
@@ -69,6 +72,39 @@ export class RouteService {
         return route
     }
 
+    getFileTablePath(): string {
+        return this.getPathRoot() + '-files/:GONG__StackPath'
+    }
+    getFileTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getFileTablePath(), component: FilesTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getFileAdderPath(): string {
+        return this.getPathRoot() + '-file-adder/:GONG__StackPath'
+    }
+    getFileAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getFileAdderPath(), component: FileDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getFileAdderForUsePath(): string {
+        return this.getPathRoot() + '-file-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getFileAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getFileAdderForUsePath(), component: FileDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getFileDetailPath(): string {
+        return this.getPathRoot() + '-file-detail/:id/:GONG__StackPath'
+    }
+    getFileDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getFileDetailPath(), component: FileDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
 
 
     addDataPanelRoutes(stackPath: string) {
@@ -79,6 +115,11 @@ export class RouteService {
             this.getDocxAdderRoute(stackPath),
             this.getDocxAdderForUseRoute(stackPath),
             this.getDocxDetailRoute(stackPath),
+
+            this.getFileTableRoute(stackPath),
+            this.getFileAdderRoute(stackPath),
+            this.getFileAdderForUseRoute(stackPath),
+            this.getFileDetailRoute(stackPath),
 
         ])
     }

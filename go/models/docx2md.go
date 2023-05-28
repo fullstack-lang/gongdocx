@@ -479,7 +479,7 @@ func findFile(files []*zip.File, target string) *zip.File {
 	return nil
 }
 
-func Docx2md(arg string, embed bool) error {
+func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) error {
 	r, err := zip.OpenReader(arg)
 	if err != nil {
 		return err
@@ -490,6 +490,10 @@ func Docx2md(arg string, embed bool) error {
 	var num Numbering
 
 	for _, f := range r.File {
+
+		file := (&File{Name: f.Name}).Stage(gongdocx_stage)
+		docx.Files = append(docx.Files, file)
+
 		switch f.Name {
 		case "word/_rels/document.xml.rels":
 			rc, err := f.Open()

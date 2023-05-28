@@ -8,6 +8,9 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	case *Docx:
 		ok = stage.IsStagedDocx(target)
 
+	case *File:
+		ok = stage.IsStagedFile(target)
+
 	default:
 		_ = target
 	}
@@ -18,6 +21,13 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	func (stage *StageStruct) IsStagedDocx(docx *Docx) (ok bool) {
 
 		_, ok = stage.Docxs[docx]
+	
+		return
+	}
+
+	func (stage *StageStruct) IsStagedFile(file *File) (ok bool) {
+
+		_, ok = stage.Files[file]
 	
 		return
 	}
@@ -33,6 +43,9 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 	// insertion point for stage branch
 	case *Docx:
 		stage.StageBranchDocx(target)
+
+	case *File:
+		stage.StageBranchFile(target)
 
 	default:
 		_ = target
@@ -52,6 +65,24 @@ func (stage *StageStruct) StageBranchDocx(docx *Docx) {
 	//insertion point for the staging of instances referenced by pointers
 
 	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _file := range docx.Files {
+		StageBranch(stage, _file)
+	}
+
+}
+
+func (stage *StageStruct) StageBranchFile(file *File) {
+
+	// check if instance is already staged
+	if IsStaged(stage, file) {
+		return
+	}
+
+	file.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+
+	//insertion point for the staging of instances referenced by slice of pointers
 
 }
 
@@ -67,6 +98,9 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 	case *Docx:
 		stage.UnstageBranchDocx(target)
 
+	case *File:
+		stage.UnstageBranchFile(target)
+
 	default:
 		_ = target
 	}
@@ -81,6 +115,24 @@ func (stage *StageStruct) UnstageBranchDocx(docx *Docx) {
 	}
 
 	docx.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _file := range docx.Files {
+		UnstageBranch(stage, _file)
+	}
+
+}
+
+func (stage *StageStruct) UnstageBranchFile(file *File) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, file) {
+		return
+	}
+
+	file.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
 
