@@ -64,6 +64,9 @@ type ParagraphDB struct {
 
 	// Declation for basic field paragraphDB.Name
 	Name_Data sql.NullString
+
+	// Declation for basic field paragraphDB.Content
+	Content_Data sql.NullString
 	// encoding of pointers
 	ParagraphPointersEnconding
 }
@@ -86,6 +89,8 @@ type ParagraphWOP struct {
 	// insertion for WOP basic fields
 
 	Name string `xlsx:"1"`
+
+	Content string `xlsx:"2"`
 	// insertion for WOP pointer fields
 }
 
@@ -93,6 +98,7 @@ var Paragraph_Fields = []string{
 	// insertion for WOP basic fields
 	"ID",
 	"Name",
+	"Content",
 }
 
 type BackRepoParagraphStruct struct {
@@ -368,6 +374,9 @@ func (paragraphDB *ParagraphDB) CopyBasicFieldsFromParagraph(paragraph *models.P
 
 	paragraphDB.Name_Data.String = paragraph.Name
 	paragraphDB.Name_Data.Valid = true
+
+	paragraphDB.Content_Data.String = paragraph.Content
+	paragraphDB.Content_Data.Valid = true
 }
 
 // CopyBasicFieldsFromParagraphWOP
@@ -376,12 +385,16 @@ func (paragraphDB *ParagraphDB) CopyBasicFieldsFromParagraphWOP(paragraph *Parag
 
 	paragraphDB.Name_Data.String = paragraph.Name
 	paragraphDB.Name_Data.Valid = true
+
+	paragraphDB.Content_Data.String = paragraph.Content
+	paragraphDB.Content_Data.Valid = true
 }
 
 // CopyBasicFieldsToParagraph
 func (paragraphDB *ParagraphDB) CopyBasicFieldsToParagraph(paragraph *models.Paragraph) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	paragraph.Name = paragraphDB.Name_Data.String
+	paragraph.Content = paragraphDB.Content_Data.String
 }
 
 // CopyBasicFieldsToParagraphWOP
@@ -389,6 +402,7 @@ func (paragraphDB *ParagraphDB) CopyBasicFieldsToParagraphWOP(paragraph *Paragra
 	paragraph.ID = int(paragraphDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	paragraph.Name = paragraphDB.Name_Data.String
+	paragraph.Content = paragraphDB.Content_Data.String
 }
 
 // Backup generates a json file from a slice of all ParagraphDB instances in the backrepo

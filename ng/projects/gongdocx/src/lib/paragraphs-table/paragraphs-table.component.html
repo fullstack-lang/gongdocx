@@ -26,6 +26,13 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="Content">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Content </th>
+            <td mat-cell *matCellDef="let Paragraph">
+                {{Paragraph.Content}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="Node">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Node </th>
             <td mat-cell *matCellDef="let Paragraph">

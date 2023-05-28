@@ -189,13 +189,14 @@ func attr(attrs []xml.Attr, name string) (string, bool) {
 	return "", false
 }
 
-var nodeCounter = 0
-
 func (zf *file) walk(
 	node *Node,
 	gongdocxStage *StageStruct,
 	node_ *Node_,
 	w io.Writer) error {
+
+	var nodeCounter = 0
+
 	switch node_.XMLName.Local {
 	case "hyperlink":
 		fmt.Fprint(w, "[")
@@ -219,11 +220,11 @@ func (zf *file) walk(
 		}
 		fmt.Fprint(w, ")")
 	case "t":
-		node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
 		node.Nodes = append(node.Nodes, node__)
 		nodeCounter = nodeCounter + 1
 
-		text := (&Text{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		text := (&Text{Name: node__.Name}).Stage(gongdocxStage)
 		text.Node = node__
 		text.Content = string(node_.Content)
 
@@ -231,11 +232,11 @@ func (zf *file) walk(
 	case "pPr":
 		code := false
 
-		node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
 		node.Nodes = append(node.Nodes, node__)
 		nodeCounter = nodeCounter + 1
 
-		paragraphproperties_ := (&ParagraphProperties{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		paragraphproperties_ := (&ParagraphProperties{Name: node__.Name}).Stage(gongdocxStage)
 		paragraphproperties_.Node = node__
 
 		for _, n := range node_.Nodes {
@@ -395,12 +396,13 @@ func (zf *file) walk(
 		fmt.Fprint(w, "\n")
 	case "r":
 
-		node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
 		node.Nodes = append(node.Nodes, node__)
 		nodeCounter = nodeCounter + 1
 
-		rune_ := (&Rune{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		rune_ := (&Rune{Name: node__.Name}).Stage(gongdocxStage)
 		rune_.Node = node__
+		rune_.Content = string(node_.Content)
 
 		bold := false
 		italic := false
@@ -449,14 +451,15 @@ func (zf *file) walk(
 			fmt.Fprint(w, "~~")
 		}
 	case "p":
+		paragraph := (&Paragraph{Name: node.Name}).Stage(gongdocxStage)
+		paragraph.Node = node
+		paragraph.Content = string(node_.Content)
+
 		for _, n := range node_.Nodes {
 
-			node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+			node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
 			node.Nodes = append(node.Nodes, node__)
 			nodeCounter = nodeCounter + 1
-
-			paragraph := (&Paragraph{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
-			paragraph.Node = node__
 
 			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {
 				return err
@@ -485,7 +488,11 @@ func (zf *file) walk(
 		fmt.Fprintln(w, "\n```\n"+cbuf.String()+"```")
 	default:
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node, gongdocxStage, &n, w); err != nil {
+			node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
+			node.Nodes = append(node.Nodes, node__)
+			nodeCounter = nodeCounter + 1
+
+			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
@@ -580,7 +587,7 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 	if err != nil {
 		return err
 	}
-	node := (&Node{Name: "Root node"}).Stage(gongdocx_stage)
+	node := (&Node{Name: "0"}).Stage(gongdocx_stage)
 	document.Root = node
 
 	var buf bytes.Buffer

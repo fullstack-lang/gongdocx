@@ -24,6 +24,7 @@ const NoteOnRune = ""
 type Rune struct {
 	Name      string
 	RuneStyle RuneStyle
+	Content   string
 
 	Node *Node
 }
