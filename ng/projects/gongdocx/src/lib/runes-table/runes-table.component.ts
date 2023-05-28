@@ -14,8 +14,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 const allowMultiSelect = true;
 
 import { ActivatedRoute, Router, RouterState } from '@angular/router';
-import { TextDB } from '../text-db'
-import { TextService } from '../text.service'
+import { RuneDB } from '../rune-db'
+import { RuneService } from '../rune.service'
 
 // insertion point for additional imports
 
@@ -31,26 +31,26 @@ enum TableComponentMode {
 
 // generated table component
 @Component({
-  selector: 'app-textstable',
-  templateUrl: './texts-table.component.html',
-  styleUrls: ['./texts-table.component.css'],
+  selector: 'app-runestable',
+  templateUrl: './runes-table.component.html',
+  styleUrls: ['./runes-table.component.css'],
 })
-export class TextsTableComponent implements OnInit {
+export class RunesTableComponent implements OnInit {
 
   @Input() GONG__StackPath: string = ""
 
   // mode at invocation
   mode: TableComponentMode = TableComponentMode.DISPLAY_MODE
 
-  // used if the component is called as a selection component of Text instances
-  selection: SelectionModel<TextDB> = new (SelectionModel)
-  initialSelection = new Array<TextDB>()
+  // used if the component is called as a selection component of Rune instances
+  selection: SelectionModel<RuneDB> = new (SelectionModel)
+  initialSelection = new Array<RuneDB>()
 
   // the data source for the table
-  texts: TextDB[] = []
-  matTableDataSource: MatTableDataSource<TextDB> = new (MatTableDataSource)
+  runes: RuneDB[] = []
+  matTableDataSource: MatTableDataSource<RuneDB> = new (MatTableDataSource)
 
-  // front repo, that will be referenced by this.texts
+  // front repo, that will be referenced by this.runes
   frontRepo: FrontRepo = new (FrontRepo)
 
   // displayedColumns is referenced by the MatTable component for specify what columns
@@ -66,20 +66,17 @@ export class TextsTableComponent implements OnInit {
   ngAfterViewInit() {
 
     // enable sorting on all fields (including pointers and reverse pointer)
-    this.matTableDataSource.sortingDataAccessor = (textDB: TextDB, property: string) => {
+    this.matTableDataSource.sortingDataAccessor = (runeDB: RuneDB, property: string) => {
       switch (property) {
         case 'ID':
-          return textDB.ID
+          return runeDB.ID
 
         // insertion point for specific sorting accessor
         case 'Name':
-          return textDB.Name;
-
-        case 'Content':
-          return textDB.Content;
+          return runeDB.Name;
 
         case 'Node':
-          return (textDB.Node ? textDB.Node.Name : '');
+          return (runeDB.Node ? runeDB.Node.Name : '');
 
         default:
           console.assert(false, "Unknown field")
@@ -88,17 +85,16 @@ export class TextsTableComponent implements OnInit {
     };
 
     // enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
-    this.matTableDataSource.filterPredicate = (textDB: TextDB, filter: string) => {
+    this.matTableDataSource.filterPredicate = (runeDB: RuneDB, filter: string) => {
 
       // filtering is based on finding a lower case filter into a concatenated string
-      // the textDB properties
+      // the runeDB properties
       let mergedContent = ""
 
       // insertion point for merging of fields
-      mergedContent += textDB.Name.toLowerCase()
-      mergedContent += textDB.Content.toLowerCase()
-      if (textDB.Node) {
-        mergedContent += textDB.Node.Name.toLowerCase()
+      mergedContent += runeDB.Name.toLowerCase()
+      if (runeDB.Node) {
+        mergedContent += runeDB.Node.Name.toLowerCase()
       }
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
@@ -115,11 +111,11 @@ export class TextsTableComponent implements OnInit {
   }
 
   constructor(
-    private textService: TextService,
+    private runeService: RuneService,
     private frontRepoService: FrontRepoService,
 
-    // not null if the component is called as a selection component of text instances
-    public dialogRef: MatDialogRef<TextsTableComponent>,
+    // not null if the component is called as a selection component of rune instances
+    public dialogRef: MatDialogRef<RunesTableComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: DialogData,
 
     private router: Router,
@@ -145,26 +141,24 @@ export class TextsTableComponent implements OnInit {
     }
 
     // observable for changes in structs
-    this.textService.TextServiceChanged.subscribe(
+    this.runeService.RuneServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
-          this.getTexts()
+          this.getRunes()
         }
       }
     )
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Delete', // insertion point for columns to display
         "Name",
-        "Content",
         "Node",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
-        "Content",
         "Node",
       ]
-      this.selection = new SelectionModel<TextDB>(allowMultiSelect, this.initialSelection);
+      this.selection = new SelectionModel<RuneDB>(allowMultiSelect, this.initialSelection);
     }
 
   }
@@ -175,84 +169,84 @@ export class TextsTableComponent implements OnInit {
       this.GONG__StackPath = stackPath
     }
 
-    this.getTexts()
+    this.getRunes()
 
-    this.matTableDataSource = new MatTableDataSource(this.texts)
+    this.matTableDataSource = new MatTableDataSource(this.runes)
   }
 
-  getTexts(): void {
+  getRunes(): void {
     this.frontRepoService.pull(this.GONG__StackPath).subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
 
-        this.texts = this.frontRepo.Texts_array;
+        this.runes = this.frontRepo.Runes_array;
 
         // insertion point for time duration Recoveries
         // insertion point for enum int Recoveries
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          for (let text of this.texts) {
+          for (let rune of this.runes) {
             let ID = this.dialogData.ID
-            let revPointer = text[this.dialogData.ReversePointer as keyof TextDB] as unknown as NullInt64
+            let revPointer = rune[this.dialogData.ReversePointer as keyof RuneDB] as unknown as NullInt64
             if (revPointer.Int64 == ID) {
-              this.initialSelection.push(text)
+              this.initialSelection.push(rune)
             }
-            this.selection = new SelectionModel<TextDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<RuneDB>(allowMultiSelect, this.initialSelection);
           }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
-          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, TextDB>
+          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, RuneDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to TextDB
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to RuneDB
           // the field name is sourceField
-          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as TextDB[]
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as RuneDB[]
           if (sourceFieldArray != null) {
             for (let associationInstance of sourceFieldArray) {
-              let text = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as TextDB
-              this.initialSelection.push(text)
+              let rune = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as RuneDB
+              this.initialSelection.push(rune)
             }
           }
 
-          this.selection = new SelectionModel<TextDB>(allowMultiSelect, this.initialSelection);
+          this.selection = new SelectionModel<RuneDB>(allowMultiSelect, this.initialSelection);
         }
 
         // update the mat table data source
-        this.matTableDataSource.data = this.texts
+        this.matTableDataSource.data = this.runes
       }
     )
   }
 
-  // newText initiate a new text
-  // create a new Text objet
-  newText() {
+  // newRune initiate a new rune
+  // create a new Rune objet
+  newRune() {
   }
 
-  deleteText(textID: number, text: TextDB) {
-    // list of texts is truncated of text before the delete
-    this.texts = this.texts.filter(h => h !== text);
+  deleteRune(runeID: number, rune: RuneDB) {
+    // list of runes is truncated of rune before the delete
+    this.runes = this.runes.filter(h => h !== rune);
 
-    this.textService.deleteText(textID, this.GONG__StackPath).subscribe(
-      text => {
-        this.textService.TextServiceChanged.next("delete")
+    this.runeService.deleteRune(runeID, this.GONG__StackPath).subscribe(
+      rune => {
+        this.runeService.RuneServiceChanged.next("delete")
       }
     );
   }
 
-  editText(textID: number, text: TextDB) {
+  editRune(runeID: number, rune: RuneDB) {
 
   }
 
   // set editor outlet
-  setEditorRouterOutlet(textID: number) {
+  setEditorRouterOutlet(runeID: number) {
     let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
-    let fullPath = this.routeService.getPathRoot() + "-" + "text" + "-detail"
+    let fullPath = this.routeService.getPathRoot() + "-" + "rune" + "-detail"
 
     let outletConf: any = {}
-    outletConf[outletName] = [fullPath, textID, this.GONG__StackPath]
+    outletConf[outletName] = [fullPath, runeID, this.GONG__StackPath]
 
     this.router.navigate([{ outlets: outletConf }])
   }
@@ -260,7 +254,7 @@ export class TextsTableComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.texts.length;
+    const numRows = this.runes.length;
     return numSelected === numRows;
   }
 
@@ -268,39 +262,39 @@ export class TextsTableComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.texts.forEach(row => this.selection.select(row));
+      this.runes.forEach(row => this.selection.select(row));
   }
 
   save() {
 
     if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
 
-      let toUpdate = new Set<TextDB>()
+      let toUpdate = new Set<RuneDB>()
 
-      // reset all initial selection of text that belong to text
-      for (let text of this.initialSelection) {
-        let index = text[this.dialogData.ReversePointer as keyof TextDB] as unknown as NullInt64
+      // reset all initial selection of rune that belong to rune
+      for (let rune of this.initialSelection) {
+        let index = rune[this.dialogData.ReversePointer as keyof RuneDB] as unknown as NullInt64
         index.Int64 = 0
         index.Valid = true
-        toUpdate.add(text)
+        toUpdate.add(rune)
 
       }
 
-      // from selection, set text that belong to text
-      for (let text of this.selection.selected) {
+      // from selection, set rune that belong to rune
+      for (let rune of this.selection.selected) {
         let ID = this.dialogData.ID as number
-        let reversePointer = text[this.dialogData.ReversePointer as keyof TextDB] as unknown as NullInt64
+        let reversePointer = rune[this.dialogData.ReversePointer as keyof RuneDB] as unknown as NullInt64
         reversePointer.Int64 = ID
         reversePointer.Valid = true
-        toUpdate.add(text)
+        toUpdate.add(rune)
       }
 
 
-      // update all text (only update selection & initial selection)
-      for (let text of toUpdate) {
-        this.textService.updateText(text, this.GONG__StackPath)
-          .subscribe(text => {
-            this.textService.TextServiceChanged.next("update")
+      // update all rune (only update selection & initial selection)
+      for (let rune of toUpdate) {
+        this.runeService.updateRune(rune, this.GONG__StackPath)
+          .subscribe(rune => {
+            this.runeService.RuneServiceChanged.next("update")
           });
       }
     }
@@ -308,26 +302,26 @@ export class TextsTableComponent implements OnInit {
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
       // get the source instance via the map of instances in the front repo
-      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, TextDB>
+      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, RuneDB>
       let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
       // First, parse all instance of the association struct and remove the instance
       // that have unselect
-      let unselectedText = new Set<number>()
-      for (let text of this.initialSelection) {
-        if (this.selection.selected.includes(text)) {
-          // console.log("text " + text.Name + " is still selected")
+      let unselectedRune = new Set<number>()
+      for (let rune of this.initialSelection) {
+        if (this.selection.selected.includes(rune)) {
+          // console.log("rune " + rune.Name + " is still selected")
         } else {
-          console.log("text " + text.Name + " has been unselected")
-          unselectedText.add(text.ID)
-          console.log("is unselected " + unselectedText.has(text.ID))
+          console.log("rune " + rune.Name + " has been unselected")
+          unselectedRune.add(rune.ID)
+          console.log("is unselected " + unselectedRune.has(rune.ID))
         }
       }
 
       // delete the association instance
       let associationInstance = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]
-      let text = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as TextDB
-      if (unselectedText.has(text.ID)) {
+      let rune = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as RuneDB
+      if (unselectedRune.has(rune.ID)) {
         this.frontRepoService.deleteService(this.dialogData.IntermediateStruct, associationInstance)
 
 
@@ -335,38 +329,38 @@ export class TextsTableComponent implements OnInit {
 
       // is the source array is empty create it
       if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] == undefined) {
-        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<TextDB>) = new Array<TextDB>()
+        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<RuneDB>) = new Array<RuneDB>()
       }
 
       // second, parse all instance of the selected
       if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]) {
         this.selection.selected.forEach(
-          text => {
-            if (!this.initialSelection.includes(text)) {
-              // console.log("text " + text.Name + " has been added to the selection")
+          rune => {
+            if (!this.initialSelection.includes(rune)) {
+              // console.log("rune " + rune.Name + " has been added to the selection")
 
               let associationInstance = {
-                Name: sourceInstance["Name"] + "-" + text.Name,
+                Name: sourceInstance["Name"] + "-" + rune.Name,
               }
 
               let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
-              index.Int64 = text.ID
+              index.Int64 = rune.ID
               index.Valid = true
 
               let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
-              indexDB.Int64 = text.ID
+              indexDB.Int64 = rune.ID
               index.Valid = true
 
               this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
-              // console.log("text " + text.Name + " is still selected")
+              // console.log("rune " + rune.Name + " is still selected")
             }
           }
         )
       }
 
-      // this.selection = new SelectionModel<TextDB>(allowMultiSelect, this.initialSelection);
+      // this.selection = new SelectionModel<RuneDB>(allowMultiSelect, this.initialSelection);
     }
 
     // why pizza ?

@@ -64,6 +64,9 @@ type TextDB struct {
 
 	// Declation for basic field textDB.Name
 	Name_Data sql.NullString
+
+	// Declation for basic field textDB.Content
+	Content_Data sql.NullString
 	// encoding of pointers
 	TextPointersEnconding
 }
@@ -86,6 +89,8 @@ type TextWOP struct {
 	// insertion for WOP basic fields
 
 	Name string `xlsx:"1"`
+
+	Content string `xlsx:"2"`
 	// insertion for WOP pointer fields
 }
 
@@ -93,6 +98,7 @@ var Text_Fields = []string{
 	// insertion for WOP basic fields
 	"ID",
 	"Name",
+	"Content",
 }
 
 type BackRepoTextStruct struct {
@@ -368,6 +374,9 @@ func (textDB *TextDB) CopyBasicFieldsFromText(text *models.Text) {
 
 	textDB.Name_Data.String = text.Name
 	textDB.Name_Data.Valid = true
+
+	textDB.Content_Data.String = text.Content
+	textDB.Content_Data.Valid = true
 }
 
 // CopyBasicFieldsFromTextWOP
@@ -376,12 +385,16 @@ func (textDB *TextDB) CopyBasicFieldsFromTextWOP(text *TextWOP) {
 
 	textDB.Name_Data.String = text.Name
 	textDB.Name_Data.Valid = true
+
+	textDB.Content_Data.String = text.Content
+	textDB.Content_Data.Valid = true
 }
 
 // CopyBasicFieldsToText
 func (textDB *TextDB) CopyBasicFieldsToText(text *models.Text) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	text.Name = textDB.Name_Data.String
+	text.Content = textDB.Content_Data.String
 }
 
 // CopyBasicFieldsToTextWOP
@@ -389,6 +402,7 @@ func (textDB *TextDB) CopyBasicFieldsToTextWOP(text *TextWOP) {
 	text.ID = int(textDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	text.Name = textDB.Name_Data.String
+	text.Content = textDB.Content_Data.String
 }
 
 // Backup generates a json file from a slice of all TextDB instances in the backrepo

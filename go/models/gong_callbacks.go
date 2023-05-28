@@ -25,6 +25,10 @@ func AfterCreateFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterParagraphCreateCallback != nil {
 			stage.OnAfterParagraphCreateCallback.OnAfterCreate(stage, target)
 		}
+	case *Rune:
+		if stage.OnAfterRuneCreateCallback != nil {
+			stage.OnAfterRuneCreateCallback.OnAfterCreate(stage, target)
+		}
 	case *Text:
 		if stage.OnAfterTextCreateCallback != nil {
 			stage.OnAfterTextCreateCallback.OnAfterCreate(stage, target)
@@ -63,6 +67,11 @@ func AfterUpdateFromFront[Type Gongstruct](stage *StageStruct, old, new *Type) {
 		newTarget := any(new).(*Paragraph)
 		if stage.OnAfterParagraphUpdateCallback != nil {
 			stage.OnAfterParagraphUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+		}
+	case *Rune:
+		newTarget := any(new).(*Rune)
+		if stage.OnAfterRuneUpdateCallback != nil {
+			stage.OnAfterRuneUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
 		}
 	case *Text:
 		newTarget := any(new).(*Text)
@@ -104,6 +113,11 @@ func AfterDeleteFromFront[Type Gongstruct](stage *StageStruct, staged, front *Ty
 			staged := any(staged).(*Paragraph)
 			stage.OnAfterParagraphDeleteCallback.OnAfterDelete(stage, staged, front)
 		}
+	case *Rune:
+		if stage.OnAfterRuneDeleteCallback != nil {
+			staged := any(staged).(*Rune)
+			stage.OnAfterRuneDeleteCallback.OnAfterDelete(stage, staged, front)
+		}
 	case *Text:
 		if stage.OnAfterTextDeleteCallback != nil {
 			staged := any(staged).(*Text)
@@ -139,6 +153,10 @@ func AfterReadFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterParagraphReadCallback != nil {
 			stage.OnAfterParagraphReadCallback.OnAfterRead(stage, target)
 		}
+	case *Rune:
+		if stage.OnAfterRuneReadCallback != nil {
+			stage.OnAfterRuneReadCallback.OnAfterRead(stage, target)
+		}
 	case *Text:
 		if stage.OnAfterTextReadCallback != nil {
 			stage.OnAfterTextReadCallback.OnAfterRead(stage, target)
@@ -169,6 +187,9 @@ func SetCallbackAfterUpdateFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *Paragraph:
 		stage.OnAfterParagraphUpdateCallback = any(callback).(OnAfterUpdateInterface[Paragraph])
 	
+	case *Rune:
+		stage.OnAfterRuneUpdateCallback = any(callback).(OnAfterUpdateInterface[Rune])
+	
 	case *Text:
 		stage.OnAfterTextUpdateCallback = any(callback).(OnAfterUpdateInterface[Text])
 	
@@ -193,6 +214,9 @@ func SetCallbackAfterCreateFromFront[Type Gongstruct](stage *StageStruct, callba
 	
 	case *Paragraph:
 		stage.OnAfterParagraphCreateCallback = any(callback).(OnAfterCreateInterface[Paragraph])
+	
+	case *Rune:
+		stage.OnAfterRuneCreateCallback = any(callback).(OnAfterCreateInterface[Rune])
 	
 	case *Text:
 		stage.OnAfterTextCreateCallback = any(callback).(OnAfterCreateInterface[Text])
@@ -219,6 +243,9 @@ func SetCallbackAfterDeleteFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *Paragraph:
 		stage.OnAfterParagraphDeleteCallback = any(callback).(OnAfterDeleteInterface[Paragraph])
 	
+	case *Rune:
+		stage.OnAfterRuneDeleteCallback = any(callback).(OnAfterDeleteInterface[Rune])
+	
 	case *Text:
 		stage.OnAfterTextDeleteCallback = any(callback).(OnAfterDeleteInterface[Text])
 	
@@ -243,6 +270,9 @@ func SetCallbackAfterReadFromFront[Type Gongstruct](stage *StageStruct, callback
 	
 	case *Paragraph:
 		stage.OnAfterParagraphReadCallback = any(callback).(OnAfterReadInterface[Paragraph])
+	
+	case *Rune:
+		stage.OnAfterRuneReadCallback = any(callback).(OnAfterReadInterface[Rune])
 	
 	case *Text:
 		stage.OnAfterTextReadCallback = any(callback).(OnAfterReadInterface[Text])

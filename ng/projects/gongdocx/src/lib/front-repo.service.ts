@@ -19,6 +19,9 @@ import { NodeService } from './node.service'
 import { ParagraphDB } from './paragraph-db'
 import { ParagraphService } from './paragraph.service'
 
+import { RuneDB } from './rune-db'
+import { RuneService } from './rune.service'
+
 import { TextDB } from './text-db'
 import { TextService } from './text.service'
 
@@ -40,6 +43,9 @@ export class FrontRepo { // insertion point sub template
   Paragraphs_array = new Array<ParagraphDB>(); // array of repo instances
   Paragraphs = new Map<number, ParagraphDB>(); // map of repo instances
   Paragraphs_batch = new Map<number, ParagraphDB>(); // same but only in last GET (for finding repo instances to delete)
+  Runes_array = new Array<RuneDB>(); // array of repo instances
+  Runes = new Map<number, RuneDB>(); // map of repo instances
+  Runes_batch = new Map<number, RuneDB>(); // same but only in last GET (for finding repo instances to delete)
   Texts_array = new Array<TextDB>(); // array of repo instances
   Texts = new Map<number, TextDB>(); // map of repo instances
   Texts_batch = new Map<number, TextDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -110,6 +116,7 @@ export class FrontRepoService {
     private fileService: FileService,
     private nodeService: NodeService,
     private paragraphService: ParagraphService,
+    private runeService: RuneService,
     private textService: TextService,
   ) { }
 
@@ -146,6 +153,7 @@ export class FrontRepoService {
     Observable<FileDB[]>,
     Observable<NodeDB[]>,
     Observable<ParagraphDB[]>,
+    Observable<RuneDB[]>,
     Observable<TextDB[]>,
   ] = [ // insertion point sub template
       this.documentService.getDocuments(this.GONG__StackPath),
@@ -153,6 +161,7 @@ export class FrontRepoService {
       this.fileService.getFiles(this.GONG__StackPath),
       this.nodeService.getNodes(this.GONG__StackPath),
       this.paragraphService.getParagraphs(this.GONG__StackPath),
+      this.runeService.getRunes(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ];
 
@@ -172,6 +181,7 @@ export class FrontRepoService {
       this.fileService.getFiles(this.GONG__StackPath),
       this.nodeService.getNodes(this.GONG__StackPath),
       this.paragraphService.getParagraphs(this.GONG__StackPath),
+      this.runeService.getRunes(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ]
 
@@ -186,6 +196,7 @@ export class FrontRepoService {
             files_,
             nodes_,
             paragraphs_,
+            runes_,
             texts_,
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
@@ -200,6 +211,8 @@ export class FrontRepoService {
             nodes = nodes_ as NodeDB[]
             var paragraphs: ParagraphDB[]
             paragraphs = paragraphs_ as ParagraphDB[]
+            var runes: RuneDB[]
+            runes = runes_ as RuneDB[]
             var texts: TextDB[]
             texts = texts_ as TextDB[]
 
@@ -372,6 +385,39 @@ export class FrontRepoService {
             });
 
             // init the array
+            this.frontRepo.Runes_array = runes
+
+            // clear the map that counts Rune in the GET
+            this.frontRepo.Runes_batch.clear()
+
+            runes.forEach(
+              rune => {
+                this.frontRepo.Runes.set(rune.ID, rune)
+                this.frontRepo.Runes_batch.set(rune.ID, rune)
+              }
+            )
+
+            // clear runes that are absent from the batch
+            this.frontRepo.Runes.forEach(
+              rune => {
+                if (this.frontRepo.Runes_batch.get(rune.ID) == undefined) {
+                  this.frontRepo.Runes.delete(rune.ID)
+                }
+              }
+            )
+
+            // sort Runes_array array
+            this.frontRepo.Runes_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
             this.frontRepo.Texts_array = texts
 
             // clear the map that counts Text in the GET
@@ -484,6 +530,20 @@ export class FrontRepoService {
                   let _node = this.frontRepo.Nodes.get(paragraph.NodeID.Int64)
                   if (_node) {
                     paragraph.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+            runes.forEach(
+              rune => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(rune.NodeID.Int64)
+                  if (_node) {
+                    rune.Node = _node
                   }
                 }
 
@@ -817,6 +877,64 @@ export class FrontRepoService {
     )
   }
 
+  // RunePull performs a GET on Rune of the stack and redeem association pointers 
+  RunePull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.runeService.getRunes(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            runes,
+          ]) => {
+            // init the array
+            this.frontRepo.Runes_array = runes
+
+            // clear the map that counts Rune in the GET
+            this.frontRepo.Runes_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            runes.forEach(
+              rune => {
+                this.frontRepo.Runes.set(rune.ID, rune)
+                this.frontRepo.Runes_batch.set(rune.ID, rune)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(rune.NodeID.Int64)
+                  if (_node) {
+                    rune.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear runes that are absent from the GET
+            this.frontRepo.Runes.forEach(
+              rune => {
+                if (this.frontRepo.Runes_batch.get(rune.ID) == undefined) {
+                  this.frontRepo.Runes.delete(rune.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
   // TextPull performs a GET on Text of the stack and redeem association pointers 
   TextPull(): Observable<FrontRepo> {
     return new Observable<FrontRepo>(
@@ -892,6 +1010,9 @@ export function getNodeUniqueID(id: number): number {
 export function getParagraphUniqueID(id: number): number {
   return 47 * id
 }
-export function getTextUniqueID(id: number): number {
+export function getRuneUniqueID(id: number): number {
   return 53 * id
+}
+export function getTextUniqueID(id: number): number {
+  return 59 * id
 }

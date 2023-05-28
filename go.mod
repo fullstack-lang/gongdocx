@@ -3,7 +3,7 @@ module github.com/fullstack-lang/gongdocx
 go 1.20
 
 require (
-	github.com/fullstack-lang/gongdoc v0.0.0-20230528083722-f3d42ca856ba
+	github.com/fullstack-lang/gongdoc v0.0.0-20230528130244-b89013d59723
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.0

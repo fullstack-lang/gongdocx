@@ -308,6 +308,7 @@ var __gong__map_Docx = make(map[string]*Docx)
 var __gong__map_File = make(map[string]*File)
 var __gong__map_Node = make(map[string]*Node)
 var __gong__map_Paragraph = make(map[string]*Paragraph)
+var __gong__map_Rune = make(map[string]*Rune)
 var __gong__map_Text = make(map[string]*Text)
 
 // Parser needs to be configured for having the [Name1.Name2] or [pkg.Name1] ...
@@ -501,6 +502,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 										instanceParagraph := (&Paragraph{Name: instanceName}).Stage(stage)
 										instance = any(instanceParagraph)
 										__gong__map_Paragraph[identifier] = instanceParagraph
+									case "Rune":
+										instanceRune := (&Rune{Name: instanceName}).Stage(stage)
+										instance = any(instanceRune)
+										__gong__map_Rune[identifier] = instanceRune
 									case "Text":
 										instanceText := (&Text{Name: instanceName}).Stage(stage)
 										instance = any(instanceText)
@@ -558,6 +563,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 							// insertion point for date assign code
 							}
 						case "Paragraph":
+							switch fieldName {
+							// insertion point for date assign code
+							}
+						case "Rune":
 							switch fieldName {
 							// insertion point for date assign code
 							}
@@ -619,6 +628,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 								append(__gong__map_Node[identifier].Nodes, target)
 						}
 					case "Paragraph":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						}
+					case "Rune":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
 						}
@@ -715,6 +728,14 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_Paragraph[identifier].Name = fielValue
 				}
+			case "Rune":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_Rune[identifier].Name = fielValue
+				}
 			case "Text":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -722,6 +743,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					// remove first and last char
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_Text[identifier].Name = fielValue
+				case "Content":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_Text[identifier].Content = fielValue
 				}
 			}
 		case *ast.Ident:
@@ -765,6 +790,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Node":
 					targetIdentifier := ident.Name
 					__gong__map_Paragraph[identifier].Node = __gong__map_Node[targetIdentifier]
+				}
+			case "Rune":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Node":
+					targetIdentifier := ident.Name
+					__gong__map_Rune[identifier].Node = __gong__map_Node[targetIdentifier]
 				}
 			case "Text":
 				switch fieldName {
@@ -818,6 +850,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					// insertion point for enum assign code
 					}
 				case "Paragraph":
+					switch fieldName {
+					// insertion point for enum assign code
+					}
+				case "Rune":
 					switch fieldName {
 					// insertion point for enum assign code
 					}

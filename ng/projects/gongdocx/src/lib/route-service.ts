@@ -17,6 +17,9 @@ import { NodeDetailComponent } from './node-detail/node-detail.component'
 import { ParagraphsTableComponent } from './paragraphs-table/paragraphs-table.component'
 import { ParagraphDetailComponent } from './paragraph-detail/paragraph-detail.component'
 
+import { RunesTableComponent } from './runes-table/runes-table.component'
+import { RuneDetailComponent } from './rune-detail/rune-detail.component'
+
 import { TextsTableComponent } from './texts-table/texts-table.component'
 import { TextDetailComponent } from './text-detail/text-detail.component'
 
@@ -216,6 +219,39 @@ export class RouteService {
         return route
     }
 
+    getRuneTablePath(): string {
+        return this.getPathRoot() + '-runes/:GONG__StackPath'
+    }
+    getRuneTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRuneTablePath(), component: RunesTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getRuneAdderPath(): string {
+        return this.getPathRoot() + '-rune-adder/:GONG__StackPath'
+    }
+    getRuneAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRuneAdderPath(), component: RuneDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getRuneAdderForUsePath(): string {
+        return this.getPathRoot() + '-rune-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getRuneAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRuneAdderForUsePath(), component: RuneDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getRuneDetailPath(): string {
+        return this.getPathRoot() + '-rune-detail/:id/:GONG__StackPath'
+    }
+    getRuneDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRuneDetailPath(), component: RuneDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
     getTextTablePath(): string {
         return this.getPathRoot() + '-texts/:GONG__StackPath'
     }
@@ -279,6 +315,11 @@ export class RouteService {
             this.getParagraphAdderRoute(stackPath),
             this.getParagraphAdderForUseRoute(stackPath),
             this.getParagraphDetailRoute(stackPath),
+
+            this.getRuneTableRoute(stackPath),
+            this.getRuneAdderRoute(stackPath),
+            this.getRuneAdderForUseRoute(stackPath),
+            this.getRuneDetailRoute(stackPath),
 
             this.getTextTableRoute(stackPath),
             this.getTextAdderRoute(stackPath),

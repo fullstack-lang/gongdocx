@@ -270,6 +270,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_Rune_Identifiers := make(map[*Rune]string)
+	_ = map_Rune_Identifiers
+
+	runeOrdered := []*Rune{}
+	for rune := range stage.Runes {
+		runeOrdered = append(runeOrdered, rune)
+	}
+	sort.Slice(runeOrdered[:], func(i, j int) bool {
+		return runeOrdered[i].Name < runeOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of Rune"
+	for idx, rune := range runeOrdered {
+
+		id = generatesIdentifier("Rune", idx, rune.Name)
+		map_Rune_Identifiers[rune] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Rune")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", rune.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// Rune values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(rune.Name))
+		initializerStatements += setValueField
+
+	}
+
 	map_Text_Identifiers := make(map[*Text]string)
 	_ = map_Text_Identifiers
 
@@ -298,6 +330,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(text.Name))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Content")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(text.Content))
 		initializerStatements += setValueField
 
 	}
@@ -388,6 +426,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[paragraph.Node])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, rune := range runeOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("Rune", idx, rune.Name)
+		map_Rune_Identifiers[rune] = id
+
+		// Initialisation of values
+		if rune.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[rune.Node])
 			pointersInitializesStatements += setPointerField
 		}
 

@@ -20,6 +20,9 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	case *Paragraph:
 		ok = stage.IsStagedParagraph(target)
 
+	case *Rune:
+		ok = stage.IsStagedRune(target)
+
 	case *Text:
 		ok = stage.IsStagedText(target)
 
@@ -65,6 +68,13 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 		return
 	}
 
+	func (stage *StageStruct) IsStagedRune(rune *Rune) (ok bool) {
+
+		_, ok = stage.Runes[rune]
+	
+		return
+	}
+
 	func (stage *StageStruct) IsStagedText(text *Text) (ok bool) {
 
 		_, ok = stage.Texts[text]
@@ -95,6 +105,9 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *Paragraph:
 		stage.StageBranchParagraph(target)
+
+	case *Rune:
+		stage.StageBranchRune(target)
 
 	case *Text:
 		stage.StageBranchText(target)
@@ -195,6 +208,24 @@ func (stage *StageStruct) StageBranchParagraph(paragraph *Paragraph) {
 
 }
 
+func (stage *StageStruct) StageBranchRune(rune *Rune) {
+
+	// check if instance is already staged
+	if IsStaged(stage, rune) {
+		return
+	}
+
+	rune.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if rune.Node != nil {
+		StageBranch(stage, rune.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
 func (stage *StageStruct) StageBranchText(text *Text) {
 
 	// check if instance is already staged
@@ -236,6 +267,9 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *Paragraph:
 		stage.UnstageBranchParagraph(target)
+
+	case *Rune:
+		stage.UnstageBranchRune(target)
 
 	case *Text:
 		stage.UnstageBranchText(target)
@@ -330,6 +364,24 @@ func (stage *StageStruct) UnstageBranchParagraph(paragraph *Paragraph) {
 	//insertion point for the staging of instances referenced by pointers
 	if paragraph.Node != nil {
 		UnstageBranch(stage, paragraph.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) UnstageBranchRune(rune *Rune) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, rune) {
+		return
+	}
+
+	rune.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if rune.Node != nil {
+		UnstageBranch(stage, rune.Node)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers

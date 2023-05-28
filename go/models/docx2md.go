@@ -189,6 +189,8 @@ func attr(attrs []xml.Attr, name string) (string, bool) {
 	return "", false
 }
 
+var nodeCounter = 0
+
 func (zf *file) walk(
 	node *Node,
 	gongdocxStage *StageStruct,
@@ -217,11 +219,13 @@ func (zf *file) walk(
 		}
 		fmt.Fprint(w, ")")
 	case "t":
-		node__ := (&Node{Name: string(node_.Content)}).Stage(gongdocxStage)
+		node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
 		node.Nodes = append(node.Nodes, node__)
+		nodeCounter = nodeCounter + 1
 
-		text := (&Text{Name: string(node_.Content)}).Stage(gongdocxStage)
+		text := (&Text{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
 		text.Node = node__
+		text.Content = string(node_.Content)
 
 		fmt.Fprint(w, string(node_.Content))
 	case "pPr":
@@ -382,6 +386,14 @@ func (zf *file) walk(
 		}
 		fmt.Fprint(w, "\n")
 	case "r":
+
+		node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		node.Nodes = append(node.Nodes, node__)
+		nodeCounter = nodeCounter + 1
+
+		rune := (&Rune{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		rune.Node = node__
+
 		bold := false
 		italic := false
 		strike := false
@@ -411,7 +423,7 @@ func (zf *file) walk(
 		}
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node, gongdocxStage, &n, &cbuf); err != nil {
+			if err := zf.walk(node__, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
@@ -428,10 +440,11 @@ func (zf *file) walk(
 	case "p":
 		for _, n := range node_.Nodes {
 
-			node__ := (&Node{Name: string(node_.Content)}).Stage(gongdocxStage)
+			node__ := (&Node{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
 			node.Nodes = append(node.Nodes, node__)
+			nodeCounter = nodeCounter + 1
 
-			paragraph := (&Paragraph{Name: string(node_.Content)}).Stage(gongdocxStage)
+			paragraph := (&Paragraph{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
 			paragraph.Node = node__
 
 			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {

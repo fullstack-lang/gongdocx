@@ -10,6 +10,7 @@ package models
 const NodeOnText = ""
 
 type Text struct {
-	Name string
-	Node *Node
+	Name    string
+	Content string
+	Node    *Node
 }

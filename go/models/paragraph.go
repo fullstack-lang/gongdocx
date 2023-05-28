@@ -1,8 +1,9 @@
 package models
 
 // GONGNOTE(NoteOnParagraph)
-// The "w:p" node represents a paragraph in a Word document's XML structure. It is
-// one of the primary building blocks of a document's content within the
+// The "w:p" node represents a [models.Paragraph] in a Word document's XML structure.
+// -
+// It is one of the primary building blocks of a document's content within the
 // document.xml file.
 // -
 // Each "w:p" element contains a series of "w:r" (run) elements, which represent
