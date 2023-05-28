@@ -59,3 +59,4 @@ export * from './lib/text-db'
 export * from './lib/text.service'
 
 
+export * from './lib/RuneStyle'

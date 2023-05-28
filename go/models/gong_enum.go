@@ -2,4 +2,68 @@
 package models
 
 // insertion point of enum utility functions
+// Utility function for RuneStyle
+// if enum values are string, it is stored with the value
+// if enum values are int, they are stored with the code of the value
+func (runestyle RuneStyle) ToString() (res string) {
+
+	// migration of former implementation of enum
+	switch runestyle {
+	// insertion code per enum code
+	case BOLD:
+		res = "BOLD"
+	case ITALIC:
+		res = "ITALIC"
+	case STRIKE:
+		res = "STRIKE"
+	}
+	return
+}
+
+func (runestyle *RuneStyle) FromString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "BOLD":
+		*runestyle = BOLD
+	case "ITALIC":
+		*runestyle = ITALIC
+	case "STRIKE":
+		*runestyle = STRIKE
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
+func (runestyle *RuneStyle) FromCodeString(input string) (err error) {
+
+	switch input {
+	// insertion code per enum code
+	case "BOLD":
+		*runestyle = BOLD
+	case "ITALIC":
+		*runestyle = ITALIC
+	case "STRIKE":
+		*runestyle = STRIKE
+	default:
+		return errUnkownEnum
+	}
+	return
+}
+
+func (runestyle *RuneStyle) ToCodeString() (res string) {
+
+	switch *runestyle {
+	// insertion code per enum code
+	case BOLD:
+		res = "BOLD"
+	case ITALIC:
+		res = "ITALIC"
+	case STRIKE:
+		res = "STRIKE"
+	}
+	return
+}
+
 // Last line of the template

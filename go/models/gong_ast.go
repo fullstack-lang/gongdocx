@@ -856,6 +856,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Rune":
 					switch fieldName {
 					// insertion point for enum assign code
+					case "RuneStyle":
+						var val RuneStyle
+						err := (&val).FromCodeString(enumValue)
+						if err != nil {
+							log.Fatalln(err)
+						}
+						__gong__map_Rune[identifier].RuneStyle = RuneStyle(val)
 					}
 				case "Text":
 					switch fieldName {

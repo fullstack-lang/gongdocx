@@ -391,8 +391,8 @@ func (zf *file) walk(
 		node.Nodes = append(node.Nodes, node__)
 		nodeCounter = nodeCounter + 1
 
-		rune := (&Rune{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
-		rune.Node = node__
+		rune_ := (&Rune{Name: fmt.Sprintf("%d", nodeCounter)}).Stage(gongdocxStage)
+		rune_.Node = node__
 
 		bold := false
 		italic := false
@@ -405,10 +405,13 @@ func (zf *file) walk(
 				switch nn.XMLName.Local {
 				case "b":
 					bold = true
+					rune_.RuneStyle = BOLD
 				case "i":
 					italic = true
+					rune_.RuneStyle = ITALIC
 				case "strike":
 					strike = true
+					rune_.RuneStyle = STRIKE
 				}
 			}
 		}

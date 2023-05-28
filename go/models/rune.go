@@ -22,6 +22,8 @@ package models
 const NoteOnRune = ""
 
 type Rune struct {
-	Name string
+	Name      string
+	RuneStyle RuneStyle
+
 	Node *Node
 }

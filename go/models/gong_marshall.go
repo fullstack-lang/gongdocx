@@ -300,6 +300,14 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(rune.Name))
 		initializerStatements += setValueField
 
+		if rune.RuneStyle != "" {
+			setValueField = StringEnumInitStatement
+			setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "RuneStyle")
+			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", "models."+rune.RuneStyle.ToCodeString())
+			initializerStatements += setValueField
+		}
+
 	}
 
 	map_Text_Identifiers := make(map[*Text]string)

@@ -26,6 +26,13 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="RuneStyle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> RuneStyle </th>
+            <td mat-cell *matCellDef="let Rune">
+                {{Rune.RuneStyle}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="Node">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Node </th>
             <td mat-cell *matCellDef="let Rune">

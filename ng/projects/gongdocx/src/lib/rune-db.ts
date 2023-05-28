@@ -14,6 +14,7 @@ export class RuneDB {
 
 	// insertion point for basic fields declarations
 	Name: string = ""
+	RuneStyle: string = ""
 
 	// insertion point for other declarations
 	Node?: NodeDB

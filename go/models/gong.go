@@ -1108,7 +1108,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Paragraph:
 		res = []string{"Name", "Node"}
 	case Rune:
-		res = []string{"Name", "Node"}
+		res = []string{"Name", "RuneStyle", "Node"}
 	case Text:
 		res = []string{"Name", "Content", "Node"}
 	}
@@ -1181,6 +1181,9 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		// string value of fields
 		case "Name":
 			res = any(instance).(Rune).Name
+		case "RuneStyle":
+			enum := any(instance).(Rune).RuneStyle
+			res = enum.ToCodeString()
 		case "Node":
 			if any(instance).(Rune).Node != nil {
 				res = any(instance).(Rune).Node.Name

@@ -10,6 +10,7 @@ import { MapOfComponents } from '../map-components'
 import { MapOfSortingComponents } from '../map-components'
 
 // insertion point for imports
+import { RuneStyleSelect, RuneStyleList } from '../RuneStyle'
 
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -33,6 +34,7 @@ enum RuneDetailComponentState {
 export class RuneDetailComponent implements OnInit {
 
 	// insertion point for declarations
+	RuneStyleList: RuneStyleSelect[] = []
 
 	// the RuneDB of interest
 	rune: RuneDB = new RuneDB
@@ -110,6 +112,7 @@ export class RuneDetailComponent implements OnInit {
 		)
 
 		// insertion point for initialisation of enums list
+		this.RuneStyleList = RuneStyleList
 	}
 
 	getRune(): void {

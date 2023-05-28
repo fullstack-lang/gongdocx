@@ -21,6 +21,16 @@
         <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="rune.Name"></textarea>
     </mat-form-field>
 
+    <!-- -->
+    <mat-form-field appearance="fill" class="detail-full-width">
+        <mat-label>RuneStyle</mat-label>
+        <mat-select [(ngModel)]="rune.RuneStyle" [ngModelOptions]="{standalone: true}">
+            <mat-option *ngFor="let enum of RuneStyleList" [value]="enum.value">
+                {{enum.viewValue}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
     <mat-form-field class="detail-full-width">
         <mat-label>Node</mat-label>
         <mat-select [compareWith]="compareObjects" [(value)]="rune.Node" (selectionChange)="fillUpNameIfEmpty($event)">

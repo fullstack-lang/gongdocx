@@ -64,6 +64,9 @@ type RuneDB struct {
 
 	// Declation for basic field runeDB.Name
 	Name_Data sql.NullString
+
+	// Declation for basic field runeDB.RuneStyle
+	RuneStyle_Data sql.NullString
 	// encoding of pointers
 	RunePointersEnconding
 }
@@ -86,6 +89,8 @@ type RuneWOP struct {
 	// insertion for WOP basic fields
 
 	Name string `xlsx:"1"`
+
+	RuneStyle models.RuneStyle `xlsx:"2"`
 	// insertion for WOP pointer fields
 }
 
@@ -93,6 +98,7 @@ var Rune_Fields = []string{
 	// insertion for WOP basic fields
 	"ID",
 	"Name",
+	"RuneStyle",
 }
 
 type BackRepoRuneStruct struct {
@@ -368,6 +374,9 @@ func (runeDB *RuneDB) CopyBasicFieldsFromRune(rune *models.Rune) {
 
 	runeDB.Name_Data.String = rune.Name
 	runeDB.Name_Data.Valid = true
+
+	runeDB.RuneStyle_Data.String = rune.RuneStyle.ToString()
+	runeDB.RuneStyle_Data.Valid = true
 }
 
 // CopyBasicFieldsFromRuneWOP
@@ -376,12 +385,16 @@ func (runeDB *RuneDB) CopyBasicFieldsFromRuneWOP(rune *RuneWOP) {
 
 	runeDB.Name_Data.String = rune.Name
 	runeDB.Name_Data.Valid = true
+
+	runeDB.RuneStyle_Data.String = rune.RuneStyle.ToString()
+	runeDB.RuneStyle_Data.Valid = true
 }
 
 // CopyBasicFieldsToRune
 func (runeDB *RuneDB) CopyBasicFieldsToRune(rune *models.Rune) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	rune.Name = runeDB.Name_Data.String
+	rune.RuneStyle.FromString(runeDB.RuneStyle_Data.String)
 }
 
 // CopyBasicFieldsToRuneWOP
@@ -389,6 +402,7 @@ func (runeDB *RuneDB) CopyBasicFieldsToRuneWOP(rune *RuneWOP) {
 	rune.ID = int(runeDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	rune.Name = runeDB.Name_Data.String
+	rune.RuneStyle.FromString(runeDB.RuneStyle_Data.String)
 }
 
 // Backup generates a json file from a slice of all RuneDB instances in the backrepo

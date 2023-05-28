@@ -75,6 +75,9 @@ export class RunesTableComponent implements OnInit {
         case 'Name':
           return runeDB.Name;
 
+        case 'RuneStyle':
+          return runeDB.RuneStyle;
+
         case 'Node':
           return (runeDB.Node ? runeDB.Node.Name : '');
 
@@ -93,6 +96,7 @@ export class RunesTableComponent implements OnInit {
 
       // insertion point for merging of fields
       mergedContent += runeDB.Name.toLowerCase()
+      mergedContent += runeDB.RuneStyle.toLowerCase()
       if (runeDB.Node) {
         mergedContent += runeDB.Node.Name.toLowerCase()
       }
@@ -151,11 +155,13 @@ export class RunesTableComponent implements OnInit {
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Delete', // insertion point for columns to display
         "Name",
+        "RuneStyle",
         "Node",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
+        "RuneStyle",
         "Node",
       ]
       this.selection = new SelectionModel<RuneDB>(allowMultiSelect, this.initialSelection);
