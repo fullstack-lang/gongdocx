@@ -29,6 +29,8 @@ type BackRepoStruct struct {
 
 	BackRepoNode BackRepoNodeStruct
 
+	BackRepoParagraph BackRepoParagraphStruct
+
 	BackRepoText BackRepoTextStruct
 
 	CommitFromBackNb uint // records commit increments when performed by the back
@@ -71,6 +73,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&DocxDB{},
 		&FileDB{},
 		&NodeDB{},
+		&ParagraphDB{},
 		&TextDB{},
 	)
 
@@ -110,6 +113,14 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_NodeDBID_NodePtr: make(map[uint]*models.Node, 0),
 		Map_NodeDBID_NodeDB:  make(map[uint]*NodeDB, 0),
 		Map_NodePtr_NodeDBID: make(map[*models.Node]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
+	backRepo.BackRepoParagraph = BackRepoParagraphStruct{
+		Map_ParagraphDBID_ParagraphPtr: make(map[uint]*models.Paragraph, 0),
+		Map_ParagraphDBID_ParagraphDB:  make(map[uint]*ParagraphDB, 0),
+		Map_ParagraphPtr_ParagraphDBID: make(map[*models.Paragraph]uint, 0),
 
 		db:    db,
 		stage: stage,
@@ -171,6 +182,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoDocx.CommitPhaseOne(stage)
 	backRepo.BackRepoFile.CommitPhaseOne(stage)
 	backRepo.BackRepoNode.CommitPhaseOne(stage)
+	backRepo.BackRepoParagraph.CommitPhaseOne(stage)
 	backRepo.BackRepoText.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
@@ -178,6 +190,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoDocx.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoFile.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoNode.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoParagraph.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoText.CommitPhaseTwo(backRepo)
 
 	backRepo.IncrementCommitFromBackNb()
@@ -190,6 +203,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoDocx.CheckoutPhaseOne()
 	backRepo.BackRepoFile.CheckoutPhaseOne()
 	backRepo.BackRepoNode.CheckoutPhaseOne()
+	backRepo.BackRepoParagraph.CheckoutPhaseOne()
 	backRepo.BackRepoText.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
@@ -197,6 +211,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoDocx.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoFile.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoNode.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoParagraph.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoText.CheckoutPhaseTwo(backRepo)
 }
 
@@ -228,6 +243,7 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	backRepo.BackRepoDocx.Backup(dirPath)
 	backRepo.BackRepoFile.Backup(dirPath)
 	backRepo.BackRepoNode.Backup(dirPath)
+	backRepo.BackRepoParagraph.Backup(dirPath)
 	backRepo.BackRepoText.Backup(dirPath)
 }
 
@@ -243,6 +259,7 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	backRepo.BackRepoDocx.BackupXL(file)
 	backRepo.BackRepoFile.BackupXL(file)
 	backRepo.BackRepoNode.BackupXL(file)
+	backRepo.BackRepoParagraph.BackupXL(file)
 	backRepo.BackRepoText.BackupXL(file)
 
 	var b bytes.Buffer
@@ -272,6 +289,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoDocx.RestorePhaseOne(dirPath)
 	backRepo.BackRepoFile.RestorePhaseOne(dirPath)
 	backRepo.BackRepoNode.RestorePhaseOne(dirPath)
+	backRepo.BackRepoParagraph.RestorePhaseOne(dirPath)
 	backRepo.BackRepoText.RestorePhaseOne(dirPath)
 
 	//
@@ -283,6 +301,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoDocx.RestorePhaseTwo()
 	backRepo.BackRepoFile.RestorePhaseTwo()
 	backRepo.BackRepoNode.RestorePhaseTwo()
+	backRepo.BackRepoParagraph.RestorePhaseTwo()
 	backRepo.BackRepoText.RestorePhaseTwo()
 
 	backRepo.stage.Checkout()
@@ -315,6 +334,7 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.BackRepoDocx.RestoreXLPhaseOne(file)
 	backRepo.BackRepoFile.RestoreXLPhaseOne(file)
 	backRepo.BackRepoNode.RestoreXLPhaseOne(file)
+	backRepo.BackRepoParagraph.RestoreXLPhaseOne(file)
 	backRepo.BackRepoText.RestoreXLPhaseOne(file)
 
 	// commit the restored stage

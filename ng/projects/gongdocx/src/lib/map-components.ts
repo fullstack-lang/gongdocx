@@ -7,6 +7,8 @@
   import { FileSortingComponent } from './file-sorting/file-sorting.component'
   import { NodesTableComponent } from './nodes-table/nodes-table.component'
   import { NodeSortingComponent } from './node-sorting/node-sorting.component'
+  import { ParagraphsTableComponent } from './paragraphs-table/paragraphs-table.component'
+  import { ParagraphSortingComponent } from './paragraph-sorting/paragraph-sorting.component'
   import { TextsTableComponent } from './texts-table/texts-table.component'
   import { TextSortingComponent } from './text-sorting/text-sorting.component'
 
@@ -19,6 +21,8 @@
   export const MapOfFileSortingComponents: Map<string, any> = new Map([["FileSortingComponent", FileSortingComponent],])
   export const MapOfNodesComponents: Map<string, any> = new Map([["NodesTableComponent", NodesTableComponent],])
   export const MapOfNodeSortingComponents: Map<string, any> = new Map([["NodeSortingComponent", NodeSortingComponent],])
+  export const MapOfParagraphsComponents: Map<string, any> = new Map([["ParagraphsTableComponent", ParagraphsTableComponent],])
+  export const MapOfParagraphSortingComponents: Map<string, any> = new Map([["ParagraphSortingComponent", ParagraphSortingComponent],])
   export const MapOfTextsComponents: Map<string, any> = new Map([["TextsTableComponent", TextsTableComponent],])
   export const MapOfTextSortingComponents: Map<string, any> = new Map([["TextSortingComponent", TextSortingComponent],])
 
@@ -31,6 +35,7 @@ export const MapOfComponents: Map<string, any> =
       ["Docx", MapOfDocxsComponents],
       ["File", MapOfFilesComponents],
       ["Node", MapOfNodesComponents],
+      ["Paragraph", MapOfParagraphsComponents],
       ["Text", MapOfTextsComponents],
     ]
   )
@@ -44,6 +49,7 @@ export const MapOfSortingComponents: Map<string, any> =
       ["Docx", MapOfDocxSortingComponents],
       ["File", MapOfFileSortingComponents],
       ["Node", MapOfNodeSortingComponents],
+      ["Paragraph", MapOfParagraphSortingComponents],
       ["Text", MapOfTextSortingComponents],
     ]
   )

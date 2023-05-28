@@ -55,6 +55,12 @@ var map_DocLink_Identifier_NewDiagram_1 map[string]any = map[string]any{
 
 	"ref_models.NoteOnDocument": ref_models.NoteOnDocument,
 
+	"ref_models.Paragraph": &(ref_models.Paragraph{}),
+
+	"ref_models.Paragraph.Name": (ref_models.Paragraph{}).Name,
+
+	"ref_models.Paragraph.Node": (ref_models.Paragraph{}).Node,
+
 	"ref_models.Text": &(ref_models.Text{}),
 
 	"ref_models.Text.Name": (ref_models.Text{}).Name,
@@ -168,8 +174,8 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	//gong:ident [ref_models.Node]
 	__GongStructShape__000001_NewDiagram_1_Node.Identifier = `ref_models.Node`
 	__GongStructShape__000001_NewDiagram_1_Node.ShowNbInstances = true
-	__GongStructShape__000001_NewDiagram_1_Node.NbInstances = 8
-	__GongStructShape__000001_NewDiagram_1_Node.Width = 240.000000
+	__GongStructShape__000001_NewDiagram_1_Node.NbInstances = 24
+	__GongStructShape__000001_NewDiagram_1_Node.Width = 1199.000000
 	__GongStructShape__000001_NewDiagram_1_Node.Heigth = 63.000000
 	__GongStructShape__000001_NewDiagram_1_Node.IsSelected = false
 
@@ -180,8 +186,8 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.Text]
 	__GongStructShape__000002_NewDiagram_1_Text.Identifier = `ref_models.Text`
-	__GongStructShape__000002_NewDiagram_1_Text.ShowNbInstances = false
-	__GongStructShape__000002_NewDiagram_1_Text.NbInstances = 0
+	__GongStructShape__000002_NewDiagram_1_Text.ShowNbInstances = true
+	__GongStructShape__000002_NewDiagram_1_Text.NbInstances = 8
 	__GongStructShape__000002_NewDiagram_1_Text.Width = 240.000000
 	__GongStructShape__000002_NewDiagram_1_Text.Heigth = 78.000000
 	__GongStructShape__000002_NewDiagram_1_Text.IsSelected = false
@@ -210,7 +216,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__Link__000000_Node.StartRatio = 0.533333
 	__Link__000000_Node.EndOrientation = models.ORIENTATION_VERTICAL
 	__Link__000000_Node.EndRatio = 0.558333
-	__Link__000000_Node.CornerOffsetRatio = -0.141026
+	__Link__000000_Node.CornerOffsetRatio = 1.416667
 
 	// Link values setup
 	__Link__000001_Root.Name = `Root`
@@ -253,9 +259,16 @@ When parsing these nodes, your code should handle each type of node appropriatel
 based on its name. For example, when you encounter a t node, you might simply
 extract and store the text content.
 `
-	__NoteShape__000000_NodeOnText.BodyHTML = ``
-	__NoteShape__000000_NodeOnText.X = 358.000000
-	__NoteShape__000000_NodeOnText.Y = 490.000000
+	__NoteShape__000000_NodeOnText.BodyHTML = `<p>:
+t: This stands for &apos;text&apos;. This element is used to represent a run of text within
+a paragraph. The t element will contain the actual string of text as its content.
+-
+When parsing these nodes, your code should handle each type of node appropriately
+based on its name. For example, when you encounter a t node, you might simply
+extract and store the text content.
+`
+	__NoteShape__000000_NodeOnText.X = 353.000000
+	__NoteShape__000000_NodeOnText.Y = 790.000000
 	__NoteShape__000000_NodeOnText.Width = 670.000000
 	__NoteShape__000000_NodeOnText.Heigth = 178.000000
 	__NoteShape__000000_NodeOnText.Matched = false
@@ -327,13 +340,13 @@ different section of the overall document.
 	__Position__000000_Pos_NewDiagram_1_Document.Name = `Pos-NewDiagram_1-Document`
 
 	// Position values setup
-	__Position__000001_Pos_NewDiagram_1_Node.X = 42.000000
-	__Position__000001_Pos_NewDiagram_1_Node.Y = 280.000000
+	__Position__000001_Pos_NewDiagram_1_Node.X = 44.000000
+	__Position__000001_Pos_NewDiagram_1_Node.Y = 455.000000
 	__Position__000001_Pos_NewDiagram_1_Node.Name = `Pos-NewDiagram_1-Node`
 
 	// Position values setup
-	__Position__000002_Pos_NewDiagram_1_Text.X = 49.000000
-	__Position__000002_Pos_NewDiagram_1_Text.Y = 534.000000
+	__Position__000002_Pos_NewDiagram_1_Text.X = 54.000000
+	__Position__000002_Pos_NewDiagram_1_Text.Y = 688.000000
 	__Position__000002_Pos_NewDiagram_1_Text.Name = `Pos-NewDiagram_1-Text`
 
 	// Vertice values setup

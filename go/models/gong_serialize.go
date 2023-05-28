@@ -17,6 +17,7 @@ func SerializeStage(stage *StageStruct, filename string) {
 		SerializeExcelize[Docx](stage, f)
 		SerializeExcelize[File](stage, f)
 		SerializeExcelize[Node](stage, f)
+		SerializeExcelize[Paragraph](stage, f)
 		SerializeExcelize[Text](stage, f)
 	}
 

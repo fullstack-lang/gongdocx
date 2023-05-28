@@ -55,6 +55,10 @@ import { NodesTableComponent } from './nodes-table/nodes-table.component'
 import { NodeSortingComponent } from './node-sorting/node-sorting.component'
 import { NodeDetailComponent } from './node-detail/node-detail.component'
 
+import { ParagraphsTableComponent } from './paragraphs-table/paragraphs-table.component'
+import { ParagraphSortingComponent } from './paragraph-sorting/paragraph-sorting.component'
+import { ParagraphDetailComponent } from './paragraph-detail/paragraph-detail.component'
+
 import { TextsTableComponent } from './texts-table/texts-table.component'
 import { TextSortingComponent } from './text-sorting/text-sorting.component'
 import { TextDetailComponent } from './text-detail/text-detail.component'
@@ -78,6 +82,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		NodesTableComponent,
 		NodeSortingComponent,
 		NodeDetailComponent,
+
+		ParagraphsTableComponent,
+		ParagraphSortingComponent,
+		ParagraphDetailComponent,
 
 		TextsTableComponent,
 		TextSortingComponent,
@@ -137,6 +145,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		NodesTableComponent,
 		NodeSortingComponent,
 		NodeDetailComponent,
+
+		ParagraphsTableComponent,
+		ParagraphSortingComponent,
+		ParagraphDetailComponent,
 
 		TextsTableComponent,
 		TextSortingComponent,

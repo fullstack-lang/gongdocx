@@ -69,6 +69,13 @@ func registerControllers(r *gin.Engine) {
 		v1.PUT("/v1/nodes/:id", GetController().UpdateNode)
 		v1.DELETE("/v1/nodes/:id", GetController().DeleteNode)
 
+		v1.GET("/v1/paragraphs", GetController().GetParagraphs)
+		v1.GET("/v1/paragraphs/:id", GetController().GetParagraph)
+		v1.POST("/v1/paragraphs", GetController().PostParagraph)
+		v1.PATCH("/v1/paragraphs/:id", GetController().UpdateParagraph)
+		v1.PUT("/v1/paragraphs/:id", GetController().UpdateParagraph)
+		v1.DELETE("/v1/paragraphs/:id", GetController().DeleteParagraph)
+
 		v1.GET("/v1/texts", GetController().GetTexts)
 		v1.GET("/v1/texts/:id", GetController().GetText)
 		v1.POST("/v1/texts", GetController().PostText)

@@ -238,6 +238,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_Paragraph_Identifiers := make(map[*Paragraph]string)
+	_ = map_Paragraph_Identifiers
+
+	paragraphOrdered := []*Paragraph{}
+	for paragraph := range stage.Paragraphs {
+		paragraphOrdered = append(paragraphOrdered, paragraph)
+	}
+	sort.Slice(paragraphOrdered[:], func(i, j int) bool {
+		return paragraphOrdered[i].Name < paragraphOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of Paragraph"
+	for idx, paragraph := range paragraphOrdered {
+
+		id = generatesIdentifier("Paragraph", idx, paragraph.Name)
+		map_Paragraph_Identifiers[paragraph] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Paragraph")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", paragraph.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// Paragraph values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(paragraph.Name))
+		initializerStatements += setValueField
+
+	}
+
 	map_Text_Identifiers := make(map[*Text]string)
 	_ = map_Text_Identifiers
 
@@ -338,6 +370,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Nodes")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[_node])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, paragraph := range paragraphOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("Paragraph", idx, paragraph.Name)
+		map_Paragraph_Identifiers[paragraph] = id
+
+		// Initialisation of values
+		if paragraph.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[paragraph.Node])
 			pointersInitializesStatements += setPointerField
 		}
 

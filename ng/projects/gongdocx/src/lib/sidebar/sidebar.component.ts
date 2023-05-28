@@ -19,6 +19,8 @@ import { FileService } from '../file.service'
 import { getFileUniqueID } from '../front-repo.service'
 import { NodeService } from '../node.service'
 import { getNodeUniqueID } from '../front-repo.service'
+import { ParagraphService } from '../paragraph.service'
+import { getParagraphUniqueID } from '../front-repo.service'
 import { TextService } from '../text.service'
 import { getTextUniqueID } from '../front-repo.service'
 
@@ -170,6 +172,7 @@ export class SidebarComponent implements OnInit {
     private docxService: DocxService,
     private fileService: FileService,
     private nodeService: NodeService,
+    private paragraphService: ParagraphService,
     private textService: TextService,
 
     private routeService: RouteService,
@@ -232,6 +235,14 @@ export class SidebarComponent implements OnInit {
     )
     // observable for changes in structs
     this.nodeService.NodeServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.paragraphService.ParagraphServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -576,6 +587,85 @@ export class SidebarComponent implements OnInit {
             }
             NodesGongNodeAssociation.children.push(nodeNode)
           })
+
+        }
+      )
+
+      /**
+      * fill up the Paragraph part of the mat tree
+      */
+      let paragraphGongNodeStruct: GongNode = {
+        name: "Paragraph",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Paragraph",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(paragraphGongNodeStruct)
+
+      this.frontRepo.Paragraphs_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Paragraphs_array.forEach(
+        paragraphDB => {
+          let paragraphGongNodeInstance: GongNode = {
+            name: paragraphDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: paragraphDB.ID,
+            uniqueIdPerStack: getParagraphUniqueID(paragraphDB.ID),
+            structName: "Paragraph",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          paragraphGongNodeStruct.children!.push(paragraphGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Node
+          */
+          let NodeGongNodeAssociation: GongNode = {
+            name: "(Node) Node",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: paragraphDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Paragraph",
+            associationField: "Node",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphGongNodeInstance.children!.push(NodeGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Node
+            */
+          if (paragraphDB.Node != undefined) {
+            let paragraphGongNodeInstance_Node: GongNode = {
+              name: paragraphDB.Node.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphDB.Node.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getParagraphUniqueID(paragraphDB.ID)
+                + 5 * getNodeUniqueID(paragraphDB.Node.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodeGongNodeAssociation.children.push(paragraphGongNodeInstance_Node)
+          }
 
         }
       )

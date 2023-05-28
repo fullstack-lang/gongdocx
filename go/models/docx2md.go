@@ -427,7 +427,14 @@ func (zf *file) walk(
 		}
 	case "p":
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node, gongdocxStage, &n, w); err != nil {
+
+			node__ := (&Node{Name: string(node_.Content)}).Stage(gongdocxStage)
+			node.Nodes = append(node.Nodes, node__)
+
+			paragraph := (&Paragraph{Name: string(node_.Content)}).Stage(gongdocxStage)
+			paragraph.Node = node__
+
+			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
