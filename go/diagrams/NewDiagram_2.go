@@ -27,8 +27,6 @@ var ___dummy__ref_models_NewDiagram_2 ref_models.StageStruct
 var map_DocLink_Identifier_NewDiagram_2 map[string]any = map[string]any{
 	// injection point for docLink to identifiers
 
-	"ref_models.BOLD": ref_models.BOLD,
-
 	"ref_models.Document": &(ref_models.Document{}),
 
 	"ref_models.Document.File": (ref_models.Document{}).File,
@@ -46,8 +44,6 @@ var map_DocLink_Identifier_NewDiagram_2 map[string]any = map[string]any{
 	"ref_models.File": &(ref_models.File{}),
 
 	"ref_models.File.Name": (ref_models.File{}).Name,
-
-	"ref_models.ITALIC": ref_models.ITALIC,
 
 	"ref_models.Node": &(ref_models.Node{}),
 
@@ -103,8 +99,6 @@ var map_DocLink_Identifier_NewDiagram_2 map[string]any = map[string]any{
 
 	"ref_models.Rune.Node": (ref_models.Rune{}).Node,
 
-	"ref_models.Rune.RuneStyle": (ref_models.Rune{}).RuneStyle,
-
 	"ref_models.RuneProperties": &(ref_models.RuneProperties{}),
 
 	"ref_models.RuneProperties.Content": (ref_models.RuneProperties{}).Content,
@@ -118,12 +112,6 @@ var map_DocLink_Identifier_NewDiagram_2 map[string]any = map[string]any{
 	"ref_models.RuneProperties.Name": (ref_models.RuneProperties{}).Name,
 
 	"ref_models.RuneProperties.Node": (ref_models.RuneProperties{}).Node,
-
-	"ref_models.RuneProperties.RuneStyle": (ref_models.RuneProperties{}).RuneStyle,
-
-	"ref_models.RuneStyle": ref_models.RuneStyle(""),
-
-	"ref_models.STRIKE": ref_models.STRIKE,
 
 	"ref_models.Text": &(ref_models.Text{}),
 
@@ -284,8 +272,8 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.ParagraphStyle]
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Identifier = `ref_models.ParagraphStyle`
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.ShowNbInstances = false
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.NbInstances = 0
+	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.ShowNbInstances = true
+	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.NbInstances = 2
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Width = 240.000000
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Heigth = 108.000000
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.IsSelected = false
@@ -362,7 +350,26 @@ When parsing a "w:pStyle" node, your code should map the style ID to the
 corresponding style in the styles.xml file and apply the associated formatting
 to the paragraph.
 `
-	__NoteShape__000001_NoteOnStyle.BodyHTML = ``
+	__NoteShape__000001_NoteOnStyle.BodyHTML = `<p>The &quot;w:pStyle&quot; element, found within the paragraph properties (&quot;w:pPr&quot;) node in
+a Word document&apos;s XML structure, defines the paragraph style for a given
+paragraph (&quot;w:p&quot;).
+-
+The &quot;w:pStyle&quot; element includes an attribute &quot;w:val&quot; that references the ID of
+the style being applied to the paragraph. This style ID correlates with the
+styles defined in the styles.xml part of the .docx package.
+-
+A style in Word includes a predefined set of formatting instructions. It can
+control multiple aspects of the paragraph&apos;s appearance, including alignment,
+spacing, font, size, color, and more.
+-
+By using styles, a document can maintain a consistent look and feel, and
+changing the style in one place will automatically update all paragraphs that
+reference that style.
+-
+When parsing a &quot;w:pStyle&quot; node, your code should map the style ID to the
+corresponding style in the styles.xml file and apply the associated formatting
+to the paragraph.
+`
 	__NoteShape__000001_NoteOnStyle.X = 585.000000
 	__NoteShape__000001_NoteOnStyle.Y = 409.000000
 	__NoteShape__000001_NoteOnStyle.Width = 668.000000

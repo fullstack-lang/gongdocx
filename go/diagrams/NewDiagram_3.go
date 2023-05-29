@@ -27,8 +27,6 @@ var ___dummy__ref_models_NewDiagram_3 ref_models.StageStruct
 var map_DocLink_Identifier_NewDiagram_3 map[string]any = map[string]any{
 	// injection point for docLink to identifiers
 
-	"ref_models.BOLD": ref_models.BOLD,
-
 	"ref_models.Document": &(ref_models.Document{}),
 
 	"ref_models.Document.File": (ref_models.Document{}).File,
@@ -46,8 +44,6 @@ var map_DocLink_Identifier_NewDiagram_3 map[string]any = map[string]any{
 	"ref_models.File": &(ref_models.File{}),
 
 	"ref_models.File.Name": (ref_models.File{}).Name,
-
-	"ref_models.ITALIC": ref_models.ITALIC,
 
 	"ref_models.Node": &(ref_models.Node{}),
 
@@ -67,6 +63,8 @@ var map_DocLink_Identifier_NewDiagram_3 map[string]any = map[string]any{
 
 	"ref_models.NoteOnRune": ref_models.NoteOnRune,
 
+	"ref_models.NoteOnStyle": ref_models.NoteOnStyle,
+
 	"ref_models.Paragraph": &(ref_models.Paragraph{}),
 
 	"ref_models.Paragraph.Content": (ref_models.Paragraph{}).Content,
@@ -83,6 +81,16 @@ var map_DocLink_Identifier_NewDiagram_3 map[string]any = map[string]any{
 
 	"ref_models.ParagraphProperties.Node": (ref_models.ParagraphProperties{}).Node,
 
+	"ref_models.ParagraphStyle": &(ref_models.ParagraphStyle{}),
+
+	"ref_models.ParagraphStyle.Content": (ref_models.ParagraphStyle{}).Content,
+
+	"ref_models.ParagraphStyle.Name": (ref_models.ParagraphStyle{}).Name,
+
+	"ref_models.ParagraphStyle.Node": (ref_models.ParagraphStyle{}).Node,
+
+	"ref_models.ParagraphStyle.ValAttr": (ref_models.ParagraphStyle{}).ValAttr,
+
 	"ref_models.Rune": &(ref_models.Rune{}),
 
 	"ref_models.Rune.Content": (ref_models.Rune{}).Content,
@@ -90,8 +98,6 @@ var map_DocLink_Identifier_NewDiagram_3 map[string]any = map[string]any{
 	"ref_models.Rune.Name": (ref_models.Rune{}).Name,
 
 	"ref_models.Rune.Node": (ref_models.Rune{}).Node,
-
-	"ref_models.Rune.RuneStyle": (ref_models.Rune{}).RuneStyle,
 
 	"ref_models.RuneProperties": &(ref_models.RuneProperties{}),
 
@@ -106,12 +112,6 @@ var map_DocLink_Identifier_NewDiagram_3 map[string]any = map[string]any{
 	"ref_models.RuneProperties.Name": (ref_models.RuneProperties{}).Name,
 
 	"ref_models.RuneProperties.Node": (ref_models.RuneProperties{}).Node,
-
-	"ref_models.RuneProperties.RuneStyle": (ref_models.RuneProperties{}).RuneStyle,
-
-	"ref_models.RuneStyle": ref_models.RuneStyle(""),
-
-	"ref_models.STRIKE": ref_models.STRIKE,
 
 	"ref_models.Text": &(ref_models.Text{}),
 
@@ -244,10 +244,10 @@ func NewDiagram_3Injection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.RuneProperties.Name]
-	__Field__000005_Name.Identifier = `ref_models.RuneProperties.Name`
+	//gong:ident [ref_models.Rune.Name]
+	__Field__000005_Name.Identifier = `ref_models.Rune.Name`
 	__Field__000005_Name.FieldTypeAsString = ``
-	__Field__000005_Name.Structname = `RuneProperties`
+	__Field__000005_Name.Structname = `Rune`
 	__Field__000005_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -255,10 +255,10 @@ func NewDiagram_3Injection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Rune.Name]
-	__Field__000006_Name.Identifier = `ref_models.Rune.Name`
+	//gong:ident [ref_models.RuneProperties.Name]
+	__Field__000006_Name.Identifier = `ref_models.RuneProperties.Name`
 	__Field__000006_Name.FieldTypeAsString = ``
-	__Field__000006_Name.Structname = `Rune`
+	__Field__000006_Name.Structname = `RuneProperties`
 	__Field__000006_Name.Fieldtypename = `string`
 
 	// GongStructShape values setup
@@ -268,8 +268,8 @@ func NewDiagram_3Injection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.Rune]
 	__GongStructShape__000000_NewDiagram_3_Rune.Identifier = `ref_models.Rune`
-	__GongStructShape__000000_NewDiagram_3_Rune.ShowNbInstances = false
-	__GongStructShape__000000_NewDiagram_3_Rune.NbInstances = 0
+	__GongStructShape__000000_NewDiagram_3_Rune.ShowNbInstances = true
+	__GongStructShape__000000_NewDiagram_3_Rune.NbInstances = 14
 	__GongStructShape__000000_NewDiagram_3_Rune.Width = 240.000000
 	__GongStructShape__000000_NewDiagram_3_Rune.Heigth = 93.000000
 	__GongStructShape__000000_NewDiagram_3_Rune.IsSelected = false
@@ -281,8 +281,8 @@ func NewDiagram_3Injection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.RuneProperties]
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Identifier = `ref_models.RuneProperties`
-	__GongStructShape__000001_NewDiagram_3_RuneProperties.ShowNbInstances = false
-	__GongStructShape__000001_NewDiagram_3_RuneProperties.NbInstances = 0
+	__GongStructShape__000001_NewDiagram_3_RuneProperties.ShowNbInstances = true
+	__GongStructShape__000001_NewDiagram_3_RuneProperties.NbInstances = 14
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Width = 240.000000
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Heigth = 138.000000
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.IsSelected = false
@@ -311,7 +311,22 @@ When parsing a "w:rPr" node, your code should use the information it provides to
 apply the appropriate formatting to the text in the run ("w:r") that contains
 this "w:rPr" node.
 `
-	__NoteShape__000000_NoteOnRunProperties.BodyHTML = ``
+	__NoteShape__000000_NoteOnRunProperties.BodyHTML = `<p>The &quot;w:rPr&quot; node represents run properties in a Word document&apos;s XML structure.
+It is found within a &quot;w:r&quot; (run) node in the document.xml file.
+-
+This node defines the formatting for a specific run of text within a paragraph.
+It can include properties like font size, font type, color, highlighting,
+bolding, italics, underlining, and more.
+-
+For example, a &quot;w:rPr&quot; node might contain a &quot;w:sz&quot; element for font size, a
+&quot;w:color&quot; element for text color, or &quot;w:b&quot; for bold formatting. The presence of
+elements like &quot;w:b&quot; (bold), &quot;w:i&quot; (italic), and &quot;w:u&quot; (underline) indicate that
+the formatting is applied, as they are toggled by their presence alone.
+-
+When parsing a &quot;w:rPr&quot; node, your code should use the information it provides to
+apply the appropriate formatting to the text in the run (&quot;w:r&quot;) that contains
+this &quot;w:rPr&quot; node.
+`
 	__NoteShape__000000_NoteOnRunProperties.X = 766.000000
 	__NoteShape__000000_NoteOnRunProperties.Y = 347.000000
 	__NoteShape__000000_NoteOnRunProperties.Width = 595.000000
@@ -345,7 +360,25 @@ When parsing a "w:r" node, your code should handle the formatting information
 provided in the "w:rPr" node (if present) and apply it to the text found within
 the "w:t" nodes.
 `
-	__NoteShape__000001_NoteOnRune.BodyHTML = ``
+	__NoteShape__000001_NoteOnRune.BodyHTML = `<p>for <a href="/models#Rune">models.Rune</a>
+-
+The &quot;w:r&quot; node, known as a run, represents a continuous run of text within a
+paragraph (&quot;w:p&quot; node) in a Word document&apos;s XML structure. It is found within
+the document.xml file.
+-
+Runs are segments of text within a paragraph that share the same formatting.
+This can include properties like bolding, italics, underlining, color, size,
+font, and more. The specific formatting is defined in a &quot;w:rPr&quot; (Run Properties)
+element within the &quot;w:r&quot; node.
+-
+A &quot;w:r&quot; node contains one or more &quot;w:t&quot; nodes, which hold the actual text
+content of the run. It can also contain other types of nodes like &quot;w:br&quot; for a
+line break or &quot;w:tab&quot; for a tab character.
+-
+When parsing a &quot;w:r&quot; node, your code should handle the formatting information
+provided in the &quot;w:rPr&quot; node (if present) and apply it to the text found within
+the &quot;w:t&quot; nodes.
+`
 	__NoteShape__000001_NoteOnRune.X = 44.000000
 	__NoteShape__000001_NoteOnRune.Y = 324.000000
 	__NoteShape__000001_NoteOnRune.Width = 631.000000
@@ -368,10 +401,10 @@ the "w:t" nodes.
 	__Classdiagram__000000_NewDiagram_3.NoteShapes = append(__Classdiagram__000000_NewDiagram_3.NoteShapes, __NoteShape__000001_NoteOnRune)
 	__Classdiagram__000000_NewDiagram_3.NoteShapes = append(__Classdiagram__000000_NewDiagram_3.NoteShapes, __NoteShape__000000_NoteOnRunProperties)
 	__GongStructShape__000000_NewDiagram_3_Rune.Position = __Position__000000_Pos_NewDiagram_3_Rune
-	__GongStructShape__000000_NewDiagram_3_Rune.Fields = append(__GongStructShape__000000_NewDiagram_3_Rune.Fields, __Field__000006_Name)
+	__GongStructShape__000000_NewDiagram_3_Rune.Fields = append(__GongStructShape__000000_NewDiagram_3_Rune.Fields, __Field__000005_Name)
 	__GongStructShape__000000_NewDiagram_3_Rune.Fields = append(__GongStructShape__000000_NewDiagram_3_Rune.Fields, __Field__000000_Content)
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Position = __Position__000001_Pos_NewDiagram_3_RuneProperties
-	__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields = append(__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields, __Field__000005_Name)
+	__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields = append(__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields, __Field__000006_Name)
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields = append(__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields, __Field__000002_IsBold)
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields = append(__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields, __Field__000004_IsStrike)
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields = append(__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields, __Field__000003_IsItalic)

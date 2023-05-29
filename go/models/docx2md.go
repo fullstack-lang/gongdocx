@@ -189,7 +189,8 @@ func attr(attrs []xml.Attr, name string) (string, bool) {
 	return "", false
 }
 
-func (zf *file) walk(
+func walk(
+	zf *file,
 	node *Node,
 	gongdocxStage *StageStruct,
 	node_ *Node_,
@@ -202,7 +203,7 @@ func (zf *file) walk(
 		fmt.Fprint(w, "[")
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node, gongdocxStage, &n, &cbuf); err != nil {
+			if err := walk(zf, node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
@@ -339,7 +340,7 @@ func (zf *file) walk(
 			fmt.Fprint(w, "`")
 		}
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {
+			if err := walk(zf, node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
@@ -358,7 +359,7 @@ func (zf *file) walk(
 					continue
 				}
 				var cbuf bytes.Buffer
-				if err := zf.walk(node, gongdocxStage, &tc, &cbuf); err != nil {
+				if err := walk(zf, node, gongdocxStage, &tc, &cbuf); err != nil {
 					return err
 				}
 				cols = append(cols, strings.Replace(cbuf.String(), "\n", "", -1))
@@ -461,7 +462,7 @@ func (zf *file) walk(
 		}
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node__, gongdocxStage, &n, &cbuf); err != nil {
+			if err := walk(zf, node__, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
@@ -486,7 +487,7 @@ func (zf *file) walk(
 			node.Nodes = append(node.Nodes, node__)
 			nodeCounter = nodeCounter + 1
 
-			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {
+			if err := walk(zf, node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
@@ -506,7 +507,7 @@ func (zf *file) walk(
 	case "txbxContent":
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
-			if err := zf.walk(node, gongdocxStage, &n, &cbuf); err != nil {
+			if err := walk(zf, node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
@@ -517,7 +518,7 @@ func (zf *file) walk(
 			node.Nodes = append(node.Nodes, node__)
 			nodeCounter = nodeCounter + 1
 
-			if err := zf.walk(node__, gongdocxStage, &n, w); err != nil {
+			if err := walk(zf, node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
@@ -623,7 +624,7 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 		embed: embed,
 		list:  make(map[string]int),
 	}
-	err = zf.walk(node, gongdocx_stage, node_, &buf)
+	err = walk(zf, node, gongdocx_stage, node_, &buf)
 	if err != nil {
 		return err
 	}
