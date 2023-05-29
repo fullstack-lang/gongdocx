@@ -452,6 +452,126 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_Table_Identifiers := make(map[*Table]string)
+	_ = map_Table_Identifiers
+
+	tableOrdered := []*Table{}
+	for table := range stage.Tables {
+		tableOrdered = append(tableOrdered, table)
+	}
+	sort.Slice(tableOrdered[:], func(i, j int) bool {
+		return tableOrdered[i].Name < tableOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of Table"
+	for idx, table := range tableOrdered {
+
+		id = generatesIdentifier("Table", idx, table.Name)
+		map_Table_Identifiers[table] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Table")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", table.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// Table values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(table.Name))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Content")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(table.Content))
+		initializerStatements += setValueField
+
+	}
+
+	map_TableProperties_Identifiers := make(map[*TableProperties]string)
+	_ = map_TableProperties_Identifiers
+
+	tablepropertiesOrdered := []*TableProperties{}
+	for tableproperties := range stage.TablePropertiess {
+		tablepropertiesOrdered = append(tablepropertiesOrdered, tableproperties)
+	}
+	sort.Slice(tablepropertiesOrdered[:], func(i, j int) bool {
+		return tablepropertiesOrdered[i].Name < tablepropertiesOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of TableProperties"
+	for idx, tableproperties := range tablepropertiesOrdered {
+
+		id = generatesIdentifier("TableProperties", idx, tableproperties.Name)
+		map_TableProperties_Identifiers[tableproperties] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "TableProperties")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", tableproperties.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// TableProperties values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(tableproperties.Name))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Content")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(tableproperties.Content))
+		initializerStatements += setValueField
+
+	}
+
+	map_TableStyle_Identifiers := make(map[*TableStyle]string)
+	_ = map_TableStyle_Identifiers
+
+	tablestyleOrdered := []*TableStyle{}
+	for tablestyle := range stage.TableStyles {
+		tablestyleOrdered = append(tablestyleOrdered, tablestyle)
+	}
+	sort.Slice(tablestyleOrdered[:], func(i, j int) bool {
+		return tablestyleOrdered[i].Name < tablestyleOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of TableStyle"
+	for idx, tablestyle := range tablestyleOrdered {
+
+		id = generatesIdentifier("TableStyle", idx, tablestyle.Name)
+		map_TableStyle_Identifiers[tablestyle] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "TableStyle")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", tablestyle.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// TableStyle values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(tablestyle.Name))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Content")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(tablestyle.Content))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Val")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(tablestyle.Val))
+		initializerStatements += setValueField
+
+	}
+
 	map_Text_Identifiers := make(map[*Text]string)
 	_ = map_Text_Identifiers
 
@@ -688,6 +808,76 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[runeproperties.Node])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, table := range tableOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("Table", idx, table.Name)
+		map_Table_Identifiers[table] = id
+
+		// Initialisation of values
+		if table.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[table.Node])
+			pointersInitializesStatements += setPointerField
+		}
+
+		if table.TableProperties != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "TableProperties")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_TableProperties_Identifiers[table.TableProperties])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, tableproperties := range tablepropertiesOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("TableProperties", idx, tableproperties.Name)
+		map_TableProperties_Identifiers[tableproperties] = id
+
+		// Initialisation of values
+		if tableproperties.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[tableproperties.Node])
+			pointersInitializesStatements += setPointerField
+		}
+
+		if tableproperties.TableStyle != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "TableStyle")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_TableStyle_Identifiers[tableproperties.TableStyle])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, tablestyle := range tablestyleOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("TableStyle", idx, tablestyle.Name)
+		map_TableStyle_Identifiers[tablestyle] = id
+
+		// Initialisation of values
+		if tablestyle.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[tablestyle.Node])
 			pointersInitializesStatements += setPointerField
 		}
 

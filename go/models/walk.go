@@ -182,13 +182,47 @@ func walk(
 			fmt.Fprint(w, "`")
 		}
 	case "tbl":
+
+		table := (&Table{Name: node.Name}).Stage(gongdocxStage)
+		table.Node = node
+		table.Content = string(node_.Content)
+
 		var rows [][]string
-		for _, tr := range node_.Nodes {
-			if tr.XMLName.Local != "tr" {
+		for _, tableNode := range node_.Nodes {
+			if tableNode.XMLName.Local == "tblPr" {
+				nodeCounter_ := 0
+				node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
+				node.Nodes = append(node.Nodes, node__)
+				nodeCounter_ = nodeCounter_ + 1
+
+				tableProperties := (&TableProperties{Name: node.Name}).Stage(gongdocxStage)
+				tableProperties.Node = node
+				tableProperties.Content = string(tableNode.Content)
+				table.TableProperties = tableProperties
+
+				for _, tblStyle := range tableNode.Nodes {
+
+					if tblStyle.XMLName.Local == "tblStyle" {
+						node___ := (&Node{Name: fmt.Sprintf(node__.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
+						node.Nodes = append(node.Nodes, node___)
+						nodeCounter_ = nodeCounter_ + 1
+
+						tableStyle := (&TableStyle{Name: node.Name}).Stage(gongdocxStage)
+						tableStyle.Node = node
+						tableStyle.Content = string(tblStyle.Content)
+						tableProperties.TableStyle = tableStyle
+
+						if val, ok := attr(tblStyle.Attrs, "val"); ok {
+							tableStyle.Val = val
+						}
+					}
+				}
+			}
+			if tableNode.XMLName.Local != "tr" {
 				continue
 			}
 			var cols []string
-			for _, tc := range tr.Nodes {
+			for _, tc := range tableNode.Nodes {
 				if tc.XMLName.Local != "tc" {
 					continue
 				}

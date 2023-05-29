@@ -102,6 +102,30 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterRunePropertiesDeleteCallback OnAfterDeleteInterface[RuneProperties]
 	OnAfterRunePropertiesReadCallback   OnAfterReadInterface[RuneProperties]
 
+	Tables           map[*Table]any
+	Tables_mapString map[string]*Table
+
+	OnAfterTableCreateCallback OnAfterCreateInterface[Table]
+	OnAfterTableUpdateCallback OnAfterUpdateInterface[Table]
+	OnAfterTableDeleteCallback OnAfterDeleteInterface[Table]
+	OnAfterTableReadCallback   OnAfterReadInterface[Table]
+
+	TablePropertiess           map[*TableProperties]any
+	TablePropertiess_mapString map[string]*TableProperties
+
+	OnAfterTablePropertiesCreateCallback OnAfterCreateInterface[TableProperties]
+	OnAfterTablePropertiesUpdateCallback OnAfterUpdateInterface[TableProperties]
+	OnAfterTablePropertiesDeleteCallback OnAfterDeleteInterface[TableProperties]
+	OnAfterTablePropertiesReadCallback   OnAfterReadInterface[TableProperties]
+
+	TableStyles           map[*TableStyle]any
+	TableStyles_mapString map[string]*TableStyle
+
+	OnAfterTableStyleCreateCallback OnAfterCreateInterface[TableStyle]
+	OnAfterTableStyleUpdateCallback OnAfterUpdateInterface[TableStyle]
+	OnAfterTableStyleDeleteCallback OnAfterDeleteInterface[TableStyle]
+	OnAfterTableStyleReadCallback   OnAfterReadInterface[TableStyle]
+
 	Texts           map[*Text]any
 	Texts_mapString map[string]*Text
 
@@ -192,6 +216,12 @@ type BackRepoInterface interface {
 	CheckoutRune(rune *Rune)
 	CommitRuneProperties(runeproperties *RuneProperties)
 	CheckoutRuneProperties(runeproperties *RuneProperties)
+	CommitTable(table *Table)
+	CheckoutTable(table *Table)
+	CommitTableProperties(tableproperties *TableProperties)
+	CheckoutTableProperties(tableproperties *TableProperties)
+	CommitTableStyle(tablestyle *TableStyle)
+	CheckoutTableStyle(tablestyle *TableStyle)
 	CommitText(text *Text)
 	CheckoutText(text *Text)
 	GetLastCommitFromBackNb() uint
@@ -239,6 +269,15 @@ func NewStage() (stage *StageStruct) {
 		RunePropertiess:           make(map[*RuneProperties]any),
 		RunePropertiess_mapString: make(map[string]*RuneProperties),
 
+		Tables:           make(map[*Table]any),
+		Tables_mapString: make(map[string]*Table),
+
+		TablePropertiess:           make(map[*TableProperties]any),
+		TablePropertiess_mapString: make(map[string]*TableProperties),
+
+		TableStyles:           make(map[*TableStyle]any),
+		TableStyles_mapString: make(map[string]*TableStyle),
+
 		Texts:           make(map[*Text]any),
 		Texts_mapString: make(map[string]*Text),
 
@@ -268,6 +307,9 @@ func (stage *StageStruct) Commit() {
 	stage.Map_GongStructName_InstancesNb["ParagraphStyle"] = len(stage.ParagraphStyles)
 	stage.Map_GongStructName_InstancesNb["Rune"] = len(stage.Runes)
 	stage.Map_GongStructName_InstancesNb["RuneProperties"] = len(stage.RunePropertiess)
+	stage.Map_GongStructName_InstancesNb["Table"] = len(stage.Tables)
+	stage.Map_GongStructName_InstancesNb["TableProperties"] = len(stage.TablePropertiess)
+	stage.Map_GongStructName_InstancesNb["TableStyle"] = len(stage.TableStyles)
 	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
 
 }
@@ -287,6 +329,9 @@ func (stage *StageStruct) Checkout() {
 	stage.Map_GongStructName_InstancesNb["ParagraphStyle"] = len(stage.ParagraphStyles)
 	stage.Map_GongStructName_InstancesNb["Rune"] = len(stage.Runes)
 	stage.Map_GongStructName_InstancesNb["RuneProperties"] = len(stage.RunePropertiess)
+	stage.Map_GongStructName_InstancesNb["Table"] = len(stage.Tables)
+	stage.Map_GongStructName_InstancesNb["TableProperties"] = len(stage.TablePropertiess)
+	stage.Map_GongStructName_InstancesNb["TableStyle"] = len(stage.TableStyles)
 	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
 
 }
@@ -680,6 +725,126 @@ func (runeproperties *RuneProperties) GetName() (res string) {
 	return runeproperties.Name
 }
 
+// Stage puts table to the model stage
+func (table *Table) Stage(stage *StageStruct) *Table {
+	stage.Tables[table] = __member
+	stage.Tables_mapString[table.Name] = table
+
+	return table
+}
+
+// Unstage removes table off the model stage
+func (table *Table) Unstage(stage *StageStruct) *Table {
+	delete(stage.Tables, table)
+	delete(stage.Tables_mapString, table.Name)
+	return table
+}
+
+// commit table to the back repo (if it is already staged)
+func (table *Table) Commit(stage *StageStruct) *Table {
+	if _, ok := stage.Tables[table]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitTable(table)
+		}
+	}
+	return table
+}
+
+// Checkout table to the back repo (if it is already staged)
+func (table *Table) Checkout(stage *StageStruct) *Table {
+	if _, ok := stage.Tables[table]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutTable(table)
+		}
+	}
+	return table
+}
+
+// for satisfaction of GongStruct interface
+func (table *Table) GetName() (res string) {
+	return table.Name
+}
+
+// Stage puts tableproperties to the model stage
+func (tableproperties *TableProperties) Stage(stage *StageStruct) *TableProperties {
+	stage.TablePropertiess[tableproperties] = __member
+	stage.TablePropertiess_mapString[tableproperties.Name] = tableproperties
+
+	return tableproperties
+}
+
+// Unstage removes tableproperties off the model stage
+func (tableproperties *TableProperties) Unstage(stage *StageStruct) *TableProperties {
+	delete(stage.TablePropertiess, tableproperties)
+	delete(stage.TablePropertiess_mapString, tableproperties.Name)
+	return tableproperties
+}
+
+// commit tableproperties to the back repo (if it is already staged)
+func (tableproperties *TableProperties) Commit(stage *StageStruct) *TableProperties {
+	if _, ok := stage.TablePropertiess[tableproperties]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitTableProperties(tableproperties)
+		}
+	}
+	return tableproperties
+}
+
+// Checkout tableproperties to the back repo (if it is already staged)
+func (tableproperties *TableProperties) Checkout(stage *StageStruct) *TableProperties {
+	if _, ok := stage.TablePropertiess[tableproperties]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutTableProperties(tableproperties)
+		}
+	}
+	return tableproperties
+}
+
+// for satisfaction of GongStruct interface
+func (tableproperties *TableProperties) GetName() (res string) {
+	return tableproperties.Name
+}
+
+// Stage puts tablestyle to the model stage
+func (tablestyle *TableStyle) Stage(stage *StageStruct) *TableStyle {
+	stage.TableStyles[tablestyle] = __member
+	stage.TableStyles_mapString[tablestyle.Name] = tablestyle
+
+	return tablestyle
+}
+
+// Unstage removes tablestyle off the model stage
+func (tablestyle *TableStyle) Unstage(stage *StageStruct) *TableStyle {
+	delete(stage.TableStyles, tablestyle)
+	delete(stage.TableStyles_mapString, tablestyle.Name)
+	return tablestyle
+}
+
+// commit tablestyle to the back repo (if it is already staged)
+func (tablestyle *TableStyle) Commit(stage *StageStruct) *TableStyle {
+	if _, ok := stage.TableStyles[tablestyle]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitTableStyle(tablestyle)
+		}
+	}
+	return tablestyle
+}
+
+// Checkout tablestyle to the back repo (if it is already staged)
+func (tablestyle *TableStyle) Checkout(stage *StageStruct) *TableStyle {
+	if _, ok := stage.TableStyles[tablestyle]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutTableStyle(tablestyle)
+		}
+	}
+	return tablestyle
+}
+
+// for satisfaction of GongStruct interface
+func (tablestyle *TableStyle) GetName() (res string) {
+	return tablestyle.Name
+}
+
 // Stage puts text to the model stage
 func (text *Text) Stage(stage *StageStruct) *Text {
 	stage.Texts[text] = __member
@@ -731,6 +896,9 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 	CreateORMParagraphStyle(ParagraphStyle *ParagraphStyle)
 	CreateORMRune(Rune *Rune)
 	CreateORMRuneProperties(RuneProperties *RuneProperties)
+	CreateORMTable(Table *Table)
+	CreateORMTableProperties(TableProperties *TableProperties)
+	CreateORMTableStyle(TableStyle *TableStyle)
 	CreateORMText(Text *Text)
 }
 
@@ -744,6 +912,9 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 	DeleteORMParagraphStyle(ParagraphStyle *ParagraphStyle)
 	DeleteORMRune(Rune *Rune)
 	DeleteORMRuneProperties(RuneProperties *RuneProperties)
+	DeleteORMTable(Table *Table)
+	DeleteORMTableProperties(TableProperties *TableProperties)
+	DeleteORMTableStyle(TableStyle *TableStyle)
 	DeleteORMText(Text *Text)
 }
 
@@ -774,6 +945,15 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 
 	stage.RunePropertiess = make(map[*RuneProperties]any)
 	stage.RunePropertiess_mapString = make(map[string]*RuneProperties)
+
+	stage.Tables = make(map[*Table]any)
+	stage.Tables_mapString = make(map[string]*Table)
+
+	stage.TablePropertiess = make(map[*TableProperties]any)
+	stage.TablePropertiess_mapString = make(map[string]*TableProperties)
+
+	stage.TableStyles = make(map[*TableStyle]any)
+	stage.TableStyles_mapString = make(map[string]*TableStyle)
 
 	stage.Texts = make(map[*Text]any)
 	stage.Texts_mapString = make(map[string]*Text)
@@ -807,6 +987,15 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 
 	stage.RunePropertiess = nil
 	stage.RunePropertiess_mapString = nil
+
+	stage.Tables = nil
+	stage.Tables_mapString = nil
+
+	stage.TablePropertiess = nil
+	stage.TablePropertiess_mapString = nil
+
+	stage.TableStyles = nil
+	stage.TableStyles_mapString = nil
 
 	stage.Texts = nil
 	stage.Texts_mapString = nil
@@ -850,6 +1039,18 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 		runeproperties.Unstage(stage)
 	}
 
+	for table := range stage.Tables {
+		table.Unstage(stage)
+	}
+
+	for tableproperties := range stage.TablePropertiess {
+		tableproperties.Unstage(stage)
+	}
+
+	for tablestyle := range stage.TableStyles {
+		tablestyle.Unstage(stage)
+	}
+
 	for text := range stage.Texts {
 		text.Unstage(stage)
 	}
@@ -862,7 +1063,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	Document | Docx | File | Node | Paragraph | ParagraphProperties | ParagraphStyle | Rune | RuneProperties | Text
+	Document | Docx | File | Node | Paragraph | ParagraphProperties | ParagraphStyle | Rune | RuneProperties | Table | TableProperties | TableStyle | Text
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -871,7 +1072,7 @@ type Gongstruct interface {
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
 	// insertion point for generic types
-	*Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *ParagraphStyle | *Rune | *RuneProperties | *Text
+	*Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *ParagraphStyle | *Rune | *RuneProperties | *Table | *TableProperties | *TableStyle | *Text
 	GetName() string
 }
 
@@ -887,6 +1088,9 @@ type GongstructSet interface {
 		map[*ParagraphStyle]any |
 		map[*Rune]any |
 		map[*RuneProperties]any |
+		map[*Table]any |
+		map[*TableProperties]any |
+		map[*TableStyle]any |
 		map[*Text]any |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
@@ -903,6 +1107,9 @@ type GongstructMapString interface {
 		map[string]*ParagraphStyle |
 		map[string]*Rune |
 		map[string]*RuneProperties |
+		map[string]*Table |
+		map[string]*TableProperties |
+		map[string]*TableStyle |
 		map[string]*Text |
 		map[*any]any // because go does not support an extra "|" at the end of type specifications
 }
@@ -932,6 +1139,12 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 		return any(&stage.Runes).(*Type)
 	case map[*RuneProperties]any:
 		return any(&stage.RunePropertiess).(*Type)
+	case map[*Table]any:
+		return any(&stage.Tables).(*Type)
+	case map[*TableProperties]any:
+		return any(&stage.TablePropertiess).(*Type)
+	case map[*TableStyle]any:
+		return any(&stage.TableStyles).(*Type)
 	case map[*Text]any:
 		return any(&stage.Texts).(*Type)
 	default:
@@ -964,6 +1177,12 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 		return any(&stage.Runes_mapString).(*Type)
 	case map[string]*RuneProperties:
 		return any(&stage.RunePropertiess_mapString).(*Type)
+	case map[string]*Table:
+		return any(&stage.Tables_mapString).(*Type)
+	case map[string]*TableProperties:
+		return any(&stage.TablePropertiess_mapString).(*Type)
+	case map[string]*TableStyle:
+		return any(&stage.TableStyles_mapString).(*Type)
 	case map[string]*Text:
 		return any(&stage.Texts_mapString).(*Type)
 	default:
@@ -996,6 +1215,12 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 		return any(&stage.Runes).(*map[*Type]any)
 	case RuneProperties:
 		return any(&stage.RunePropertiess).(*map[*Type]any)
+	case Table:
+		return any(&stage.Tables).(*map[*Type]any)
+	case TableProperties:
+		return any(&stage.TablePropertiess).(*map[*Type]any)
+	case TableStyle:
+		return any(&stage.TableStyles).(*map[*Type]any)
 	case Text:
 		return any(&stage.Texts).(*map[*Type]any)
 	default:
@@ -1028,6 +1253,12 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 		return any(&stage.Runes_mapString).(*map[string]*Type)
 	case RuneProperties:
 		return any(&stage.RunePropertiess_mapString).(*map[string]*Type)
+	case Table:
+		return any(&stage.Tables_mapString).(*map[string]*Type)
+	case TableProperties:
+		return any(&stage.TablePropertiess_mapString).(*map[string]*Type)
+	case TableStyle:
+		return any(&stage.TableStyles_mapString).(*map[string]*Type)
 	case Text:
 		return any(&stage.Texts_mapString).(*map[string]*Type)
 	default:
@@ -1104,6 +1335,28 @@ func GetAssociationName[Type Gongstruct]() *Type {
 		}).(*Type)
 	case RuneProperties:
 		return any(&RuneProperties{
+			// Initialisation of associations
+			// field is initialized with an instance of Node with the name of the field
+			Node: &Node{Name: "Node"},
+		}).(*Type)
+	case Table:
+		return any(&Table{
+			// Initialisation of associations
+			// field is initialized with an instance of Node with the name of the field
+			Node: &Node{Name: "Node"},
+			// field is initialized with an instance of TableProperties with the name of the field
+			TableProperties: &TableProperties{Name: "TableProperties"},
+		}).(*Type)
+	case TableProperties:
+		return any(&TableProperties{
+			// Initialisation of associations
+			// field is initialized with an instance of Node with the name of the field
+			Node: &Node{Name: "Node"},
+			// field is initialized with an instance of TableStyle with the name of the field
+			TableStyle: &TableStyle{Name: "TableStyle"},
+		}).(*Type)
+	case TableStyle:
+		return any(&TableStyle{
 			// Initialisation of associations
 			// field is initialized with an instance of Node with the name of the field
 			Node: &Node{Name: "Node"},
@@ -1364,6 +1617,106 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 			}
 			return any(res).(map[*End][]*Start)
 		}
+	// reverse maps of direct associations of Table
+	case Table:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Node":
+			res := make(map[*Node][]*Table)
+			for table := range stage.Tables {
+				if table.Node != nil {
+					node_ := table.Node
+					var tables []*Table
+					_, ok := res[node_]
+					if ok {
+						tables = res[node_]
+					} else {
+						tables = make([]*Table, 0)
+					}
+					tables = append(tables, table)
+					res[node_] = tables
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "TableProperties":
+			res := make(map[*TableProperties][]*Table)
+			for table := range stage.Tables {
+				if table.TableProperties != nil {
+					tableproperties_ := table.TableProperties
+					var tables []*Table
+					_, ok := res[tableproperties_]
+					if ok {
+						tables = res[tableproperties_]
+					} else {
+						tables = make([]*Table, 0)
+					}
+					tables = append(tables, table)
+					res[tableproperties_] = tables
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		}
+	// reverse maps of direct associations of TableProperties
+	case TableProperties:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Node":
+			res := make(map[*Node][]*TableProperties)
+			for tableproperties := range stage.TablePropertiess {
+				if tableproperties.Node != nil {
+					node_ := tableproperties.Node
+					var tablepropertiess []*TableProperties
+					_, ok := res[node_]
+					if ok {
+						tablepropertiess = res[node_]
+					} else {
+						tablepropertiess = make([]*TableProperties, 0)
+					}
+					tablepropertiess = append(tablepropertiess, tableproperties)
+					res[node_] = tablepropertiess
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "TableStyle":
+			res := make(map[*TableStyle][]*TableProperties)
+			for tableproperties := range stage.TablePropertiess {
+				if tableproperties.TableStyle != nil {
+					tablestyle_ := tableproperties.TableStyle
+					var tablepropertiess []*TableProperties
+					_, ok := res[tablestyle_]
+					if ok {
+						tablepropertiess = res[tablestyle_]
+					} else {
+						tablepropertiess = make([]*TableProperties, 0)
+					}
+					tablepropertiess = append(tablepropertiess, tableproperties)
+					res[tablestyle_] = tablepropertiess
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		}
+	// reverse maps of direct associations of TableStyle
+	case TableStyle:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Node":
+			res := make(map[*Node][]*TableStyle)
+			for tablestyle := range stage.TableStyles {
+				if tablestyle.Node != nil {
+					node_ := tablestyle.Node
+					var tablestyles []*TableStyle
+					_, ok := res[node_]
+					if ok {
+						tablestyles = res[node_]
+					} else {
+						tablestyles = make([]*TableStyle, 0)
+					}
+					tablestyles = append(tablestyles, tablestyle)
+					res[node_] = tablestyles
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		}
 	// reverse maps of direct associations of Text
 	case Text:
 		switch fieldname {
@@ -1471,6 +1824,21 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 		switch fieldname {
 		// insertion point for per direct association field
 		}
+	// reverse maps of direct associations of Table
+	case Table:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
+	// reverse maps of direct associations of TableProperties
+	case TableProperties:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
+	// reverse maps of direct associations of TableStyle
+	case TableStyle:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
 	// reverse maps of direct associations of Text
 	case Text:
 		switch fieldname {
@@ -1506,6 +1874,12 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 		res = "Rune"
 	case RuneProperties:
 		res = "RuneProperties"
+	case Table:
+		res = "Table"
+	case TableProperties:
+		res = "TableProperties"
+	case TableStyle:
+		res = "TableStyle"
 	case Text:
 		res = "Text"
 	}
@@ -1537,6 +1911,12 @@ func GetFields[Type Gongstruct]() (res []string) {
 		res = []string{"Name", "Content", "Node", "Text", "RuneProperties"}
 	case RuneProperties:
 		res = []string{"Name", "Node", "IsBold", "IsStrike", "IsItalic", "Content"}
+	case Table:
+		res = []string{"Name", "Node", "Content", "TableProperties"}
+	case TableProperties:
+		res = []string{"Name", "Node", "Content", "TableStyle"}
+	case TableStyle:
+		res = []string{"Name", "Node", "Content", "Val"}
 	case Text:
 		res = []string{"Name", "Content", "Node"}
 	}
@@ -1684,6 +2064,52 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			res = fmt.Sprintf("%t", any(instance).(RuneProperties).IsItalic)
 		case "Content":
 			res = any(instance).(RuneProperties).Content
+		}
+	case Table:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(Table).Name
+		case "Node":
+			if any(instance).(Table).Node != nil {
+				res = any(instance).(Table).Node.Name
+			}
+		case "Content":
+			res = any(instance).(Table).Content
+		case "TableProperties":
+			if any(instance).(Table).TableProperties != nil {
+				res = any(instance).(Table).TableProperties.Name
+			}
+		}
+	case TableProperties:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(TableProperties).Name
+		case "Node":
+			if any(instance).(TableProperties).Node != nil {
+				res = any(instance).(TableProperties).Node.Name
+			}
+		case "Content":
+			res = any(instance).(TableProperties).Content
+		case "TableStyle":
+			if any(instance).(TableProperties).TableStyle != nil {
+				res = any(instance).(TableProperties).TableStyle.Name
+			}
+		}
+	case TableStyle:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(TableStyle).Name
+		case "Node":
+			if any(instance).(TableStyle).Node != nil {
+				res = any(instance).(TableStyle).Node.Name
+			}
+		case "Content":
+			res = any(instance).(TableStyle).Content
+		case "Val":
+			res = any(instance).(TableStyle).Val
 		}
 	case Text:
 		switch fieldName {

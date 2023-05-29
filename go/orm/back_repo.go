@@ -39,6 +39,12 @@ type BackRepoStruct struct {
 
 	BackRepoRuneProperties BackRepoRunePropertiesStruct
 
+	BackRepoTable BackRepoTableStruct
+
+	BackRepoTableProperties BackRepoTablePropertiesStruct
+
+	BackRepoTableStyle BackRepoTableStyleStruct
+
 	BackRepoText BackRepoTextStruct
 
 	CommitFromBackNb uint // records commit increments when performed by the back
@@ -86,6 +92,9 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&ParagraphStyleDB{},
 		&RuneDB{},
 		&RunePropertiesDB{},
+		&TableDB{},
+		&TablePropertiesDB{},
+		&TableStyleDB{},
 		&TextDB{},
 	)
 
@@ -169,6 +178,30 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		db:    db,
 		stage: stage,
 	}
+	backRepo.BackRepoTable = BackRepoTableStruct{
+		Map_TableDBID_TablePtr: make(map[uint]*models.Table, 0),
+		Map_TableDBID_TableDB:  make(map[uint]*TableDB, 0),
+		Map_TablePtr_TableDBID: make(map[*models.Table]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
+	backRepo.BackRepoTableProperties = BackRepoTablePropertiesStruct{
+		Map_TablePropertiesDBID_TablePropertiesPtr: make(map[uint]*models.TableProperties, 0),
+		Map_TablePropertiesDBID_TablePropertiesDB:  make(map[uint]*TablePropertiesDB, 0),
+		Map_TablePropertiesPtr_TablePropertiesDBID: make(map[*models.TableProperties]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
+	backRepo.BackRepoTableStyle = BackRepoTableStyleStruct{
+		Map_TableStyleDBID_TableStylePtr: make(map[uint]*models.TableStyle, 0),
+		Map_TableStyleDBID_TableStyleDB:  make(map[uint]*TableStyleDB, 0),
+		Map_TableStylePtr_TableStyleDBID: make(map[*models.TableStyle]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
 	backRepo.BackRepoText = BackRepoTextStruct{
 		Map_TextDBID_TextPtr: make(map[uint]*models.Text, 0),
 		Map_TextDBID_TextDB:  make(map[uint]*TextDB, 0),
@@ -231,6 +264,9 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoParagraphStyle.CommitPhaseOne(stage)
 	backRepo.BackRepoRune.CommitPhaseOne(stage)
 	backRepo.BackRepoRuneProperties.CommitPhaseOne(stage)
+	backRepo.BackRepoTable.CommitPhaseOne(stage)
+	backRepo.BackRepoTableProperties.CommitPhaseOne(stage)
+	backRepo.BackRepoTableStyle.CommitPhaseOne(stage)
 	backRepo.BackRepoText.CommitPhaseOne(stage)
 
 	// insertion point for per struct back repo phase two commit
@@ -243,6 +279,9 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoParagraphStyle.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoRune.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoRuneProperties.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoTable.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoTableProperties.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoTableStyle.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoText.CommitPhaseTwo(backRepo)
 
 	backRepo.IncrementCommitFromBackNb()
@@ -260,6 +299,9 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoParagraphStyle.CheckoutPhaseOne()
 	backRepo.BackRepoRune.CheckoutPhaseOne()
 	backRepo.BackRepoRuneProperties.CheckoutPhaseOne()
+	backRepo.BackRepoTable.CheckoutPhaseOne()
+	backRepo.BackRepoTableProperties.CheckoutPhaseOne()
+	backRepo.BackRepoTableStyle.CheckoutPhaseOne()
 	backRepo.BackRepoText.CheckoutPhaseOne()
 
 	// insertion point for per struct back repo phase two commit
@@ -272,6 +314,9 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoParagraphStyle.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoRune.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoRuneProperties.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoTable.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoTableProperties.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoTableStyle.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoText.CheckoutPhaseTwo(backRepo)
 }
 
@@ -308,6 +353,9 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	backRepo.BackRepoParagraphStyle.Backup(dirPath)
 	backRepo.BackRepoRune.Backup(dirPath)
 	backRepo.BackRepoRuneProperties.Backup(dirPath)
+	backRepo.BackRepoTable.Backup(dirPath)
+	backRepo.BackRepoTableProperties.Backup(dirPath)
+	backRepo.BackRepoTableStyle.Backup(dirPath)
 	backRepo.BackRepoText.Backup(dirPath)
 }
 
@@ -328,6 +376,9 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	backRepo.BackRepoParagraphStyle.BackupXL(file)
 	backRepo.BackRepoRune.BackupXL(file)
 	backRepo.BackRepoRuneProperties.BackupXL(file)
+	backRepo.BackRepoTable.BackupXL(file)
+	backRepo.BackRepoTableProperties.BackupXL(file)
+	backRepo.BackRepoTableStyle.BackupXL(file)
 	backRepo.BackRepoText.BackupXL(file)
 
 	var b bytes.Buffer
@@ -362,6 +413,9 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoParagraphStyle.RestorePhaseOne(dirPath)
 	backRepo.BackRepoRune.RestorePhaseOne(dirPath)
 	backRepo.BackRepoRuneProperties.RestorePhaseOne(dirPath)
+	backRepo.BackRepoTable.RestorePhaseOne(dirPath)
+	backRepo.BackRepoTableProperties.RestorePhaseOne(dirPath)
+	backRepo.BackRepoTableStyle.RestorePhaseOne(dirPath)
 	backRepo.BackRepoText.RestorePhaseOne(dirPath)
 
 	//
@@ -378,6 +432,9 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoParagraphStyle.RestorePhaseTwo()
 	backRepo.BackRepoRune.RestorePhaseTwo()
 	backRepo.BackRepoRuneProperties.RestorePhaseTwo()
+	backRepo.BackRepoTable.RestorePhaseTwo()
+	backRepo.BackRepoTableProperties.RestorePhaseTwo()
+	backRepo.BackRepoTableStyle.RestorePhaseTwo()
 	backRepo.BackRepoText.RestorePhaseTwo()
 
 	backRepo.stage.Checkout()
@@ -415,6 +472,9 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.BackRepoParagraphStyle.RestoreXLPhaseOne(file)
 	backRepo.BackRepoRune.RestoreXLPhaseOne(file)
 	backRepo.BackRepoRuneProperties.RestoreXLPhaseOne(file)
+	backRepo.BackRepoTable.RestoreXLPhaseOne(file)
+	backRepo.BackRepoTableProperties.RestoreXLPhaseOne(file)
+	backRepo.BackRepoTableStyle.RestoreXLPhaseOne(file)
 	backRepo.BackRepoText.RestoreXLPhaseOne(file)
 
 	// commit the restored stage

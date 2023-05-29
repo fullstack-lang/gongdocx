@@ -31,6 +31,15 @@ import { RuneService } from './rune.service'
 import { RunePropertiesDB } from './runeproperties-db'
 import { RunePropertiesService } from './runeproperties.service'
 
+import { TableDB } from './table-db'
+import { TableService } from './table.service'
+
+import { TablePropertiesDB } from './tableproperties-db'
+import { TablePropertiesService } from './tableproperties.service'
+
+import { TableStyleDB } from './tablestyle-db'
+import { TableStyleService } from './tablestyle.service'
+
 import { TextDB } from './text-db'
 import { TextService } from './text.service'
 
@@ -64,6 +73,15 @@ export class FrontRepo { // insertion point sub template
   RunePropertiess_array = new Array<RunePropertiesDB>(); // array of repo instances
   RunePropertiess = new Map<number, RunePropertiesDB>(); // map of repo instances
   RunePropertiess_batch = new Map<number, RunePropertiesDB>(); // same but only in last GET (for finding repo instances to delete)
+  Tables_array = new Array<TableDB>(); // array of repo instances
+  Tables = new Map<number, TableDB>(); // map of repo instances
+  Tables_batch = new Map<number, TableDB>(); // same but only in last GET (for finding repo instances to delete)
+  TablePropertiess_array = new Array<TablePropertiesDB>(); // array of repo instances
+  TablePropertiess = new Map<number, TablePropertiesDB>(); // map of repo instances
+  TablePropertiess_batch = new Map<number, TablePropertiesDB>(); // same but only in last GET (for finding repo instances to delete)
+  TableStyles_array = new Array<TableStyleDB>(); // array of repo instances
+  TableStyles = new Map<number, TableStyleDB>(); // map of repo instances
+  TableStyles_batch = new Map<number, TableStyleDB>(); // same but only in last GET (for finding repo instances to delete)
   Texts_array = new Array<TextDB>(); // array of repo instances
   Texts = new Map<number, TextDB>(); // map of repo instances
   Texts_batch = new Map<number, TextDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -138,6 +156,9 @@ export class FrontRepoService {
     private paragraphstyleService: ParagraphStyleService,
     private runeService: RuneService,
     private runepropertiesService: RunePropertiesService,
+    private tableService: TableService,
+    private tablepropertiesService: TablePropertiesService,
+    private tablestyleService: TableStyleService,
     private textService: TextService,
   ) { }
 
@@ -178,6 +199,9 @@ export class FrontRepoService {
     Observable<ParagraphStyleDB[]>,
     Observable<RuneDB[]>,
     Observable<RunePropertiesDB[]>,
+    Observable<TableDB[]>,
+    Observable<TablePropertiesDB[]>,
+    Observable<TableStyleDB[]>,
     Observable<TextDB[]>,
   ] = [ // insertion point sub template
       this.documentService.getDocuments(this.GONG__StackPath),
@@ -189,6 +213,9 @@ export class FrontRepoService {
       this.paragraphstyleService.getParagraphStyles(this.GONG__StackPath),
       this.runeService.getRunes(this.GONG__StackPath),
       this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
+      this.tableService.getTables(this.GONG__StackPath),
+      this.tablepropertiesService.getTablePropertiess(this.GONG__StackPath),
+      this.tablestyleService.getTableStyles(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ];
 
@@ -212,6 +239,9 @@ export class FrontRepoService {
       this.paragraphstyleService.getParagraphStyles(this.GONG__StackPath),
       this.runeService.getRunes(this.GONG__StackPath),
       this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
+      this.tableService.getTables(this.GONG__StackPath),
+      this.tablepropertiesService.getTablePropertiess(this.GONG__StackPath),
+      this.tablestyleService.getTableStyles(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ]
 
@@ -230,6 +260,9 @@ export class FrontRepoService {
             paragraphstyles_,
             runes_,
             runepropertiess_,
+            tables_,
+            tablepropertiess_,
+            tablestyles_,
             texts_,
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
@@ -252,6 +285,12 @@ export class FrontRepoService {
             runes = runes_ as RuneDB[]
             var runepropertiess: RunePropertiesDB[]
             runepropertiess = runepropertiess_ as RunePropertiesDB[]
+            var tables: TableDB[]
+            tables = tables_ as TableDB[]
+            var tablepropertiess: TablePropertiesDB[]
+            tablepropertiess = tablepropertiess_ as TablePropertiesDB[]
+            var tablestyles: TableStyleDB[]
+            tablestyles = tablestyles_ as TableStyleDB[]
             var texts: TextDB[]
             texts = texts_ as TextDB[]
 
@@ -556,6 +595,105 @@ export class FrontRepoService {
             });
 
             // init the array
+            this.frontRepo.Tables_array = tables
+
+            // clear the map that counts Table in the GET
+            this.frontRepo.Tables_batch.clear()
+
+            tables.forEach(
+              table => {
+                this.frontRepo.Tables.set(table.ID, table)
+                this.frontRepo.Tables_batch.set(table.ID, table)
+              }
+            )
+
+            // clear tables that are absent from the batch
+            this.frontRepo.Tables.forEach(
+              table => {
+                if (this.frontRepo.Tables_batch.get(table.ID) == undefined) {
+                  this.frontRepo.Tables.delete(table.ID)
+                }
+              }
+            )
+
+            // sort Tables_array array
+            this.frontRepo.Tables_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
+            this.frontRepo.TablePropertiess_array = tablepropertiess
+
+            // clear the map that counts TableProperties in the GET
+            this.frontRepo.TablePropertiess_batch.clear()
+
+            tablepropertiess.forEach(
+              tableproperties => {
+                this.frontRepo.TablePropertiess.set(tableproperties.ID, tableproperties)
+                this.frontRepo.TablePropertiess_batch.set(tableproperties.ID, tableproperties)
+              }
+            )
+
+            // clear tablepropertiess that are absent from the batch
+            this.frontRepo.TablePropertiess.forEach(
+              tableproperties => {
+                if (this.frontRepo.TablePropertiess_batch.get(tableproperties.ID) == undefined) {
+                  this.frontRepo.TablePropertiess.delete(tableproperties.ID)
+                }
+              }
+            )
+
+            // sort TablePropertiess_array array
+            this.frontRepo.TablePropertiess_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
+            this.frontRepo.TableStyles_array = tablestyles
+
+            // clear the map that counts TableStyle in the GET
+            this.frontRepo.TableStyles_batch.clear()
+
+            tablestyles.forEach(
+              tablestyle => {
+                this.frontRepo.TableStyles.set(tablestyle.ID, tablestyle)
+                this.frontRepo.TableStyles_batch.set(tablestyle.ID, tablestyle)
+              }
+            )
+
+            // clear tablestyles that are absent from the batch
+            this.frontRepo.TableStyles.forEach(
+              tablestyle => {
+                if (this.frontRepo.TableStyles_batch.get(tablestyle.ID) == undefined) {
+                  this.frontRepo.TableStyles.delete(tablestyle.ID)
+                }
+              }
+            )
+
+            // sort TableStyles_array array
+            this.frontRepo.TableStyles_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
             this.frontRepo.Texts_array = texts
 
             // clear the map that counts Text in the GET
@@ -765,6 +903,62 @@ export class FrontRepoService {
                   let _node = this.frontRepo.Nodes.get(runeproperties.NodeID.Int64)
                   if (_node) {
                     runeproperties.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+            tables.forEach(
+              table => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(table.NodeID.Int64)
+                  if (_node) {
+                    table.Node = _node
+                  }
+                }
+                // insertion point for pointer field TableProperties redeeming
+                {
+                  let _tableproperties = this.frontRepo.TablePropertiess.get(table.TablePropertiesID.Int64)
+                  if (_tableproperties) {
+                    table.TableProperties = _tableproperties
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+            tablepropertiess.forEach(
+              tableproperties => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tableproperties.NodeID.Int64)
+                  if (_node) {
+                    tableproperties.Node = _node
+                  }
+                }
+                // insertion point for pointer field TableStyle redeeming
+                {
+                  let _tablestyle = this.frontRepo.TableStyles.get(tableproperties.TableStyleID.Int64)
+                  if (_tablestyle) {
+                    tableproperties.TableStyle = _tablestyle
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+            tablestyles.forEach(
+              tablestyle => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tablestyle.NodeID.Int64)
+                  if (_node) {
+                    tablestyle.Node = _node
                   }
                 }
 
@@ -1371,6 +1565,194 @@ export class FrontRepoService {
     )
   }
 
+  // TablePull performs a GET on Table of the stack and redeem association pointers 
+  TablePull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.tableService.getTables(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            tables,
+          ]) => {
+            // init the array
+            this.frontRepo.Tables_array = tables
+
+            // clear the map that counts Table in the GET
+            this.frontRepo.Tables_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            tables.forEach(
+              table => {
+                this.frontRepo.Tables.set(table.ID, table)
+                this.frontRepo.Tables_batch.set(table.ID, table)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(table.NodeID.Int64)
+                  if (_node) {
+                    table.Node = _node
+                  }
+                }
+                // insertion point for pointer field TableProperties redeeming
+                {
+                  let _tableproperties = this.frontRepo.TablePropertiess.get(table.TablePropertiesID.Int64)
+                  if (_tableproperties) {
+                    table.TableProperties = _tableproperties
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear tables that are absent from the GET
+            this.frontRepo.Tables.forEach(
+              table => {
+                if (this.frontRepo.Tables_batch.get(table.ID) == undefined) {
+                  this.frontRepo.Tables.delete(table.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
+  // TablePropertiesPull performs a GET on TableProperties of the stack and redeem association pointers 
+  TablePropertiesPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.tablepropertiesService.getTablePropertiess(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            tablepropertiess,
+          ]) => {
+            // init the array
+            this.frontRepo.TablePropertiess_array = tablepropertiess
+
+            // clear the map that counts TableProperties in the GET
+            this.frontRepo.TablePropertiess_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            tablepropertiess.forEach(
+              tableproperties => {
+                this.frontRepo.TablePropertiess.set(tableproperties.ID, tableproperties)
+                this.frontRepo.TablePropertiess_batch.set(tableproperties.ID, tableproperties)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tableproperties.NodeID.Int64)
+                  if (_node) {
+                    tableproperties.Node = _node
+                  }
+                }
+                // insertion point for pointer field TableStyle redeeming
+                {
+                  let _tablestyle = this.frontRepo.TableStyles.get(tableproperties.TableStyleID.Int64)
+                  if (_tablestyle) {
+                    tableproperties.TableStyle = _tablestyle
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear tablepropertiess that are absent from the GET
+            this.frontRepo.TablePropertiess.forEach(
+              tableproperties => {
+                if (this.frontRepo.TablePropertiess_batch.get(tableproperties.ID) == undefined) {
+                  this.frontRepo.TablePropertiess.delete(tableproperties.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
+  // TableStylePull performs a GET on TableStyle of the stack and redeem association pointers 
+  TableStylePull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.tablestyleService.getTableStyles(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            tablestyles,
+          ]) => {
+            // init the array
+            this.frontRepo.TableStyles_array = tablestyles
+
+            // clear the map that counts TableStyle in the GET
+            this.frontRepo.TableStyles_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            tablestyles.forEach(
+              tablestyle => {
+                this.frontRepo.TableStyles.set(tablestyle.ID, tablestyle)
+                this.frontRepo.TableStyles_batch.set(tablestyle.ID, tablestyle)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tablestyle.NodeID.Int64)
+                  if (_node) {
+                    tablestyle.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear tablestyles that are absent from the GET
+            this.frontRepo.TableStyles.forEach(
+              tablestyle => {
+                if (this.frontRepo.TableStyles_batch.get(tablestyle.ID) == undefined) {
+                  this.frontRepo.TableStyles.delete(tablestyle.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
   // TextPull performs a GET on Text of the stack and redeem association pointers 
   TextPull(): Observable<FrontRepo> {
     return new Observable<FrontRepo>(
@@ -1458,6 +1840,15 @@ export function getRuneUniqueID(id: number): number {
 export function getRunePropertiesUniqueID(id: number): number {
   return 67 * id
 }
-export function getTextUniqueID(id: number): number {
+export function getTableUniqueID(id: number): number {
   return 71 * id
+}
+export function getTablePropertiesUniqueID(id: number): number {
+  return 73 * id
+}
+export function getTableStyleUniqueID(id: number): number {
+  return 79 * id
+}
+export function getTextUniqueID(id: number): number {
+  return 83 * id
 }

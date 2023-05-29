@@ -29,6 +29,12 @@ import { RuneService } from '../rune.service'
 import { getRuneUniqueID } from '../front-repo.service'
 import { RunePropertiesService } from '../runeproperties.service'
 import { getRunePropertiesUniqueID } from '../front-repo.service'
+import { TableService } from '../table.service'
+import { getTableUniqueID } from '../front-repo.service'
+import { TablePropertiesService } from '../tableproperties.service'
+import { getTablePropertiesUniqueID } from '../front-repo.service'
+import { TableStyleService } from '../tablestyle.service'
+import { getTableStyleUniqueID } from '../front-repo.service'
 import { TextService } from '../text.service'
 import { getTextUniqueID } from '../front-repo.service'
 
@@ -185,6 +191,9 @@ export class SidebarComponent implements OnInit {
     private paragraphstyleService: ParagraphStyleService,
     private runeService: RuneService,
     private runepropertiesService: RunePropertiesService,
+    private tableService: TableService,
+    private tablepropertiesService: TablePropertiesService,
+    private tablestyleService: TableStyleService,
     private textService: TextService,
 
     private routeService: RouteService,
@@ -287,6 +296,30 @@ export class SidebarComponent implements OnInit {
     )
     // observable for changes in structs
     this.runepropertiesService.RunePropertiesServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.tableService.TableServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.tablepropertiesService.TablePropertiesServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.tablestyleService.TableStyleServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -1197,6 +1230,313 @@ export class SidebarComponent implements OnInit {
               children: new Array<GongNode>()
             }
             NodeGongNodeAssociation.children.push(runepropertiesGongNodeInstance_Node)
+          }
+
+        }
+      )
+
+      /**
+      * fill up the Table part of the mat tree
+      */
+      let tableGongNodeStruct: GongNode = {
+        name: "Table",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Table",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(tableGongNodeStruct)
+
+      this.frontRepo.Tables_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Tables_array.forEach(
+        tableDB => {
+          let tableGongNodeInstance: GongNode = {
+            name: tableDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: tableDB.ID,
+            uniqueIdPerStack: getTableUniqueID(tableDB.ID),
+            structName: "Table",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          tableGongNodeStruct.children!.push(tableGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Node
+          */
+          let NodeGongNodeAssociation: GongNode = {
+            name: "(Node) Node",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: tableDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Table",
+            associationField: "Node",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          tableGongNodeInstance.children!.push(NodeGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Node
+            */
+          if (tableDB.Node != undefined) {
+            let tableGongNodeInstance_Node: GongNode = {
+              name: tableDB.Node.Name,
+              type: GongNodeType.INSTANCE,
+              id: tableDB.Node.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getTableUniqueID(tableDB.ID)
+                + 5 * getNodeUniqueID(tableDB.Node.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodeGongNodeAssociation.children.push(tableGongNodeInstance_Node)
+          }
+
+          /**
+          * let append a node for the association TableProperties
+          */
+          let TablePropertiesGongNodeAssociation: GongNode = {
+            name: "(TableProperties) TableProperties",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: tableDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Table",
+            associationField: "TableProperties",
+            associatedStructName: "TableProperties",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          tableGongNodeInstance.children!.push(TablePropertiesGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation TableProperties
+            */
+          if (tableDB.TableProperties != undefined) {
+            let tableGongNodeInstance_TableProperties: GongNode = {
+              name: tableDB.TableProperties.Name,
+              type: GongNodeType.INSTANCE,
+              id: tableDB.TableProperties.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getTableUniqueID(tableDB.ID)
+                + 5 * getTablePropertiesUniqueID(tableDB.TableProperties.ID),
+              structName: "TableProperties",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            TablePropertiesGongNodeAssociation.children.push(tableGongNodeInstance_TableProperties)
+          }
+
+        }
+      )
+
+      /**
+      * fill up the TableProperties part of the mat tree
+      */
+      let tablepropertiesGongNodeStruct: GongNode = {
+        name: "TableProperties",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "TableProperties",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(tablepropertiesGongNodeStruct)
+
+      this.frontRepo.TablePropertiess_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.TablePropertiess_array.forEach(
+        tablepropertiesDB => {
+          let tablepropertiesGongNodeInstance: GongNode = {
+            name: tablepropertiesDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: tablepropertiesDB.ID,
+            uniqueIdPerStack: getTablePropertiesUniqueID(tablepropertiesDB.ID),
+            structName: "TableProperties",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          tablepropertiesGongNodeStruct.children!.push(tablepropertiesGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Node
+          */
+          let NodeGongNodeAssociation: GongNode = {
+            name: "(Node) Node",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: tablepropertiesDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "TableProperties",
+            associationField: "Node",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          tablepropertiesGongNodeInstance.children!.push(NodeGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Node
+            */
+          if (tablepropertiesDB.Node != undefined) {
+            let tablepropertiesGongNodeInstance_Node: GongNode = {
+              name: tablepropertiesDB.Node.Name,
+              type: GongNodeType.INSTANCE,
+              id: tablepropertiesDB.Node.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getTablePropertiesUniqueID(tablepropertiesDB.ID)
+                + 5 * getNodeUniqueID(tablepropertiesDB.Node.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodeGongNodeAssociation.children.push(tablepropertiesGongNodeInstance_Node)
+          }
+
+          /**
+          * let append a node for the association TableStyle
+          */
+          let TableStyleGongNodeAssociation: GongNode = {
+            name: "(TableStyle) TableStyle",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: tablepropertiesDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "TableProperties",
+            associationField: "TableStyle",
+            associatedStructName: "TableStyle",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          tablepropertiesGongNodeInstance.children!.push(TableStyleGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation TableStyle
+            */
+          if (tablepropertiesDB.TableStyle != undefined) {
+            let tablepropertiesGongNodeInstance_TableStyle: GongNode = {
+              name: tablepropertiesDB.TableStyle.Name,
+              type: GongNodeType.INSTANCE,
+              id: tablepropertiesDB.TableStyle.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getTablePropertiesUniqueID(tablepropertiesDB.ID)
+                + 5 * getTableStyleUniqueID(tablepropertiesDB.TableStyle.ID),
+              structName: "TableStyle",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            TableStyleGongNodeAssociation.children.push(tablepropertiesGongNodeInstance_TableStyle)
+          }
+
+        }
+      )
+
+      /**
+      * fill up the TableStyle part of the mat tree
+      */
+      let tablestyleGongNodeStruct: GongNode = {
+        name: "TableStyle",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "TableStyle",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(tablestyleGongNodeStruct)
+
+      this.frontRepo.TableStyles_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.TableStyles_array.forEach(
+        tablestyleDB => {
+          let tablestyleGongNodeInstance: GongNode = {
+            name: tablestyleDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: tablestyleDB.ID,
+            uniqueIdPerStack: getTableStyleUniqueID(tablestyleDB.ID),
+            structName: "TableStyle",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          tablestyleGongNodeStruct.children!.push(tablestyleGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Node
+          */
+          let NodeGongNodeAssociation: GongNode = {
+            name: "(Node) Node",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: tablestyleDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "TableStyle",
+            associationField: "Node",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          tablestyleGongNodeInstance.children!.push(NodeGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Node
+            */
+          if (tablestyleDB.Node != undefined) {
+            let tablestyleGongNodeInstance_Node: GongNode = {
+              name: tablestyleDB.Node.Name,
+              type: GongNodeType.INSTANCE,
+              id: tablestyleDB.Node.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getTableStyleUniqueID(tablestyleDB.ID)
+                + 5 * getNodeUniqueID(tablestyleDB.Node.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodeGongNodeAssociation.children.push(tablestyleGongNodeInstance_Node)
           }
 
         }

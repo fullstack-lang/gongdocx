@@ -41,6 +41,18 @@ func AfterCreateFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterRunePropertiesCreateCallback != nil {
 			stage.OnAfterRunePropertiesCreateCallback.OnAfterCreate(stage, target)
 		}
+	case *Table:
+		if stage.OnAfterTableCreateCallback != nil {
+			stage.OnAfterTableCreateCallback.OnAfterCreate(stage, target)
+		}
+	case *TableProperties:
+		if stage.OnAfterTablePropertiesCreateCallback != nil {
+			stage.OnAfterTablePropertiesCreateCallback.OnAfterCreate(stage, target)
+		}
+	case *TableStyle:
+		if stage.OnAfterTableStyleCreateCallback != nil {
+			stage.OnAfterTableStyleCreateCallback.OnAfterCreate(stage, target)
+		}
 	case *Text:
 		if stage.OnAfterTextCreateCallback != nil {
 			stage.OnAfterTextCreateCallback.OnAfterCreate(stage, target)
@@ -99,6 +111,21 @@ func AfterUpdateFromFront[Type Gongstruct](stage *StageStruct, old, new *Type) {
 		newTarget := any(new).(*RuneProperties)
 		if stage.OnAfterRunePropertiesUpdateCallback != nil {
 			stage.OnAfterRunePropertiesUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+		}
+	case *Table:
+		newTarget := any(new).(*Table)
+		if stage.OnAfterTableUpdateCallback != nil {
+			stage.OnAfterTableUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+		}
+	case *TableProperties:
+		newTarget := any(new).(*TableProperties)
+		if stage.OnAfterTablePropertiesUpdateCallback != nil {
+			stage.OnAfterTablePropertiesUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+		}
+	case *TableStyle:
+		newTarget := any(new).(*TableStyle)
+		if stage.OnAfterTableStyleUpdateCallback != nil {
+			stage.OnAfterTableStyleUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
 		}
 	case *Text:
 		newTarget := any(new).(*Text)
@@ -160,6 +187,21 @@ func AfterDeleteFromFront[Type Gongstruct](stage *StageStruct, staged, front *Ty
 			staged := any(staged).(*RuneProperties)
 			stage.OnAfterRunePropertiesDeleteCallback.OnAfterDelete(stage, staged, front)
 		}
+	case *Table:
+		if stage.OnAfterTableDeleteCallback != nil {
+			staged := any(staged).(*Table)
+			stage.OnAfterTableDeleteCallback.OnAfterDelete(stage, staged, front)
+		}
+	case *TableProperties:
+		if stage.OnAfterTablePropertiesDeleteCallback != nil {
+			staged := any(staged).(*TableProperties)
+			stage.OnAfterTablePropertiesDeleteCallback.OnAfterDelete(stage, staged, front)
+		}
+	case *TableStyle:
+		if stage.OnAfterTableStyleDeleteCallback != nil {
+			staged := any(staged).(*TableStyle)
+			stage.OnAfterTableStyleDeleteCallback.OnAfterDelete(stage, staged, front)
+		}
 	case *Text:
 		if stage.OnAfterTextDeleteCallback != nil {
 			staged := any(staged).(*Text)
@@ -211,6 +253,18 @@ func AfterReadFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterRunePropertiesReadCallback != nil {
 			stage.OnAfterRunePropertiesReadCallback.OnAfterRead(stage, target)
 		}
+	case *Table:
+		if stage.OnAfterTableReadCallback != nil {
+			stage.OnAfterTableReadCallback.OnAfterRead(stage, target)
+		}
+	case *TableProperties:
+		if stage.OnAfterTablePropertiesReadCallback != nil {
+			stage.OnAfterTablePropertiesReadCallback.OnAfterRead(stage, target)
+		}
+	case *TableStyle:
+		if stage.OnAfterTableStyleReadCallback != nil {
+			stage.OnAfterTableStyleReadCallback.OnAfterRead(stage, target)
+		}
 	case *Text:
 		if stage.OnAfterTextReadCallback != nil {
 			stage.OnAfterTextReadCallback.OnAfterRead(stage, target)
@@ -253,6 +307,15 @@ func SetCallbackAfterUpdateFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *RuneProperties:
 		stage.OnAfterRunePropertiesUpdateCallback = any(callback).(OnAfterUpdateInterface[RuneProperties])
 	
+	case *Table:
+		stage.OnAfterTableUpdateCallback = any(callback).(OnAfterUpdateInterface[Table])
+	
+	case *TableProperties:
+		stage.OnAfterTablePropertiesUpdateCallback = any(callback).(OnAfterUpdateInterface[TableProperties])
+	
+	case *TableStyle:
+		stage.OnAfterTableStyleUpdateCallback = any(callback).(OnAfterUpdateInterface[TableStyle])
+	
 	case *Text:
 		stage.OnAfterTextUpdateCallback = any(callback).(OnAfterUpdateInterface[Text])
 	
@@ -289,6 +352,15 @@ func SetCallbackAfterCreateFromFront[Type Gongstruct](stage *StageStruct, callba
 	
 	case *RuneProperties:
 		stage.OnAfterRunePropertiesCreateCallback = any(callback).(OnAfterCreateInterface[RuneProperties])
+	
+	case *Table:
+		stage.OnAfterTableCreateCallback = any(callback).(OnAfterCreateInterface[Table])
+	
+	case *TableProperties:
+		stage.OnAfterTablePropertiesCreateCallback = any(callback).(OnAfterCreateInterface[TableProperties])
+	
+	case *TableStyle:
+		stage.OnAfterTableStyleCreateCallback = any(callback).(OnAfterCreateInterface[TableStyle])
 	
 	case *Text:
 		stage.OnAfterTextCreateCallback = any(callback).(OnAfterCreateInterface[Text])
@@ -327,6 +399,15 @@ func SetCallbackAfterDeleteFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *RuneProperties:
 		stage.OnAfterRunePropertiesDeleteCallback = any(callback).(OnAfterDeleteInterface[RuneProperties])
 	
+	case *Table:
+		stage.OnAfterTableDeleteCallback = any(callback).(OnAfterDeleteInterface[Table])
+	
+	case *TableProperties:
+		stage.OnAfterTablePropertiesDeleteCallback = any(callback).(OnAfterDeleteInterface[TableProperties])
+	
+	case *TableStyle:
+		stage.OnAfterTableStyleDeleteCallback = any(callback).(OnAfterDeleteInterface[TableStyle])
+	
 	case *Text:
 		stage.OnAfterTextDeleteCallback = any(callback).(OnAfterDeleteInterface[Text])
 	
@@ -363,6 +444,15 @@ func SetCallbackAfterReadFromFront[Type Gongstruct](stage *StageStruct, callback
 	
 	case *RuneProperties:
 		stage.OnAfterRunePropertiesReadCallback = any(callback).(OnAfterReadInterface[RuneProperties])
+	
+	case *Table:
+		stage.OnAfterTableReadCallback = any(callback).(OnAfterReadInterface[Table])
+	
+	case *TableProperties:
+		stage.OnAfterTablePropertiesReadCallback = any(callback).(OnAfterReadInterface[TableProperties])
+	
+	case *TableStyle:
+		stage.OnAfterTableStyleReadCallback = any(callback).(OnAfterReadInterface[TableStyle])
 	
 	case *Text:
 		stage.OnAfterTextReadCallback = any(callback).(OnAfterReadInterface[Text])

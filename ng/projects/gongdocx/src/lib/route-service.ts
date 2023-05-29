@@ -29,6 +29,15 @@ import { RuneDetailComponent } from './rune-detail/rune-detail.component'
 import { RunePropertiessTableComponent } from './runepropertiess-table/runepropertiess-table.component'
 import { RunePropertiesDetailComponent } from './runeproperties-detail/runeproperties-detail.component'
 
+import { TablesTableComponent } from './tables-table/tables-table.component'
+import { TableDetailComponent } from './table-detail/table-detail.component'
+
+import { TablePropertiessTableComponent } from './tablepropertiess-table/tablepropertiess-table.component'
+import { TablePropertiesDetailComponent } from './tableproperties-detail/tableproperties-detail.component'
+
+import { TableStylesTableComponent } from './tablestyles-table/tablestyles-table.component'
+import { TableStyleDetailComponent } from './tablestyle-detail/tablestyle-detail.component'
+
 import { TextsTableComponent } from './texts-table/texts-table.component'
 import { TextDetailComponent } from './text-detail/text-detail.component'
 
@@ -360,6 +369,105 @@ export class RouteService {
         return route
     }
 
+    getTableTablePath(): string {
+        return this.getPathRoot() + '-tables/:GONG__StackPath'
+    }
+    getTableTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableTablePath(), component: TablesTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getTableAdderPath(): string {
+        return this.getPathRoot() + '-table-adder/:GONG__StackPath'
+    }
+    getTableAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableAdderPath(), component: TableDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTableAdderForUsePath(): string {
+        return this.getPathRoot() + '-table-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getTableAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableAdderForUsePath(), component: TableDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTableDetailPath(): string {
+        return this.getPathRoot() + '-table-detail/:id/:GONG__StackPath'
+    }
+    getTableDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableDetailPath(), component: TableDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
+    getTablePropertiesTablePath(): string {
+        return this.getPathRoot() + '-tablepropertiess/:GONG__StackPath'
+    }
+    getTablePropertiesTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTablePropertiesTablePath(), component: TablePropertiessTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getTablePropertiesAdderPath(): string {
+        return this.getPathRoot() + '-tableproperties-adder/:GONG__StackPath'
+    }
+    getTablePropertiesAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTablePropertiesAdderPath(), component: TablePropertiesDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTablePropertiesAdderForUsePath(): string {
+        return this.getPathRoot() + '-tableproperties-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getTablePropertiesAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTablePropertiesAdderForUsePath(), component: TablePropertiesDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTablePropertiesDetailPath(): string {
+        return this.getPathRoot() + '-tableproperties-detail/:id/:GONG__StackPath'
+    }
+    getTablePropertiesDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTablePropertiesDetailPath(), component: TablePropertiesDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
+    getTableStyleTablePath(): string {
+        return this.getPathRoot() + '-tablestyles/:GONG__StackPath'
+    }
+    getTableStyleTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableStyleTablePath(), component: TableStylesTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getTableStyleAdderPath(): string {
+        return this.getPathRoot() + '-tablestyle-adder/:GONG__StackPath'
+    }
+    getTableStyleAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableStyleAdderPath(), component: TableStyleDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTableStyleAdderForUsePath(): string {
+        return this.getPathRoot() + '-tablestyle-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getTableStyleAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableStyleAdderForUsePath(), component: TableStyleDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getTableStyleDetailPath(): string {
+        return this.getPathRoot() + '-tablestyle-detail/:id/:GONG__StackPath'
+    }
+    getTableStyleDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getTableStyleDetailPath(), component: TableStyleDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
     getTextTablePath(): string {
         return this.getPathRoot() + '-texts/:GONG__StackPath'
     }
@@ -443,6 +551,21 @@ export class RouteService {
             this.getRunePropertiesAdderRoute(stackPath),
             this.getRunePropertiesAdderForUseRoute(stackPath),
             this.getRunePropertiesDetailRoute(stackPath),
+
+            this.getTableTableRoute(stackPath),
+            this.getTableAdderRoute(stackPath),
+            this.getTableAdderForUseRoute(stackPath),
+            this.getTableDetailRoute(stackPath),
+
+            this.getTablePropertiesTableRoute(stackPath),
+            this.getTablePropertiesAdderRoute(stackPath),
+            this.getTablePropertiesAdderForUseRoute(stackPath),
+            this.getTablePropertiesDetailRoute(stackPath),
+
+            this.getTableStyleTableRoute(stackPath),
+            this.getTableStyleAdderRoute(stackPath),
+            this.getTableStyleAdderForUseRoute(stackPath),
+            this.getTableStyleDetailRoute(stackPath),
 
             this.getTextTableRoute(stackPath),
             this.getTextAdderRoute(stackPath),

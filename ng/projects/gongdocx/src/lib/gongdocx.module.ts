@@ -75,6 +75,18 @@ import { RunePropertiessTableComponent } from './runepropertiess-table/runeprope
 import { RunePropertiesSortingComponent } from './runeproperties-sorting/runeproperties-sorting.component'
 import { RunePropertiesDetailComponent } from './runeproperties-detail/runeproperties-detail.component'
 
+import { TablesTableComponent } from './tables-table/tables-table.component'
+import { TableSortingComponent } from './table-sorting/table-sorting.component'
+import { TableDetailComponent } from './table-detail/table-detail.component'
+
+import { TablePropertiessTableComponent } from './tablepropertiess-table/tablepropertiess-table.component'
+import { TablePropertiesSortingComponent } from './tableproperties-sorting/tableproperties-sorting.component'
+import { TablePropertiesDetailComponent } from './tableproperties-detail/tableproperties-detail.component'
+
+import { TableStylesTableComponent } from './tablestyles-table/tablestyles-table.component'
+import { TableStyleSortingComponent } from './tablestyle-sorting/tablestyle-sorting.component'
+import { TableStyleDetailComponent } from './tablestyle-detail/tablestyle-detail.component'
+
 import { TextsTableComponent } from './texts-table/texts-table.component'
 import { TextSortingComponent } from './text-sorting/text-sorting.component'
 import { TextDetailComponent } from './text-detail/text-detail.component'
@@ -118,6 +130,18 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		RunePropertiessTableComponent,
 		RunePropertiesSortingComponent,
 		RunePropertiesDetailComponent,
+
+		TablesTableComponent,
+		TableSortingComponent,
+		TableDetailComponent,
+
+		TablePropertiessTableComponent,
+		TablePropertiesSortingComponent,
+		TablePropertiesDetailComponent,
+
+		TableStylesTableComponent,
+		TableStyleSortingComponent,
+		TableStyleDetailComponent,
 
 		TextsTableComponent,
 		TextSortingComponent,
@@ -197,6 +221,18 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		RunePropertiessTableComponent,
 		RunePropertiesSortingComponent,
 		RunePropertiesDetailComponent,
+
+		TablesTableComponent,
+		TableSortingComponent,
+		TableDetailComponent,
+
+		TablePropertiessTableComponent,
+		TablePropertiesSortingComponent,
+		TablePropertiesDetailComponent,
+
+		TableStylesTableComponent,
+		TableStyleSortingComponent,
+		TableStyleDetailComponent,
 
 		TextsTableComponent,
 		TextSortingComponent,

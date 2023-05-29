@@ -32,6 +32,15 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	case *RuneProperties:
 		ok = stage.IsStagedRuneProperties(target)
 
+	case *Table:
+		ok = stage.IsStagedTable(target)
+
+	case *TableProperties:
+		ok = stage.IsStagedTableProperties(target)
+
+	case *TableStyle:
+		ok = stage.IsStagedTableStyle(target)
+
 	case *Text:
 		ok = stage.IsStagedText(target)
 
@@ -105,6 +114,27 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 		return
 	}
 
+	func (stage *StageStruct) IsStagedTable(table *Table) (ok bool) {
+
+		_, ok = stage.Tables[table]
+	
+		return
+	}
+
+	func (stage *StageStruct) IsStagedTableProperties(tableproperties *TableProperties) (ok bool) {
+
+		_, ok = stage.TablePropertiess[tableproperties]
+	
+		return
+	}
+
+	func (stage *StageStruct) IsStagedTableStyle(tablestyle *TableStyle) (ok bool) {
+
+		_, ok = stage.TableStyles[tablestyle]
+	
+		return
+	}
+
 	func (stage *StageStruct) IsStagedText(text *Text) (ok bool) {
 
 		_, ok = stage.Texts[text]
@@ -147,6 +177,15 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *RuneProperties:
 		stage.StageBranchRuneProperties(target)
+
+	case *Table:
+		stage.StageBranchTable(target)
+
+	case *TableProperties:
+		stage.StageBranchTableProperties(target)
+
+	case *TableStyle:
+		stage.StageBranchTableStyle(target)
 
 	case *Text:
 		stage.StageBranchText(target)
@@ -334,6 +373,66 @@ func (stage *StageStruct) StageBranchRuneProperties(runeproperties *RuneProperti
 
 }
 
+func (stage *StageStruct) StageBranchTable(table *Table) {
+
+	// check if instance is already staged
+	if IsStaged(stage, table) {
+		return
+	}
+
+	table.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if table.Node != nil {
+		StageBranch(stage, table.Node)
+	}
+	if table.TableProperties != nil {
+		StageBranch(stage, table.TableProperties)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) StageBranchTableProperties(tableproperties *TableProperties) {
+
+	// check if instance is already staged
+	if IsStaged(stage, tableproperties) {
+		return
+	}
+
+	tableproperties.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tableproperties.Node != nil {
+		StageBranch(stage, tableproperties.Node)
+	}
+	if tableproperties.TableStyle != nil {
+		StageBranch(stage, tableproperties.TableStyle)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) StageBranchTableStyle(tablestyle *TableStyle) {
+
+	// check if instance is already staged
+	if IsStaged(stage, tablestyle) {
+		return
+	}
+
+	tablestyle.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablestyle.Node != nil {
+		StageBranch(stage, tablestyle.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
 func (stage *StageStruct) StageBranchText(text *Text) {
 
 	// check if instance is already staged
@@ -387,6 +486,15 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *RuneProperties:
 		stage.UnstageBranchRuneProperties(target)
+
+	case *Table:
+		stage.UnstageBranchTable(target)
+
+	case *TableProperties:
+		stage.UnstageBranchTableProperties(target)
+
+	case *TableStyle:
+		stage.UnstageBranchTableStyle(target)
 
 	case *Text:
 		stage.UnstageBranchText(target)
@@ -568,6 +676,66 @@ func (stage *StageStruct) UnstageBranchRuneProperties(runeproperties *RuneProper
 	//insertion point for the staging of instances referenced by pointers
 	if runeproperties.Node != nil {
 		UnstageBranch(stage, runeproperties.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) UnstageBranchTable(table *Table) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, table) {
+		return
+	}
+
+	table.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if table.Node != nil {
+		UnstageBranch(stage, table.Node)
+	}
+	if table.TableProperties != nil {
+		UnstageBranch(stage, table.TableProperties)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) UnstageBranchTableProperties(tableproperties *TableProperties) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, tableproperties) {
+		return
+	}
+
+	tableproperties.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tableproperties.Node != nil {
+		UnstageBranch(stage, tableproperties.Node)
+	}
+	if tableproperties.TableStyle != nil {
+		UnstageBranch(stage, tableproperties.TableStyle)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) UnstageBranchTableStyle(tablestyle *TableStyle) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, tablestyle) {
+		return
+	}
+
+	tablestyle.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablestyle.Node != nil {
+		UnstageBranch(stage, tablestyle.Node)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
