@@ -18,6 +18,8 @@ package models
 const NoteOnParagraphProperties = ""
 
 type ParagraphProperties struct {
-	Name string
+	Name    string
+	Content string
+
 	Node *Node
 }

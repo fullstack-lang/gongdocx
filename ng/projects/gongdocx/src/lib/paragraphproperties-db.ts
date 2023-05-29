@@ -14,6 +14,7 @@ export class ParagraphPropertiesDB {
 
 	// insertion point for basic fields declarations
 	Name: string = ""
+	Content: string = ""
 
 	// insertion point for other declarations
 	Node?: NodeDB

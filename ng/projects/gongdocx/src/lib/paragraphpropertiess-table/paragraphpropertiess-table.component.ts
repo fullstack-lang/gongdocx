@@ -75,6 +75,9 @@ export class ParagraphPropertiessTableComponent implements OnInit {
         case 'Name':
           return paragraphpropertiesDB.Name;
 
+        case 'Content':
+          return paragraphpropertiesDB.Content;
+
         case 'Node':
           return (paragraphpropertiesDB.Node ? paragraphpropertiesDB.Node.Name : '');
 
@@ -93,6 +96,7 @@ export class ParagraphPropertiessTableComponent implements OnInit {
 
       // insertion point for merging of fields
       mergedContent += paragraphpropertiesDB.Name.toLowerCase()
+      mergedContent += paragraphpropertiesDB.Content.toLowerCase()
       if (paragraphpropertiesDB.Node) {
         mergedContent += paragraphpropertiesDB.Node.Name.toLowerCase()
       }
@@ -151,11 +155,13 @@ export class ParagraphPropertiessTableComponent implements OnInit {
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Delete', // insertion point for columns to display
         "Name",
+        "Content",
         "Node",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
+        "Content",
         "Node",
       ]
       this.selection = new SelectionModel<ParagraphPropertiesDB>(allowMultiSelect, this.initialSelection);

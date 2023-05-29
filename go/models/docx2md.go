@@ -238,6 +238,7 @@ func (zf *file) walk(
 
 		paragraphproperties_ := (&ParagraphProperties{Name: node__.Name}).Stage(gongdocxStage)
 		paragraphproperties_.Node = node__
+		paragraphproperties_.Content = string(node_.Content)
 
 		for _, n := range node_.Nodes {
 			switch n.XMLName.Local {

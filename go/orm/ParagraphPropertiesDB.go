@@ -64,6 +64,9 @@ type ParagraphPropertiesDB struct {
 
 	// Declation for basic field paragraphpropertiesDB.Name
 	Name_Data sql.NullString
+
+	// Declation for basic field paragraphpropertiesDB.Content
+	Content_Data sql.NullString
 	// encoding of pointers
 	ParagraphPropertiesPointersEnconding
 }
@@ -86,6 +89,8 @@ type ParagraphPropertiesWOP struct {
 	// insertion for WOP basic fields
 
 	Name string `xlsx:"1"`
+
+	Content string `xlsx:"2"`
 	// insertion for WOP pointer fields
 }
 
@@ -93,6 +98,7 @@ var ParagraphProperties_Fields = []string{
 	// insertion for WOP basic fields
 	"ID",
 	"Name",
+	"Content",
 }
 
 type BackRepoParagraphPropertiesStruct struct {
@@ -368,6 +374,9 @@ func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsFromParagraph
 
 	paragraphpropertiesDB.Name_Data.String = paragraphproperties.Name
 	paragraphpropertiesDB.Name_Data.Valid = true
+
+	paragraphpropertiesDB.Content_Data.String = paragraphproperties.Content
+	paragraphpropertiesDB.Content_Data.Valid = true
 }
 
 // CopyBasicFieldsFromParagraphPropertiesWOP
@@ -376,12 +385,16 @@ func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsFromParagraph
 
 	paragraphpropertiesDB.Name_Data.String = paragraphproperties.Name
 	paragraphpropertiesDB.Name_Data.Valid = true
+
+	paragraphpropertiesDB.Content_Data.String = paragraphproperties.Content
+	paragraphpropertiesDB.Content_Data.Valid = true
 }
 
 // CopyBasicFieldsToParagraphProperties
 func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsToParagraphProperties(paragraphproperties *models.ParagraphProperties) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	paragraphproperties.Name = paragraphpropertiesDB.Name_Data.String
+	paragraphproperties.Content = paragraphpropertiesDB.Content_Data.String
 }
 
 // CopyBasicFieldsToParagraphPropertiesWOP
@@ -389,6 +402,7 @@ func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsToParagraphPr
 	paragraphproperties.ID = int(paragraphpropertiesDB.ID)
 	// insertion point for checkout of basic fields (back repo to stage)
 	paragraphproperties.Name = paragraphpropertiesDB.Name_Data.String
+	paragraphproperties.Content = paragraphpropertiesDB.Content_Data.String
 }
 
 // Backup generates a json file from a slice of all ParagraphPropertiesDB instances in the backrepo
