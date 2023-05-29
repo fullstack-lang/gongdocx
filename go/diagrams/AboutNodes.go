@@ -134,16 +134,16 @@ var map_DocLink_Identifier_NewDiagram_1 map[string]any = map[string]any{
 // but it has to properly reference the Injection gateway in the main package
 // func init() {
 // 	_ = __Dummy_time_variable
-// 	InjectionGateway["NewDiagram_1"] = NewDiagram_1Injection
+// 	InjectionGateway["AboutNodes"] = NewDiagram_1Injection
 // }
 
-// NewDiagram_1Injection will stage objects of database "NewDiagram_1"
+// NewDiagram_1Injection will stage objects of database "AboutNodes"
 func NewDiagram_1Injection(stage *models.StageStruct) {
 
 	// Declaration of instances to stage
 
 	// Declarations of staged instances of Classdiagram
-	__Classdiagram__000000_NewDiagram_1 := (&models.Classdiagram{Name: `NewDiagram_1`}).Stage(stage)
+	__Classdiagram__000000_NewDiagram_1 := (&models.Classdiagram{Name: `AboutNodes`}).Stage(stage)
 
 	// Declarations of staged instances of DiagramPackage
 
@@ -158,11 +158,11 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	// Declarations of staged instances of GongEnumValueEntry
 
 	// Declarations of staged instances of GongStructShape
-	__GongStructShape__000000_NewDiagram_1_Document := (&models.GongStructShape{Name: `NewDiagram_1-Document`}).Stage(stage)
-	__GongStructShape__000001_NewDiagram_1_Node := (&models.GongStructShape{Name: `NewDiagram_1-Node`}).Stage(stage)
-	__GongStructShape__000002_NewDiagram_1_Paragraph := (&models.GongStructShape{Name: `NewDiagram_1-Paragraph`}).Stage(stage)
-	__GongStructShape__000003_NewDiagram_1_Rune := (&models.GongStructShape{Name: `NewDiagram_1-Rune`}).Stage(stage)
-	__GongStructShape__000004_NewDiagram_1_Text := (&models.GongStructShape{Name: `NewDiagram_1-Text`}).Stage(stage)
+	__GongStructShape__000000_NewDiagram_1_Document := (&models.GongStructShape{Name: `AboutNodes-Document`}).Stage(stage)
+	__GongStructShape__000001_NewDiagram_1_Node := (&models.GongStructShape{Name: `AboutNodes-Node`}).Stage(stage)
+	__GongStructShape__000002_NewDiagram_1_Paragraph := (&models.GongStructShape{Name: `AboutNodes-Paragraph`}).Stage(stage)
+	__GongStructShape__000003_NewDiagram_1_Rune := (&models.GongStructShape{Name: `AboutNodes-Rune`}).Stage(stage)
+	__GongStructShape__000004_NewDiagram_1_Text := (&models.GongStructShape{Name: `AboutNodes-Text`}).Stage(stage)
 
 	// Declarations of staged instances of Link
 	__Link__000000_Node := (&models.Link{Name: `Node`}).Stage(stage)
@@ -187,11 +187,11 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__NoteShapeLink__000002_Text := (&models.NoteShapeLink{Name: `Text`}).Stage(stage)
 
 	// Declarations of staged instances of Position
-	__Position__000000_Pos_NewDiagram_1_Document := (&models.Position{Name: `Pos-NewDiagram_1-Document`}).Stage(stage)
-	__Position__000001_Pos_NewDiagram_1_Node := (&models.Position{Name: `Pos-NewDiagram_1-Node`}).Stage(stage)
-	__Position__000002_Pos_NewDiagram_1_Paragraph := (&models.Position{Name: `Pos-NewDiagram_1-Paragraph`}).Stage(stage)
-	__Position__000003_Pos_NewDiagram_1_Rune := (&models.Position{Name: `Pos-NewDiagram_1-Rune`}).Stage(stage)
-	__Position__000004_Pos_NewDiagram_1_Text := (&models.Position{Name: `Pos-NewDiagram_1-Text`}).Stage(stage)
+	__Position__000000_Pos_NewDiagram_1_Document := (&models.Position{Name: `Pos-AboutNodes-Document`}).Stage(stage)
+	__Position__000001_Pos_NewDiagram_1_Node := (&models.Position{Name: `Pos-AboutNodes-Node`}).Stage(stage)
+	__Position__000002_Pos_NewDiagram_1_Paragraph := (&models.Position{Name: `Pos-AboutNodes-Paragraph`}).Stage(stage)
+	__Position__000003_Pos_NewDiagram_1_Rune := (&models.Position{Name: `Pos-AboutNodes-Rune`}).Stage(stage)
+	__Position__000004_Pos_NewDiagram_1_Text := (&models.Position{Name: `Pos-AboutNodes-Text`}).Stage(stage)
 
 	// Declarations of staged instances of Tree
 
@@ -200,18 +200,18 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	// Declarations of staged instances of Umlsc
 
 	// Declarations of staged instances of Vertice
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Document and NewDiagram_1-Node`}).Stage(stage)
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Node_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Node and NewDiagram_1-Node`}).Stage(stage)
-	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Paragraph and NewDiagram_1-Node`}).Stage(stage)
-	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Paragraph and NewDiagram_1-Rune`}).Stage(stage)
-	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Node`}).Stage(stage)
-	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Text`}).Stage(stage)
-	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Text and NewDiagram_1-Node`}).Stage(stage)
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram AboutNodes in middle between AboutNodes-Document and AboutNodes-Node`}).Stage(stage)
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Node_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram AboutNodes in middle between AboutNodes-Node and AboutNodes-Node`}).Stage(stage)
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram AboutNodes in middle between AboutNodes-Paragraph and AboutNodes-Node`}).Stage(stage)
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune := (&models.Vertice{Name: `Verticle in class diagram AboutNodes in middle between AboutNodes-Paragraph and AboutNodes-Rune`}).Stage(stage)
+	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram AboutNodes in middle between AboutNodes-Rune and AboutNodes-Node`}).Stage(stage)
+	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text := (&models.Vertice{Name: `Verticle in class diagram AboutNodes in middle between AboutNodes-Rune and AboutNodes-Text`}).Stage(stage)
+	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram AboutNodes in middle between AboutNodes-Text and AboutNodes-Node`}).Stage(stage)
 
 	// Setup of values
 
 	// Classdiagram values setup
-	__Classdiagram__000000_NewDiagram_1.Name = `NewDiagram_1`
+	__Classdiagram__000000_NewDiagram_1.Name = `AboutNodes`
 	__Classdiagram__000000_NewDiagram_1.IsInDrawMode = true
 
 	// Field values setup
@@ -259,7 +259,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__Field__000003_Name.Fieldtypename = `string`
 
 	// GongStructShape values setup
-	__GongStructShape__000000_NewDiagram_1_Document.Name = `NewDiagram_1-Document`
+	__GongStructShape__000000_NewDiagram_1_Document.Name = `AboutNodes-Document`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -272,7 +272,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000000_NewDiagram_1_Document.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000001_NewDiagram_1_Node.Name = `NewDiagram_1-Node`
+	__GongStructShape__000001_NewDiagram_1_Node.Name = `AboutNodes-Node`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -285,7 +285,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000001_NewDiagram_1_Node.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000002_NewDiagram_1_Paragraph.Name = `NewDiagram_1-Paragraph`
+	__GongStructShape__000002_NewDiagram_1_Paragraph.Name = `AboutNodes-Paragraph`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -298,7 +298,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000002_NewDiagram_1_Paragraph.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000003_NewDiagram_1_Rune.Name = `NewDiagram_1-Rune`
+	__GongStructShape__000003_NewDiagram_1_Rune.Name = `AboutNodes-Rune`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -311,7 +311,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000003_NewDiagram_1_Rune.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000004_NewDiagram_1_Text.Name = `NewDiagram_1-Text`
+	__GongStructShape__000004_NewDiagram_1_Text.Name = `AboutNodes-Text`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -731,62 +731,62 @@ the &quot;w:t&quot; nodes.
 	// Position values setup
 	__Position__000000_Pos_NewDiagram_1_Document.X = 53.000000
 	__Position__000000_Pos_NewDiagram_1_Document.Y = 18.000000
-	__Position__000000_Pos_NewDiagram_1_Document.Name = `Pos-NewDiagram_1-Document`
+	__Position__000000_Pos_NewDiagram_1_Document.Name = `Pos-AboutNodes-Document`
 
 	// Position values setup
 	__Position__000001_Pos_NewDiagram_1_Node.X = 50.000000
 	__Position__000001_Pos_NewDiagram_1_Node.Y = 483.000000
-	__Position__000001_Pos_NewDiagram_1_Node.Name = `Pos-NewDiagram_1-Node`
+	__Position__000001_Pos_NewDiagram_1_Node.Name = `Pos-AboutNodes-Node`
 
 	// Position values setup
 	__Position__000002_Pos_NewDiagram_1_Paragraph.X = 41.000000
 	__Position__000002_Pos_NewDiagram_1_Paragraph.Y = 714.000000
-	__Position__000002_Pos_NewDiagram_1_Paragraph.Name = `Pos-NewDiagram_1-Paragraph`
+	__Position__000002_Pos_NewDiagram_1_Paragraph.Name = `Pos-AboutNodes-Paragraph`
 
 	// Position values setup
 	__Position__000003_Pos_NewDiagram_1_Rune.X = 510.000000
 	__Position__000003_Pos_NewDiagram_1_Rune.Y = 714.000000
-	__Position__000003_Pos_NewDiagram_1_Rune.Name = `Pos-NewDiagram_1-Rune`
+	__Position__000003_Pos_NewDiagram_1_Rune.Name = `Pos-AboutNodes-Rune`
 
 	// Position values setup
 	__Position__000004_Pos_NewDiagram_1_Text.X = 1017.000000
 	__Position__000004_Pos_NewDiagram_1_Text.Y = 707.000000
-	__Position__000004_Pos_NewDiagram_1_Text.Name = `Pos-NewDiagram_1-Text`
+	__Position__000004_Pos_NewDiagram_1_Text.Name = `Pos-AboutNodes-Text`
 
 	// Vertice values setup
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node.X = 429.500000
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node.Y = 94.500000
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Document and NewDiagram_1-Node`
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node.Name = `Verticle in class diagram AboutNodes in middle between AboutNodes-Document and AboutNodes-Node`
 
 	// Vertice values setup
 	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Node_and_NewDiagram_1_Node.X = 1848.500000
 	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Node_and_NewDiagram_1_Node.Y = 514.500000
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Node_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Node and NewDiagram_1-Node`
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Node_and_NewDiagram_1_Node.Name = `Verticle in class diagram AboutNodes in middle between AboutNodes-Node and AboutNodes-Node`
 
 	// Vertice values setup
 	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node.X = 638.500000
 	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node.Y = 613.000000
-	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Paragraph and NewDiagram_1-Node`
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node.Name = `Verticle in class diagram AboutNodes in middle between AboutNodes-Paragraph and AboutNodes-Node`
 
 	// Vertice values setup
 	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune.X = 635.500000
 	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune.Y = 753.000000
-	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Paragraph and NewDiagram_1-Rune`
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune.Name = `Verticle in class diagram AboutNodes in middle between AboutNodes-Paragraph and AboutNodes-Rune`
 
 	// Vertice values setup
 	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node.X = 640.000000
 	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node.Y = 630.000000
-	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Node`
+	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node.Name = `Verticle in class diagram AboutNodes in middle between AboutNodes-Rune and AboutNodes-Node`
 
 	// Vertice values setup
 	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text.X = 1102.000000
 	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text.Y = 750.000000
-	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Text`
+	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text.Name = `Verticle in class diagram AboutNodes in middle between AboutNodes-Rune and AboutNodes-Text`
 
 	// Vertice values setup
 	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.X = 405.000000
 	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.Y = 413.000000
-	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Text and NewDiagram_1-Node`
+	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.Name = `Verticle in class diagram AboutNodes in middle between AboutNodes-Text and AboutNodes-Node`
 
 	// Setup of pointers
 	__Classdiagram__000000_NewDiagram_1.GongStructShapes = append(__Classdiagram__000000_NewDiagram_1.GongStructShapes, __GongStructShape__000000_NewDiagram_1_Document)

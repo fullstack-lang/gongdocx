@@ -230,7 +230,7 @@ export class TreeComponent implements OnInit {
     const d = new Date()
     console.log("TreeComponent ", this.GONG__StackPath, " name ", this.name, " addNewItem, " + d.toLocaleTimeString() + `.${d.getMilliseconds()}` + " " + this.name)
 
-    gongNode.Name = "NewDiagram"
+    gongNode.Name = "AboutDocument"
     gongNode.HasEditButton = true
     gongNode.IsInEditMode = true
     gongNode.Node_ChildrenDBID.Valid = true

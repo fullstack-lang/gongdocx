@@ -11,11 +11,11 @@ import (
 
 // generated in order to avoid error in the package import
 // if there are no elements in the stage to marshall
-var ___dummy__Stage_NewDiagram_2 models.StageStruct
-var ___dummy__Time_NewDiagram_2 time.Time
+var ___dummy__Stage_AboutParagraph models.StageStruct
+var ___dummy__Time_AboutParagraph time.Time
 
 // Injection point for meta package dummy declaration
-var ___dummy__ref_models_NewDiagram_2 ref_models.StageStruct
+var ___dummy__ref_models_AboutParagraph ref_models.StageStruct
 
 // currently, DocLink renaming is not enabled in gopls
 // the following map are devised to overcome this limitation
@@ -24,7 +24,7 @@ var ___dummy__ref_models_NewDiagram_2 ref_models.StageStruct
 // [Corresponding Issue](https://github.com/golang/go/issues/57559)
 //
 // When parsed, those maps will help with the renaming process
-var map_DocLink_Identifier_NewDiagram_2 map[string]any = map[string]any{
+var map_DocLink_Identifier_AboutParagraph map[string]any = map[string]any{
 	// injection point for docLink to identifiers
 
 	"ref_models.Document": &(ref_models.Document{}),
@@ -130,16 +130,16 @@ var map_DocLink_Identifier_NewDiagram_2 map[string]any = map[string]any{
 // but it has to properly reference the Injection gateway in the main package
 // func init() {
 // 	_ = __Dummy_time_variable
-// 	InjectionGateway["NewDiagram_2"] = NewDiagram_2Injection
+// 	InjectionGateway["AboutParagraph"] = AboutParagraphInjection
 // }
 
-// NewDiagram_2Injection will stage objects of database "NewDiagram_2"
-func NewDiagram_2Injection(stage *models.StageStruct) {
+// AboutParagraphInjection will stage objects of database "AboutParagraph"
+func AboutParagraphInjection(stage *models.StageStruct) {
 
 	// Declaration of instances to stage
 
 	// Declarations of staged instances of Classdiagram
-	__Classdiagram__000000_NewDiagram_2 := (&models.Classdiagram{Name: `NewDiagram_2`}).Stage(stage)
+	__Classdiagram__000000_AboutParagraph := (&models.Classdiagram{Name: `AboutParagraph`}).Stage(stage)
 
 	// Declarations of staged instances of DiagramPackage
 
@@ -155,9 +155,9 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	// Declarations of staged instances of GongEnumValueEntry
 
 	// Declarations of staged instances of GongStructShape
-	__GongStructShape__000000_NewDiagram_2_Paragraph := (&models.GongStructShape{Name: `NewDiagram_2-Paragraph`}).Stage(stage)
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties := (&models.GongStructShape{Name: `NewDiagram_2-ParagraphProperties`}).Stage(stage)
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle := (&models.GongStructShape{Name: `NewDiagram_2-ParagraphStyle`}).Stage(stage)
+	__GongStructShape__000000_AboutParagraph_Paragraph := (&models.GongStructShape{Name: `AboutParagraph-Paragraph`}).Stage(stage)
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties := (&models.GongStructShape{Name: `AboutParagraph-ParagraphProperties`}).Stage(stage)
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle := (&models.GongStructShape{Name: `AboutParagraph-ParagraphStyle`}).Stage(stage)
 
 	// Declarations of staged instances of Link
 	__Link__000000_ParagraphProperties := (&models.Link{Name: `ParagraphProperties`}).Stage(stage)
@@ -174,9 +174,9 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__NoteShapeLink__000001_ParagraphStyle := (&models.NoteShapeLink{Name: `ParagraphStyle`}).Stage(stage)
 
 	// Declarations of staged instances of Position
-	__Position__000000_Pos_NewDiagram_2_Paragraph := (&models.Position{Name: `Pos-NewDiagram_2-Paragraph`}).Stage(stage)
-	__Position__000001_Pos_NewDiagram_2_ParagraphProperties := (&models.Position{Name: `Pos-NewDiagram_2-ParagraphProperties`}).Stage(stage)
-	__Position__000002_Pos_NewDiagram_2_ParagraphStyle := (&models.Position{Name: `Pos-NewDiagram_2-ParagraphStyle`}).Stage(stage)
+	__Position__000000_Pos_AboutParagraph_Paragraph := (&models.Position{Name: `Pos-AboutParagraph-Paragraph`}).Stage(stage)
+	__Position__000001_Pos_AboutParagraph_ParagraphProperties := (&models.Position{Name: `Pos-AboutParagraph-ParagraphProperties`}).Stage(stage)
+	__Position__000002_Pos_AboutParagraph_ParagraphStyle := (&models.Position{Name: `Pos-AboutParagraph-ParagraphStyle`}).Stage(stage)
 
 	// Declarations of staged instances of Tree
 
@@ -185,14 +185,14 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	// Declarations of staged instances of Umlsc
 
 	// Declarations of staged instances of Vertice
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_Paragraph_and_NewDiagram_2_ParagraphProperties := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_2 in middle between NewDiagram_2-Paragraph and NewDiagram_2-ParagraphProperties`}).Stage(stage)
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_ParagraphProperties_and_NewDiagram_2_ParagraphStyle := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_2 in middle between NewDiagram_2-ParagraphProperties and NewDiagram_2-ParagraphStyle`}).Stage(stage)
+	__Vertice__000000_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_Paragraph_and_AboutParagraph_ParagraphProperties := (&models.Vertice{Name: `Verticle in class diagram AboutParagraph in middle between AboutParagraph-Paragraph and AboutParagraph-ParagraphProperties`}).Stage(stage)
+	__Vertice__000001_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_ParagraphProperties_and_AboutParagraph_ParagraphStyle := (&models.Vertice{Name: `Verticle in class diagram AboutParagraph in middle between AboutParagraph-ParagraphProperties and AboutParagraph-ParagraphStyle`}).Stage(stage)
 
 	// Setup of values
 
 	// Classdiagram values setup
-	__Classdiagram__000000_NewDiagram_2.Name = `NewDiagram_2`
-	__Classdiagram__000000_NewDiagram_2.IsInDrawMode = true
+	__Classdiagram__000000_AboutParagraph.Name = `AboutParagraph`
+	__Classdiagram__000000_AboutParagraph.IsInDrawMode = true
 
 	// Field values setup
 	__Field__000000_Content.Name = `Content`
@@ -250,43 +250,43 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__Field__000004_ValAttr.Fieldtypename = `string`
 
 	// GongStructShape values setup
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Name = `NewDiagram_2-Paragraph`
+	__GongStructShape__000000_AboutParagraph_Paragraph.Name = `AboutParagraph-Paragraph`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Paragraph]
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Identifier = `ref_models.Paragraph`
-	__GongStructShape__000000_NewDiagram_2_Paragraph.ShowNbInstances = true
-	__GongStructShape__000000_NewDiagram_2_Paragraph.NbInstances = 9
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Width = 353.000000
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Heigth = 78.000000
-	__GongStructShape__000000_NewDiagram_2_Paragraph.IsSelected = false
+	__GongStructShape__000000_AboutParagraph_Paragraph.Identifier = `ref_models.Paragraph`
+	__GongStructShape__000000_AboutParagraph_Paragraph.ShowNbInstances = true
+	__GongStructShape__000000_AboutParagraph_Paragraph.NbInstances = 9
+	__GongStructShape__000000_AboutParagraph_Paragraph.Width = 353.000000
+	__GongStructShape__000000_AboutParagraph_Paragraph.Heigth = 78.000000
+	__GongStructShape__000000_AboutParagraph_Paragraph.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Name = `NewDiagram_2-ParagraphProperties`
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Name = `AboutParagraph-ParagraphProperties`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.ParagraphProperties]
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Identifier = `ref_models.ParagraphProperties`
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.ShowNbInstances = true
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.NbInstances = 9
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Width = 353.000000
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Heigth = 78.000000
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.IsSelected = false
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Identifier = `ref_models.ParagraphProperties`
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.ShowNbInstances = true
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.NbInstances = 9
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Width = 353.000000
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Heigth = 78.000000
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Name = `NewDiagram_2-ParagraphStyle`
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Name = `AboutParagraph-ParagraphStyle`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.ParagraphStyle]
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Identifier = `ref_models.ParagraphStyle`
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.ShowNbInstances = true
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.NbInstances = 2
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Width = 351.000000
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Heigth = 108.000000
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.IsSelected = false
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Identifier = `ref_models.ParagraphStyle`
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.ShowNbInstances = true
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.NbInstances = 2
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Width = 351.000000
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Heigth = 108.000000
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.IsSelected = false
 
 	// Link values setup
 	__Link__000000_ParagraphProperties.Name = `ParagraphProperties`
@@ -463,48 +463,48 @@ to the paragraph.
 	__NoteShapeLink__000001_ParagraphStyle.Type = models.NOTE_SHAPE_LINK_TO_GONG_STRUCT_OR_ENUM_SHAPE
 
 	// Position values setup
-	__Position__000000_Pos_NewDiagram_2_Paragraph.X = 65.000000
-	__Position__000000_Pos_NewDiagram_2_Paragraph.Y = 71.000000
-	__Position__000000_Pos_NewDiagram_2_Paragraph.Name = `Pos-NewDiagram_2-Paragraph`
+	__Position__000000_Pos_AboutParagraph_Paragraph.X = 65.000000
+	__Position__000000_Pos_AboutParagraph_Paragraph.Y = 71.000000
+	__Position__000000_Pos_AboutParagraph_Paragraph.Name = `Pos-AboutParagraph-Paragraph`
 
 	// Position values setup
-	__Position__000001_Pos_NewDiagram_2_ParagraphProperties.X = 67.000000
-	__Position__000001_Pos_NewDiagram_2_ParagraphProperties.Y = 257.000000
-	__Position__000001_Pos_NewDiagram_2_ParagraphProperties.Name = `Pos-NewDiagram_2-ParagraphProperties`
+	__Position__000001_Pos_AboutParagraph_ParagraphProperties.X = 67.000000
+	__Position__000001_Pos_AboutParagraph_ParagraphProperties.Y = 257.000000
+	__Position__000001_Pos_AboutParagraph_ParagraphProperties.Name = `Pos-AboutParagraph-ParagraphProperties`
 
 	// Position values setup
-	__Position__000002_Pos_NewDiagram_2_ParagraphStyle.X = 67.000000
-	__Position__000002_Pos_NewDiagram_2_ParagraphStyle.Y = 467.000000
-	__Position__000002_Pos_NewDiagram_2_ParagraphStyle.Name = `Pos-NewDiagram_2-ParagraphStyle`
+	__Position__000002_Pos_AboutParagraph_ParagraphStyle.X = 67.000000
+	__Position__000002_Pos_AboutParagraph_ParagraphStyle.Y = 467.000000
+	__Position__000002_Pos_AboutParagraph_ParagraphStyle.Name = `Pos-AboutParagraph-ParagraphStyle`
 
 	// Vertice values setup
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_Paragraph_and_NewDiagram_2_ParagraphProperties.X = 609.000000
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_Paragraph_and_NewDiagram_2_ParagraphProperties.Y = 109.000000
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_Paragraph_and_NewDiagram_2_ParagraphProperties.Name = `Verticle in class diagram NewDiagram_2 in middle between NewDiagram_2-Paragraph and NewDiagram_2-ParagraphProperties`
+	__Vertice__000000_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_Paragraph_and_AboutParagraph_ParagraphProperties.X = 609.000000
+	__Vertice__000000_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_Paragraph_and_AboutParagraph_ParagraphProperties.Y = 109.000000
+	__Vertice__000000_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_Paragraph_and_AboutParagraph_ParagraphProperties.Name = `Verticle in class diagram AboutParagraph in middle between AboutParagraph-Paragraph and AboutParagraph-ParagraphProperties`
 
 	// Vertice values setup
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_ParagraphProperties_and_NewDiagram_2_ParagraphStyle.X = 427.000000
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_ParagraphProperties_and_NewDiagram_2_ParagraphStyle.Y = 401.000000
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_ParagraphProperties_and_NewDiagram_2_ParagraphStyle.Name = `Verticle in class diagram NewDiagram_2 in middle between NewDiagram_2-ParagraphProperties and NewDiagram_2-ParagraphStyle`
+	__Vertice__000001_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_ParagraphProperties_and_AboutParagraph_ParagraphStyle.X = 427.000000
+	__Vertice__000001_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_ParagraphProperties_and_AboutParagraph_ParagraphStyle.Y = 401.000000
+	__Vertice__000001_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_ParagraphProperties_and_AboutParagraph_ParagraphStyle.Name = `Verticle in class diagram AboutParagraph in middle between AboutParagraph-ParagraphProperties and AboutParagraph-ParagraphStyle`
 
 	// Setup of pointers
-	__Classdiagram__000000_NewDiagram_2.GongStructShapes = append(__Classdiagram__000000_NewDiagram_2.GongStructShapes, __GongStructShape__000000_NewDiagram_2_Paragraph)
-	__Classdiagram__000000_NewDiagram_2.GongStructShapes = append(__Classdiagram__000000_NewDiagram_2.GongStructShapes, __GongStructShape__000001_NewDiagram_2_ParagraphProperties)
-	__Classdiagram__000000_NewDiagram_2.GongStructShapes = append(__Classdiagram__000000_NewDiagram_2.GongStructShapes, __GongStructShape__000002_NewDiagram_2_ParagraphStyle)
-	__Classdiagram__000000_NewDiagram_2.NoteShapes = append(__Classdiagram__000000_NewDiagram_2.NoteShapes, __NoteShape__000000_NoteOnParagraphProperties)
-	__Classdiagram__000000_NewDiagram_2.NoteShapes = append(__Classdiagram__000000_NewDiagram_2.NoteShapes, __NoteShape__000001_NoteOnStyle)
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Position = __Position__000000_Pos_NewDiagram_2_Paragraph
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Fields = append(__GongStructShape__000000_NewDiagram_2_Paragraph.Fields, __Field__000002_Name)
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Links = append(__GongStructShape__000000_NewDiagram_2_Paragraph.Links, __Link__000000_ParagraphProperties)
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Position = __Position__000001_Pos_NewDiagram_2_ParagraphProperties
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Fields = append(__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Fields, __Field__000003_Name)
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Links = append(__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Links, __Link__000001_ParagraphStyle)
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Position = __Position__000002_Pos_NewDiagram_2_ParagraphStyle
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields = append(__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields, __Field__000001_Name)
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields = append(__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields, __Field__000000_Content)
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields = append(__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields, __Field__000004_ValAttr)
-	__Link__000000_ParagraphProperties.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_Paragraph_and_NewDiagram_2_ParagraphProperties
-	__Link__000001_ParagraphStyle.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_ParagraphProperties_and_NewDiagram_2_ParagraphStyle
+	__Classdiagram__000000_AboutParagraph.GongStructShapes = append(__Classdiagram__000000_AboutParagraph.GongStructShapes, __GongStructShape__000000_AboutParagraph_Paragraph)
+	__Classdiagram__000000_AboutParagraph.GongStructShapes = append(__Classdiagram__000000_AboutParagraph.GongStructShapes, __GongStructShape__000001_AboutParagraph_ParagraphProperties)
+	__Classdiagram__000000_AboutParagraph.GongStructShapes = append(__Classdiagram__000000_AboutParagraph.GongStructShapes, __GongStructShape__000002_AboutParagraph_ParagraphStyle)
+	__Classdiagram__000000_AboutParagraph.NoteShapes = append(__Classdiagram__000000_AboutParagraph.NoteShapes, __NoteShape__000000_NoteOnParagraphProperties)
+	__Classdiagram__000000_AboutParagraph.NoteShapes = append(__Classdiagram__000000_AboutParagraph.NoteShapes, __NoteShape__000001_NoteOnStyle)
+	__GongStructShape__000000_AboutParagraph_Paragraph.Position = __Position__000000_Pos_AboutParagraph_Paragraph
+	__GongStructShape__000000_AboutParagraph_Paragraph.Fields = append(__GongStructShape__000000_AboutParagraph_Paragraph.Fields, __Field__000002_Name)
+	__GongStructShape__000000_AboutParagraph_Paragraph.Links = append(__GongStructShape__000000_AboutParagraph_Paragraph.Links, __Link__000000_ParagraphProperties)
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Position = __Position__000001_Pos_AboutParagraph_ParagraphProperties
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Fields = append(__GongStructShape__000001_AboutParagraph_ParagraphProperties.Fields, __Field__000003_Name)
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Links = append(__GongStructShape__000001_AboutParagraph_ParagraphProperties.Links, __Link__000001_ParagraphStyle)
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Position = __Position__000002_Pos_AboutParagraph_ParagraphStyle
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Fields = append(__GongStructShape__000002_AboutParagraph_ParagraphStyle.Fields, __Field__000001_Name)
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Fields = append(__GongStructShape__000002_AboutParagraph_ParagraphStyle.Fields, __Field__000000_Content)
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Fields = append(__GongStructShape__000002_AboutParagraph_ParagraphStyle.Fields, __Field__000004_ValAttr)
+	__Link__000000_ParagraphProperties.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_Paragraph_and_AboutParagraph_ParagraphProperties
+	__Link__000001_ParagraphStyle.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_AboutParagraph_in_middle_between_AboutParagraph_ParagraphProperties_and_AboutParagraph_ParagraphStyle
 	__NoteShape__000000_NoteOnParagraphProperties.NoteShapeLinks = append(__NoteShape__000000_NoteOnParagraphProperties.NoteShapeLinks, __NoteShapeLink__000000_ParagraphProperties)
 	__NoteShape__000001_NoteOnStyle.NoteShapeLinks = append(__NoteShape__000001_NoteOnStyle.NoteShapeLinks, __NoteShapeLink__000001_ParagraphStyle)
 }

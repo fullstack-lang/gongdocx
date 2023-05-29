@@ -61,8 +61,6 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 
 	"ref_models.NoteOnParagraphStyle": ref_models.NoteOnParagraphStyle,
 
-	"ref_models.NoteOnParagraphStyle": ref_models.NoteOnParagraphStyle,
-
 	"ref_models.NoteOnRunProperties": ref_models.NoteOnRunProperties,
 
 	"ref_models.NoteOnRune": ref_models.NoteOnRune,
@@ -136,16 +134,16 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 // but it has to properly reference the Injection gateway in the main package
 // func init() {
 // 	_ = __Dummy_time_variable
-// 	InjectionGateway["NewDiagram"] = NewDiagramInjection
+// 	InjectionGateway["AboutDocument"] = NewDiagramInjection
 // }
 
-// NewDiagramInjection will stage objects of database "NewDiagram"
+// NewDiagramInjection will stage objects of database "AboutDocument"
 func NewDiagramInjection(stage *models.StageStruct) {
 
 	// Declaration of instances to stage
 
 	// Declarations of staged instances of Classdiagram
-	__Classdiagram__000000_NewDiagram := (&models.Classdiagram{Name: `NewDiagram`}).Stage(stage)
+	__Classdiagram__000000_NewDiagram := (&models.Classdiagram{Name: `AboutDocument`}).Stage(stage)
 
 	// Declarations of staged instances of DiagramPackage
 
@@ -160,10 +158,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	// Declarations of staged instances of GongEnumValueEntry
 
 	// Declarations of staged instances of GongStructShape
-	__GongStructShape__000000_NewDiagram_Document := (&models.GongStructShape{Name: `NewDiagram-Document`}).Stage(stage)
-	__GongStructShape__000001_NewDiagram_Docx := (&models.GongStructShape{Name: `NewDiagram-Docx`}).Stage(stage)
-	__GongStructShape__000002_NewDiagram_File := (&models.GongStructShape{Name: `NewDiagram-File`}).Stage(stage)
-	__GongStructShape__000003_NewDiagram_Node := (&models.GongStructShape{Name: `NewDiagram-Node`}).Stage(stage)
+	__GongStructShape__000000_NewDiagram_Document := (&models.GongStructShape{Name: `AboutDocument-Document`}).Stage(stage)
+	__GongStructShape__000001_NewDiagram_Docx := (&models.GongStructShape{Name: `AboutDocument-Docx`}).Stage(stage)
+	__GongStructShape__000002_NewDiagram_File := (&models.GongStructShape{Name: `AboutDocument-File`}).Stage(stage)
+	__GongStructShape__000003_NewDiagram_Node := (&models.GongStructShape{Name: `AboutDocument-Node`}).Stage(stage)
 
 	// Declarations of staged instances of Link
 	__Link__000000_File := (&models.Link{Name: `File`}).Stage(stage)
@@ -178,10 +176,10 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	// Declarations of staged instances of NoteShapeLink
 
 	// Declarations of staged instances of Position
-	__Position__000000_Pos_NewDiagram_Document := (&models.Position{Name: `Pos-NewDiagram-Document`}).Stage(stage)
-	__Position__000001_Pos_NewDiagram_Docx := (&models.Position{Name: `Pos-NewDiagram-Docx`}).Stage(stage)
-	__Position__000002_Pos_NewDiagram_File := (&models.Position{Name: `Pos-NewDiagram-File`}).Stage(stage)
-	__Position__000003_Pos_NewDiagram_Node := (&models.Position{Name: `Pos-NewDiagram-Node`}).Stage(stage)
+	__Position__000000_Pos_NewDiagram_Document := (&models.Position{Name: `Pos-AboutDocument-Document`}).Stage(stage)
+	__Position__000001_Pos_NewDiagram_Docx := (&models.Position{Name: `Pos-AboutDocument-Docx`}).Stage(stage)
+	__Position__000002_Pos_NewDiagram_File := (&models.Position{Name: `Pos-AboutDocument-File`}).Stage(stage)
+	__Position__000003_Pos_NewDiagram_Node := (&models.Position{Name: `Pos-AboutDocument-Node`}).Stage(stage)
 
 	// Declarations of staged instances of Tree
 
@@ -190,15 +188,15 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	// Declarations of staged instances of Umlsc
 
 	// Declarations of staged instances of Vertice
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-File`}).Stage(stage)
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-Node`}).Stage(stage)
-	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Docx and NewDiagram-File`}).Stage(stage)
-	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram in middle between NewDiagram-Node and NewDiagram-Node`}).Stage(stage)
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File := (&models.Vertice{Name: `Verticle in class diagram AboutDocument in middle between AboutDocument-Document and AboutDocument-File`}).Stage(stage)
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node := (&models.Vertice{Name: `Verticle in class diagram AboutDocument in middle between AboutDocument-Document and AboutDocument-Node`}).Stage(stage)
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File := (&models.Vertice{Name: `Verticle in class diagram AboutDocument in middle between AboutDocument-Docx and AboutDocument-File`}).Stage(stage)
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node := (&models.Vertice{Name: `Verticle in class diagram AboutDocument in middle between AboutDocument-Node and AboutDocument-Node`}).Stage(stage)
 
 	// Setup of values
 
 	// Classdiagram values setup
-	__Classdiagram__000000_NewDiagram.Name = `NewDiagram`
+	__Classdiagram__000000_NewDiagram.Name = `AboutDocument`
 	__Classdiagram__000000_NewDiagram.IsInDrawMode = true
 
 	// Field values setup
@@ -246,7 +244,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Field__000003_Name.Fieldtypename = `string`
 
 	// GongStructShape values setup
-	__GongStructShape__000000_NewDiagram_Document.Name = `NewDiagram-Document`
+	__GongStructShape__000000_NewDiagram_Document.Name = `AboutDocument-Document`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -259,7 +257,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000000_NewDiagram_Document.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000001_NewDiagram_Docx.Name = `NewDiagram-Docx`
+	__GongStructShape__000001_NewDiagram_Docx.Name = `AboutDocument-Docx`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -272,7 +270,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000001_NewDiagram_Docx.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000002_NewDiagram_File.Name = `NewDiagram-File`
+	__GongStructShape__000002_NewDiagram_File.Name = `AboutDocument-File`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -285,7 +283,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000002_NewDiagram_File.IsSelected = false
 
 	// GongStructShape values setup
-	__GongStructShape__000003_NewDiagram_Node.Name = `NewDiagram-Node`
+	__GongStructShape__000003_NewDiagram_Node.Name = `AboutDocument-Node`
 
 	// comment added to overcome the problem with the comment map association
 
@@ -404,42 +402,42 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	// Position values setup
 	__Position__000000_Pos_NewDiagram_Document.X = 192.000000
 	__Position__000000_Pos_NewDiagram_Document.Y = 391.000000
-	__Position__000000_Pos_NewDiagram_Document.Name = `Pos-NewDiagram-Document`
+	__Position__000000_Pos_NewDiagram_Document.Name = `Pos-AboutDocument-Document`
 
 	// Position values setup
 	__Position__000001_Pos_NewDiagram_Docx.X = 196.000000
 	__Position__000001_Pos_NewDiagram_Docx.Y = 77.000000
-	__Position__000001_Pos_NewDiagram_Docx.Name = `Pos-NewDiagram-Docx`
+	__Position__000001_Pos_NewDiagram_Docx.Name = `Pos-AboutDocument-Docx`
 
 	// Position values setup
 	__Position__000002_Pos_NewDiagram_File.X = 192.000000
 	__Position__000002_Pos_NewDiagram_File.Y = 239.000000
-	__Position__000002_Pos_NewDiagram_File.Name = `Pos-NewDiagram-File`
+	__Position__000002_Pos_NewDiagram_File.Name = `Pos-AboutDocument-File`
 
 	// Position values setup
 	__Position__000003_Pos_NewDiagram_Node.X = 194.000000
 	__Position__000003_Pos_NewDiagram_Node.Y = 554.000000
-	__Position__000003_Pos_NewDiagram_Node.Name = `Pos-NewDiagram-Node`
+	__Position__000003_Pos_NewDiagram_Node.Name = `Pos-AboutDocument-Node`
 
 	// Vertice values setup
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File.X = 957.000000
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File.Y = 211.000000
-	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-File`
+	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_File.Name = `Verticle in class diagram AboutDocument in middle between AboutDocument-Document and AboutDocument-File`
 
 	// Vertice values setup
 	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node.X = 961.500000
 	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node.Y = 419.000000
-	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Document and NewDiagram-Node`
+	__Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node.Name = `Verticle in class diagram AboutDocument in middle between AboutDocument-Document and AboutDocument-Node`
 
 	// Vertice values setup
 	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.X = 465.000000
 	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.Y = 109.000000
-	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Docx and NewDiagram-File`
+	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Docx_and_NewDiagram_File.Name = `Verticle in class diagram AboutDocument in middle between AboutDocument-Docx and AboutDocument-File`
 
 	// Vertice values setup
 	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node.X = 941.000000
 	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node.Y = 503.500000
-	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node.Name = `Verticle in class diagram NewDiagram in middle between NewDiagram-Node and NewDiagram-Node`
+	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node.Name = `Verticle in class diagram AboutDocument in middle between AboutDocument-Node and AboutDocument-Node`
 
 	// Setup of pointers
 	__Classdiagram__000000_NewDiagram.GongStructShapes = append(__Classdiagram__000000_NewDiagram.GongStructShapes, __GongStructShape__000001_NewDiagram_Docx)
@@ -463,5 +461,3 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Link__000002_Nodes.Middlevertice = __Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node
 	__Link__000003_Root.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node
 }
-
-
