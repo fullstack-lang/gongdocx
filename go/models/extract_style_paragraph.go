@@ -49,8 +49,9 @@ func ExtractStyleText(styleName string, gongdocxStage *StageStruct) (res []strin
 		for _, paragraphStyle := range paragraphStyleSlice {
 			for _, paragraphProperties := range reverseMapParagraphProperties_ParagraphStyles[paragraphStyle] {
 				for _, paragraph := range reverseMapParagraph_ParagraphProperties[paragraphProperties] {
-					// for _, rune_ := range paragraph.
-					_ = paragraph
+					for _, rune_ := range paragraph.Runes {
+						res = append(res, rune_.Text.Content)
+					}
 				}
 			}
 		}

@@ -61,8 +61,6 @@ var map_DocLink_Identifier_NewDiagram_1 map[string]any = map[string]any{
 
 	"ref_models.NoteOnParagraphStyle": ref_models.NoteOnParagraphStyle,
 
-	"ref_models.NoteOnParagraphStyle": ref_models.NoteOnParagraphStyle,
-
 	"ref_models.NoteOnRunProperties": ref_models.NoteOnRunProperties,
 
 	"ref_models.NoteOnRune": ref_models.NoteOnRune,
@@ -827,5 +825,3 @@ the &quot;w:t&quot; nodes.
 	__NoteShape__000002_NoteOnParagraph.NoteShapeLinks = append(__NoteShape__000002_NoteOnParagraph.NoteShapeLinks, __NoteShapeLink__000000_Paragraph)
 	__NoteShape__000003_NoteOnRune.NoteShapeLinks = append(__NoteShape__000003_NoteOnRune.NoteShapeLinks, __NoteShapeLink__000001_Rune)
 }
-
-

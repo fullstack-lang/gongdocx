@@ -19,6 +19,7 @@ var (
 
 	diagrams         = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams")
 	embeddedDiagrams = flag.Bool("embeddedDiagrams", false, "parse/analysis go/models and go/embeddedDiagrams")
+	style            = flag.String("style", "", "style for extracting instances")
 )
 
 // InjectionGateway is the singloton that stores all functions
@@ -60,8 +61,15 @@ func main() {
 	}
 	gongdocxStage.Commit()
 
-	//
-	gongdocx_models.ExtractStyleText("Titre1", gongdocxStage)
+	if *style != "" {
+		instances := gongdocx_models.ExtractStyleText(*style, gongdocxStage)
+		log.Println("Instances of ", *style)
+
+		for _, instance := range instances {
+			log.Println(instance)
+		}
+
+	}
 
 	gongdoc_load.Load(
 		"gongdocx",

@@ -8,17 +8,9 @@
             "mode": "debug",
             "program": "${workspaceFolder}/go/cmd/gongdocx",
             "args": [
-                "samples/test.docx"
-            ]
-        },
-        {
-            "name": "go server TestFR.docx",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}/go/cmd/gongdocx",
-            "args": [
-                "samples/TestFR.docx"
+                "-style",
+                "Titre2",
+                "samples/test.docx",
             ]
         },
     ]
