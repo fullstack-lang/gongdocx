@@ -33,6 +33,13 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="ParagraphStyle">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> ParagraphStyle </th>
+            <td mat-cell *matCellDef="let ParagraphProperties">
+                {{ ParagraphProperties.ParagraphStyle ? ParagraphProperties.ParagraphStyle.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="Node">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Node </th>
             <td mat-cell *matCellDef="let ParagraphProperties">

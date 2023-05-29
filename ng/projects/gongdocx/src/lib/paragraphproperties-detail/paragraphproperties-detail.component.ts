@@ -145,6 +145,16 @@ export class ParagraphPropertiesDetailComponent implements OnInit {
 		// pointers fields, after the translation, are nulled in order to perform serialization
 
 		// insertion point for translation/nullation of each field
+		if (this.paragraphproperties.ParagraphStyleID == undefined) {
+			this.paragraphproperties.ParagraphStyleID = new NullInt64
+		}
+		if (this.paragraphproperties.ParagraphStyle != undefined) {
+			this.paragraphproperties.ParagraphStyleID.Int64 = this.paragraphproperties.ParagraphStyle.ID
+			this.paragraphproperties.ParagraphStyleID.Valid = true
+		} else {
+			this.paragraphproperties.ParagraphStyleID.Int64 = 0
+			this.paragraphproperties.ParagraphStyleID.Valid = true
+		}
 		if (this.paragraphproperties.NodeID == undefined) {
 			this.paragraphproperties.NodeID = new NullInt64
 		}

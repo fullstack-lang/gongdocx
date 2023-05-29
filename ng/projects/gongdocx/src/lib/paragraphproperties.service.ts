@@ -14,6 +14,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { ParagraphPropertiesDB } from './paragraphproperties-db';
 
 // insertion point for imports
+import { ParagraphStyleDB } from './paragraphstyle-db'
 import { NodeDB } from './node-db'
 
 @Injectable({
@@ -71,6 +72,7 @@ export class ParagraphPropertiesService {
   postParagraphProperties(paragraphpropertiesdb: ParagraphPropertiesDB, GONG__StackPath: string): Observable<ParagraphPropertiesDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    paragraphpropertiesdb.ParagraphStyle = new ParagraphStyleDB
     paragraphpropertiesdb.Node = new NodeDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -111,6 +113,7 @@ export class ParagraphPropertiesService {
     const url = `${this.paragraphpropertiessUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    paragraphpropertiesdb.ParagraphStyle = new ParagraphStyleDB
     paragraphpropertiesdb.Node = new NodeDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)

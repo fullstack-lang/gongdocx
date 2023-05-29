@@ -56,14 +56,14 @@ func walk(
 	case "pPr":
 		code := false
 
-		paragraphproperties_ := (&ParagraphProperties{Name: node.Name}).Stage(gongdocxStage)
-		paragraphproperties_.Node = node
-		paragraphproperties_.Content = string(node_.Content)
+		paragraphProperties := (&ParagraphProperties{Name: node.Name}).Stage(gongdocxStage)
+		paragraphProperties.Node = node
+		paragraphProperties.Content = string(node_.Content)
 
 		// check if the parent node is a paragraph
 		switch paragraph := parentNode.(type) {
 		case *Paragraph:
-			paragraph.ParagraphProperties = paragraphproperties_
+			paragraph.ParagraphProperties = paragraphProperties
 		}
 
 		for _, n := range node_.Nodes {
@@ -85,10 +85,12 @@ func walk(
 				paragraphStyle := (&ParagraphStyle{Name: node___.Name}).Stage(gongdocxStage)
 				paragraphStyle.Node = node
 				paragraphStyle.Content = string(n.Content)
+				paragraphProperties.ParagraphStyle = paragraphStyle
 
 				if val, ok := attr(n.Attrs, "val"); ok {
 
 					paragraphStyle.ValAttr = val
+					paragraphStyle.Name = paragraphStyle.Name + " " + paragraphStyle.ValAttr
 
 					if strings.HasPrefix(val, "Heading") {
 						if i, err := strconv.Atoi(val[7:]); err == nil && i > 0 {

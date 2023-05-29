@@ -1079,6 +1079,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 	case ParagraphProperties:
 		return any(&ParagraphProperties{
 			// Initialisation of associations
+			// field is initialized with an instance of ParagraphStyle with the name of the field
+			ParagraphStyle: &ParagraphStyle{Name: "ParagraphStyle"},
 			// field is initialized with an instance of Node with the name of the field
 			Node: &Node{Name: "Node"},
 		}).(*Type)
@@ -1221,6 +1223,23 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 	case ParagraphProperties:
 		switch fieldname {
 		// insertion point for per direct association field
+		case "ParagraphStyle":
+			res := make(map[*ParagraphStyle][]*ParagraphProperties)
+			for paragraphproperties := range stage.ParagraphPropertiess {
+				if paragraphproperties.ParagraphStyle != nil {
+					paragraphstyle_ := paragraphproperties.ParagraphStyle
+					var paragraphpropertiess []*ParagraphProperties
+					_, ok := res[paragraphstyle_]
+					if ok {
+						paragraphpropertiess = res[paragraphstyle_]
+					} else {
+						paragraphpropertiess = make([]*ParagraphProperties, 0)
+					}
+					paragraphpropertiess = append(paragraphpropertiess, paragraphproperties)
+					res[paragraphstyle_] = paragraphpropertiess
+				}
+			}
+			return any(res).(map[*End][]*Start)
 		case "Node":
 			res := make(map[*Node][]*ParagraphProperties)
 			for paragraphproperties := range stage.ParagraphPropertiess {
@@ -1463,7 +1482,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Paragraph:
 		res = []string{"Name", "Content", "Node", "ParagraphProperties"}
 	case ParagraphProperties:
-		res = []string{"Name", "Content", "Node"}
+		res = []string{"Name", "Content", "ParagraphStyle", "Node"}
 	case ParagraphStyle:
 		res = []string{"Name", "Node", "Content", "ValAttr"}
 	case Rune:
@@ -1550,6 +1569,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			res = any(instance).(ParagraphProperties).Name
 		case "Content":
 			res = any(instance).(ParagraphProperties).Content
+		case "ParagraphStyle":
+			if any(instance).(ParagraphProperties).ParagraphStyle != nil {
+				res = any(instance).(ParagraphProperties).ParagraphStyle.Name
+			}
 		case "Node":
 			if any(instance).(ParagraphProperties).Node != nil {
 				res = any(instance).(ParagraphProperties).Node.Name

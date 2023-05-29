@@ -791,6 +791,41 @@ export class SidebarComponent implements OnInit {
 
           // insertion point for per field code
           /**
+          * let append a node for the association ParagraphStyle
+          */
+          let ParagraphStyleGongNodeAssociation: GongNode = {
+            name: "(ParagraphStyle) ParagraphStyle",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: paragraphpropertiesDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "ParagraphProperties",
+            associationField: "ParagraphStyle",
+            associatedStructName: "ParagraphStyle",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphpropertiesGongNodeInstance.children!.push(ParagraphStyleGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation ParagraphStyle
+            */
+          if (paragraphpropertiesDB.ParagraphStyle != undefined) {
+            let paragraphpropertiesGongNodeInstance_ParagraphStyle: GongNode = {
+              name: paragraphpropertiesDB.ParagraphStyle.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphpropertiesDB.ParagraphStyle.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getParagraphPropertiesUniqueID(paragraphpropertiesDB.ID)
+                + 5 * getParagraphStyleUniqueID(paragraphpropertiesDB.ParagraphStyle.ID),
+              structName: "ParagraphStyle",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            ParagraphStyleGongNodeAssociation.children.push(paragraphpropertiesGongNodeInstance_ParagraphStyle)
+          }
+
+          /**
           * let append a node for the association Node
           */
           let NodeGongNodeAssociation: GongNode = {

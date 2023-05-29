@@ -42,6 +42,16 @@
     </mat-form-field>
 
     <mat-form-field class="detail-full-width">
+        <mat-label>ParagraphStyle</mat-label>
+        <mat-select [compareWith]="compareObjects" [(value)]="paragraphproperties.ParagraphStyle" (selectionChange)="fillUpNameIfEmpty($event)">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let paragraphstyle of frontRepo.ParagraphStyles_array" [value]="paragraphstyle">
+                {{paragraphstyle.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="detail-full-width">
         <mat-label>Node</mat-label>
         <mat-select [compareWith]="compareObjects" [(value)]="paragraphproperties.Node" (selectionChange)="fillUpNameIfEmpty($event)">
             <mat-option>None</mat-option>

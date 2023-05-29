@@ -21,5 +21,7 @@ type ParagraphProperties struct {
 	Name    string
 	Content string
 
+	ParagraphStyle *ParagraphStyle
+
 	Node *Node
 }

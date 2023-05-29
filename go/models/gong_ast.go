@@ -884,6 +884,9 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 			case "ParagraphProperties":
 				switch fieldName {
 				// insertion point for field dependant code
+				case "ParagraphStyle":
+					targetIdentifier := ident.Name
+					__gong__map_ParagraphProperties[identifier].ParagraphStyle = __gong__map_ParagraphStyle[targetIdentifier]
 				case "Node":
 					targetIdentifier := ident.Name
 					__gong__map_ParagraphProperties[identifier].Node = __gong__map_Node[targetIdentifier]

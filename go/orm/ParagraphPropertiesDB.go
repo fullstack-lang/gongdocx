@@ -46,6 +46,10 @@ type ParagraphPropertiesAPI struct {
 type ParagraphPropertiesPointersEnconding struct {
 	// insertion for pointer fields encoding declaration
 
+	// field ParagraphStyle is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	ParagraphStyleID sql.NullInt64
+
 	// field Node is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	NodeID sql.NullInt64
@@ -218,6 +222,15 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 		paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties(paragraphproperties)
 
 		// insertion point for translating pointers encodings into actual pointers
+		// commit pointer value paragraphproperties.ParagraphStyle translates to updating the paragraphproperties.ParagraphStyleID
+		paragraphpropertiesDB.ParagraphStyleID.Valid = true // allow for a 0 value (nil association)
+		if paragraphproperties.ParagraphStyle != nil {
+			if ParagraphStyleId, ok := backRepo.BackRepoParagraphStyle.Map_ParagraphStylePtr_ParagraphStyleDBID[paragraphproperties.ParagraphStyle]; ok {
+				paragraphpropertiesDB.ParagraphStyleID.Int64 = int64(ParagraphStyleId)
+				paragraphpropertiesDB.ParagraphStyleID.Valid = true
+			}
+		}
+
 		// commit pointer value paragraphproperties.Node translates to updating the paragraphproperties.NodeID
 		paragraphpropertiesDB.NodeID.Valid = true // allow for a 0 value (nil association)
 		if paragraphproperties.Node != nil {
@@ -334,6 +347,10 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CheckoutPh
 	_ = paragraphproperties // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
 
 	// insertion point for checkout of pointer encoding
+	// ParagraphStyle field
+	if paragraphpropertiesDB.ParagraphStyleID.Int64 != 0 {
+		paragraphproperties.ParagraphStyle = backRepo.BackRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStylePtr[uint(paragraphpropertiesDB.ParagraphStyleID.Int64)]
+	}
 	// Node field
 	if paragraphpropertiesDB.NodeID.Int64 != 0 {
 		paragraphproperties.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphpropertiesDB.NodeID.Int64)]
@@ -560,6 +577,12 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestorePha
 		_ = paragraphpropertiesDB
 
 		// insertion point for reindexing pointers encoding
+		// reindexing ParagraphStyle field
+		if paragraphpropertiesDB.ParagraphStyleID.Int64 != 0 {
+			paragraphpropertiesDB.ParagraphStyleID.Int64 = int64(BackRepoParagraphStyleid_atBckpTime_newID[uint(paragraphpropertiesDB.ParagraphStyleID.Int64)])
+			paragraphpropertiesDB.ParagraphStyleID.Valid = true
+		}
+
 		// reindexing Node field
 		if paragraphpropertiesDB.NodeID.Int64 != 0 {
 			paragraphpropertiesDB.NodeID.Int64 = int64(BackRepoNodeid_atBckpTime_newID[uint(paragraphpropertiesDB.NodeID.Int64)])

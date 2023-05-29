@@ -684,6 +684,13 @@ export class FrontRepoService {
             paragraphpropertiess.forEach(
               paragraphproperties => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field ParagraphStyle redeeming
+                {
+                  let _paragraphstyle = this.frontRepo.ParagraphStyles.get(paragraphproperties.ParagraphStyleID.Int64)
+                  if (_paragraphstyle) {
+                    paragraphproperties.ParagraphStyle = _paragraphstyle
+                  }
+                }
                 // insertion point for pointer field Node redeeming
                 {
                   let _node = this.frontRepo.Nodes.get(paragraphproperties.NodeID.Int64)
@@ -1096,6 +1103,13 @@ export class FrontRepoService {
                 this.frontRepo.ParagraphPropertiess_batch.set(paragraphproperties.ID, paragraphproperties)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field ParagraphStyle redeeming
+                {
+                  let _paragraphstyle = this.frontRepo.ParagraphStyles.get(paragraphproperties.ParagraphStyleID.Int64)
+                  if (_paragraphstyle) {
+                    paragraphproperties.ParagraphStyle = _paragraphstyle
+                  }
+                }
                 // insertion point for pointer field Node redeeming
                 {
                   let _node = this.frontRepo.Nodes.get(paragraphproperties.NodeID.Int64)

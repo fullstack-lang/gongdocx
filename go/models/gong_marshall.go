@@ -597,6 +597,14 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		map_ParagraphProperties_Identifiers[paragraphproperties] = id
 
 		// Initialisation of values
+		if paragraphproperties.ParagraphStyle != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "ParagraphStyle")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_ParagraphStyle_Identifiers[paragraphproperties.ParagraphStyle])
+			pointersInitializesStatements += setPointerField
+		}
+
 		if paragraphproperties.Node != nil {
 			setPointerField = PointerFieldInitStatement
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
