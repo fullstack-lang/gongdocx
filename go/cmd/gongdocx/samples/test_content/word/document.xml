@@ -110,6 +110,27 @@
                 <w:t xml:space="preserve"> 3</w:t>
             </w:r>
         </w:p>
+        <w:p w14:paraId="3F783658" w14:textId="76374466" w:rsidR="0037386E"
+            w:rsidRDefault="0037386E" w:rsidP="0037386E">
+            <w:pPr>
+                <w:pStyle w:val="Lgende" />
+                <w:keepNext />
+            </w:pPr>
+            <w:r>
+                <w:t xml:space="preserve">Tableau </w:t>
+            </w:r>
+            <w:fldSimple w:instr=" SEQ Tableau \* ARABIC ">
+                <w:r>
+                    <w:rPr>
+                        <w:noProof />
+                    </w:rPr>
+                    <w:t>1</w:t>
+                </w:r>
+            </w:fldSimple>
+            <w:r>
+                <w:t xml:space="preserve"> Exemple de tableau</w:t>
+            </w:r>
+        </w:p>
         <w:tbl>
             <w:tblPr>
                 <w:tblStyle w:val="Grilledutableau" />
@@ -265,25 +286,7 @@
                             <w:rPr>
                                 <w:lang w:val="en-US" />
                             </w:rPr>
-                            <w:t xml:space="preserve">Row </w:t>
-                        </w:r>
-                        <w:r>
-                            <w:rPr>
-                                <w:lang w:val="en-US" />
-                            </w:rPr>
-                            <w:t>3</w:t>
-                        </w:r>
-                        <w:r>
-                            <w:rPr>
-                                <w:lang w:val="en-US" />
-                            </w:rPr>
-                            <w:t xml:space="preserve">, Column </w:t>
-                        </w:r>
-                        <w:r>
-                            <w:rPr>
-                                <w:lang w:val="en-US" />
-                            </w:rPr>
-                            <w:t>2</w:t>
+                            <w:t>Row 3, Column 2</w:t>
                         </w:r>
                     </w:p>
                 </w:tc>
@@ -391,13 +394,7 @@
                             <w:rPr>
                                 <w:lang w:val="en-US" />
                             </w:rPr>
-                            <w:t xml:space="preserve">Row 5, Column </w:t>
-                        </w:r>
-                        <w:r>
-                            <w:rPr>
-                                <w:lang w:val="en-US" />
-                            </w:rPr>
-                            <w:t>3</w:t>
+                            <w:t>Row 5, Column 3</w:t>
                         </w:r>
                     </w:p>
                 </w:tc>
