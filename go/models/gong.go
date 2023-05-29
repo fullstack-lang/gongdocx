@@ -1097,6 +1097,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			// Initialisation of associations
 			// field is initialized with an instance of Node with the name of the field
 			Node: &Node{Name: "Node"},
+			// field is initialized with an instance of Text with the name of the field
+			Text: &Text{Name: "Text"},
 		}).(*Type)
 	case RuneProperties:
 		return any(&RuneProperties{
@@ -1303,6 +1305,23 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 				}
 			}
 			return any(res).(map[*End][]*Start)
+		case "Text":
+			res := make(map[*Text][]*Rune)
+			for rune := range stage.Runes {
+				if rune.Text != nil {
+					text_ := rune.Text
+					var runes []*Rune
+					_, ok := res[text_]
+					if ok {
+						runes = res[text_]
+					} else {
+						runes = make([]*Rune, 0)
+					}
+					runes = append(runes, rune)
+					res[text_] = runes
+				}
+			}
+			return any(res).(map[*End][]*Start)
 		}
 	// reverse maps of direct associations of RuneProperties
 	case RuneProperties:
@@ -1496,7 +1515,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case ParagraphStyle:
 		res = []string{"Name", "Node", "Content", "ValAttr"}
 	case Rune:
-		res = []string{"Name", "Content", "Node"}
+		res = []string{"Name", "Content", "Node", "Text"}
 	case RuneProperties:
 		res = []string{"Name", "Node", "IsBold", "IsStrike", "IsItalic", "Content"}
 	case Text:
@@ -1619,6 +1638,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "Node":
 			if any(instance).(Rune).Node != nil {
 				res = any(instance).(Rune).Node.Name
+			}
+		case "Text":
+			if any(instance).(Rune).Text != nil {
+				res = any(instance).(Rune).Text.Name
 			}
 		}
 	case RuneProperties:

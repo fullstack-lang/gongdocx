@@ -26,4 +26,5 @@ type Rune struct {
 	Content string
 
 	Node *Node
+	Text *Text
 }

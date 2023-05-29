@@ -15,6 +15,7 @@ import { RuneDB } from './rune-db';
 
 // insertion point for imports
 import { NodeDB } from './node-db'
+import { TextDB } from './text-db'
 import { ParagraphDB } from './paragraph-db'
 
 @Injectable({
@@ -73,6 +74,7 @@ export class RuneService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     runedb.Node = new NodeDB
+    runedb.Text = new TextDB
     let _Paragraph_Runes_reverse = runedb.Paragraph_Runes_reverse
     runedb.Paragraph_Runes_reverse = new ParagraphDB
 
@@ -116,6 +118,7 @@ export class RuneService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     runedb.Node = new NodeDB
+    runedb.Text = new TextDB
     let _Paragraph_Runes_reverse = runedb.Paragraph_Runes_reverse
     runedb.Paragraph_Runes_reverse = new ParagraphDB
 

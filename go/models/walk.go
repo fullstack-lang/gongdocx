@@ -52,6 +52,12 @@ func walk(
 		text.Node = node__
 		text.Content = string(node_.Content)
 
+		// check if the parent node is a rune
+		switch rune_ := parentNode.(type) {
+		case *Rune:
+			rune_.Text = text
+		}
+
 		fmt.Fprint(w, string(node_.Content))
 	case "pPr":
 		code := false
@@ -292,7 +298,7 @@ func walk(
 		}
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
-			if err := walk(zf, dummyNode, node, gongdocxStage, &n, &cbuf); err != nil {
+			if err := walk(zf, rune_, node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}

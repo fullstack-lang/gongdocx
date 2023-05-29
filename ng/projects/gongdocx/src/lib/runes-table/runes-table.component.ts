@@ -81,6 +81,9 @@ export class RunesTableComponent implements OnInit {
         case 'Node':
           return (runeDB.Node ? runeDB.Node.Name : '');
 
+        case 'Text':
+          return (runeDB.Text ? runeDB.Text.Name : '');
+
         case 'Paragraph_Runes':
           if (this.frontRepo.Paragraphs.get(runeDB.Paragraph_RunesDBID.Int64) != undefined) {
             return this.frontRepo.Paragraphs.get(runeDB.Paragraph_RunesDBID.Int64)!.Name
@@ -106,6 +109,9 @@ export class RunesTableComponent implements OnInit {
       mergedContent += runeDB.Content.toLowerCase()
       if (runeDB.Node) {
         mergedContent += runeDB.Node.Name.toLowerCase()
+      }
+      if (runeDB.Text) {
+        mergedContent += runeDB.Text.Name.toLowerCase()
       }
       if (runeDB.Paragraph_RunesDBID.Int64 != 0) {
         mergedContent += this.frontRepo.Paragraphs.get(runeDB.Paragraph_RunesDBID.Int64)!.Name.toLowerCase()
@@ -168,6 +174,7 @@ export class RunesTableComponent implements OnInit {
         "Name",
         "Content",
         "Node",
+        "Text",
         "Paragraph_Runes",
       ]
     } else {
@@ -175,6 +182,7 @@ export class RunesTableComponent implements OnInit {
         "Name",
         "Content",
         "Node",
+        "Text",
         "Paragraph_Runes",
       ]
       this.selection = new SelectionModel<RuneDB>(allowMultiSelect, this.initialSelection);

@@ -50,6 +50,10 @@ type RunePointersEnconding struct {
 	// This field is generated into another field to enable AS ONE association
 	NodeID sql.NullInt64
 
+	// field Text is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	TextID sql.NullInt64
+
 	// Implementation of a reverse ID for field Paragraph{}.Runes []*Rune
 	Paragraph_RunesDBID sql.NullInt64
 
@@ -233,6 +237,15 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// commit pointer value rune.Text translates to updating the rune.TextID
+		runeDB.TextID.Valid = true // allow for a 0 value (nil association)
+		if rune.Text != nil {
+			if TextId, ok := backRepo.BackRepoText.Map_TextPtr_TextDBID[rune.Text]; ok {
+				runeDB.TextID.Int64 = int64(TextId)
+				runeDB.TextID.Valid = true
+			}
+		}
+
 		query := backRepoRune.db.Save(&runeDB)
 		if query.Error != nil {
 			return query.Error
@@ -343,6 +356,10 @@ func (backRepoRune *BackRepoRuneStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// Node field
 	if runeDB.NodeID.Int64 != 0 {
 		rune.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(runeDB.NodeID.Int64)]
+	}
+	// Text field
+	if runeDB.TextID.Int64 != 0 {
+		rune.Text = backRepo.BackRepoText.Map_TextDBID_TextPtr[uint(runeDB.TextID.Int64)]
 	}
 	return
 }
@@ -570,6 +587,12 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 		if runeDB.NodeID.Int64 != 0 {
 			runeDB.NodeID.Int64 = int64(BackRepoNodeid_atBckpTime_newID[uint(runeDB.NodeID.Int64)])
 			runeDB.NodeID.Valid = true
+		}
+
+		// reindexing Text field
+		if runeDB.TextID.Int64 != 0 {
+			runeDB.TextID.Int64 = int64(BackRepoTextid_atBckpTime_newID[uint(runeDB.TextID.Int64)])
+			runeDB.TextID.Valid = true
 		}
 
 		// This reindex rune.Runes

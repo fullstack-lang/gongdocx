@@ -1,6 +1,8 @@
 package models
 
 // GONGNOTE(NodeOnText) :
+// [models.Text]
+// -
 // t: This stands for 'text'. This element is used to represent a run of text within
 // a paragraph. The t element will contain the actual string of text as its content.
 // -

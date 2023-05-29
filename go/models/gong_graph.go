@@ -305,6 +305,9 @@ func (stage *StageStruct) StageBranchRune(rune *Rune) {
 	if rune.Node != nil {
 		StageBranch(stage, rune.Node)
 	}
+	if rune.Text != nil {
+		StageBranch(stage, rune.Text)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 
@@ -538,6 +541,9 @@ func (stage *StageStruct) UnstageBranchRune(rune *Rune) {
 	//insertion point for the staging of instances referenced by pointers
 	if rune.Node != nil {
 		UnstageBranch(stage, rune.Node)
+	}
+	if rune.Text != nil {
+		UnstageBranch(stage, rune.Text)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers

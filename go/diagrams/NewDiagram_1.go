@@ -107,6 +107,8 @@ var map_DocLink_Identifier_NewDiagram_1 map[string]any = map[string]any{
 
 	"ref_models.Rune.Node": (ref_models.Rune{}).Node,
 
+	"ref_models.Rune.Text": (ref_models.Rune{}).Text,
+
 	"ref_models.RuneProperties": &(ref_models.RuneProperties{}),
 
 	"ref_models.RuneProperties.Content": (ref_models.RuneProperties{}).Content,
@@ -154,12 +156,8 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__Field__000003_Name := (&models.Field{Name: `Name`}).Stage(stage)
 
 	// Declarations of staged instances of GongEnumShape
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle := (&models.GongEnumShape{Name: `NewDiagram_1-RuneStyle`}).Stage(stage)
 
 	// Declarations of staged instances of GongEnumValueEntry
-	__GongEnumValueEntry__000000_BOLD := (&models.GongEnumValueEntry{Name: `BOLD`}).Stage(stage)
-	__GongEnumValueEntry__000001_ITALIC := (&models.GongEnumValueEntry{Name: `ITALIC`}).Stage(stage)
-	__GongEnumValueEntry__000002_STRIKE := (&models.GongEnumValueEntry{Name: `STRIKE`}).Stage(stage)
 
 	// Declarations of staged instances of GongStructShape
 	__GongStructShape__000000_NewDiagram_1_Document := (&models.GongStructShape{Name: `NewDiagram_1-Document`}).Stage(stage)
@@ -175,6 +173,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__Link__000003_Nodes := (&models.Link{Name: `Nodes`}).Stage(stage)
 	__Link__000004_Root := (&models.Link{Name: `Root`}).Stage(stage)
 	__Link__000005_Runes := (&models.Link{Name: `Runes`}).Stage(stage)
+	__Link__000006_Text := (&models.Link{Name: `Text`}).Stage(stage)
 
 	// Declarations of staged instances of Node
 
@@ -186,14 +185,15 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 
 	// Declarations of staged instances of NoteShapeLink
 	__NoteShapeLink__000000_Paragraph := (&models.NoteShapeLink{Name: `Paragraph`}).Stage(stage)
+	__NoteShapeLink__000001_Rune := (&models.NoteShapeLink{Name: `Rune`}).Stage(stage)
+	__NoteShapeLink__000002_Text := (&models.NoteShapeLink{Name: `Text`}).Stage(stage)
 
 	// Declarations of staged instances of Position
 	__Position__000000_Pos_NewDiagram_1_Document := (&models.Position{Name: `Pos-NewDiagram_1-Document`}).Stage(stage)
 	__Position__000001_Pos_NewDiagram_1_Node := (&models.Position{Name: `Pos-NewDiagram_1-Node`}).Stage(stage)
 	__Position__000002_Pos_NewDiagram_1_Paragraph := (&models.Position{Name: `Pos-NewDiagram_1-Paragraph`}).Stage(stage)
 	__Position__000003_Pos_NewDiagram_1_Rune := (&models.Position{Name: `Pos-NewDiagram_1-Rune`}).Stage(stage)
-	__Position__000004_Pos_NewDiagram_1_RuneStyle := (&models.Position{Name: `Pos-NewDiagram_1-RuneStyle`}).Stage(stage)
-	__Position__000005_Pos_NewDiagram_1_Text := (&models.Position{Name: `Pos-NewDiagram_1-Text`}).Stage(stage)
+	__Position__000004_Pos_NewDiagram_1_Text := (&models.Position{Name: `Pos-NewDiagram_1-Text`}).Stage(stage)
 
 	// Declarations of staged instances of Tree
 
@@ -207,7 +207,8 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Paragraph and NewDiagram_1-Node`}).Stage(stage)
 	__Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Paragraph and NewDiagram_1-Rune`}).Stage(stage)
 	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Node`}).Stage(stage)
-	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Text and NewDiagram_1-Node`}).Stage(stage)
+	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Text`}).Stage(stage)
+	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node := (&models.Vertice{Name: `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Text and NewDiagram_1-Node`}).Stage(stage)
 
 	// Setup of values
 
@@ -231,10 +232,10 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Text.Name]
-	__Field__000001_Name.Identifier = `ref_models.Text.Name`
+	//gong:ident [ref_models.Document.Name]
+	__Field__000001_Name.Identifier = `ref_models.Document.Name`
 	__Field__000001_Name.FieldTypeAsString = ``
-	__Field__000001_Name.Structname = `Text`
+	__Field__000001_Name.Structname = `Document`
 	__Field__000001_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -242,10 +243,10 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Document.Name]
-	__Field__000002_Name.Identifier = `ref_models.Document.Name`
+	//gong:ident [ref_models.Text.Name]
+	__Field__000002_Name.Identifier = `ref_models.Text.Name`
 	__Field__000002_Name.FieldTypeAsString = ``
-	__Field__000002_Name.Structname = `Document`
+	__Field__000002_Name.Structname = `Text`
 	__Field__000002_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -258,40 +259,6 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__Field__000003_Name.FieldTypeAsString = ``
 	__Field__000003_Name.Structname = `Paragraph`
 	__Field__000003_Name.Fieldtypename = `string`
-
-	// GongEnumShape values setup
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.Name = `NewDiagram_1-RuneStyle`
-
-	// comment added to overcome the problem with the comment map association
-
-	//gong:ident [ref_models.RuneStyle]
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.Identifier = `ref_models.RuneStyle`
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.Width = 240.000000
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.Heigth = 108.000000
-
-	// GongEnumValueEntry values setup
-	__GongEnumValueEntry__000000_BOLD.Name = `BOLD`
-
-	// comment added to overcome the problem with the comment map association
-
-	//gong:ident [ref_models.RuneStyle.BOLD]
-	__GongEnumValueEntry__000000_BOLD.Identifier = `ref_models.RuneStyle.BOLD`
-
-	// GongEnumValueEntry values setup
-	__GongEnumValueEntry__000001_ITALIC.Name = `ITALIC`
-
-	// comment added to overcome the problem with the comment map association
-
-	//gong:ident [ref_models.RuneStyle.ITALIC]
-	__GongEnumValueEntry__000001_ITALIC.Identifier = `ref_models.RuneStyle.ITALIC`
-
-	// GongEnumValueEntry values setup
-	__GongEnumValueEntry__000002_STRIKE.Name = `STRIKE`
-
-	// comment added to overcome the problem with the comment map association
-
-	//gong:ident [ref_models.RuneStyle.STRIKE]
-	__GongEnumValueEntry__000002_STRIKE.Identifier = `ref_models.RuneStyle.STRIKE`
 
 	// GongStructShape values setup
 	__GongStructShape__000000_NewDiagram_1_Document.Name = `NewDiagram_1-Document`
@@ -363,52 +330,52 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Text.Node]
-	__Link__000000_Node.Identifier = `ref_models.Text.Node`
+	//gong:ident [ref_models.Paragraph.Node]
+	__Link__000000_Node.Identifier = `ref_models.Paragraph.Node`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Node]
 	__Link__000000_Node.Fieldtypename = `ref_models.Node`
-	__Link__000000_Node.FieldOffsetX = 15.000000
-	__Link__000000_Node.FieldOffsetY = 21.000000
+	__Link__000000_Node.FieldOffsetX = 13.000000
+	__Link__000000_Node.FieldOffsetY = 24.000000
 	__Link__000000_Node.TargetMultiplicity = models.ZERO_ONE
 	__Link__000000_Node.TargetMultiplicityOffsetX = -50.000000
 	__Link__000000_Node.TargetMultiplicityOffsetY = 16.000000
 	__Link__000000_Node.SourceMultiplicity = models.MANY
-	__Link__000000_Node.SourceMultiplicityOffsetX = -32.000000
-	__Link__000000_Node.SourceMultiplicityOffsetY = -12.000000
+	__Link__000000_Node.SourceMultiplicityOffsetX = -26.000000
+	__Link__000000_Node.SourceMultiplicityOffsetY = -10.000000
 	__Link__000000_Node.StartOrientation = models.ORIENTATION_VERTICAL
-	__Link__000000_Node.StartRatio = 0.533333
+	__Link__000000_Node.StartRatio = 0.462500
 	__Link__000000_Node.EndOrientation = models.ORIENTATION_VERTICAL
-	__Link__000000_Node.EndRatio = 0.878232
-	__Link__000000_Node.CornerOffsetRatio = -1.051282
+	__Link__000000_Node.EndRatio = 0.080067
+	__Link__000000_Node.CornerOffsetRatio = -1.346154
 
 	// Link values setup
 	__Link__000001_Node.Name = `Node`
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Paragraph.Node]
-	__Link__000001_Node.Identifier = `ref_models.Paragraph.Node`
+	//gong:ident [ref_models.Text.Node]
+	__Link__000001_Node.Identifier = `ref_models.Text.Node`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Node]
 	__Link__000001_Node.Fieldtypename = `ref_models.Node`
-	__Link__000001_Node.FieldOffsetX = 13.000000
-	__Link__000001_Node.FieldOffsetY = 24.000000
+	__Link__000001_Node.FieldOffsetX = 15.000000
+	__Link__000001_Node.FieldOffsetY = 21.000000
 	__Link__000001_Node.TargetMultiplicity = models.ZERO_ONE
 	__Link__000001_Node.TargetMultiplicityOffsetX = -50.000000
 	__Link__000001_Node.TargetMultiplicityOffsetY = 16.000000
 	__Link__000001_Node.SourceMultiplicity = models.MANY
-	__Link__000001_Node.SourceMultiplicityOffsetX = -26.000000
-	__Link__000001_Node.SourceMultiplicityOffsetY = -10.000000
+	__Link__000001_Node.SourceMultiplicityOffsetX = -32.000000
+	__Link__000001_Node.SourceMultiplicityOffsetY = -12.000000
 	__Link__000001_Node.StartOrientation = models.ORIENTATION_VERTICAL
-	__Link__000001_Node.StartRatio = 0.462500
+	__Link__000001_Node.StartRatio = 0.533333
 	__Link__000001_Node.EndOrientation = models.ORIENTATION_VERTICAL
-	__Link__000001_Node.EndRatio = 0.080067
-	__Link__000001_Node.CornerOffsetRatio = -1.346154
+	__Link__000001_Node.EndRatio = 0.909925
+	__Link__000001_Node.CornerOffsetRatio = -1.051282
 
 	// Link values setup
 	__Link__000002_Node.Name = `Node`
@@ -500,11 +467,11 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.Rune]
 	__Link__000005_Runes.Fieldtypename = `ref_models.Rune`
-	__Link__000005_Runes.FieldOffsetX = -71.000000
-	__Link__000005_Runes.FieldOffsetY = -17.000000
+	__Link__000005_Runes.FieldOffsetX = -61.000000
+	__Link__000005_Runes.FieldOffsetY = -18.000000
 	__Link__000005_Runes.TargetMultiplicity = models.MANY
-	__Link__000005_Runes.TargetMultiplicityOffsetX = -50.000000
-	__Link__000005_Runes.TargetMultiplicityOffsetY = 16.000000
+	__Link__000005_Runes.TargetMultiplicityOffsetX = -35.000000
+	__Link__000005_Runes.TargetMultiplicityOffsetY = 33.000000
 	__Link__000005_Runes.SourceMultiplicity = models.ZERO_ONE
 	__Link__000005_Runes.SourceMultiplicityOffsetX = 17.000000
 	__Link__000005_Runes.SourceMultiplicityOffsetY = 25.000000
@@ -514,6 +481,32 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__Link__000005_Runes.EndRatio = 0.525641
 	__Link__000005_Runes.CornerOffsetRatio = 1.375000
 
+	// Link values setup
+	__Link__000006_Text.Name = `Text`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Rune.Text]
+	__Link__000006_Text.Identifier = `ref_models.Rune.Text`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Text]
+	__Link__000006_Text.Fieldtypename = `ref_models.Text`
+	__Link__000006_Text.FieldOffsetX = -50.000000
+	__Link__000006_Text.FieldOffsetY = -16.000000
+	__Link__000006_Text.TargetMultiplicity = models.ZERO_ONE
+	__Link__000006_Text.TargetMultiplicityOffsetX = -41.000000
+	__Link__000006_Text.TargetMultiplicityOffsetY = 27.000000
+	__Link__000006_Text.SourceMultiplicity = models.MANY
+	__Link__000006_Text.SourceMultiplicityOffsetX = 17.000000
+	__Link__000006_Text.SourceMultiplicityOffsetY = 29.000000
+	__Link__000006_Text.StartOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000006_Text.StartRatio = 0.500000
+	__Link__000006_Text.EndOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000006_Text.EndRatio = 0.583333
+	__Link__000006_Text.CornerOffsetRatio = 1.533333
+
 	// NoteShape values setup
 	__NoteShape__000000_NodeOnText.Name = `NodeOnText`
 
@@ -522,6 +515,8 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	//gong:ident [ref_models.NodeOnText]
 	__NoteShape__000000_NodeOnText.Identifier = `ref_models.NodeOnText`
 	__NoteShape__000000_NodeOnText.Body = `:
+[models.Text]
+-
 t: This stands for 'text'. This element is used to represent a run of text within
 a paragraph. The t element will contain the actual string of text as its content.
 -
@@ -530,6 +525,8 @@ based on its name. For example, when you encounter a t node, you might simply
 extract and store the text content.
 `
 	__NoteShape__000000_NodeOnText.BodyHTML = `<p>:
+<a href="/models#Text">models.Text</a>
+-
 t: This stands for &apos;text&apos;. This element is used to represent a run of text within
 a paragraph. The t element will contain the actual string of text as its content.
 -
@@ -537,8 +534,8 @@ When parsing these nodes, your code should handle each type of node appropriatel
 based on its name. For example, when you encounter a t node, you might simply
 extract and store the text content.
 `
-	__NoteShape__000000_NodeOnText.X = 715.000000
-	__NoteShape__000000_NodeOnText.Y = 977.000000
+	__NoteShape__000000_NodeOnText.X = 701.000000
+	__NoteShape__000000_NodeOnText.Y = 868.000000
 	__NoteShape__000000_NodeOnText.Width = 670.000000
 	__NoteShape__000000_NodeOnText.Heigth = 178.000000
 	__NoteShape__000000_NodeOnText.Matched = false
@@ -700,8 +697,8 @@ When parsing a &quot;w:r&quot; node, your code should handle the formatting info
 provided in the &quot;w:rPr&quot; node (if present) and apply it to the text found within
 the &quot;w:t&quot; nodes.
 `
-	__NoteShape__000003_NoteOnRune.X = 418.000000
-	__NoteShape__000003_NoteOnRune.Y = 1241.000000
+	__NoteShape__000003_NoteOnRune.X = 685.000000
+	__NoteShape__000003_NoteOnRune.Y = 1068.000000
 	__NoteShape__000003_NoteOnRune.Width = 611.000000
 	__NoteShape__000003_NoteOnRune.Heigth = 342.000000
 	__NoteShape__000003_NoteOnRune.Matched = false
@@ -714,6 +711,24 @@ the &quot;w:t&quot; nodes.
 	//gong:ident [ref_models.Paragraph]
 	__NoteShapeLink__000000_Paragraph.Identifier = `ref_models.Paragraph`
 	__NoteShapeLink__000000_Paragraph.Type = models.NOTE_SHAPE_LINK_TO_GONG_STRUCT_OR_ENUM_SHAPE
+
+	// NoteShapeLink values setup
+	__NoteShapeLink__000001_Rune.Name = `Rune`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Rune]
+	__NoteShapeLink__000001_Rune.Identifier = `ref_models.Rune`
+	__NoteShapeLink__000001_Rune.Type = models.NOTE_SHAPE_LINK_TO_GONG_STRUCT_OR_ENUM_SHAPE
+
+	// NoteShapeLink values setup
+	__NoteShapeLink__000002_Text.Name = `Text`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Text]
+	__NoteShapeLink__000002_Text.Identifier = `ref_models.Text`
+	__NoteShapeLink__000002_Text.Type = models.NOTE_SHAPE_LINK_TO_GONG_STRUCT_OR_ENUM_SHAPE
 
 	// Position values setup
 	__Position__000000_Pos_NewDiagram_1_Document.X = 53.000000
@@ -736,14 +751,9 @@ the &quot;w:t&quot; nodes.
 	__Position__000003_Pos_NewDiagram_1_Rune.Name = `Pos-NewDiagram_1-Rune`
 
 	// Position values setup
-	__Position__000004_Pos_NewDiagram_1_RuneStyle.X = 685.000000
-	__Position__000004_Pos_NewDiagram_1_RuneStyle.Y = 829.000000
-	__Position__000004_Pos_NewDiagram_1_RuneStyle.Name = `Pos-NewDiagram_1-RuneStyle`
-
-	// Position values setup
-	__Position__000005_Pos_NewDiagram_1_Text.X = 974.000000
-	__Position__000005_Pos_NewDiagram_1_Text.Y = 708.000000
-	__Position__000005_Pos_NewDiagram_1_Text.Name = `Pos-NewDiagram_1-Text`
+	__Position__000004_Pos_NewDiagram_1_Text.X = 1017.000000
+	__Position__000004_Pos_NewDiagram_1_Text.Y = 707.000000
+	__Position__000004_Pos_NewDiagram_1_Text.Name = `Pos-NewDiagram_1-Text`
 
 	// Vertice values setup
 	__Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node.X = 429.500000
@@ -771,9 +781,14 @@ the &quot;w:t&quot; nodes.
 	__Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Node`
 
 	// Vertice values setup
-	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.X = 405.000000
-	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.Y = 413.000000
-	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Text and NewDiagram_1-Node`
+	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text.X = 1102.000000
+	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text.Y = 750.000000
+	__Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Rune and NewDiagram_1-Text`
+
+	// Vertice values setup
+	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.X = 405.000000
+	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.Y = 413.000000
+	__Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node.Name = `Verticle in class diagram NewDiagram_1 in middle between NewDiagram_1-Text and NewDiagram_1-Node`
 
 	// Setup of pointers
 	__Classdiagram__000000_NewDiagram_1.GongStructShapes = append(__Classdiagram__000000_NewDiagram_1.GongStructShapes, __GongStructShape__000000_NewDiagram_1_Document)
@@ -781,37 +796,36 @@ the &quot;w:t&quot; nodes.
 	__Classdiagram__000000_NewDiagram_1.GongStructShapes = append(__Classdiagram__000000_NewDiagram_1.GongStructShapes, __GongStructShape__000004_NewDiagram_1_Text)
 	__Classdiagram__000000_NewDiagram_1.GongStructShapes = append(__Classdiagram__000000_NewDiagram_1.GongStructShapes, __GongStructShape__000002_NewDiagram_1_Paragraph)
 	__Classdiagram__000000_NewDiagram_1.GongStructShapes = append(__Classdiagram__000000_NewDiagram_1.GongStructShapes, __GongStructShape__000003_NewDiagram_1_Rune)
-	__Classdiagram__000000_NewDiagram_1.GongEnumShapes = append(__Classdiagram__000000_NewDiagram_1.GongEnumShapes, __GongEnumShape__000000_NewDiagram_1_RuneStyle)
 	__Classdiagram__000000_NewDiagram_1.NoteShapes = append(__Classdiagram__000000_NewDiagram_1.NoteShapes, __NoteShape__000001_NoteOnDocument)
 	__Classdiagram__000000_NewDiagram_1.NoteShapes = append(__Classdiagram__000000_NewDiagram_1.NoteShapes, __NoteShape__000000_NodeOnText)
 	__Classdiagram__000000_NewDiagram_1.NoteShapes = append(__Classdiagram__000000_NewDiagram_1.NoteShapes, __NoteShape__000002_NoteOnParagraph)
 	__Classdiagram__000000_NewDiagram_1.NoteShapes = append(__Classdiagram__000000_NewDiagram_1.NoteShapes, __NoteShape__000003_NoteOnRune)
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.Position = __Position__000004_Pos_NewDiagram_1_RuneStyle
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.GongEnumValueEntrys = append(__GongEnumShape__000000_NewDiagram_1_RuneStyle.GongEnumValueEntrys, __GongEnumValueEntry__000000_BOLD)
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.GongEnumValueEntrys = append(__GongEnumShape__000000_NewDiagram_1_RuneStyle.GongEnumValueEntrys, __GongEnumValueEntry__000001_ITALIC)
-	__GongEnumShape__000000_NewDiagram_1_RuneStyle.GongEnumValueEntrys = append(__GongEnumShape__000000_NewDiagram_1_RuneStyle.GongEnumValueEntrys, __GongEnumValueEntry__000002_STRIKE)
 	__GongStructShape__000000_NewDiagram_1_Document.Position = __Position__000000_Pos_NewDiagram_1_Document
-	__GongStructShape__000000_NewDiagram_1_Document.Fields = append(__GongStructShape__000000_NewDiagram_1_Document.Fields, __Field__000002_Name)
+	__GongStructShape__000000_NewDiagram_1_Document.Fields = append(__GongStructShape__000000_NewDiagram_1_Document.Fields, __Field__000001_Name)
 	__GongStructShape__000000_NewDiagram_1_Document.Links = append(__GongStructShape__000000_NewDiagram_1_Document.Links, __Link__000004_Root)
 	__GongStructShape__000001_NewDiagram_1_Node.Position = __Position__000001_Pos_NewDiagram_1_Node
 	__GongStructShape__000001_NewDiagram_1_Node.Links = append(__GongStructShape__000001_NewDiagram_1_Node.Links, __Link__000003_Nodes)
 	__GongStructShape__000002_NewDiagram_1_Paragraph.Position = __Position__000002_Pos_NewDiagram_1_Paragraph
 	__GongStructShape__000002_NewDiagram_1_Paragraph.Fields = append(__GongStructShape__000002_NewDiagram_1_Paragraph.Fields, __Field__000003_Name)
-	__GongStructShape__000002_NewDiagram_1_Paragraph.Links = append(__GongStructShape__000002_NewDiagram_1_Paragraph.Links, __Link__000001_Node)
+	__GongStructShape__000002_NewDiagram_1_Paragraph.Links = append(__GongStructShape__000002_NewDiagram_1_Paragraph.Links, __Link__000000_Node)
 	__GongStructShape__000002_NewDiagram_1_Paragraph.Links = append(__GongStructShape__000002_NewDiagram_1_Paragraph.Links, __Link__000005_Runes)
 	__GongStructShape__000003_NewDiagram_1_Rune.Position = __Position__000003_Pos_NewDiagram_1_Rune
 	__GongStructShape__000003_NewDiagram_1_Rune.Fields = append(__GongStructShape__000003_NewDiagram_1_Rune.Fields, __Field__000000_Content)
 	__GongStructShape__000003_NewDiagram_1_Rune.Links = append(__GongStructShape__000003_NewDiagram_1_Rune.Links, __Link__000002_Node)
-	__GongStructShape__000004_NewDiagram_1_Text.Position = __Position__000005_Pos_NewDiagram_1_Text
-	__GongStructShape__000004_NewDiagram_1_Text.Fields = append(__GongStructShape__000004_NewDiagram_1_Text.Fields, __Field__000001_Name)
-	__GongStructShape__000004_NewDiagram_1_Text.Links = append(__GongStructShape__000004_NewDiagram_1_Text.Links, __Link__000000_Node)
-	__Link__000000_Node.Middlevertice = __Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node
-	__Link__000001_Node.Middlevertice = __Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node
+	__GongStructShape__000003_NewDiagram_1_Rune.Links = append(__GongStructShape__000003_NewDiagram_1_Rune.Links, __Link__000006_Text)
+	__GongStructShape__000004_NewDiagram_1_Text.Position = __Position__000004_Pos_NewDiagram_1_Text
+	__GongStructShape__000004_NewDiagram_1_Text.Fields = append(__GongStructShape__000004_NewDiagram_1_Text.Fields, __Field__000002_Name)
+	__GongStructShape__000004_NewDiagram_1_Text.Links = append(__GongStructShape__000004_NewDiagram_1_Text.Links, __Link__000001_Node)
+	__Link__000000_Node.Middlevertice = __Vertice__000002_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Node
+	__Link__000001_Node.Middlevertice = __Vertice__000006_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Text_and_NewDiagram_1_Node
 	__Link__000002_Node.Middlevertice = __Vertice__000004_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Node
 	__Link__000003_Nodes.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Node_and_NewDiagram_1_Node
 	__Link__000004_Root.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node
 	__Link__000005_Runes.Middlevertice = __Vertice__000003_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Paragraph_and_NewDiagram_1_Rune
+	__Link__000006_Text.Middlevertice = __Vertice__000005_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Rune_and_NewDiagram_1_Text
+	__NoteShape__000000_NodeOnText.NoteShapeLinks = append(__NoteShape__000000_NodeOnText.NoteShapeLinks, __NoteShapeLink__000002_Text)
 	__NoteShape__000002_NoteOnParagraph.NoteShapeLinks = append(__NoteShape__000002_NoteOnParagraph.NoteShapeLinks, __NoteShapeLink__000000_Paragraph)
+	__NoteShape__000003_NoteOnRune.NoteShapeLinks = append(__NoteShape__000003_NoteOnRune.NoteShapeLinks, __NoteShapeLink__000001_Rune)
 }
 
 

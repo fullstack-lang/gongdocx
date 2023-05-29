@@ -1050,6 +1050,41 @@ export class SidebarComponent implements OnInit {
             NodeGongNodeAssociation.children.push(runeGongNodeInstance_Node)
           }
 
+          /**
+          * let append a node for the association Text
+          */
+          let TextGongNodeAssociation: GongNode = {
+            name: "(Text) Text",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: runeDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Rune",
+            associationField: "Text",
+            associatedStructName: "Text",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          runeGongNodeInstance.children!.push(TextGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Text
+            */
+          if (runeDB.Text != undefined) {
+            let runeGongNodeInstance_Text: GongNode = {
+              name: runeDB.Text.Name,
+              type: GongNodeType.INSTANCE,
+              id: runeDB.Text.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getRuneUniqueID(runeDB.ID)
+                + 5 * getTextUniqueID(runeDB.Text.ID),
+              structName: "Text",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            TextGongNodeAssociation.children.push(runeGongNodeInstance_Text)
+          }
+
         }
       )
 

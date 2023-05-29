@@ -1,5 +1,6 @@
 // insertion point for imports
 import { NodeDB } from './node-db'
+import { TextDB } from './text-db'
 import { ParagraphDB } from './paragraph-db'
 
 // usefull for managing pointer ID values that can be nullable
@@ -20,6 +21,9 @@ export class RuneDB {
 	// insertion point for other declarations
 	Node?: NodeDB
 	NodeID: NullInt64 = new NullInt64 // if pointer is null, Node.ID = 0
+
+	Text?: TextDB
+	TextID: NullInt64 = new NullInt64 // if pointer is null, Text.ID = 0
 
 	Paragraph_RunesDBID: NullInt64 = new NullInt64
 	Paragraph_RunesDBID_Index: NullInt64  = new NullInt64 // store the index of the rune instance in Paragraph.Runes
