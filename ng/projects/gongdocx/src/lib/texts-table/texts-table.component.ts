@@ -81,6 +81,9 @@ export class TextsTableComponent implements OnInit {
         case 'Node':
           return (textDB.Node ? textDB.Node.Name : '');
 
+        case 'PreserveWhiteSpace':
+          return textDB.PreserveWhiteSpace ? "true" : "false";
+
         default:
           console.assert(false, "Unknown field")
           return "";
@@ -157,12 +160,14 @@ export class TextsTableComponent implements OnInit {
         "Name",
         "Content",
         "Node",
+        "PreserveWhiteSpace",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
         "Content",
         "Node",
+        "PreserveWhiteSpace",
       ]
       this.selection = new SelectionModel<TextDB>(allowMultiSelect, this.initialSelection);
     }

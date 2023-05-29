@@ -15,6 +15,7 @@ export class TextDB {
 	// insertion point for basic fields declarations
 	Name: string = ""
 	Content: string = ""
+	PreserveWhiteSpace: boolean = false
 
 	// insertion point for other declarations
 	Node?: NodeDB

@@ -67,6 +67,10 @@ type TextDB struct {
 
 	// Declation for basic field textDB.Content
 	Content_Data sql.NullString
+
+	// Declation for basic field textDB.PreserveWhiteSpace
+	// provide the sql storage for the boolan
+	PreserveWhiteSpace_Data sql.NullBool
 	// encoding of pointers
 	TextPointersEnconding
 }
@@ -91,6 +95,8 @@ type TextWOP struct {
 	Name string `xlsx:"1"`
 
 	Content string `xlsx:"2"`
+
+	PreserveWhiteSpace bool `xlsx:"3"`
 	// insertion for WOP pointer fields
 }
 
@@ -99,6 +105,7 @@ var Text_Fields = []string{
 	"ID",
 	"Name",
 	"Content",
+	"PreserveWhiteSpace",
 }
 
 type BackRepoTextStruct struct {
@@ -377,6 +384,9 @@ func (textDB *TextDB) CopyBasicFieldsFromText(text *models.Text) {
 
 	textDB.Content_Data.String = text.Content
 	textDB.Content_Data.Valid = true
+
+	textDB.PreserveWhiteSpace_Data.Bool = text.PreserveWhiteSpace
+	textDB.PreserveWhiteSpace_Data.Valid = true
 }
 
 // CopyBasicFieldsFromTextWOP
@@ -388,6 +398,9 @@ func (textDB *TextDB) CopyBasicFieldsFromTextWOP(text *TextWOP) {
 
 	textDB.Content_Data.String = text.Content
 	textDB.Content_Data.Valid = true
+
+	textDB.PreserveWhiteSpace_Data.Bool = text.PreserveWhiteSpace
+	textDB.PreserveWhiteSpace_Data.Valid = true
 }
 
 // CopyBasicFieldsToText
@@ -395,6 +408,7 @@ func (textDB *TextDB) CopyBasicFieldsToText(text *models.Text) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	text.Name = textDB.Name_Data.String
 	text.Content = textDB.Content_Data.String
+	text.PreserveWhiteSpace = textDB.PreserveWhiteSpace_Data.Bool
 }
 
 // CopyBasicFieldsToTextWOP
@@ -403,6 +417,7 @@ func (textDB *TextDB) CopyBasicFieldsToTextWOP(text *TextWOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	text.Name = textDB.Name_Data.String
 	text.Content = textDB.Content_Data.String
+	text.PreserveWhiteSpace = textDB.PreserveWhiteSpace_Data.Bool
 }
 
 // Backup generates a json file from a slice of all TextDB instances in the backrepo

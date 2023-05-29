@@ -2176,7 +2176,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case TableStyle:
 		res = []string{"Name", "Node", "Content", "Val"}
 	case Text:
-		res = []string{"Name", "Content", "Node"}
+		res = []string{"Name", "Content", "Node", "PreserveWhiteSpace"}
 	}
 	return
 }
@@ -2425,6 +2425,8 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			if any(instance).(Text).Node != nil {
 				res = any(instance).(Text).Node.Name
 			}
+		case "PreserveWhiteSpace":
+			res = fmt.Sprintf("%t", any(instance).(Text).PreserveWhiteSpace)
 		}
 	}
 	return

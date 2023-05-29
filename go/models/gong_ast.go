@@ -1139,6 +1139,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Node":
 					targetIdentifier := ident.Name
 					__gong__map_Text[identifier].Node = __gong__map_Node[targetIdentifier]
+				case "PreserveWhiteSpace":
+					// convert string to boolean
+					fielValue, err := strconv.ParseBool(ident.Name)
+					if err != nil {
+						log.Fatalln(err)
+					}
+					__gong__map_Text[identifier].PreserveWhiteSpace = fielValue
 				}
 			}
 		case *ast.SelectorExpr:

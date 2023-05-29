@@ -33,6 +33,7 @@ enum TextDetailComponentState {
 export class TextDetailComponent implements OnInit {
 
 	// insertion point for declarations
+	PreserveWhiteSpaceFormControl: UntypedFormControl = new UntypedFormControl(false);
 
 	// the TextDB of interest
 	text: TextDB = new TextDB
@@ -133,6 +134,7 @@ export class TextDetailComponent implements OnInit {
 				}
 
 				// insertion point for recovery of form controls value for bool fields
+				this.PreserveWhiteSpaceFormControl.setValue(this.text.PreserveWhiteSpace)
 			}
 		)
 
@@ -155,6 +157,7 @@ export class TextDetailComponent implements OnInit {
 			this.text.NodeID.Int64 = 0
 			this.text.NodeID.Valid = true
 		}
+		this.text.PreserveWhiteSpace = this.PreserveWhiteSpaceFormControl.value
 
 		// save from the front pointer space to the non pointer space for serialization
 

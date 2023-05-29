@@ -52,6 +52,10 @@ func walk(
 		text.Node = node__
 		text.Content = string(node_.Content)
 
+		if _, ok := attr(node_.Attrs, "space"); ok {
+			text.PreserveWhiteSpace = true
+		}
+
 		// check if the parent node is a rune
 		switch rune_ := parentNode.(type) {
 		case *Rune:
