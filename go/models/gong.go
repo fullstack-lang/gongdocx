@@ -78,6 +78,14 @@ type StageStruct struct { // insertion point for definition of arrays registerin
 	OnAfterParagraphPropertiesDeleteCallback OnAfterDeleteInterface[ParagraphProperties]
 	OnAfterParagraphPropertiesReadCallback   OnAfterReadInterface[ParagraphProperties]
 
+	ParagraphStyles           map[*ParagraphStyle]any
+	ParagraphStyles_mapString map[string]*ParagraphStyle
+
+	OnAfterParagraphStyleCreateCallback OnAfterCreateInterface[ParagraphStyle]
+	OnAfterParagraphStyleUpdateCallback OnAfterUpdateInterface[ParagraphStyle]
+	OnAfterParagraphStyleDeleteCallback OnAfterDeleteInterface[ParagraphStyle]
+	OnAfterParagraphStyleReadCallback   OnAfterReadInterface[ParagraphStyle]
+
 	Runes           map[*Rune]any
 	Runes_mapString map[string]*Rune
 
@@ -178,6 +186,8 @@ type BackRepoInterface interface {
 	CheckoutParagraph(paragraph *Paragraph)
 	CommitParagraphProperties(paragraphproperties *ParagraphProperties)
 	CheckoutParagraphProperties(paragraphproperties *ParagraphProperties)
+	CommitParagraphStyle(paragraphstyle *ParagraphStyle)
+	CheckoutParagraphStyle(paragraphstyle *ParagraphStyle)
 	CommitRune(rune *Rune)
 	CheckoutRune(rune *Rune)
 	CommitRuneProperties(runeproperties *RuneProperties)
@@ -220,6 +230,9 @@ func NewStage() (stage *StageStruct) {
 		ParagraphPropertiess:           make(map[*ParagraphProperties]any),
 		ParagraphPropertiess_mapString: make(map[string]*ParagraphProperties),
 
+		ParagraphStyles:           make(map[*ParagraphStyle]any),
+		ParagraphStyles_mapString: make(map[string]*ParagraphStyle),
+
 		Runes:           make(map[*Rune]any),
 		Runes_mapString: make(map[string]*Rune),
 
@@ -252,6 +265,7 @@ func (stage *StageStruct) Commit() {
 	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
 	stage.Map_GongStructName_InstancesNb["Paragraph"] = len(stage.Paragraphs)
 	stage.Map_GongStructName_InstancesNb["ParagraphProperties"] = len(stage.ParagraphPropertiess)
+	stage.Map_GongStructName_InstancesNb["ParagraphStyle"] = len(stage.ParagraphStyles)
 	stage.Map_GongStructName_InstancesNb["Rune"] = len(stage.Runes)
 	stage.Map_GongStructName_InstancesNb["RuneProperties"] = len(stage.RunePropertiess)
 	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
@@ -270,6 +284,7 @@ func (stage *StageStruct) Checkout() {
 	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)
 	stage.Map_GongStructName_InstancesNb["Paragraph"] = len(stage.Paragraphs)
 	stage.Map_GongStructName_InstancesNb["ParagraphProperties"] = len(stage.ParagraphPropertiess)
+	stage.Map_GongStructName_InstancesNb["ParagraphStyle"] = len(stage.ParagraphStyles)
 	stage.Map_GongStructName_InstancesNb["Rune"] = len(stage.Runes)
 	stage.Map_GongStructName_InstancesNb["RuneProperties"] = len(stage.RunePropertiess)
 	stage.Map_GongStructName_InstancesNb["Text"] = len(stage.Texts)
@@ -545,6 +560,46 @@ func (paragraphproperties *ParagraphProperties) GetName() (res string) {
 	return paragraphproperties.Name
 }
 
+// Stage puts paragraphstyle to the model stage
+func (paragraphstyle *ParagraphStyle) Stage(stage *StageStruct) *ParagraphStyle {
+	stage.ParagraphStyles[paragraphstyle] = __member
+	stage.ParagraphStyles_mapString[paragraphstyle.Name] = paragraphstyle
+
+	return paragraphstyle
+}
+
+// Unstage removes paragraphstyle off the model stage
+func (paragraphstyle *ParagraphStyle) Unstage(stage *StageStruct) *ParagraphStyle {
+	delete(stage.ParagraphStyles, paragraphstyle)
+	delete(stage.ParagraphStyles_mapString, paragraphstyle.Name)
+	return paragraphstyle
+}
+
+// commit paragraphstyle to the back repo (if it is already staged)
+func (paragraphstyle *ParagraphStyle) Commit(stage *StageStruct) *ParagraphStyle {
+	if _, ok := stage.ParagraphStyles[paragraphstyle]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitParagraphStyle(paragraphstyle)
+		}
+	}
+	return paragraphstyle
+}
+
+// Checkout paragraphstyle to the back repo (if it is already staged)
+func (paragraphstyle *ParagraphStyle) Checkout(stage *StageStruct) *ParagraphStyle {
+	if _, ok := stage.ParagraphStyles[paragraphstyle]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutParagraphStyle(paragraphstyle)
+		}
+	}
+	return paragraphstyle
+}
+
+// for satisfaction of GongStruct interface
+func (paragraphstyle *ParagraphStyle) GetName() (res string) {
+	return paragraphstyle.Name
+}
+
 // Stage puts rune to the model stage
 func (rune *Rune) Stage(stage *StageStruct) *Rune {
 	stage.Runes[rune] = __member
@@ -673,6 +728,7 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 	CreateORMNode(Node *Node)
 	CreateORMParagraph(Paragraph *Paragraph)
 	CreateORMParagraphProperties(ParagraphProperties *ParagraphProperties)
+	CreateORMParagraphStyle(ParagraphStyle *ParagraphStyle)
 	CreateORMRune(Rune *Rune)
 	CreateORMRuneProperties(RuneProperties *RuneProperties)
 	CreateORMText(Text *Text)
@@ -685,6 +741,7 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 	DeleteORMNode(Node *Node)
 	DeleteORMParagraph(Paragraph *Paragraph)
 	DeleteORMParagraphProperties(ParagraphProperties *ParagraphProperties)
+	DeleteORMParagraphStyle(ParagraphStyle *ParagraphStyle)
 	DeleteORMRune(Rune *Rune)
 	DeleteORMRuneProperties(RuneProperties *RuneProperties)
 	DeleteORMText(Text *Text)
@@ -708,6 +765,9 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 
 	stage.ParagraphPropertiess = make(map[*ParagraphProperties]any)
 	stage.ParagraphPropertiess_mapString = make(map[string]*ParagraphProperties)
+
+	stage.ParagraphStyles = make(map[*ParagraphStyle]any)
+	stage.ParagraphStyles_mapString = make(map[string]*ParagraphStyle)
 
 	stage.Runes = make(map[*Rune]any)
 	stage.Runes_mapString = make(map[string]*Rune)
@@ -738,6 +798,9 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 
 	stage.ParagraphPropertiess = nil
 	stage.ParagraphPropertiess_mapString = nil
+
+	stage.ParagraphStyles = nil
+	stage.ParagraphStyles_mapString = nil
 
 	stage.Runes = nil
 	stage.Runes_mapString = nil
@@ -775,6 +838,10 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 		paragraphproperties.Unstage(stage)
 	}
 
+	for paragraphstyle := range stage.ParagraphStyles {
+		paragraphstyle.Unstage(stage)
+	}
+
 	for rune := range stage.Runes {
 		rune.Unstage(stage)
 	}
@@ -795,7 +862,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	Document | Docx | File | Node | Paragraph | ParagraphProperties | Rune | RuneProperties | Text
+	Document | Docx | File | Node | Paragraph | ParagraphProperties | ParagraphStyle | Rune | RuneProperties | Text
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -804,7 +871,7 @@ type Gongstruct interface {
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
 	// insertion point for generic types
-	*Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *Rune | *RuneProperties | *Text
+	*Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *ParagraphStyle | *Rune | *RuneProperties | *Text
 	GetName() string
 }
 
@@ -817,6 +884,7 @@ type GongstructSet interface {
 		map[*Node]any |
 		map[*Paragraph]any |
 		map[*ParagraphProperties]any |
+		map[*ParagraphStyle]any |
 		map[*Rune]any |
 		map[*RuneProperties]any |
 		map[*Text]any |
@@ -832,6 +900,7 @@ type GongstructMapString interface {
 		map[string]*Node |
 		map[string]*Paragraph |
 		map[string]*ParagraphProperties |
+		map[string]*ParagraphStyle |
 		map[string]*Rune |
 		map[string]*RuneProperties |
 		map[string]*Text |
@@ -857,6 +926,8 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 		return any(&stage.Paragraphs).(*Type)
 	case map[*ParagraphProperties]any:
 		return any(&stage.ParagraphPropertiess).(*Type)
+	case map[*ParagraphStyle]any:
+		return any(&stage.ParagraphStyles).(*Type)
 	case map[*Rune]any:
 		return any(&stage.Runes).(*Type)
 	case map[*RuneProperties]any:
@@ -887,6 +958,8 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 		return any(&stage.Paragraphs_mapString).(*Type)
 	case map[string]*ParagraphProperties:
 		return any(&stage.ParagraphPropertiess_mapString).(*Type)
+	case map[string]*ParagraphStyle:
+		return any(&stage.ParagraphStyles_mapString).(*Type)
 	case map[string]*Rune:
 		return any(&stage.Runes_mapString).(*Type)
 	case map[string]*RuneProperties:
@@ -917,6 +990,8 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 		return any(&stage.Paragraphs).(*map[*Type]any)
 	case ParagraphProperties:
 		return any(&stage.ParagraphPropertiess).(*map[*Type]any)
+	case ParagraphStyle:
+		return any(&stage.ParagraphStyles).(*map[*Type]any)
 	case Rune:
 		return any(&stage.Runes).(*map[*Type]any)
 	case RuneProperties:
@@ -947,6 +1022,8 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 		return any(&stage.Paragraphs_mapString).(*map[string]*Type)
 	case ParagraphProperties:
 		return any(&stage.ParagraphPropertiess_mapString).(*map[string]*Type)
+	case ParagraphStyle:
+		return any(&stage.ParagraphStyles_mapString).(*map[string]*Type)
 	case Rune:
 		return any(&stage.Runes_mapString).(*map[string]*Type)
 	case RuneProperties:
@@ -999,6 +1076,12 @@ func GetAssociationName[Type Gongstruct]() *Type {
 		}).(*Type)
 	case ParagraphProperties:
 		return any(&ParagraphProperties{
+			// Initialisation of associations
+			// field is initialized with an instance of Node with the name of the field
+			Node: &Node{Name: "Node"},
+		}).(*Type)
+	case ParagraphStyle:
+		return any(&ParagraphStyle{
 			// Initialisation of associations
 			// field is initialized with an instance of Node with the name of the field
 			Node: &Node{Name: "Node"},
@@ -1137,6 +1220,28 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 			}
 			return any(res).(map[*End][]*Start)
 		}
+	// reverse maps of direct associations of ParagraphStyle
+	case ParagraphStyle:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Node":
+			res := make(map[*Node][]*ParagraphStyle)
+			for paragraphstyle := range stage.ParagraphStyles {
+				if paragraphstyle.Node != nil {
+					node_ := paragraphstyle.Node
+					var paragraphstyles []*ParagraphStyle
+					_, ok := res[node_]
+					if ok {
+						paragraphstyles = res[node_]
+					} else {
+						paragraphstyles = make([]*ParagraphStyle, 0)
+					}
+					paragraphstyles = append(paragraphstyles, paragraphstyle)
+					res[node_] = paragraphstyles
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		}
 	// reverse maps of direct associations of Rune
 	case Rune:
 		switch fieldname {
@@ -1265,6 +1370,11 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 		switch fieldname {
 		// insertion point for per direct association field
 		}
+	// reverse maps of direct associations of ParagraphStyle
+	case ParagraphStyle:
+		switch fieldname {
+		// insertion point for per direct association field
+		}
 	// reverse maps of direct associations of Rune
 	case Rune:
 		switch fieldname {
@@ -1304,6 +1414,8 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 		res = "Paragraph"
 	case ParagraphProperties:
 		res = "ParagraphProperties"
+	case ParagraphStyle:
+		res = "ParagraphStyle"
 	case Rune:
 		res = "Rune"
 	case RuneProperties:
@@ -1333,6 +1445,8 @@ func GetFields[Type Gongstruct]() (res []string) {
 		res = []string{"Name", "Content", "Node"}
 	case ParagraphProperties:
 		res = []string{"Name", "Content", "Node"}
+	case ParagraphStyle:
+		res = []string{"Name", "Node", "Content", "ValAttr"}
 	case Rune:
 		res = []string{"Name", "Content", "Node"}
 	case RuneProperties:
@@ -1417,6 +1531,20 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			if any(instance).(ParagraphProperties).Node != nil {
 				res = any(instance).(ParagraphProperties).Node.Name
 			}
+		}
+	case ParagraphStyle:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(ParagraphStyle).Name
+		case "Node":
+			if any(instance).(ParagraphStyle).Node != nil {
+				res = any(instance).(ParagraphStyle).Node.Name
+			}
+		case "Content":
+			res = any(instance).(ParagraphStyle).Content
+		case "ValAttr":
+			res = any(instance).(ParagraphStyle).ValAttr
 		}
 	case Rune:
 		switch fieldName {

@@ -23,6 +23,8 @@ import { ParagraphService } from '../paragraph.service'
 import { getParagraphUniqueID } from '../front-repo.service'
 import { ParagraphPropertiesService } from '../paragraphproperties.service'
 import { getParagraphPropertiesUniqueID } from '../front-repo.service'
+import { ParagraphStyleService } from '../paragraphstyle.service'
+import { getParagraphStyleUniqueID } from '../front-repo.service'
 import { RuneService } from '../rune.service'
 import { getRuneUniqueID } from '../front-repo.service'
 import { RunePropertiesService } from '../runeproperties.service'
@@ -180,6 +182,7 @@ export class SidebarComponent implements OnInit {
     private nodeService: NodeService,
     private paragraphService: ParagraphService,
     private paragraphpropertiesService: ParagraphPropertiesService,
+    private paragraphstyleService: ParagraphStyleService,
     private runeService: RuneService,
     private runepropertiesService: RunePropertiesService,
     private textService: TextService,
@@ -260,6 +263,14 @@ export class SidebarComponent implements OnInit {
     )
     // observable for changes in structs
     this.paragraphpropertiesService.ParagraphPropertiesServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.paragraphstyleService.ParagraphStyleServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -777,6 +788,85 @@ export class SidebarComponent implements OnInit {
               children: new Array<GongNode>()
             }
             NodeGongNodeAssociation.children.push(paragraphpropertiesGongNodeInstance_Node)
+          }
+
+        }
+      )
+
+      /**
+      * fill up the ParagraphStyle part of the mat tree
+      */
+      let paragraphstyleGongNodeStruct: GongNode = {
+        name: "ParagraphStyle",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "ParagraphStyle",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(paragraphstyleGongNodeStruct)
+
+      this.frontRepo.ParagraphStyles_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.ParagraphStyles_array.forEach(
+        paragraphstyleDB => {
+          let paragraphstyleGongNodeInstance: GongNode = {
+            name: paragraphstyleDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: paragraphstyleDB.ID,
+            uniqueIdPerStack: getParagraphStyleUniqueID(paragraphstyleDB.ID),
+            structName: "ParagraphStyle",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          paragraphstyleGongNodeStruct.children!.push(paragraphstyleGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Node
+          */
+          let NodeGongNodeAssociation: GongNode = {
+            name: "(Node) Node",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: paragraphstyleDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "ParagraphStyle",
+            associationField: "Node",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphstyleGongNodeInstance.children!.push(NodeGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Node
+            */
+          if (paragraphstyleDB.Node != undefined) {
+            let paragraphstyleGongNodeInstance_Node: GongNode = {
+              name: paragraphstyleDB.Node.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphstyleDB.Node.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getParagraphStyleUniqueID(paragraphstyleDB.ID)
+                + 5 * getNodeUniqueID(paragraphstyleDB.Node.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodeGongNodeAssociation.children.push(paragraphstyleGongNodeInstance_Node)
           }
 
         }

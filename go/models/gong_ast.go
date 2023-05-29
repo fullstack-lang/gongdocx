@@ -309,6 +309,7 @@ var __gong__map_File = make(map[string]*File)
 var __gong__map_Node = make(map[string]*Node)
 var __gong__map_Paragraph = make(map[string]*Paragraph)
 var __gong__map_ParagraphProperties = make(map[string]*ParagraphProperties)
+var __gong__map_ParagraphStyle = make(map[string]*ParagraphStyle)
 var __gong__map_Rune = make(map[string]*Rune)
 var __gong__map_RuneProperties = make(map[string]*RuneProperties)
 var __gong__map_Text = make(map[string]*Text)
@@ -508,6 +509,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 										instanceParagraphProperties := (&ParagraphProperties{Name: instanceName}).Stage(stage)
 										instance = any(instanceParagraphProperties)
 										__gong__map_ParagraphProperties[identifier] = instanceParagraphProperties
+									case "ParagraphStyle":
+										instanceParagraphStyle := (&ParagraphStyle{Name: instanceName}).Stage(stage)
+										instance = any(instanceParagraphStyle)
+										__gong__map_ParagraphStyle[identifier] = instanceParagraphStyle
 									case "Rune":
 										instanceRune := (&Rune{Name: instanceName}).Stage(stage)
 										instance = any(instanceRune)
@@ -577,6 +582,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 							// insertion point for date assign code
 							}
 						case "ParagraphProperties":
+							switch fieldName {
+							// insertion point for date assign code
+							}
+						case "ParagraphStyle":
 							switch fieldName {
 							// insertion point for date assign code
 							}
@@ -650,6 +659,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 						// insertion point for slice of pointers assign code
 						}
 					case "ParagraphProperties":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						}
+					case "ParagraphStyle":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
 						}
@@ -770,6 +783,22 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_ParagraphProperties[identifier].Content = fielValue
 				}
+			case "ParagraphStyle":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_ParagraphStyle[identifier].Name = fielValue
+				case "Content":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_ParagraphStyle[identifier].Content = fielValue
+				case "ValAttr":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_ParagraphStyle[identifier].ValAttr = fielValue
+				}
 			case "Rune":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -855,6 +884,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Node":
 					targetIdentifier := ident.Name
 					__gong__map_ParagraphProperties[identifier].Node = __gong__map_Node[targetIdentifier]
+				}
+			case "ParagraphStyle":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Node":
+					targetIdentifier := ident.Name
+					__gong__map_ParagraphStyle[identifier].Node = __gong__map_Node[targetIdentifier]
 				}
 			case "Rune":
 				switch fieldName {
@@ -947,6 +983,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					// insertion point for enum assign code
 					}
 				case "ParagraphProperties":
+					switch fieldName {
+					// insertion point for enum assign code
+					}
+				case "ParagraphStyle":
 					switch fieldName {
 					// insertion point for enum assign code
 					}

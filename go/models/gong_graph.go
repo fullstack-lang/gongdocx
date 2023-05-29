@@ -23,6 +23,9 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	case *ParagraphProperties:
 		ok = stage.IsStagedParagraphProperties(target)
 
+	case *ParagraphStyle:
+		ok = stage.IsStagedParagraphStyle(target)
+
 	case *Rune:
 		ok = stage.IsStagedRune(target)
 
@@ -81,6 +84,13 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 		return
 	}
 
+	func (stage *StageStruct) IsStagedParagraphStyle(paragraphstyle *ParagraphStyle) (ok bool) {
+
+		_, ok = stage.ParagraphStyles[paragraphstyle]
+	
+		return
+	}
+
 	func (stage *StageStruct) IsStagedRune(rune *Rune) (ok bool) {
 
 		_, ok = stage.Runes[rune]
@@ -128,6 +138,9 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *ParagraphProperties:
 		stage.StageBranchParagraphProperties(target)
+
+	case *ParagraphStyle:
+		stage.StageBranchParagraphStyle(target)
 
 	case *Rune:
 		stage.StageBranchRune(target)
@@ -252,6 +265,24 @@ func (stage *StageStruct) StageBranchParagraphProperties(paragraphproperties *Pa
 
 }
 
+func (stage *StageStruct) StageBranchParagraphStyle(paragraphstyle *ParagraphStyle) {
+
+	// check if instance is already staged
+	if IsStaged(stage, paragraphstyle) {
+		return
+	}
+
+	paragraphstyle.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if paragraphstyle.Node != nil {
+		StageBranch(stage, paragraphstyle.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
 func (stage *StageStruct) StageBranchRune(rune *Rune) {
 
 	// check if instance is already staged
@@ -332,6 +363,9 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	case *ParagraphProperties:
 		stage.UnstageBranchParagraphProperties(target)
+
+	case *ParagraphStyle:
+		stage.UnstageBranchParagraphStyle(target)
 
 	case *Rune:
 		stage.UnstageBranchRune(target)
@@ -450,6 +484,24 @@ func (stage *StageStruct) UnstageBranchParagraphProperties(paragraphproperties *
 	//insertion point for the staging of instances referenced by pointers
 	if paragraphproperties.Node != nil {
 		UnstageBranch(stage, paragraphproperties.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) UnstageBranchParagraphStyle(paragraphstyle *ParagraphStyle) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, paragraphstyle) {
+		return
+	}
+
+	paragraphstyle.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if paragraphstyle.Node != nil {
+		UnstageBranch(stage, paragraphstyle.Node)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers

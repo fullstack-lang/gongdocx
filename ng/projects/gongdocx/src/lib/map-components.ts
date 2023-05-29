@@ -11,6 +11,8 @@
   import { ParagraphSortingComponent } from './paragraph-sorting/paragraph-sorting.component'
   import { ParagraphPropertiessTableComponent } from './paragraphpropertiess-table/paragraphpropertiess-table.component'
   import { ParagraphPropertiesSortingComponent } from './paragraphproperties-sorting/paragraphproperties-sorting.component'
+  import { ParagraphStylesTableComponent } from './paragraphstyles-table/paragraphstyles-table.component'
+  import { ParagraphStyleSortingComponent } from './paragraphstyle-sorting/paragraphstyle-sorting.component'
   import { RunesTableComponent } from './runes-table/runes-table.component'
   import { RuneSortingComponent } from './rune-sorting/rune-sorting.component'
   import { RunePropertiessTableComponent } from './runepropertiess-table/runepropertiess-table.component'
@@ -31,6 +33,8 @@
   export const MapOfParagraphSortingComponents: Map<string, any> = new Map([["ParagraphSortingComponent", ParagraphSortingComponent],])
   export const MapOfParagraphPropertiessComponents: Map<string, any> = new Map([["ParagraphPropertiessTableComponent", ParagraphPropertiessTableComponent],])
   export const MapOfParagraphPropertiesSortingComponents: Map<string, any> = new Map([["ParagraphPropertiesSortingComponent", ParagraphPropertiesSortingComponent],])
+  export const MapOfParagraphStylesComponents: Map<string, any> = new Map([["ParagraphStylesTableComponent", ParagraphStylesTableComponent],])
+  export const MapOfParagraphStyleSortingComponents: Map<string, any> = new Map([["ParagraphStyleSortingComponent", ParagraphStyleSortingComponent],])
   export const MapOfRunesComponents: Map<string, any> = new Map([["RunesTableComponent", RunesTableComponent],])
   export const MapOfRuneSortingComponents: Map<string, any> = new Map([["RuneSortingComponent", RuneSortingComponent],])
   export const MapOfRunePropertiessComponents: Map<string, any> = new Map([["RunePropertiessTableComponent", RunePropertiessTableComponent],])
@@ -49,6 +53,7 @@ export const MapOfComponents: Map<string, any> =
       ["Node", MapOfNodesComponents],
       ["Paragraph", MapOfParagraphsComponents],
       ["ParagraphProperties", MapOfParagraphPropertiessComponents],
+      ["ParagraphStyle", MapOfParagraphStylesComponents],
       ["Rune", MapOfRunesComponents],
       ["RuneProperties", MapOfRunePropertiessComponents],
       ["Text", MapOfTextsComponents],
@@ -66,6 +71,7 @@ export const MapOfSortingComponents: Map<string, any> =
       ["Node", MapOfNodeSortingComponents],
       ["Paragraph", MapOfParagraphSortingComponents],
       ["ParagraphProperties", MapOfParagraphPropertiesSortingComponents],
+      ["ParagraphStyle", MapOfParagraphStyleSortingComponents],
       ["Rune", MapOfRuneSortingComponents],
       ["RuneProperties", MapOfRunePropertiesSortingComponents],
       ["Text", MapOfTextSortingComponents],

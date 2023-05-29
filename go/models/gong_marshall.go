@@ -314,6 +314,50 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 	}
 
+	map_ParagraphStyle_Identifiers := make(map[*ParagraphStyle]string)
+	_ = map_ParagraphStyle_Identifiers
+
+	paragraphstyleOrdered := []*ParagraphStyle{}
+	for paragraphstyle := range stage.ParagraphStyles {
+		paragraphstyleOrdered = append(paragraphstyleOrdered, paragraphstyle)
+	}
+	sort.Slice(paragraphstyleOrdered[:], func(i, j int) bool {
+		return paragraphstyleOrdered[i].Name < paragraphstyleOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of ParagraphStyle"
+	for idx, paragraphstyle := range paragraphstyleOrdered {
+
+		id = generatesIdentifier("ParagraphStyle", idx, paragraphstyle.Name)
+		map_ParagraphStyle_Identifiers[paragraphstyle] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "ParagraphStyle")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", paragraphstyle.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// ParagraphStyle values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(paragraphstyle.Name))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Content")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(paragraphstyle.Content))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "ValAttr")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(paragraphstyle.ValAttr))
+		initializerStatements += setValueField
+
+	}
+
 	map_Rune_Identifiers := make(map[*Rune]string)
 	_ = map_Rune_Identifiers
 
@@ -550,6 +594,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[paragraphproperties.Node])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, paragraphstyle := range paragraphstyleOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("ParagraphStyle", idx, paragraphstyle.Name)
+		map_ParagraphStyle_Identifiers[paragraphstyle] = id
+
+		// Initialisation of values
+		if paragraphstyle.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[paragraphstyle.Node])
 			pointersInitializesStatements += setPointerField
 		}
 

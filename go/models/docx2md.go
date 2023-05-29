@@ -249,7 +249,20 @@ func (zf *file) walk(
 					}
 				}
 			case "pStyle":
+
+				nodeCounter_ := 0
+				node___ := (&Node{Name: fmt.Sprintf(node__.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
+				node.Nodes = append(node__.Nodes, node___)
+				nodeCounter_ = nodeCounter_ + 1
+
+				paragraphStyle := (&ParagraphStyle{Name: node___.Name}).Stage(gongdocxStage)
+				paragraphStyle.Node = node__
+				paragraphStyle.Content = string(n.Content)
+
 				if val, ok := attr(n.Attrs, "val"); ok {
+
+					paragraphStyle.ValAttr = val
+
 					if strings.HasPrefix(val, "Heading") {
 						if i, err := strconv.Atoi(val[7:]); err == nil && i > 0 {
 							fmt.Fprint(w, strings.Repeat("#", i)+" ")

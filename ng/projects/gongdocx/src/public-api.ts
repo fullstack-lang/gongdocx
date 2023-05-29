@@ -52,6 +52,12 @@ export * from './lib/paragraphpropertiess-table/paragraphpropertiess-table.compo
 export * from './lib/paragraphproperties-db'
 export * from './lib/paragraphproperties.service'
 
+export * from './lib/paragraphstyle-detail/paragraphstyle-detail.component'
+export * from './lib/paragraphstyle-sorting/paragraphstyle-sorting.component'
+export * from './lib/paragraphstyles-table/paragraphstyles-table.component'
+export * from './lib/paragraphstyle-db'
+export * from './lib/paragraphstyle.service'
+
 export * from './lib/rune-detail/rune-detail.component'
 export * from './lib/rune-sorting/rune-sorting.component'
 export * from './lib/runes-table/runes-table.component'

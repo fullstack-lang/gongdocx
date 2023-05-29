@@ -22,6 +22,9 @@ import { ParagraphService } from './paragraph.service'
 import { ParagraphPropertiesDB } from './paragraphproperties-db'
 import { ParagraphPropertiesService } from './paragraphproperties.service'
 
+import { ParagraphStyleDB } from './paragraphstyle-db'
+import { ParagraphStyleService } from './paragraphstyle.service'
+
 import { RuneDB } from './rune-db'
 import { RuneService } from './rune.service'
 
@@ -52,6 +55,9 @@ export class FrontRepo { // insertion point sub template
   ParagraphPropertiess_array = new Array<ParagraphPropertiesDB>(); // array of repo instances
   ParagraphPropertiess = new Map<number, ParagraphPropertiesDB>(); // map of repo instances
   ParagraphPropertiess_batch = new Map<number, ParagraphPropertiesDB>(); // same but only in last GET (for finding repo instances to delete)
+  ParagraphStyles_array = new Array<ParagraphStyleDB>(); // array of repo instances
+  ParagraphStyles = new Map<number, ParagraphStyleDB>(); // map of repo instances
+  ParagraphStyles_batch = new Map<number, ParagraphStyleDB>(); // same but only in last GET (for finding repo instances to delete)
   Runes_array = new Array<RuneDB>(); // array of repo instances
   Runes = new Map<number, RuneDB>(); // map of repo instances
   Runes_batch = new Map<number, RuneDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -129,6 +135,7 @@ export class FrontRepoService {
     private nodeService: NodeService,
     private paragraphService: ParagraphService,
     private paragraphpropertiesService: ParagraphPropertiesService,
+    private paragraphstyleService: ParagraphStyleService,
     private runeService: RuneService,
     private runepropertiesService: RunePropertiesService,
     private textService: TextService,
@@ -168,6 +175,7 @@ export class FrontRepoService {
     Observable<NodeDB[]>,
     Observable<ParagraphDB[]>,
     Observable<ParagraphPropertiesDB[]>,
+    Observable<ParagraphStyleDB[]>,
     Observable<RuneDB[]>,
     Observable<RunePropertiesDB[]>,
     Observable<TextDB[]>,
@@ -178,6 +186,7 @@ export class FrontRepoService {
       this.nodeService.getNodes(this.GONG__StackPath),
       this.paragraphService.getParagraphs(this.GONG__StackPath),
       this.paragraphpropertiesService.getParagraphPropertiess(this.GONG__StackPath),
+      this.paragraphstyleService.getParagraphStyles(this.GONG__StackPath),
       this.runeService.getRunes(this.GONG__StackPath),
       this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
@@ -200,6 +209,7 @@ export class FrontRepoService {
       this.nodeService.getNodes(this.GONG__StackPath),
       this.paragraphService.getParagraphs(this.GONG__StackPath),
       this.paragraphpropertiesService.getParagraphPropertiess(this.GONG__StackPath),
+      this.paragraphstyleService.getParagraphStyles(this.GONG__StackPath),
       this.runeService.getRunes(this.GONG__StackPath),
       this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
@@ -217,6 +227,7 @@ export class FrontRepoService {
             nodes_,
             paragraphs_,
             paragraphpropertiess_,
+            paragraphstyles_,
             runes_,
             runepropertiess_,
             texts_,
@@ -235,6 +246,8 @@ export class FrontRepoService {
             paragraphs = paragraphs_ as ParagraphDB[]
             var paragraphpropertiess: ParagraphPropertiesDB[]
             paragraphpropertiess = paragraphpropertiess_ as ParagraphPropertiesDB[]
+            var paragraphstyles: ParagraphStyleDB[]
+            paragraphstyles = paragraphstyles_ as ParagraphStyleDB[]
             var runes: RuneDB[]
             runes = runes_ as RuneDB[]
             var runepropertiess: RunePropertiesDB[]
@@ -444,6 +457,39 @@ export class FrontRepoService {
             });
 
             // init the array
+            this.frontRepo.ParagraphStyles_array = paragraphstyles
+
+            // clear the map that counts ParagraphStyle in the GET
+            this.frontRepo.ParagraphStyles_batch.clear()
+
+            paragraphstyles.forEach(
+              paragraphstyle => {
+                this.frontRepo.ParagraphStyles.set(paragraphstyle.ID, paragraphstyle)
+                this.frontRepo.ParagraphStyles_batch.set(paragraphstyle.ID, paragraphstyle)
+              }
+            )
+
+            // clear paragraphstyles that are absent from the batch
+            this.frontRepo.ParagraphStyles.forEach(
+              paragraphstyle => {
+                if (this.frontRepo.ParagraphStyles_batch.get(paragraphstyle.ID) == undefined) {
+                  this.frontRepo.ParagraphStyles.delete(paragraphstyle.ID)
+                }
+              }
+            )
+
+            // sort ParagraphStyles_array array
+            this.frontRepo.ParagraphStyles_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
             this.frontRepo.Runes_array = runes
 
             // clear the map that counts Rune in the GET
@@ -636,6 +682,20 @@ export class FrontRepoService {
                   let _node = this.frontRepo.Nodes.get(paragraphproperties.NodeID.Int64)
                   if (_node) {
                     paragraphproperties.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+            paragraphstyles.forEach(
+              paragraphstyle => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(paragraphstyle.NodeID.Int64)
+                  if (_node) {
+                    paragraphstyle.Node = _node
                   }
                 }
 
@@ -1055,6 +1115,64 @@ export class FrontRepoService {
     )
   }
 
+  // ParagraphStylePull performs a GET on ParagraphStyle of the stack and redeem association pointers 
+  ParagraphStylePull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.paragraphstyleService.getParagraphStyles(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            paragraphstyles,
+          ]) => {
+            // init the array
+            this.frontRepo.ParagraphStyles_array = paragraphstyles
+
+            // clear the map that counts ParagraphStyle in the GET
+            this.frontRepo.ParagraphStyles_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            paragraphstyles.forEach(
+              paragraphstyle => {
+                this.frontRepo.ParagraphStyles.set(paragraphstyle.ID, paragraphstyle)
+                this.frontRepo.ParagraphStyles_batch.set(paragraphstyle.ID, paragraphstyle)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(paragraphstyle.NodeID.Int64)
+                  if (_node) {
+                    paragraphstyle.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear paragraphstyles that are absent from the GET
+            this.frontRepo.ParagraphStyles.forEach(
+              paragraphstyle => {
+                if (this.frontRepo.ParagraphStyles_batch.get(paragraphstyle.ID) == undefined) {
+                  this.frontRepo.ParagraphStyles.delete(paragraphstyle.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
   // RunePull performs a GET on Rune of the stack and redeem association pointers 
   RunePull(): Observable<FrontRepo> {
     return new Observable<FrontRepo>(
@@ -1249,12 +1367,15 @@ export function getParagraphUniqueID(id: number): number {
 export function getParagraphPropertiesUniqueID(id: number): number {
   return 53 * id
 }
-export function getRuneUniqueID(id: number): number {
+export function getParagraphStyleUniqueID(id: number): number {
   return 59 * id
 }
-export function getRunePropertiesUniqueID(id: number): number {
+export function getRuneUniqueID(id: number): number {
   return 61 * id
 }
-export function getTextUniqueID(id: number): number {
+export function getRunePropertiesUniqueID(id: number): number {
   return 67 * id
+}
+export function getTextUniqueID(id: number): number {
+  return 71 * id
 }

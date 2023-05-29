@@ -20,6 +20,9 @@ import { ParagraphDetailComponent } from './paragraph-detail/paragraph-detail.co
 import { ParagraphPropertiessTableComponent } from './paragraphpropertiess-table/paragraphpropertiess-table.component'
 import { ParagraphPropertiesDetailComponent } from './paragraphproperties-detail/paragraphproperties-detail.component'
 
+import { ParagraphStylesTableComponent } from './paragraphstyles-table/paragraphstyles-table.component'
+import { ParagraphStyleDetailComponent } from './paragraphstyle-detail/paragraphstyle-detail.component'
+
 import { RunesTableComponent } from './runes-table/runes-table.component'
 import { RuneDetailComponent } from './rune-detail/rune-detail.component'
 
@@ -258,6 +261,39 @@ export class RouteService {
         return route
     }
 
+    getParagraphStyleTablePath(): string {
+        return this.getPathRoot() + '-paragraphstyles/:GONG__StackPath'
+    }
+    getParagraphStyleTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getParagraphStyleTablePath(), component: ParagraphStylesTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getParagraphStyleAdderPath(): string {
+        return this.getPathRoot() + '-paragraphstyle-adder/:GONG__StackPath'
+    }
+    getParagraphStyleAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getParagraphStyleAdderPath(), component: ParagraphStyleDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getParagraphStyleAdderForUsePath(): string {
+        return this.getPathRoot() + '-paragraphstyle-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getParagraphStyleAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getParagraphStyleAdderForUsePath(), component: ParagraphStyleDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getParagraphStyleDetailPath(): string {
+        return this.getPathRoot() + '-paragraphstyle-detail/:id/:GONG__StackPath'
+    }
+    getParagraphStyleDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getParagraphStyleDetailPath(), component: ParagraphStyleDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
     getRuneTablePath(): string {
         return this.getPathRoot() + '-runes/:GONG__StackPath'
     }
@@ -392,6 +428,11 @@ export class RouteService {
             this.getParagraphPropertiesAdderRoute(stackPath),
             this.getParagraphPropertiesAdderForUseRoute(stackPath),
             this.getParagraphPropertiesDetailRoute(stackPath),
+
+            this.getParagraphStyleTableRoute(stackPath),
+            this.getParagraphStyleAdderRoute(stackPath),
+            this.getParagraphStyleAdderForUseRoute(stackPath),
+            this.getParagraphStyleDetailRoute(stackPath),
 
             this.getRuneTableRoute(stackPath),
             this.getRuneAdderRoute(stackPath),

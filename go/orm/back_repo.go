@@ -33,6 +33,8 @@ type BackRepoStruct struct {
 
 	BackRepoParagraphProperties BackRepoParagraphPropertiesStruct
 
+	BackRepoParagraphStyle BackRepoParagraphStyleStruct
+
 	BackRepoRune BackRepoRuneStruct
 
 	BackRepoRuneProperties BackRepoRunePropertiesStruct
@@ -81,6 +83,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&NodeDB{},
 		&ParagraphDB{},
 		&ParagraphPropertiesDB{},
+		&ParagraphStyleDB{},
 		&RuneDB{},
 		&RunePropertiesDB{},
 		&TextDB{},
@@ -138,6 +141,14 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr: make(map[uint]*models.ParagraphProperties, 0),
 		Map_ParagraphPropertiesDBID_ParagraphPropertiesDB:  make(map[uint]*ParagraphPropertiesDB, 0),
 		Map_ParagraphPropertiesPtr_ParagraphPropertiesDBID: make(map[*models.ParagraphProperties]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
+	backRepo.BackRepoParagraphStyle = BackRepoParagraphStyleStruct{
+		Map_ParagraphStyleDBID_ParagraphStylePtr: make(map[uint]*models.ParagraphStyle, 0),
+		Map_ParagraphStyleDBID_ParagraphStyleDB:  make(map[uint]*ParagraphStyleDB, 0),
+		Map_ParagraphStylePtr_ParagraphStyleDBID: make(map[*models.ParagraphStyle]uint, 0),
 
 		db:    db,
 		stage: stage,
@@ -217,6 +228,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoNode.CommitPhaseOne(stage)
 	backRepo.BackRepoParagraph.CommitPhaseOne(stage)
 	backRepo.BackRepoParagraphProperties.CommitPhaseOne(stage)
+	backRepo.BackRepoParagraphStyle.CommitPhaseOne(stage)
 	backRepo.BackRepoRune.CommitPhaseOne(stage)
 	backRepo.BackRepoRuneProperties.CommitPhaseOne(stage)
 	backRepo.BackRepoText.CommitPhaseOne(stage)
@@ -228,6 +240,7 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoNode.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoParagraph.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoParagraphProperties.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoParagraphStyle.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoRune.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoRuneProperties.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoText.CommitPhaseTwo(backRepo)
@@ -244,6 +257,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoNode.CheckoutPhaseOne()
 	backRepo.BackRepoParagraph.CheckoutPhaseOne()
 	backRepo.BackRepoParagraphProperties.CheckoutPhaseOne()
+	backRepo.BackRepoParagraphStyle.CheckoutPhaseOne()
 	backRepo.BackRepoRune.CheckoutPhaseOne()
 	backRepo.BackRepoRuneProperties.CheckoutPhaseOne()
 	backRepo.BackRepoText.CheckoutPhaseOne()
@@ -255,6 +269,7 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoNode.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoParagraph.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoParagraphProperties.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoParagraphStyle.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoRune.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoRuneProperties.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoText.CheckoutPhaseTwo(backRepo)
@@ -290,6 +305,7 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	backRepo.BackRepoNode.Backup(dirPath)
 	backRepo.BackRepoParagraph.Backup(dirPath)
 	backRepo.BackRepoParagraphProperties.Backup(dirPath)
+	backRepo.BackRepoParagraphStyle.Backup(dirPath)
 	backRepo.BackRepoRune.Backup(dirPath)
 	backRepo.BackRepoRuneProperties.Backup(dirPath)
 	backRepo.BackRepoText.Backup(dirPath)
@@ -309,6 +325,7 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	backRepo.BackRepoNode.BackupXL(file)
 	backRepo.BackRepoParagraph.BackupXL(file)
 	backRepo.BackRepoParagraphProperties.BackupXL(file)
+	backRepo.BackRepoParagraphStyle.BackupXL(file)
 	backRepo.BackRepoRune.BackupXL(file)
 	backRepo.BackRepoRuneProperties.BackupXL(file)
 	backRepo.BackRepoText.BackupXL(file)
@@ -342,6 +359,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoNode.RestorePhaseOne(dirPath)
 	backRepo.BackRepoParagraph.RestorePhaseOne(dirPath)
 	backRepo.BackRepoParagraphProperties.RestorePhaseOne(dirPath)
+	backRepo.BackRepoParagraphStyle.RestorePhaseOne(dirPath)
 	backRepo.BackRepoRune.RestorePhaseOne(dirPath)
 	backRepo.BackRepoRuneProperties.RestorePhaseOne(dirPath)
 	backRepo.BackRepoText.RestorePhaseOne(dirPath)
@@ -357,6 +375,7 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoNode.RestorePhaseTwo()
 	backRepo.BackRepoParagraph.RestorePhaseTwo()
 	backRepo.BackRepoParagraphProperties.RestorePhaseTwo()
+	backRepo.BackRepoParagraphStyle.RestorePhaseTwo()
 	backRepo.BackRepoRune.RestorePhaseTwo()
 	backRepo.BackRepoRuneProperties.RestorePhaseTwo()
 	backRepo.BackRepoText.RestorePhaseTwo()
@@ -393,6 +412,7 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.BackRepoNode.RestoreXLPhaseOne(file)
 	backRepo.BackRepoParagraph.RestoreXLPhaseOne(file)
 	backRepo.BackRepoParagraphProperties.RestoreXLPhaseOne(file)
+	backRepo.BackRepoParagraphStyle.RestoreXLPhaseOne(file)
 	backRepo.BackRepoRune.RestoreXLPhaseOne(file)
 	backRepo.BackRepoRuneProperties.RestoreXLPhaseOne(file)
 	backRepo.BackRepoText.RestoreXLPhaseOne(file)
