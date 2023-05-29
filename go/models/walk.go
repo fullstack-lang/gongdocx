@@ -10,9 +10,9 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
-func walk[T Gongstruct](
+func walk(
 	zf *file,
-	parentNode *T,
+	parentNode any,
 	node *Node,
 	gongdocxStage *StageStruct,
 	node_ *Node_,
@@ -63,6 +63,12 @@ func walk[T Gongstruct](
 		paragraphproperties_ := (&ParagraphProperties{Name: node__.Name}).Stage(gongdocxStage)
 		paragraphproperties_.Node = node__
 		paragraphproperties_.Content = string(node_.Content)
+
+		// check if the parent node is a paragraph
+		switch paragraph := parentNode.(type) {
+		case *Paragraph:
+			paragraph.ParagraphProperties = paragraphproperties_
+		}
 
 		for _, n := range node_.Nodes {
 			switch n.XMLName.Local {
@@ -310,7 +316,7 @@ func walk[T Gongstruct](
 			node.Nodes = append(node.Nodes, node__)
 			nodeCounter = nodeCounter + 1
 
-			if err := walk(zf, dummyNode, node__, gongdocxStage, &n, w); err != nil {
+			if err := walk(zf, paragraph, node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}

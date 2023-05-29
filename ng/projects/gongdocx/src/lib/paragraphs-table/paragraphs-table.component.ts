@@ -81,6 +81,9 @@ export class ParagraphsTableComponent implements OnInit {
         case 'Node':
           return (paragraphDB.Node ? paragraphDB.Node.Name : '');
 
+        case 'ParagraphProperties':
+          return (paragraphDB.ParagraphProperties ? paragraphDB.ParagraphProperties.Name : '');
+
         default:
           console.assert(false, "Unknown field")
           return "";
@@ -99,6 +102,9 @@ export class ParagraphsTableComponent implements OnInit {
       mergedContent += paragraphDB.Content.toLowerCase()
       if (paragraphDB.Node) {
         mergedContent += paragraphDB.Node.Name.toLowerCase()
+      }
+      if (paragraphDB.ParagraphProperties) {
+        mergedContent += paragraphDB.ParagraphProperties.Name.toLowerCase()
       }
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
@@ -157,12 +163,14 @@ export class ParagraphsTableComponent implements OnInit {
         "Name",
         "Content",
         "Node",
+        "ParagraphProperties",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
         "Content",
         "Node",
+        "ParagraphProperties",
       ]
       this.selection = new SelectionModel<ParagraphDB>(allowMultiSelect, this.initialSelection);
     }

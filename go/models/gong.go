@@ -1073,6 +1073,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			// Initialisation of associations
 			// field is initialized with an instance of Node with the name of the field
 			Node: &Node{Name: "Node"},
+			// field is initialized with an instance of ParagraphProperties with the name of the field
+			ParagraphProperties: &ParagraphProperties{Name: "ParagraphProperties"},
 		}).(*Type)
 	case ParagraphProperties:
 		return any(&ParagraphProperties{
@@ -1194,6 +1196,23 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 					}
 					paragraphs = append(paragraphs, paragraph)
 					res[node_] = paragraphs
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "ParagraphProperties":
+			res := make(map[*ParagraphProperties][]*Paragraph)
+			for paragraph := range stage.Paragraphs {
+				if paragraph.ParagraphProperties != nil {
+					paragraphproperties_ := paragraph.ParagraphProperties
+					var paragraphs []*Paragraph
+					_, ok := res[paragraphproperties_]
+					if ok {
+						paragraphs = res[paragraphproperties_]
+					} else {
+						paragraphs = make([]*Paragraph, 0)
+					}
+					paragraphs = append(paragraphs, paragraph)
+					res[paragraphproperties_] = paragraphs
 				}
 			}
 			return any(res).(map[*End][]*Start)
@@ -1442,7 +1461,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Node:
 		res = []string{"Name", "Nodes"}
 	case Paragraph:
-		res = []string{"Name", "Content", "Node"}
+		res = []string{"Name", "Content", "Node", "ParagraphProperties"}
 	case ParagraphProperties:
 		res = []string{"Name", "Content", "Node"}
 	case ParagraphStyle:
@@ -1518,6 +1537,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "Node":
 			if any(instance).(Paragraph).Node != nil {
 				res = any(instance).(Paragraph).Node.Name
+			}
+		case "ParagraphProperties":
+			if any(instance).(Paragraph).ParagraphProperties != nil {
+				res = any(instance).(Paragraph).ParagraphProperties.Name
 			}
 		}
 	case ParagraphProperties:

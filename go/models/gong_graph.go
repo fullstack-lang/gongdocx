@@ -242,6 +242,9 @@ func (stage *StageStruct) StageBranchParagraph(paragraph *Paragraph) {
 	if paragraph.Node != nil {
 		StageBranch(stage, paragraph.Node)
 	}
+	if paragraph.ParagraphProperties != nil {
+		StageBranch(stage, paragraph.ParagraphProperties)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 
@@ -466,6 +469,9 @@ func (stage *StageStruct) UnstageBranchParagraph(paragraph *Paragraph) {
 	//insertion point for the staging of instances referenced by pointers
 	if paragraph.Node != nil {
 		UnstageBranch(stage, paragraph.Node)
+	}
+	if paragraph.ParagraphProperties != nil {
+		UnstageBranch(stage, paragraph.ParagraphProperties)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers

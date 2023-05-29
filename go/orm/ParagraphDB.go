@@ -49,6 +49,10 @@ type ParagraphPointersEnconding struct {
 	// field Node is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	NodeID sql.NullInt64
+
+	// field ParagraphProperties is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	ParagraphPropertiesID sql.NullInt64
 }
 
 // ParagraphDB describes a paragraph in the database
@@ -227,6 +231,15 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 			}
 		}
 
+		// commit pointer value paragraph.ParagraphProperties translates to updating the paragraph.ParagraphPropertiesID
+		paragraphDB.ParagraphPropertiesID.Valid = true // allow for a 0 value (nil association)
+		if paragraph.ParagraphProperties != nil {
+			if ParagraphPropertiesId, ok := backRepo.BackRepoParagraphProperties.Map_ParagraphPropertiesPtr_ParagraphPropertiesDBID[paragraph.ParagraphProperties]; ok {
+				paragraphDB.ParagraphPropertiesID.Int64 = int64(ParagraphPropertiesId)
+				paragraphDB.ParagraphPropertiesID.Valid = true
+			}
+		}
+
 		query := backRepoParagraph.db.Save(&paragraphDB)
 		if query.Error != nil {
 			return query.Error
@@ -337,6 +350,10 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 	// Node field
 	if paragraphDB.NodeID.Int64 != 0 {
 		paragraph.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphDB.NodeID.Int64)]
+	}
+	// ParagraphProperties field
+	if paragraphDB.ParagraphPropertiesID.Int64 != 0 {
+		paragraph.ParagraphProperties = backRepo.BackRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr[uint(paragraphDB.ParagraphPropertiesID.Int64)]
 	}
 	return
 }
@@ -564,6 +581,12 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseTwo() {
 		if paragraphDB.NodeID.Int64 != 0 {
 			paragraphDB.NodeID.Int64 = int64(BackRepoNodeid_atBckpTime_newID[uint(paragraphDB.NodeID.Int64)])
 			paragraphDB.NodeID.Valid = true
+		}
+
+		// reindexing ParagraphProperties field
+		if paragraphDB.ParagraphPropertiesID.Int64 != 0 {
+			paragraphDB.ParagraphPropertiesID.Int64 = int64(BackRepoParagraphPropertiesid_atBckpTime_newID[uint(paragraphDB.ParagraphPropertiesID.Int64)])
+			paragraphDB.ParagraphPropertiesID.Valid = true
 		}
 
 		// update databse with new index encoding

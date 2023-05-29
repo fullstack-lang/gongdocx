@@ -15,6 +15,7 @@ import { ParagraphDB } from './paragraph-db';
 
 // insertion point for imports
 import { NodeDB } from './node-db'
+import { ParagraphPropertiesDB } from './paragraphproperties-db'
 
 @Injectable({
   providedIn: 'root'
@@ -72,6 +73,7 @@ export class ParagraphService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     paragraphdb.Node = new NodeDB
+    paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -112,6 +114,7 @@ export class ParagraphService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     paragraphdb.Node = new NodeDB
+    paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {

@@ -21,7 +21,8 @@ package models
 const NoteOnParagraph = ""
 
 type Paragraph struct {
-	Name    string
-	Content string
-	Node    *Node
+	Name                string
+	Content             string
+	Node                *Node
+	ParagraphProperties *ParagraphProperties
 }

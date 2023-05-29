@@ -51,6 +51,16 @@
         </mat-select>
     </mat-form-field>
 
+    <mat-form-field class="detail-full-width">
+        <mat-label>ParagraphProperties</mat-label>
+        <mat-select [compareWith]="compareObjects" [(value)]="paragraph.ParagraphProperties" (selectionChange)="fillUpNameIfEmpty($event)">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let paragraphproperties of frontRepo.ParagraphPropertiess_array" [value]="paragraphproperties">
+                {{paragraphproperties.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
             Save paragraph

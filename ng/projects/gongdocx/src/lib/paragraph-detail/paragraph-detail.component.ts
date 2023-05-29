@@ -155,6 +155,16 @@ export class ParagraphDetailComponent implements OnInit {
 			this.paragraph.NodeID.Int64 = 0
 			this.paragraph.NodeID.Valid = true
 		}
+		if (this.paragraph.ParagraphPropertiesID == undefined) {
+			this.paragraph.ParagraphPropertiesID = new NullInt64
+		}
+		if (this.paragraph.ParagraphProperties != undefined) {
+			this.paragraph.ParagraphPropertiesID.Int64 = this.paragraph.ParagraphProperties.ID
+			this.paragraph.ParagraphPropertiesID.Valid = true
+		} else {
+			this.paragraph.ParagraphPropertiesID.Int64 = 0
+			this.paragraph.ParagraphPropertiesID.Valid = true
+		}
 
 		// save from the front pointer space to the non pointer space for serialization
 

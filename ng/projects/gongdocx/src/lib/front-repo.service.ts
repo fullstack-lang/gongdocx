@@ -670,6 +670,13 @@ export class FrontRepoService {
                     paragraph.Node = _node
                   }
                 }
+                // insertion point for pointer field ParagraphProperties redeeming
+                {
+                  let _paragraphproperties = this.frontRepo.ParagraphPropertiess.get(paragraph.ParagraphPropertiesID.Int64)
+                  if (_paragraphproperties) {
+                    paragraph.ParagraphProperties = _paragraphproperties
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
               }
@@ -1029,6 +1036,13 @@ export class FrontRepoService {
                   let _node = this.frontRepo.Nodes.get(paragraph.NodeID.Int64)
                   if (_node) {
                     paragraph.Node = _node
+                  }
+                }
+                // insertion point for pointer field ParagraphProperties redeeming
+                {
+                  let _paragraphproperties = this.frontRepo.ParagraphPropertiess.get(paragraph.ParagraphPropertiesID.Int64)
+                  if (_paragraphproperties) {
+                    paragraph.ParagraphProperties = _paragraphproperties
                   }
                 }
 
