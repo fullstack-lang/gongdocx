@@ -913,6 +913,9 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Text":
 					targetIdentifier := ident.Name
 					__gong__map_Rune[identifier].Text = __gong__map_Text[targetIdentifier]
+				case "RuneProperties":
+					targetIdentifier := ident.Name
+					__gong__map_Rune[identifier].RuneProperties = __gong__map_RuneProperties[targetIdentifier]
 				}
 			case "RuneProperties":
 				switch fieldName {

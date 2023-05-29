@@ -665,6 +665,14 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			pointersInitializesStatements += setPointerField
 		}
 
+		if rune.RuneProperties != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "RuneProperties")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_RuneProperties_Identifiers[rune.RuneProperties])
+			pointersInitializesStatements += setPointerField
+		}
+
 	}
 
 	for idx, runeproperties := range runepropertiesOrdered {

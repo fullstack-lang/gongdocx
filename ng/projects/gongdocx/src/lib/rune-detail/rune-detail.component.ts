@@ -175,6 +175,16 @@ export class RuneDetailComponent implements OnInit {
 			this.rune.TextID.Int64 = 0
 			this.rune.TextID.Valid = true
 		}
+		if (this.rune.RunePropertiesID == undefined) {
+			this.rune.RunePropertiesID = new NullInt64
+		}
+		if (this.rune.RuneProperties != undefined) {
+			this.rune.RunePropertiesID.Int64 = this.rune.RuneProperties.ID
+			this.rune.RunePropertiesID.Valid = true
+		} else {
+			this.rune.RunePropertiesID.Int64 = 0
+			this.rune.RunePropertiesID.Valid = true
+		}
 
 		// save from the front pointer space to the non pointer space for serialization
 

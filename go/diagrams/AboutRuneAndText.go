@@ -105,6 +105,8 @@ var map_DocLink_Identifier_AboutRuneAndText map[string]any = map[string]any{
 
 	"ref_models.Rune.Node": (ref_models.Rune{}).Node,
 
+	"ref_models.Rune.RuneProperties": (ref_models.Rune{}).RuneProperties,
+
 	"ref_models.Rune.Text": (ref_models.Rune{}).Text,
 
 	"ref_models.RuneProperties": &(ref_models.RuneProperties{}),
@@ -166,7 +168,8 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 	__GongStructShape__000002_AboutRuneAndText_Text := (&models.GongStructShape{Name: `AboutRuneAndText-Text`}).Stage(stage)
 
 	// Declarations of staged instances of Link
-	__Link__000000_Text := (&models.Link{Name: `Text`}).Stage(stage)
+	__Link__000000_RuneProperties := (&models.Link{Name: `RuneProperties`}).Stage(stage)
+	__Link__000001_Text := (&models.Link{Name: `Text`}).Stage(stage)
 
 	// Declarations of staged instances of Node
 
@@ -188,7 +191,8 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 	// Declarations of staged instances of Umlsc
 
 	// Declarations of staged instances of Vertice
-	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text := (&models.Vertice{Name: `Verticle in class diagram AboutRuneAndText in middle between AboutRuneAndText-Rune and AboutRuneAndText-Text`}).Stage(stage)
+	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_RuneProperties := (&models.Vertice{Name: `Verticle in class diagram AboutRuneAndText in middle between AboutRuneAndText-Rune and AboutRuneAndText-RuneProperties`}).Stage(stage)
+	__Vertice__000001_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text := (&models.Vertice{Name: `Verticle in class diagram AboutRuneAndText in middle between AboutRuneAndText-Rune and AboutRuneAndText-Text`}).Stage(stage)
 
 	// Setup of values
 
@@ -201,10 +205,10 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.RuneProperties.Content]
-	__Field__000000_Content.Identifier = `ref_models.RuneProperties.Content`
+	//gong:ident [ref_models.Rune.Content]
+	__Field__000000_Content.Identifier = `ref_models.Rune.Content`
 	__Field__000000_Content.FieldTypeAsString = ``
-	__Field__000000_Content.Structname = `RuneProperties`
+	__Field__000000_Content.Structname = `Rune`
 	__Field__000000_Content.Fieldtypename = `string`
 
 	// Field values setup
@@ -212,10 +216,10 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Rune.Content]
-	__Field__000001_Content.Identifier = `ref_models.Rune.Content`
+	//gong:ident [ref_models.RuneProperties.Content]
+	__Field__000001_Content.Identifier = `ref_models.RuneProperties.Content`
 	__Field__000001_Content.FieldTypeAsString = ``
-	__Field__000001_Content.Structname = `Rune`
+	__Field__000001_Content.Structname = `RuneProperties`
 	__Field__000001_Content.Fieldtypename = `string`
 
 	// Field values setup
@@ -306,37 +310,63 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.Text]
 	__GongStructShape__000002_AboutRuneAndText_Text.Identifier = `ref_models.Text`
-	__GongStructShape__000002_AboutRuneAndText_Text.ShowNbInstances = false
-	__GongStructShape__000002_AboutRuneAndText_Text.NbInstances = 0
+	__GongStructShape__000002_AboutRuneAndText_Text.ShowNbInstances = true
+	__GongStructShape__000002_AboutRuneAndText_Text.NbInstances = 25
 	__GongStructShape__000002_AboutRuneAndText_Text.Width = 240.000000
 	__GongStructShape__000002_AboutRuneAndText_Text.Heigth = 63.000000
 	__GongStructShape__000002_AboutRuneAndText_Text.IsSelected = false
 
 	// Link values setup
-	__Link__000000_Text.Name = `Text`
+	__Link__000000_RuneProperties.Name = `RuneProperties`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.Rune.RuneProperties]
+	__Link__000000_RuneProperties.Identifier = `ref_models.Rune.RuneProperties`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.RuneProperties]
+	__Link__000000_RuneProperties.Fieldtypename = `ref_models.RuneProperties`
+	__Link__000000_RuneProperties.FieldOffsetX = -119.000000
+	__Link__000000_RuneProperties.FieldOffsetY = -22.000000
+	__Link__000000_RuneProperties.TargetMultiplicity = models.ZERO_ONE
+	__Link__000000_RuneProperties.TargetMultiplicityOffsetX = -50.000000
+	__Link__000000_RuneProperties.TargetMultiplicityOffsetY = 28.000000
+	__Link__000000_RuneProperties.SourceMultiplicity = models.MANY
+	__Link__000000_RuneProperties.SourceMultiplicityOffsetX = 12.000000
+	__Link__000000_RuneProperties.SourceMultiplicityOffsetY = 30.000000
+	__Link__000000_RuneProperties.StartOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000000_RuneProperties.StartRatio = 0.500000
+	__Link__000000_RuneProperties.EndOrientation = models.ORIENTATION_HORIZONTAL
+	__Link__000000_RuneProperties.EndRatio = 0.347826
+	__Link__000000_RuneProperties.CornerOffsetRatio = 1.525000
+
+	// Link values setup
+	__Link__000001_Text.Name = `Text`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Rune.Text]
-	__Link__000000_Text.Identifier = `ref_models.Rune.Text`
+	__Link__000001_Text.Identifier = `ref_models.Rune.Text`
 
 	// comment added to overcome the problem with the comment map association
 
 	//gong:ident [ref_models.Text]
-	__Link__000000_Text.Fieldtypename = `ref_models.Text`
-	__Link__000000_Text.FieldOffsetX = -50.000000
-	__Link__000000_Text.FieldOffsetY = -16.000000
-	__Link__000000_Text.TargetMultiplicity = models.ZERO_ONE
-	__Link__000000_Text.TargetMultiplicityOffsetX = 21.000000
-	__Link__000000_Text.TargetMultiplicityOffsetY = -19.000000
-	__Link__000000_Text.SourceMultiplicity = models.MANY
-	__Link__000000_Text.SourceMultiplicityOffsetX = 21.000000
-	__Link__000000_Text.SourceMultiplicityOffsetY = 26.000000
-	__Link__000000_Text.StartOrientation = models.ORIENTATION_VERTICAL
-	__Link__000000_Text.StartRatio = 0.758333
-	__Link__000000_Text.EndOrientation = models.ORIENTATION_VERTICAL
-	__Link__000000_Text.EndRatio = 0.766667
-	__Link__000000_Text.CornerOffsetRatio = 1.161290
+	__Link__000001_Text.Fieldtypename = `ref_models.Text`
+	__Link__000001_Text.FieldOffsetX = -50.000000
+	__Link__000001_Text.FieldOffsetY = -16.000000
+	__Link__000001_Text.TargetMultiplicity = models.ZERO_ONE
+	__Link__000001_Text.TargetMultiplicityOffsetX = 21.000000
+	__Link__000001_Text.TargetMultiplicityOffsetY = -19.000000
+	__Link__000001_Text.SourceMultiplicity = models.MANY
+	__Link__000001_Text.SourceMultiplicityOffsetX = 21.000000
+	__Link__000001_Text.SourceMultiplicityOffsetY = 26.000000
+	__Link__000001_Text.StartOrientation = models.ORIENTATION_VERTICAL
+	__Link__000001_Text.StartRatio = 0.758333
+	__Link__000001_Text.EndOrientation = models.ORIENTATION_VERTICAL
+	__Link__000001_Text.EndRatio = 0.766667
+	__Link__000001_Text.CornerOffsetRatio = 1.161290
 
 	// NoteShape values setup
 	__NoteShape__000000_NoteOnRunProperties.Name = `NoteOnRunProperties`
@@ -452,9 +482,14 @@ the &quot;w:t&quot; nodes.
 	__Position__000002_Pos_AboutRuneAndText_Text.Name = `Pos-AboutRuneAndText-Text`
 
 	// Vertice values setup
-	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text.X = 406.000000
-	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text.Y = 202.000000
-	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text.Name = `Verticle in class diagram AboutRuneAndText in middle between AboutRuneAndText-Rune and AboutRuneAndText-Text`
+	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_RuneProperties.X = 688.500000
+	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_RuneProperties.Y = 119.500000
+	__Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_RuneProperties.Name = `Verticle in class diagram AboutRuneAndText in middle between AboutRuneAndText-Rune and AboutRuneAndText-RuneProperties`
+
+	// Vertice values setup
+	__Vertice__000001_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text.X = 406.000000
+	__Vertice__000001_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text.Y = 202.000000
+	__Vertice__000001_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text.Name = `Verticle in class diagram AboutRuneAndText in middle between AboutRuneAndText-Rune and AboutRuneAndText-Text`
 
 	// Setup of pointers
 	__Classdiagram__000000_AboutRuneAndText.GongStructShapes = append(__Classdiagram__000000_AboutRuneAndText.GongStructShapes, __GongStructShape__000000_AboutRuneAndText_Rune)
@@ -464,14 +499,18 @@ the &quot;w:t&quot; nodes.
 	__Classdiagram__000000_AboutRuneAndText.NoteShapes = append(__Classdiagram__000000_AboutRuneAndText.NoteShapes, __NoteShape__000000_NoteOnRunProperties)
 	__GongStructShape__000000_AboutRuneAndText_Rune.Position = __Position__000000_Pos_AboutRuneAndText_Rune
 	__GongStructShape__000000_AboutRuneAndText_Rune.Fields = append(__GongStructShape__000000_AboutRuneAndText_Rune.Fields, __Field__000006_Name)
-	__GongStructShape__000000_AboutRuneAndText_Rune.Fields = append(__GongStructShape__000000_AboutRuneAndText_Rune.Fields, __Field__000001_Content)
-	__GongStructShape__000000_AboutRuneAndText_Rune.Links = append(__GongStructShape__000000_AboutRuneAndText_Rune.Links, __Link__000000_Text)
+	__GongStructShape__000000_AboutRuneAndText_Rune.Fields = append(__GongStructShape__000000_AboutRuneAndText_Rune.Fields, __Field__000000_Content)
+	__GongStructShape__000000_AboutRuneAndText_Rune.Links = append(__GongStructShape__000000_AboutRuneAndText_Rune.Links, __Link__000001_Text)
+	__GongStructShape__000000_AboutRuneAndText_Rune.Links = append(__GongStructShape__000000_AboutRuneAndText_Rune.Links, __Link__000000_RuneProperties)
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Position = __Position__000001_Pos_AboutRuneAndText_RuneProperties
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields = append(__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields, __Field__000005_Name)
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields = append(__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields, __Field__000002_IsBold)
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields = append(__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields, __Field__000004_IsStrike)
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields = append(__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields, __Field__000003_IsItalic)
-	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields = append(__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields, __Field__000000_Content)
+	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields = append(__GongStructShape__000001_AboutRuneAndText_RuneProperties.Fields, __Field__000001_Content)
 	__GongStructShape__000002_AboutRuneAndText_Text.Position = __Position__000002_Pos_AboutRuneAndText_Text
-	__Link__000000_Text.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text
+	__Link__000000_RuneProperties.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_RuneProperties
+	__Link__000001_Text.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text
 }
+
+

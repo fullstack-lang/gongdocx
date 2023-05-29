@@ -47,6 +47,13 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="RuneProperties">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> RuneProperties </th>
+            <td mat-cell *matCellDef="let Rune">
+                {{ Rune.RuneProperties ? Rune.RuneProperties.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="Paragraph_Runes">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> <-- (Paragraph) Runes </th>
             <td mat-cell *matCellDef="let rune">

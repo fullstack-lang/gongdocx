@@ -271,6 +271,7 @@ func walk(
 			runeProperties := (&RuneProperties{Name: node___.Name}).Stage(gongdocxStage)
 			runeProperties.Node = node___
 			runeProperties.Content = string(n.Content)
+			rune_.RuneProperties = runeProperties
 
 			for _, nn := range n.Nodes {
 

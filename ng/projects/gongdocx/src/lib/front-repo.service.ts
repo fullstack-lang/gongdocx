@@ -733,6 +733,13 @@ export class FrontRepoService {
                     rune.Text = _text
                   }
                 }
+                // insertion point for pointer field RuneProperties redeeming
+                {
+                  let _runeproperties = this.frontRepo.RunePropertiess.get(rune.RunePropertiesID.Int64)
+                  if (_runeproperties) {
+                    rune.RuneProperties = _runeproperties
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
                 // insertion point for slice of pointer field Paragraph.Runes redeeming
@@ -1258,6 +1265,13 @@ export class FrontRepoService {
                   let _text = this.frontRepo.Texts.get(rune.TextID.Int64)
                   if (_text) {
                     rune.Text = _text
+                  }
+                }
+                // insertion point for pointer field RuneProperties redeeming
+                {
+                  let _runeproperties = this.frontRepo.RunePropertiess.get(rune.RunePropertiesID.Int64)
+                  if (_runeproperties) {
+                    rune.RuneProperties = _runeproperties
                   }
                 }
 

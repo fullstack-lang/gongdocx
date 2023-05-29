@@ -54,6 +54,10 @@ type RunePointersEnconding struct {
 	// This field is generated into another field to enable AS ONE association
 	TextID sql.NullInt64
 
+	// field RuneProperties is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	RunePropertiesID sql.NullInt64
+
 	// Implementation of a reverse ID for field Paragraph{}.Runes []*Rune
 	Paragraph_RunesDBID sql.NullInt64
 
@@ -246,6 +250,15 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// commit pointer value rune.RuneProperties translates to updating the rune.RunePropertiesID
+		runeDB.RunePropertiesID.Valid = true // allow for a 0 value (nil association)
+		if rune.RuneProperties != nil {
+			if RunePropertiesId, ok := backRepo.BackRepoRuneProperties.Map_RunePropertiesPtr_RunePropertiesDBID[rune.RuneProperties]; ok {
+				runeDB.RunePropertiesID.Int64 = int64(RunePropertiesId)
+				runeDB.RunePropertiesID.Valid = true
+			}
+		}
+
 		query := backRepoRune.db.Save(&runeDB)
 		if query.Error != nil {
 			return query.Error
@@ -360,6 +373,10 @@ func (backRepoRune *BackRepoRuneStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// Text field
 	if runeDB.TextID.Int64 != 0 {
 		rune.Text = backRepo.BackRepoText.Map_TextDBID_TextPtr[uint(runeDB.TextID.Int64)]
+	}
+	// RuneProperties field
+	if runeDB.RunePropertiesID.Int64 != 0 {
+		rune.RuneProperties = backRepo.BackRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[uint(runeDB.RunePropertiesID.Int64)]
 	}
 	return
 }
@@ -593,6 +610,12 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 		if runeDB.TextID.Int64 != 0 {
 			runeDB.TextID.Int64 = int64(BackRepoTextid_atBckpTime_newID[uint(runeDB.TextID.Int64)])
 			runeDB.TextID.Valid = true
+		}
+
+		// reindexing RuneProperties field
+		if runeDB.RunePropertiesID.Int64 != 0 {
+			runeDB.RunePropertiesID.Int64 = int64(BackRepoRunePropertiesid_atBckpTime_newID[uint(runeDB.RunePropertiesID.Int64)])
+			runeDB.RunePropertiesID.Valid = true
 		}
 
 		// This reindex rune.Runes

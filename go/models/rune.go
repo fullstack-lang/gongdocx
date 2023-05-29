@@ -25,6 +25,7 @@ type Rune struct {
 	Name    string
 	Content string
 
-	Node *Node
-	Text *Text
+	Node           *Node
+	Text           *Text
+	RuneProperties *RuneProperties
 }
