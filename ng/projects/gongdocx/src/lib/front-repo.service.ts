@@ -728,6 +728,19 @@ export class FrontRepoService {
                 }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Paragraph.Runes redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(rune.Paragraph_RunesDBID.Int64)
+                  if (_paragraph) {
+                    if (_paragraph.Runes == undefined) {
+                      _paragraph.Runes = new Array<RuneDB>()
+                    }
+                    _paragraph.Runes.push(rune)
+                    if (rune.Paragraph_Runes_reverse == undefined) {
+                      rune.Paragraph_Runes_reverse = _paragraph
+                    }
+                  }
+                }
               }
             )
             runepropertiess.forEach(
@@ -1235,6 +1248,19 @@ export class FrontRepoService {
                 }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Paragraph.Runes redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(rune.Paragraph_RunesDBID.Int64)
+                  if (_paragraph) {
+                    if (_paragraph.Runes == undefined) {
+                      _paragraph.Runes = new Array<RuneDB>()
+                    }
+                    _paragraph.Runes.push(rune)
+                    if (rune.Paragraph_Runes_reverse == undefined) {
+                      rune.Paragraph_Runes_reverse = _paragraph
+                    }
+                  }
+                }
               }
             )
 

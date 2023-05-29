@@ -10,6 +10,7 @@ import { MapOfComponents } from '../map-components'
 import { MapOfSortingComponents } from '../map-components'
 
 // insertion point for imports
+import { ParagraphDB } from '../paragraph-db'
 
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -23,6 +24,7 @@ enum RuneDetailComponentState {
 	CREATE_INSTANCE,
 	UPDATE_INSTANCE,
 	// insertion point for declarations of enum values of state
+	CREATE_INSTANCE_WITH_ASSOCIATION_Paragraph_Runes_SET,
 }
 
 @Component({
@@ -92,6 +94,10 @@ export class RuneDetailComponent implements OnInit {
 			} else {
 				switch (this.originStructFieldName) {
 					// insertion point for state computation
+					case "Runes":
+						// console.log("Rune" + " is instanciated with back pointer to instance " + this.id + " Paragraph association Runes")
+						this.state = RuneDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Paragraph_Runes_SET
+						break;
 					default:
 						console.log(this.originStructFieldName + " is unkown association")
 				}
@@ -128,6 +134,10 @@ export class RuneDetailComponent implements OnInit {
 						this.rune = rune!
 						break;
 					// insertion point for init of association field
+					case RuneDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Paragraph_Runes_SET:
+						this.rune = new (RuneDB)
+						this.rune.Paragraph_Runes_reverse = frontRepo.Paragraphs.get(this.id)!
+						break;
 					default:
 						console.log(this.state + " is unkown state")
 				}
@@ -159,6 +169,18 @@ export class RuneDetailComponent implements OnInit {
 		// save from the front pointer space to the non pointer space for serialization
 
 		// insertion point for translation/nullation of each pointers
+		if (this.rune.Paragraph_Runes_reverse != undefined) {
+			if (this.rune.Paragraph_RunesDBID == undefined) {
+				this.rune.Paragraph_RunesDBID = new NullInt64
+			}
+			this.rune.Paragraph_RunesDBID.Int64 = this.rune.Paragraph_Runes_reverse.ID
+			this.rune.Paragraph_RunesDBID.Valid = true
+			if (this.rune.Paragraph_RunesDBID_Index == undefined) {
+				this.rune.Paragraph_RunesDBID_Index = new NullInt64
+			}
+			this.rune.Paragraph_RunesDBID_Index.Valid = true
+			this.rune.Paragraph_Runes_reverse = new ParagraphDB // very important, otherwise, circular JSON
+		}
 
 		switch (this.state) {
 			case RuneDetailComponentState.UPDATE_INSTANCE:

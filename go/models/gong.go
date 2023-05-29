@@ -1075,6 +1075,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			Node: &Node{Name: "Node"},
 			// field is initialized with an instance of ParagraphProperties with the name of the field
 			ParagraphProperties: &ParagraphProperties{Name: "ParagraphProperties"},
+			// field is initialized with an instance of Rune with the name of the field
+			Runes: []*Rune{{Name: "Runes"}},
 		}).(*Type)
 	case ParagraphProperties:
 		return any(&ParagraphProperties{
@@ -1402,6 +1404,14 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 	case Paragraph:
 		switch fieldname {
 		// insertion point for per direct association field
+		case "Runes":
+			res := make(map[*Rune]*Paragraph)
+			for paragraph := range stage.Paragraphs {
+				for _, rune_ := range paragraph.Runes {
+					res[rune_] = paragraph
+				}
+			}
+			return any(res).(map[*End]*Start)
 		}
 	// reverse maps of direct associations of ParagraphProperties
 	case ParagraphProperties:
@@ -1480,7 +1490,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Node:
 		res = []string{"Name", "Nodes"}
 	case Paragraph:
-		res = []string{"Name", "Content", "Node", "ParagraphProperties"}
+		res = []string{"Name", "Content", "Node", "ParagraphProperties", "Runes"}
 	case ParagraphProperties:
 		res = []string{"Name", "Content", "ParagraphStyle", "Node"}
 	case ParagraphStyle:
@@ -1560,6 +1570,13 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "ParagraphProperties":
 			if any(instance).(Paragraph).ParagraphProperties != nil {
 				res = any(instance).(Paragraph).ParagraphProperties.Name
+			}
+		case "Runes":
+			for idx, __instance__ := range any(instance).(Paragraph).Runes {
+				if idx > 0 {
+					res += "\n"
+				}
+				res += __instance__.Name
 			}
 		}
 	case ParagraphProperties:

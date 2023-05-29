@@ -657,6 +657,12 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					case "Paragraph":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
+						case "Runes":
+							// remove first and last char
+							targetIdentifier := ident.Name
+							target := __gong__map_Rune[targetIdentifier]
+							__gong__map_Paragraph[identifier].Runes =
+								append(__gong__map_Paragraph[identifier].Runes, target)
 						}
 					case "ParagraphProperties":
 						switch fieldName {

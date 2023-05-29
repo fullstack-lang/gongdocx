@@ -15,6 +15,7 @@ import { RuneDB } from './rune-db';
 
 // insertion point for imports
 import { NodeDB } from './node-db'
+import { ParagraphDB } from './paragraph-db'
 
 @Injectable({
   providedIn: 'root'
@@ -72,6 +73,8 @@ export class RuneService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     runedb.Node = new NodeDB
+    let _Paragraph_Runes_reverse = runedb.Paragraph_Runes_reverse
+    runedb.Paragraph_Runes_reverse = new ParagraphDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -82,6 +85,7 @@ export class RuneService {
     return this.http.post<RuneDB>(this.runesUrl, runedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+        runedb.Paragraph_Runes_reverse = _Paragraph_Runes_reverse
         // this.log(`posted runedb id=${runedb.ID}`)
       }),
       catchError(this.handleError<RuneDB>('postRune'))
@@ -112,6 +116,8 @@ export class RuneService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     runedb.Node = new NodeDB
+    let _Paragraph_Runes_reverse = runedb.Paragraph_Runes_reverse
+    runedb.Paragraph_Runes_reverse = new ParagraphDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -122,6 +128,7 @@ export class RuneService {
     return this.http.put<RuneDB>(url, runedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+        runedb.Paragraph_Runes_reverse = _Paragraph_Runes_reverse
         // this.log(`updated runedb id=${runedb.ID}`)
       }),
       catchError(this.handleError<RuneDB>('updateRune'))

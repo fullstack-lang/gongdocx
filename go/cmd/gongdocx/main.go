@@ -53,12 +53,15 @@ func main() {
 	r := gongdocx_static.ServeStaticFiles(*logGINFlag)
 
 	// setup stack
-	stage := gongdocx_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongdocx/go/models")
+	gongdocxStage := gongdocx_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongdocx/go/models")
 
 	for _, arg := range flag.Args() {
-		gongdocx_models.NewDocx(stage, arg, embed)
+		gongdocx_models.NewDocx(gongdocxStage, arg, embed)
 	}
-	stage.Commit()
+	gongdocxStage.Commit()
+
+	//
+	gongdocx_models.ExtractStyleText("Titre1", gongdocxStage)
 
 	gongdoc_load.Load(
 		"gongdocx",
@@ -67,7 +70,7 @@ func main() {
 		gongdocx_go.GoDiagramsDir,
 		r,
 		*embeddedDiagrams,
-		&stage.Map_GongStructName_InstancesNb)
+		&gongdocxStage.Map_GongStructName_InstancesNb)
 
 	log.Printf("Server ready serve on localhost:8080")
 	r.Run()

@@ -1,6 +1,7 @@
 // insertion point for imports
 import { NodeDB } from './node-db'
 import { ParagraphPropertiesDB } from './paragraphproperties-db'
+import { RuneDB } from './rune-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -24,4 +25,5 @@ export class ParagraphDB {
 	ParagraphProperties?: ParagraphPropertiesDB
 	ParagraphPropertiesID: NullInt64 = new NullInt64 // if pointer is null, ParagraphProperties.ID = 0
 
+	Runes?: Array<RuneDB>
 }

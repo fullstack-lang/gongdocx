@@ -240,6 +240,25 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 			}
 		}
 
+		// This loop encodes the slice of pointers paragraph.Runes into the back repo.
+		// Each back repo instance at the end of the association encode the ID of the association start
+		// into a dedicated field for coding the association. The back repo instance is then saved to the db
+		for idx, runeAssocEnd := range paragraph.Runes {
+
+			// get the back repo instance at the association end
+			runeAssocEnd_DB :=
+				backRepo.BackRepoRune.GetRuneDBFromRunePtr(runeAssocEnd)
+
+			// encode reverse pointer in the association end back repo instance
+			runeAssocEnd_DB.Paragraph_RunesDBID.Int64 = int64(paragraphDB.ID)
+			runeAssocEnd_DB.Paragraph_RunesDBID.Valid = true
+			runeAssocEnd_DB.Paragraph_RunesDBID_Index.Int64 = int64(idx)
+			runeAssocEnd_DB.Paragraph_RunesDBID_Index.Valid = true
+			if q := backRepoParagraph.db.Save(runeAssocEnd_DB); q.Error != nil {
+				return q.Error
+			}
+		}
+
 		query := backRepoParagraph.db.Save(&paragraphDB)
 		if query.Error != nil {
 			return query.Error
@@ -355,6 +374,33 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 	if paragraphDB.ParagraphPropertiesID.Int64 != 0 {
 		paragraph.ParagraphProperties = backRepo.BackRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr[uint(paragraphDB.ParagraphPropertiesID.Int64)]
 	}
+	// This loop redeem paragraph.Runes in the stage from the encode in the back repo
+	// It parses all RuneDB in the back repo and if the reverse pointer encoding matches the back repo ID
+	// it appends the stage instance
+	// 1. reset the slice
+	paragraph.Runes = paragraph.Runes[:0]
+	// 2. loop all instances in the type in the association end
+	for _, runeDB_AssocEnd := range backRepo.BackRepoRune.Map_RuneDBID_RuneDB {
+		// 3. Does the ID encoding at the end and the ID at the start matches ?
+		if runeDB_AssocEnd.Paragraph_RunesDBID.Int64 == int64(paragraphDB.ID) {
+			// 4. fetch the associated instance in the stage
+			rune_AssocEnd := backRepo.BackRepoRune.Map_RuneDBID_RunePtr[runeDB_AssocEnd.ID]
+			// 5. append it the association slice
+			paragraph.Runes = append(paragraph.Runes, rune_AssocEnd)
+		}
+	}
+
+	// sort the array according to the order
+	sort.Slice(paragraph.Runes, func(i, j int) bool {
+		runeDB_i_ID := backRepo.BackRepoRune.Map_RunePtr_RuneDBID[paragraph.Runes[i]]
+		runeDB_j_ID := backRepo.BackRepoRune.Map_RunePtr_RuneDBID[paragraph.Runes[j]]
+
+		runeDB_i := backRepo.BackRepoRune.Map_RuneDBID_RuneDB[runeDB_i_ID]
+		runeDB_j := backRepo.BackRepoRune.Map_RuneDBID_RuneDB[runeDB_j_ID]
+
+		return runeDB_i.Paragraph_RunesDBID_Index.Int64 < runeDB_j.Paragraph_RunesDBID_Index.Int64
+	})
+
 	return
 }
 

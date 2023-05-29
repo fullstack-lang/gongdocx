@@ -25,4 +25,5 @@ type Paragraph struct {
 	Content             string
 	Node                *Node
 	ParagraphProperties *ParagraphProperties
+	Runes               []*Rune
 }

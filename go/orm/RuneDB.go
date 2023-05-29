@@ -49,6 +49,12 @@ type RunePointersEnconding struct {
 	// field Node is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	NodeID sql.NullInt64
+
+	// Implementation of a reverse ID for field Paragraph{}.Runes []*Rune
+	Paragraph_RunesDBID sql.NullInt64
+
+	// implementation of the index of the withing the slice
+	Paragraph_RunesDBID_Index sql.NullInt64
 }
 
 // RuneDB describes a rune in the database
@@ -564,6 +570,12 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 		if runeDB.NodeID.Int64 != 0 {
 			runeDB.NodeID.Int64 = int64(BackRepoNodeid_atBckpTime_newID[uint(runeDB.NodeID.Int64)])
 			runeDB.NodeID.Valid = true
+		}
+
+		// This reindex rune.Runes
+		if runeDB.Paragraph_RunesDBID.Int64 != 0 {
+			runeDB.Paragraph_RunesDBID.Int64 =
+				int64(BackRepoParagraphid_atBckpTime_newID[uint(runeDB.Paragraph_RunesDBID.Int64)])
 		}
 
 		// update databse with new index encoding

@@ -74,6 +74,7 @@ export class ParagraphService {
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     paragraphdb.Node = new NodeDB
     paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
+    paragraphdb.Runes = []
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -115,6 +116,7 @@ export class ParagraphService {
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     paragraphdb.Node = new NodeDB
     paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
+    paragraphdb.Runes = []
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {

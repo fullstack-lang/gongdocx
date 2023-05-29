@@ -746,6 +746,38 @@ export class SidebarComponent implements OnInit {
             ParagraphPropertiesGongNodeAssociation.children.push(paragraphGongNodeInstance_ParagraphProperties)
           }
 
+          /**
+          * let append a node for the slide of pointer Runes
+          */
+          let RunesGongNodeAssociation: GongNode = {
+            name: "(Rune) Runes",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: paragraphDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "Paragraph",
+            associationField: "Runes",
+            associatedStructName: "Rune",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphGongNodeInstance.children.push(RunesGongNodeAssociation)
+
+          paragraphDB.Runes?.forEach(runeDB => {
+            let runeNode: GongNode = {
+              name: runeDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: runeDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getParagraphUniqueID(paragraphDB.ID)
+                + 11 * getRuneUniqueID(runeDB.ID),
+              structName: "Rune",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            RunesGongNodeAssociation.children.push(runeNode)
+          })
+
         }
       )
 

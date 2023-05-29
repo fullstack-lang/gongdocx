@@ -247,6 +247,9 @@ func (stage *StageStruct) StageBranchParagraph(paragraph *Paragraph) {
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _rune := range paragraph.Runes {
+		StageBranch(stage, _rune)
+	}
 
 }
 
@@ -478,6 +481,9 @@ func (stage *StageStruct) UnstageBranchParagraph(paragraph *Paragraph) {
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _rune := range paragraph.Runes {
+		UnstageBranch(stage, _rune)
+	}
 
 }
 

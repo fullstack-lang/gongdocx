@@ -239,13 +239,15 @@ func walk(
 		fmt.Fprint(w, "\n")
 	case "r":
 
-		node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
-		node.Nodes = append(node.Nodes, node__)
-		nodeCounter = nodeCounter + 1
-
-		rune_ := (&Rune{Name: node__.Name}).Stage(gongdocxStage)
-		rune_.Node = node__
+		rune_ := (&Rune{Name: node.Name}).Stage(gongdocxStage)
+		rune_.Node = node
 		rune_.Content = string(node_.Content)
+
+		// check if the parent node is a paragraph
+		switch paragraph := parentNode.(type) {
+		case *Paragraph:
+			paragraph.Runes = append(paragraph.Runes, rune_)
+		}
 
 		bold := false
 		italic := false
@@ -256,12 +258,12 @@ func walk(
 			}
 
 			nodeCounter_ := 0
-			node___ := (&Node{Name: fmt.Sprintf(node__.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
-			node.Nodes = append(node__.Nodes, node___)
+			node___ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
+			node.Nodes = append(node.Nodes, node___)
 			nodeCounter_ = nodeCounter_ + 1
 
-			runeProperties := (&RuneProperties{Name: node__.Name}).Stage(gongdocxStage)
-			runeProperties.Node = node__
+			runeProperties := (&RuneProperties{Name: node___.Name}).Stage(gongdocxStage)
+			runeProperties.Node = node___
 			runeProperties.Content = string(n.Content)
 
 			for _, nn := range n.Nodes {
@@ -290,7 +292,7 @@ func walk(
 		}
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
-			if err := walk(zf, dummyNode, node__, gongdocxStage, &n, &cbuf); err != nil {
+			if err := walk(zf, dummyNode, node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
