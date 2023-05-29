@@ -35,8 +35,14 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 	case *Table:
 		ok = stage.IsStagedTable(target)
 
+	case *TableColumn:
+		ok = stage.IsStagedTableColumn(target)
+
 	case *TableProperties:
 		ok = stage.IsStagedTableProperties(target)
+
+	case *TableRow:
+		ok = stage.IsStagedTableRow(target)
 
 	case *TableStyle:
 		ok = stage.IsStagedTableStyle(target)
@@ -121,9 +127,23 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 		return
 	}
 
+	func (stage *StageStruct) IsStagedTableColumn(tablecolumn *TableColumn) (ok bool) {
+
+		_, ok = stage.TableColumns[tablecolumn]
+	
+		return
+	}
+
 	func (stage *StageStruct) IsStagedTableProperties(tableproperties *TableProperties) (ok bool) {
 
 		_, ok = stage.TablePropertiess[tableproperties]
+	
+		return
+	}
+
+	func (stage *StageStruct) IsStagedTableRow(tablerow *TableRow) (ok bool) {
+
+		_, ok = stage.TableRows[tablerow]
 	
 		return
 	}
@@ -181,8 +201,14 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 	case *Table:
 		stage.StageBranchTable(target)
 
+	case *TableColumn:
+		stage.StageBranchTableColumn(target)
+
 	case *TableProperties:
 		stage.StageBranchTableProperties(target)
+
+	case *TableRow:
+		stage.StageBranchTableRow(target)
 
 	case *TableStyle:
 		stage.StageBranchTableStyle(target)
@@ -391,6 +417,30 @@ func (stage *StageStruct) StageBranchTable(table *Table) {
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _tablerow := range table.TableRows {
+		StageBranch(stage, _tablerow)
+	}
+
+}
+
+func (stage *StageStruct) StageBranchTableColumn(tablecolumn *TableColumn) {
+
+	// check if instance is already staged
+	if IsStaged(stage, tablecolumn) {
+		return
+	}
+
+	tablecolumn.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablecolumn.Node != nil {
+		StageBranch(stage, tablecolumn.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _paragraph := range tablecolumn.Paragraphs {
+		StageBranch(stage, _paragraph)
+	}
 
 }
 
@@ -412,6 +462,27 @@ func (stage *StageStruct) StageBranchTableProperties(tableproperties *TablePrope
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) StageBranchTableRow(tablerow *TableRow) {
+
+	// check if instance is already staged
+	if IsStaged(stage, tablerow) {
+		return
+	}
+
+	tablerow.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablerow.Node != nil {
+		StageBranch(stage, tablerow.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _tablecolumn := range tablerow.TableColumns {
+		StageBranch(stage, _tablecolumn)
+	}
 
 }
 
@@ -490,8 +561,14 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 	case *Table:
 		stage.UnstageBranchTable(target)
 
+	case *TableColumn:
+		stage.UnstageBranchTableColumn(target)
+
 	case *TableProperties:
 		stage.UnstageBranchTableProperties(target)
+
+	case *TableRow:
+		stage.UnstageBranchTableRow(target)
 
 	case *TableStyle:
 		stage.UnstageBranchTableStyle(target)
@@ -700,6 +777,30 @@ func (stage *StageStruct) UnstageBranchTable(table *Table) {
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _tablerow := range table.TableRows {
+		UnstageBranch(stage, _tablerow)
+	}
+
+}
+
+func (stage *StageStruct) UnstageBranchTableColumn(tablecolumn *TableColumn) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, tablecolumn) {
+		return
+	}
+
+	tablecolumn.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablecolumn.Node != nil {
+		UnstageBranch(stage, tablecolumn.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _paragraph := range tablecolumn.Paragraphs {
+		UnstageBranch(stage, _paragraph)
+	}
 
 }
 
@@ -721,6 +822,27 @@ func (stage *StageStruct) UnstageBranchTableProperties(tableproperties *TablePro
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
+
+}
+
+func (stage *StageStruct) UnstageBranchTableRow(tablerow *TableRow) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, tablerow) {
+		return
+	}
+
+	tablerow.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablerow.Node != nil {
+		UnstageBranch(stage, tablerow.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _tablecolumn := range tablerow.TableColumns {
+		UnstageBranch(stage, _tablecolumn)
+	}
 
 }
 

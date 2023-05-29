@@ -74,6 +74,15 @@
             </button>
         </mat-grid-tile>
     </mat-grid-list>
+    <mat-form-field class="detail-full-width">
+        <mat-label>(TableColumn) Paragraphs</mat-label>
+        <mat-select [compareWith]="compareObjects" [(ngModel)]="paragraph.TableColumn_Paragraphs_reverse" [ngModelOptions]="{standalone: true}">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let tablecolumn of frontRepo.TableColumns_array" [value]="tablecolumn">
+                {{tablecolumn.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
             Save paragraph

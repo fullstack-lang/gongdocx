@@ -2,15 +2,15 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 
-import { ParagraphDB } from '../paragraph-db'
-import { ParagraphService } from '../paragraph.service'
+import { TableRowDB } from '../tablerow-db'
+import { TableRowService } from '../tablerow.service'
 
 import { FrontRepoService, FrontRepo, SelectionMode, DialogData } from '../front-repo.service'
 import { MapOfComponents } from '../map-components'
 import { MapOfSortingComponents } from '../map-components'
 
 // insertion point for imports
-import { TableColumnDB } from '../tablecolumn-db'
+import { TableDB } from '../table-db'
 
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -18,26 +18,26 @@ import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from '@angu
 
 import { NullInt64 } from '../null-int64'
 
-// ParagraphDetailComponent is initilizaed from different routes
-// ParagraphDetailComponentState detail different cases 
-enum ParagraphDetailComponentState {
+// TableRowDetailComponent is initilizaed from different routes
+// TableRowDetailComponentState detail different cases 
+enum TableRowDetailComponentState {
 	CREATE_INSTANCE,
 	UPDATE_INSTANCE,
 	// insertion point for declarations of enum values of state
-	CREATE_INSTANCE_WITH_ASSOCIATION_TableColumn_Paragraphs_SET,
+	CREATE_INSTANCE_WITH_ASSOCIATION_Table_TableRows_SET,
 }
 
 @Component({
-	selector: 'app-paragraph-detail',
-	templateUrl: './paragraph-detail.component.html',
-	styleUrls: ['./paragraph-detail.component.css'],
+	selector: 'app-tablerow-detail',
+	templateUrl: './tablerow-detail.component.html',
+	styleUrls: ['./tablerow-detail.component.css'],
 })
-export class ParagraphDetailComponent implements OnInit {
+export class TableRowDetailComponent implements OnInit {
 
 	// insertion point for declarations
 
-	// the ParagraphDB of interest
-	paragraph: ParagraphDB = new ParagraphDB
+	// the TableRowDB of interest
+	tablerow: TableRowDB = new TableRowDB
 
 	// front repo
 	frontRepo: FrontRepo = new FrontRepo
@@ -48,7 +48,7 @@ export class ParagraphDetailComponent implements OnInit {
 	mapFields_displayAsTextArea = new Map<string, boolean>()
 
 	// the state at initialization (CREATION, UPDATE or CREATE with one association set)
-	state: ParagraphDetailComponentState = ParagraphDetailComponentState.CREATE_INSTANCE
+	state: TableRowDetailComponentState = TableRowDetailComponentState.CREATE_INSTANCE
 
 	// in UDPATE state, if is the id of the instance to update
 	// in CREATE state with one association set, this is the id of the associated instance
@@ -61,7 +61,7 @@ export class ParagraphDetailComponent implements OnInit {
 	GONG__StackPath: string = ""
 
 	constructor(
-		private paragraphService: ParagraphService,
+		private tablerowService: TableRowService,
 		private frontRepoService: FrontRepoService,
 		public dialog: MatDialog,
 		private activatedRoute: ActivatedRoute,
@@ -87,16 +87,16 @@ export class ParagraphDetailComponent implements OnInit {
 
 		const association = this.activatedRoute.snapshot.paramMap.get('association');
 		if (this.id == 0) {
-			this.state = ParagraphDetailComponentState.CREATE_INSTANCE
+			this.state = TableRowDetailComponentState.CREATE_INSTANCE
 		} else {
 			if (this.originStruct == undefined) {
-				this.state = ParagraphDetailComponentState.UPDATE_INSTANCE
+				this.state = TableRowDetailComponentState.UPDATE_INSTANCE
 			} else {
 				switch (this.originStructFieldName) {
 					// insertion point for state computation
-					case "Paragraphs":
-						// console.log("Paragraph" + " is instanciated with back pointer to instance " + this.id + " TableColumn association Paragraphs")
-						this.state = ParagraphDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_TableColumn_Paragraphs_SET
+					case "TableRows":
+						// console.log("TableRow" + " is instanciated with back pointer to instance " + this.id + " Table association TableRows")
+						this.state = TableRowDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Table_TableRows_SET
 						break;
 					default:
 						console.log(this.originStructFieldName + " is unkown association")
@@ -104,13 +104,13 @@ export class ParagraphDetailComponent implements OnInit {
 			}
 		}
 
-		this.getParagraph()
+		this.getTableRow()
 
 		// observable for changes in structs
-		this.paragraphService.ParagraphServiceChanged.subscribe(
+		this.tablerowService.TableRowServiceChanged.subscribe(
 			message => {
 				if (message == "post" || message == "update" || message == "delete") {
-					this.getParagraph()
+					this.getTableRow()
 				}
 			}
 		)
@@ -118,25 +118,25 @@ export class ParagraphDetailComponent implements OnInit {
 		// insertion point for initialisation of enums list
 	}
 
-	getParagraph(): void {
+	getTableRow(): void {
 
 		this.frontRepoService.pull(this.GONG__StackPath).subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
 				switch (this.state) {
-					case ParagraphDetailComponentState.CREATE_INSTANCE:
-						this.paragraph = new (ParagraphDB)
+					case TableRowDetailComponentState.CREATE_INSTANCE:
+						this.tablerow = new (TableRowDB)
 						break;
-					case ParagraphDetailComponentState.UPDATE_INSTANCE:
-						let paragraph = frontRepo.Paragraphs.get(this.id)
-						console.assert(paragraph != undefined, "missing paragraph with id:" + this.id)
-						this.paragraph = paragraph!
+					case TableRowDetailComponentState.UPDATE_INSTANCE:
+						let tablerow = frontRepo.TableRows.get(this.id)
+						console.assert(tablerow != undefined, "missing tablerow with id:" + this.id)
+						this.tablerow = tablerow!
 						break;
 					// insertion point for init of association field
-					case ParagraphDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_TableColumn_Paragraphs_SET:
-						this.paragraph = new (ParagraphDB)
-						this.paragraph.TableColumn_Paragraphs_reverse = frontRepo.TableColumns.get(this.id)!
+					case TableRowDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Table_TableRows_SET:
+						this.tablerow = new (TableRowDB)
+						this.tablerow.Table_TableRows_reverse = frontRepo.Tables.get(this.id)!
 						break;
 					default:
 						console.log(this.state + " is unkown state")
@@ -155,54 +155,44 @@ export class ParagraphDetailComponent implements OnInit {
 		// pointers fields, after the translation, are nulled in order to perform serialization
 
 		// insertion point for translation/nullation of each field
-		if (this.paragraph.NodeID == undefined) {
-			this.paragraph.NodeID = new NullInt64
+		if (this.tablerow.NodeID == undefined) {
+			this.tablerow.NodeID = new NullInt64
 		}
-		if (this.paragraph.Node != undefined) {
-			this.paragraph.NodeID.Int64 = this.paragraph.Node.ID
-			this.paragraph.NodeID.Valid = true
+		if (this.tablerow.Node != undefined) {
+			this.tablerow.NodeID.Int64 = this.tablerow.Node.ID
+			this.tablerow.NodeID.Valid = true
 		} else {
-			this.paragraph.NodeID.Int64 = 0
-			this.paragraph.NodeID.Valid = true
-		}
-		if (this.paragraph.ParagraphPropertiesID == undefined) {
-			this.paragraph.ParagraphPropertiesID = new NullInt64
-		}
-		if (this.paragraph.ParagraphProperties != undefined) {
-			this.paragraph.ParagraphPropertiesID.Int64 = this.paragraph.ParagraphProperties.ID
-			this.paragraph.ParagraphPropertiesID.Valid = true
-		} else {
-			this.paragraph.ParagraphPropertiesID.Int64 = 0
-			this.paragraph.ParagraphPropertiesID.Valid = true
+			this.tablerow.NodeID.Int64 = 0
+			this.tablerow.NodeID.Valid = true
 		}
 
 		// save from the front pointer space to the non pointer space for serialization
 
 		// insertion point for translation/nullation of each pointers
-		if (this.paragraph.TableColumn_Paragraphs_reverse != undefined) {
-			if (this.paragraph.TableColumn_ParagraphsDBID == undefined) {
-				this.paragraph.TableColumn_ParagraphsDBID = new NullInt64
+		if (this.tablerow.Table_TableRows_reverse != undefined) {
+			if (this.tablerow.Table_TableRowsDBID == undefined) {
+				this.tablerow.Table_TableRowsDBID = new NullInt64
 			}
-			this.paragraph.TableColumn_ParagraphsDBID.Int64 = this.paragraph.TableColumn_Paragraphs_reverse.ID
-			this.paragraph.TableColumn_ParagraphsDBID.Valid = true
-			if (this.paragraph.TableColumn_ParagraphsDBID_Index == undefined) {
-				this.paragraph.TableColumn_ParagraphsDBID_Index = new NullInt64
+			this.tablerow.Table_TableRowsDBID.Int64 = this.tablerow.Table_TableRows_reverse.ID
+			this.tablerow.Table_TableRowsDBID.Valid = true
+			if (this.tablerow.Table_TableRowsDBID_Index == undefined) {
+				this.tablerow.Table_TableRowsDBID_Index = new NullInt64
 			}
-			this.paragraph.TableColumn_ParagraphsDBID_Index.Valid = true
-			this.paragraph.TableColumn_Paragraphs_reverse = new TableColumnDB // very important, otherwise, circular JSON
+			this.tablerow.Table_TableRowsDBID_Index.Valid = true
+			this.tablerow.Table_TableRows_reverse = new TableDB // very important, otherwise, circular JSON
 		}
 
 		switch (this.state) {
-			case ParagraphDetailComponentState.UPDATE_INSTANCE:
-				this.paragraphService.updateParagraph(this.paragraph, this.GONG__StackPath)
-					.subscribe(paragraph => {
-						this.paragraphService.ParagraphServiceChanged.next("update")
+			case TableRowDetailComponentState.UPDATE_INSTANCE:
+				this.tablerowService.updateTableRow(this.tablerow, this.GONG__StackPath)
+					.subscribe(tablerow => {
+						this.tablerowService.TableRowServiceChanged.next("update")
 					});
 				break;
 			default:
-				this.paragraphService.postParagraph(this.paragraph, this.GONG__StackPath).subscribe(paragraph => {
-					this.paragraphService.ParagraphServiceChanged.next("post")
-					this.paragraph = new (ParagraphDB) // reset fields
+				this.tablerowService.postTableRow(this.tablerow, this.GONG__StackPath).subscribe(tablerow => {
+					this.tablerowService.TableRowServiceChanged.next("post")
+					this.tablerow = new (TableRowDB) // reset fields
 				});
 		}
 	}
@@ -225,7 +215,7 @@ export class ParagraphDetailComponent implements OnInit {
 		dialogConfig.height = "50%"
 		if (selectionMode == SelectionMode.ONE_MANY_ASSOCIATION_MODE) {
 
-			dialogData.ID = this.paragraph.ID!
+			dialogData.ID = this.tablerow.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
@@ -242,14 +232,14 @@ export class ParagraphDetailComponent implements OnInit {
 			});
 		}
 		if (selectionMode == SelectionMode.MANY_MANY_ASSOCIATION_MODE) {
-			dialogData.ID = this.paragraph.ID!
+			dialogData.ID = this.tablerow.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
 			dialogData.GONG__StackPath = this.GONG__StackPath
 
 			// set up the source
-			dialogData.SourceStruct = "Paragraph"
+			dialogData.SourceStruct = "TableRow"
 			dialogData.SourceField = sourceField
 
 			// set up the intermediate struct
@@ -279,7 +269,7 @@ export class ParagraphDetailComponent implements OnInit {
 		// dialogConfig.disableClose = true;
 		dialogConfig.autoFocus = true;
 		dialogConfig.data = {
-			ID: this.paragraph.ID,
+			ID: this.tablerow.ID,
 			ReversePointer: reverseField,
 			OrderingMode: true,
 			GONG__StackPath: this.GONG__StackPath,
@@ -296,8 +286,8 @@ export class ParagraphDetailComponent implements OnInit {
 	}
 
 	fillUpNameIfEmpty(event: { value: { Name: string; }; }) {
-		if (this.paragraph.Name == "") {
-			this.paragraph.Name = event.value.Name
+		if (this.tablerow.Name == "") {
+			this.tablerow.Name = event.value.Name
 		}
 	}
 

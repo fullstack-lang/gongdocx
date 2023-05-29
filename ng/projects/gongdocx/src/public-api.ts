@@ -76,11 +76,23 @@ export * from './lib/tables-table/tables-table.component'
 export * from './lib/table-db'
 export * from './lib/table.service'
 
+export * from './lib/tablecolumn-detail/tablecolumn-detail.component'
+export * from './lib/tablecolumn-sorting/tablecolumn-sorting.component'
+export * from './lib/tablecolumns-table/tablecolumns-table.component'
+export * from './lib/tablecolumn-db'
+export * from './lib/tablecolumn.service'
+
 export * from './lib/tableproperties-detail/tableproperties-detail.component'
 export * from './lib/tableproperties-sorting/tableproperties-sorting.component'
 export * from './lib/tablepropertiess-table/tablepropertiess-table.component'
 export * from './lib/tableproperties-db'
 export * from './lib/tableproperties.service'
+
+export * from './lib/tablerow-detail/tablerow-detail.component'
+export * from './lib/tablerow-sorting/tablerow-sorting.component'
+export * from './lib/tablerows-table/tablerows-table.component'
+export * from './lib/tablerow-db'
+export * from './lib/tablerow.service'
 
 export * from './lib/tablestyle-detail/tablestyle-detail.component'
 export * from './lib/tablestyle-sorting/tablestyle-sorting.component'

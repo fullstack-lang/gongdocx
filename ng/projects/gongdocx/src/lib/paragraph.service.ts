@@ -16,6 +16,7 @@ import { ParagraphDB } from './paragraph-db';
 // insertion point for imports
 import { NodeDB } from './node-db'
 import { ParagraphPropertiesDB } from './paragraphproperties-db'
+import { TableColumnDB } from './tablecolumn-db'
 
 @Injectable({
   providedIn: 'root'
@@ -75,6 +76,8 @@ export class ParagraphService {
     paragraphdb.Node = new NodeDB
     paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
     paragraphdb.Runes = []
+    let _TableColumn_Paragraphs_reverse = paragraphdb.TableColumn_Paragraphs_reverse
+    paragraphdb.TableColumn_Paragraphs_reverse = new TableColumnDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -85,6 +88,7 @@ export class ParagraphService {
     return this.http.post<ParagraphDB>(this.paragraphsUrl, paragraphdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+        paragraphdb.TableColumn_Paragraphs_reverse = _TableColumn_Paragraphs_reverse
         // this.log(`posted paragraphdb id=${paragraphdb.ID}`)
       }),
       catchError(this.handleError<ParagraphDB>('postParagraph'))
@@ -117,6 +121,8 @@ export class ParagraphService {
     paragraphdb.Node = new NodeDB
     paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
     paragraphdb.Runes = []
+    let _TableColumn_Paragraphs_reverse = paragraphdb.TableColumn_Paragraphs_reverse
+    paragraphdb.TableColumn_Paragraphs_reverse = new TableColumnDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -127,6 +133,7 @@ export class ParagraphService {
     return this.http.put<ParagraphDB>(url, paragraphdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+        paragraphdb.TableColumn_Paragraphs_reverse = _TableColumn_Paragraphs_reverse
         // this.log(`updated paragraphdb id=${paragraphdb.ID}`)
       }),
       catchError(this.handleError<ParagraphDB>('updateParagraph'))

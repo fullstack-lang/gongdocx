@@ -240,6 +240,25 @@ func (backRepoTable *BackRepoTableStruct) CommitPhaseTwoInstance(backRepo *BackR
 			}
 		}
 
+		// This loop encodes the slice of pointers table.TableRows into the back repo.
+		// Each back repo instance at the end of the association encode the ID of the association start
+		// into a dedicated field for coding the association. The back repo instance is then saved to the db
+		for idx, tablerowAssocEnd := range table.TableRows {
+
+			// get the back repo instance at the association end
+			tablerowAssocEnd_DB :=
+				backRepo.BackRepoTableRow.GetTableRowDBFromTableRowPtr(tablerowAssocEnd)
+
+			// encode reverse pointer in the association end back repo instance
+			tablerowAssocEnd_DB.Table_TableRowsDBID.Int64 = int64(tableDB.ID)
+			tablerowAssocEnd_DB.Table_TableRowsDBID.Valid = true
+			tablerowAssocEnd_DB.Table_TableRowsDBID_Index.Int64 = int64(idx)
+			tablerowAssocEnd_DB.Table_TableRowsDBID_Index.Valid = true
+			if q := backRepoTable.db.Save(tablerowAssocEnd_DB); q.Error != nil {
+				return q.Error
+			}
+		}
+
 		query := backRepoTable.db.Save(&tableDB)
 		if query.Error != nil {
 			return query.Error
@@ -355,6 +374,33 @@ func (backRepoTable *BackRepoTableStruct) CheckoutPhaseTwoInstance(backRepo *Bac
 	if tableDB.TablePropertiesID.Int64 != 0 {
 		table.TableProperties = backRepo.BackRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesPtr[uint(tableDB.TablePropertiesID.Int64)]
 	}
+	// This loop redeem table.TableRows in the stage from the encode in the back repo
+	// It parses all TableRowDB in the back repo and if the reverse pointer encoding matches the back repo ID
+	// it appends the stage instance
+	// 1. reset the slice
+	table.TableRows = table.TableRows[:0]
+	// 2. loop all instances in the type in the association end
+	for _, tablerowDB_AssocEnd := range backRepo.BackRepoTableRow.Map_TableRowDBID_TableRowDB {
+		// 3. Does the ID encoding at the end and the ID at the start matches ?
+		if tablerowDB_AssocEnd.Table_TableRowsDBID.Int64 == int64(tableDB.ID) {
+			// 4. fetch the associated instance in the stage
+			tablerow_AssocEnd := backRepo.BackRepoTableRow.Map_TableRowDBID_TableRowPtr[tablerowDB_AssocEnd.ID]
+			// 5. append it the association slice
+			table.TableRows = append(table.TableRows, tablerow_AssocEnd)
+		}
+	}
+
+	// sort the array according to the order
+	sort.Slice(table.TableRows, func(i, j int) bool {
+		tablerowDB_i_ID := backRepo.BackRepoTableRow.Map_TableRowPtr_TableRowDBID[table.TableRows[i]]
+		tablerowDB_j_ID := backRepo.BackRepoTableRow.Map_TableRowPtr_TableRowDBID[table.TableRows[j]]
+
+		tablerowDB_i := backRepo.BackRepoTableRow.Map_TableRowDBID_TableRowDB[tablerowDB_i_ID]
+		tablerowDB_j := backRepo.BackRepoTableRow.Map_TableRowDBID_TableRowDB[tablerowDB_j_ID]
+
+		return tablerowDB_i.Table_TableRowsDBID_Index.Int64 < tablerowDB_j.Table_TableRowsDBID_Index.Int64
+	})
+
 	return
 }
 

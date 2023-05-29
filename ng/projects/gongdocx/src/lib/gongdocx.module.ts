@@ -79,9 +79,17 @@ import { TablesTableComponent } from './tables-table/tables-table.component'
 import { TableSortingComponent } from './table-sorting/table-sorting.component'
 import { TableDetailComponent } from './table-detail/table-detail.component'
 
+import { TableColumnsTableComponent } from './tablecolumns-table/tablecolumns-table.component'
+import { TableColumnSortingComponent } from './tablecolumn-sorting/tablecolumn-sorting.component'
+import { TableColumnDetailComponent } from './tablecolumn-detail/tablecolumn-detail.component'
+
 import { TablePropertiessTableComponent } from './tablepropertiess-table/tablepropertiess-table.component'
 import { TablePropertiesSortingComponent } from './tableproperties-sorting/tableproperties-sorting.component'
 import { TablePropertiesDetailComponent } from './tableproperties-detail/tableproperties-detail.component'
+
+import { TableRowsTableComponent } from './tablerows-table/tablerows-table.component'
+import { TableRowSortingComponent } from './tablerow-sorting/tablerow-sorting.component'
+import { TableRowDetailComponent } from './tablerow-detail/tablerow-detail.component'
 
 import { TableStylesTableComponent } from './tablestyles-table/tablestyles-table.component'
 import { TableStyleSortingComponent } from './tablestyle-sorting/tablestyle-sorting.component'
@@ -135,9 +143,17 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		TableSortingComponent,
 		TableDetailComponent,
 
+		TableColumnsTableComponent,
+		TableColumnSortingComponent,
+		TableColumnDetailComponent,
+
 		TablePropertiessTableComponent,
 		TablePropertiesSortingComponent,
 		TablePropertiesDetailComponent,
+
+		TableRowsTableComponent,
+		TableRowSortingComponent,
+		TableRowDetailComponent,
 
 		TableStylesTableComponent,
 		TableStyleSortingComponent,
@@ -226,9 +242,17 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		TableSortingComponent,
 		TableDetailComponent,
 
+		TableColumnsTableComponent,
+		TableColumnSortingComponent,
+		TableColumnDetailComponent,
+
 		TablePropertiessTableComponent,
 		TablePropertiesSortingComponent,
 		TablePropertiesDetailComponent,
+
+		TableRowsTableComponent,
+		TableRowSortingComponent,
+		TableRowDetailComponent,
 
 		TableStylesTableComponent,
 		TableStyleSortingComponent,

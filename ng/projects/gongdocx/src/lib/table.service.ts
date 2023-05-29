@@ -74,6 +74,7 @@ export class TableService {
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     tabledb.Node = new NodeDB
     tabledb.TableProperties = new TablePropertiesDB
+    tabledb.TableRows = []
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -115,6 +116,7 @@ export class TableService {
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     tabledb.Node = new NodeDB
     tabledb.TableProperties = new TablePropertiesDB
+    tabledb.TableRows = []
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {

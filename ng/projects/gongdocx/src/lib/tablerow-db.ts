@@ -1,14 +1,14 @@
 // insertion point for imports
 import { NodeDB } from './node-db'
-import { TablePropertiesDB } from './tableproperties-db'
-import { TableRowDB } from './tablerow-db'
+import { TableColumnDB } from './tablecolumn-db'
+import { TableDB } from './table-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class TableDB {
+export class TableRowDB {
 
-	static GONGSTRUCT_NAME = "Table"
+	static GONGSTRUCT_NAME = "TableRow"
 
 	CreatedAt?: string
 	DeletedAt?: string
@@ -22,8 +22,9 @@ export class TableDB {
 	Node?: NodeDB
 	NodeID: NullInt64 = new NullInt64 // if pointer is null, Node.ID = 0
 
-	TableProperties?: TablePropertiesDB
-	TablePropertiesID: NullInt64 = new NullInt64 // if pointer is null, TableProperties.ID = 0
+	TableColumns?: Array<TableColumnDB>
+	Table_TableRowsDBID: NullInt64 = new NullInt64
+	Table_TableRowsDBID_Index: NullInt64  = new NullInt64 // store the index of the tablerow instance in Table.TableRows
+	Table_TableRows_reverse?: TableDB 
 
-	TableRows?: Array<TableRowDB>
 }

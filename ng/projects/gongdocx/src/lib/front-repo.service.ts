@@ -34,8 +34,14 @@ import { RunePropertiesService } from './runeproperties.service'
 import { TableDB } from './table-db'
 import { TableService } from './table.service'
 
+import { TableColumnDB } from './tablecolumn-db'
+import { TableColumnService } from './tablecolumn.service'
+
 import { TablePropertiesDB } from './tableproperties-db'
 import { TablePropertiesService } from './tableproperties.service'
+
+import { TableRowDB } from './tablerow-db'
+import { TableRowService } from './tablerow.service'
 
 import { TableStyleDB } from './tablestyle-db'
 import { TableStyleService } from './tablestyle.service'
@@ -76,9 +82,15 @@ export class FrontRepo { // insertion point sub template
   Tables_array = new Array<TableDB>(); // array of repo instances
   Tables = new Map<number, TableDB>(); // map of repo instances
   Tables_batch = new Map<number, TableDB>(); // same but only in last GET (for finding repo instances to delete)
+  TableColumns_array = new Array<TableColumnDB>(); // array of repo instances
+  TableColumns = new Map<number, TableColumnDB>(); // map of repo instances
+  TableColumns_batch = new Map<number, TableColumnDB>(); // same but only in last GET (for finding repo instances to delete)
   TablePropertiess_array = new Array<TablePropertiesDB>(); // array of repo instances
   TablePropertiess = new Map<number, TablePropertiesDB>(); // map of repo instances
   TablePropertiess_batch = new Map<number, TablePropertiesDB>(); // same but only in last GET (for finding repo instances to delete)
+  TableRows_array = new Array<TableRowDB>(); // array of repo instances
+  TableRows = new Map<number, TableRowDB>(); // map of repo instances
+  TableRows_batch = new Map<number, TableRowDB>(); // same but only in last GET (for finding repo instances to delete)
   TableStyles_array = new Array<TableStyleDB>(); // array of repo instances
   TableStyles = new Map<number, TableStyleDB>(); // map of repo instances
   TableStyles_batch = new Map<number, TableStyleDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -157,7 +169,9 @@ export class FrontRepoService {
     private runeService: RuneService,
     private runepropertiesService: RunePropertiesService,
     private tableService: TableService,
+    private tablecolumnService: TableColumnService,
     private tablepropertiesService: TablePropertiesService,
+    private tablerowService: TableRowService,
     private tablestyleService: TableStyleService,
     private textService: TextService,
   ) { }
@@ -200,7 +214,9 @@ export class FrontRepoService {
     Observable<RuneDB[]>,
     Observable<RunePropertiesDB[]>,
     Observable<TableDB[]>,
+    Observable<TableColumnDB[]>,
     Observable<TablePropertiesDB[]>,
+    Observable<TableRowDB[]>,
     Observable<TableStyleDB[]>,
     Observable<TextDB[]>,
   ] = [ // insertion point sub template
@@ -214,7 +230,9 @@ export class FrontRepoService {
       this.runeService.getRunes(this.GONG__StackPath),
       this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
       this.tableService.getTables(this.GONG__StackPath),
+      this.tablecolumnService.getTableColumns(this.GONG__StackPath),
       this.tablepropertiesService.getTablePropertiess(this.GONG__StackPath),
+      this.tablerowService.getTableRows(this.GONG__StackPath),
       this.tablestyleService.getTableStyles(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ];
@@ -240,7 +258,9 @@ export class FrontRepoService {
       this.runeService.getRunes(this.GONG__StackPath),
       this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
       this.tableService.getTables(this.GONG__StackPath),
+      this.tablecolumnService.getTableColumns(this.GONG__StackPath),
       this.tablepropertiesService.getTablePropertiess(this.GONG__StackPath),
+      this.tablerowService.getTableRows(this.GONG__StackPath),
       this.tablestyleService.getTableStyles(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ]
@@ -261,7 +281,9 @@ export class FrontRepoService {
             runes_,
             runepropertiess_,
             tables_,
+            tablecolumns_,
             tablepropertiess_,
+            tablerows_,
             tablestyles_,
             texts_,
           ]) => {
@@ -287,8 +309,12 @@ export class FrontRepoService {
             runepropertiess = runepropertiess_ as RunePropertiesDB[]
             var tables: TableDB[]
             tables = tables_ as TableDB[]
+            var tablecolumns: TableColumnDB[]
+            tablecolumns = tablecolumns_ as TableColumnDB[]
             var tablepropertiess: TablePropertiesDB[]
             tablepropertiess = tablepropertiess_ as TablePropertiesDB[]
+            var tablerows: TableRowDB[]
+            tablerows = tablerows_ as TableRowDB[]
             var tablestyles: TableStyleDB[]
             tablestyles = tablestyles_ as TableStyleDB[]
             var texts: TextDB[]
@@ -628,6 +654,39 @@ export class FrontRepoService {
             });
 
             // init the array
+            this.frontRepo.TableColumns_array = tablecolumns
+
+            // clear the map that counts TableColumn in the GET
+            this.frontRepo.TableColumns_batch.clear()
+
+            tablecolumns.forEach(
+              tablecolumn => {
+                this.frontRepo.TableColumns.set(tablecolumn.ID, tablecolumn)
+                this.frontRepo.TableColumns_batch.set(tablecolumn.ID, tablecolumn)
+              }
+            )
+
+            // clear tablecolumns that are absent from the batch
+            this.frontRepo.TableColumns.forEach(
+              tablecolumn => {
+                if (this.frontRepo.TableColumns_batch.get(tablecolumn.ID) == undefined) {
+                  this.frontRepo.TableColumns.delete(tablecolumn.ID)
+                }
+              }
+            )
+
+            // sort TableColumns_array array
+            this.frontRepo.TableColumns_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
             this.frontRepo.TablePropertiess_array = tablepropertiess
 
             // clear the map that counts TableProperties in the GET
@@ -651,6 +710,39 @@ export class FrontRepoService {
 
             // sort TablePropertiess_array array
             this.frontRepo.TablePropertiess_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
+            this.frontRepo.TableRows_array = tablerows
+
+            // clear the map that counts TableRow in the GET
+            this.frontRepo.TableRows_batch.clear()
+
+            tablerows.forEach(
+              tablerow => {
+                this.frontRepo.TableRows.set(tablerow.ID, tablerow)
+                this.frontRepo.TableRows_batch.set(tablerow.ID, tablerow)
+              }
+            )
+
+            // clear tablerows that are absent from the batch
+            this.frontRepo.TableRows.forEach(
+              tablerow => {
+                if (this.frontRepo.TableRows_batch.get(tablerow.ID) == undefined) {
+                  this.frontRepo.TableRows.delete(tablerow.ID)
+                }
+              }
+            )
+
+            // sort TableRows_array array
+            this.frontRepo.TableRows_array.sort((t1, t2) => {
               if (t1.Name > t2.Name) {
                 return 1;
               }
@@ -817,6 +909,19 @@ export class FrontRepoService {
                 }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field TableColumn.Paragraphs redeeming
+                {
+                  let _tablecolumn = this.frontRepo.TableColumns.get(paragraph.TableColumn_ParagraphsDBID.Int64)
+                  if (_tablecolumn) {
+                    if (_tablecolumn.Paragraphs == undefined) {
+                      _tablecolumn.Paragraphs = new Array<ParagraphDB>()
+                    }
+                    _tablecolumn.Paragraphs.push(paragraph)
+                    if (paragraph.TableColumn_Paragraphs_reverse == undefined) {
+                      paragraph.TableColumn_Paragraphs_reverse = _tablecolumn
+                    }
+                  }
+                }
               }
             )
             paragraphpropertiess.forEach(
@@ -930,6 +1035,33 @@ export class FrontRepoService {
                 // insertion point for redeeming ONE-MANY associations
               }
             )
+            tablecolumns.forEach(
+              tablecolumn => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tablecolumn.NodeID.Int64)
+                  if (_node) {
+                    tablecolumn.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field TableRow.TableColumns redeeming
+                {
+                  let _tablerow = this.frontRepo.TableRows.get(tablecolumn.TableRow_TableColumnsDBID.Int64)
+                  if (_tablerow) {
+                    if (_tablerow.TableColumns == undefined) {
+                      _tablerow.TableColumns = new Array<TableColumnDB>()
+                    }
+                    _tablerow.TableColumns.push(tablecolumn)
+                    if (tablecolumn.TableRow_TableColumns_reverse == undefined) {
+                      tablecolumn.TableRow_TableColumns_reverse = _tablerow
+                    }
+                  }
+                }
+              }
+            )
             tablepropertiess.forEach(
               tableproperties => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
@@ -949,6 +1081,33 @@ export class FrontRepoService {
                 }
 
                 // insertion point for redeeming ONE-MANY associations
+              }
+            )
+            tablerows.forEach(
+              tablerow => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tablerow.NodeID.Int64)
+                  if (_node) {
+                    tablerow.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Table.TableRows redeeming
+                {
+                  let _table = this.frontRepo.Tables.get(tablerow.Table_TableRowsDBID.Int64)
+                  if (_table) {
+                    if (_table.TableRows == undefined) {
+                      _table.TableRows = new Array<TableRowDB>()
+                    }
+                    _table.TableRows.push(tablerow)
+                    if (tablerow.Table_TableRows_reverse == undefined) {
+                      tablerow.Table_TableRows_reverse = _table
+                    }
+                  }
+                }
               }
             )
             tablestyles.forEach(
@@ -1275,6 +1434,19 @@ export class FrontRepoService {
                 }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field TableColumn.Paragraphs redeeming
+                {
+                  let _tablecolumn = this.frontRepo.TableColumns.get(paragraph.TableColumn_ParagraphsDBID.Int64)
+                  if (_tablecolumn) {
+                    if (_tablecolumn.Paragraphs == undefined) {
+                      _tablecolumn.Paragraphs = new Array<ParagraphDB>()
+                    }
+                    _tablecolumn.Paragraphs.push(paragraph)
+                    if (paragraph.TableColumn_Paragraphs_reverse == undefined) {
+                      paragraph.TableColumn_Paragraphs_reverse = _tablecolumn
+                    }
+                  }
+                }
               }
             )
 
@@ -1630,6 +1802,77 @@ export class FrontRepoService {
     )
   }
 
+  // TableColumnPull performs a GET on TableColumn of the stack and redeem association pointers 
+  TableColumnPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.tablecolumnService.getTableColumns(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            tablecolumns,
+          ]) => {
+            // init the array
+            this.frontRepo.TableColumns_array = tablecolumns
+
+            // clear the map that counts TableColumn in the GET
+            this.frontRepo.TableColumns_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            tablecolumns.forEach(
+              tablecolumn => {
+                this.frontRepo.TableColumns.set(tablecolumn.ID, tablecolumn)
+                this.frontRepo.TableColumns_batch.set(tablecolumn.ID, tablecolumn)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tablecolumn.NodeID.Int64)
+                  if (_node) {
+                    tablecolumn.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field TableRow.TableColumns redeeming
+                {
+                  let _tablerow = this.frontRepo.TableRows.get(tablecolumn.TableRow_TableColumnsDBID.Int64)
+                  if (_tablerow) {
+                    if (_tablerow.TableColumns == undefined) {
+                      _tablerow.TableColumns = new Array<TableColumnDB>()
+                    }
+                    _tablerow.TableColumns.push(tablecolumn)
+                    if (tablecolumn.TableRow_TableColumns_reverse == undefined) {
+                      tablecolumn.TableRow_TableColumns_reverse = _tablerow
+                    }
+                  }
+                }
+              }
+            )
+
+            // clear tablecolumns that are absent from the GET
+            this.frontRepo.TableColumns.forEach(
+              tablecolumn => {
+                if (this.frontRepo.TableColumns_batch.get(tablecolumn.ID) == undefined) {
+                  this.frontRepo.TableColumns.delete(tablecolumn.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
   // TablePropertiesPull performs a GET on TableProperties of the stack and redeem association pointers 
   TablePropertiesPull(): Observable<FrontRepo> {
     return new Observable<FrontRepo>(
@@ -1679,6 +1922,77 @@ export class FrontRepoService {
               tableproperties => {
                 if (this.frontRepo.TablePropertiess_batch.get(tableproperties.ID) == undefined) {
                   this.frontRepo.TablePropertiess.delete(tableproperties.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
+  // TableRowPull performs a GET on TableRow of the stack and redeem association pointers 
+  TableRowPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.tablerowService.getTableRows(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            tablerows,
+          ]) => {
+            // init the array
+            this.frontRepo.TableRows_array = tablerows
+
+            // clear the map that counts TableRow in the GET
+            this.frontRepo.TableRows_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            tablerows.forEach(
+              tablerow => {
+                this.frontRepo.TableRows.set(tablerow.ID, tablerow)
+                this.frontRepo.TableRows_batch.set(tablerow.ID, tablerow)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(tablerow.NodeID.Int64)
+                  if (_node) {
+                    tablerow.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Table.TableRows redeeming
+                {
+                  let _table = this.frontRepo.Tables.get(tablerow.Table_TableRowsDBID.Int64)
+                  if (_table) {
+                    if (_table.TableRows == undefined) {
+                      _table.TableRows = new Array<TableRowDB>()
+                    }
+                    _table.TableRows.push(tablerow)
+                    if (tablerow.Table_TableRows_reverse == undefined) {
+                      tablerow.Table_TableRows_reverse = _table
+                    }
+                  }
+                }
+              }
+            )
+
+            // clear tablerows that are absent from the GET
+            this.frontRepo.TableRows.forEach(
+              tablerow => {
+                if (this.frontRepo.TableRows_batch.get(tablerow.ID) == undefined) {
+                  this.frontRepo.TableRows.delete(tablerow.ID)
                 }
               }
             )
@@ -1843,12 +2157,18 @@ export function getRunePropertiesUniqueID(id: number): number {
 export function getTableUniqueID(id: number): number {
   return 71 * id
 }
-export function getTablePropertiesUniqueID(id: number): number {
+export function getTableColumnUniqueID(id: number): number {
   return 73 * id
 }
-export function getTableStyleUniqueID(id: number): number {
+export function getTablePropertiesUniqueID(id: number): number {
   return 79 * id
 }
-export function getTextUniqueID(id: number): number {
+export function getTableRowUniqueID(id: number): number {
   return 83 * id
+}
+export function getTableStyleUniqueID(id: number): number {
+  return 89 * id
+}
+export function getTextUniqueID(id: number): number {
+  return 97 * id
 }

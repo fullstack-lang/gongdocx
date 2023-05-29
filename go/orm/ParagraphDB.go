@@ -53,6 +53,12 @@ type ParagraphPointersEnconding struct {
 	// field ParagraphProperties is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	ParagraphPropertiesID sql.NullInt64
+
+	// Implementation of a reverse ID for field TableColumn{}.Paragraphs []*Paragraph
+	TableColumn_ParagraphsDBID sql.NullInt64
+
+	// implementation of the index of the withing the slice
+	TableColumn_ParagraphsDBID_Index sql.NullInt64
 }
 
 // ParagraphDB describes a paragraph in the database
@@ -633,6 +639,12 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseTwo() {
 		if paragraphDB.ParagraphPropertiesID.Int64 != 0 {
 			paragraphDB.ParagraphPropertiesID.Int64 = int64(BackRepoParagraphPropertiesid_atBckpTime_newID[uint(paragraphDB.ParagraphPropertiesID.Int64)])
 			paragraphDB.ParagraphPropertiesID.Valid = true
+		}
+
+		// This reindex paragraph.Paragraphs
+		if paragraphDB.TableColumn_ParagraphsDBID.Int64 != 0 {
+			paragraphDB.TableColumn_ParagraphsDBID.Int64 =
+				int64(BackRepoTableColumnid_atBckpTime_newID[uint(paragraphDB.TableColumn_ParagraphsDBID.Int64)])
 		}
 
 		// update databse with new index encoding

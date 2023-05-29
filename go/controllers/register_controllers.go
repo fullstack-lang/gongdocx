@@ -111,12 +111,26 @@ func registerControllers(r *gin.Engine) {
 		v1.PUT("/v1/tables/:id", GetController().UpdateTable)
 		v1.DELETE("/v1/tables/:id", GetController().DeleteTable)
 
+		v1.GET("/v1/tablecolumns", GetController().GetTableColumns)
+		v1.GET("/v1/tablecolumns/:id", GetController().GetTableColumn)
+		v1.POST("/v1/tablecolumns", GetController().PostTableColumn)
+		v1.PATCH("/v1/tablecolumns/:id", GetController().UpdateTableColumn)
+		v1.PUT("/v1/tablecolumns/:id", GetController().UpdateTableColumn)
+		v1.DELETE("/v1/tablecolumns/:id", GetController().DeleteTableColumn)
+
 		v1.GET("/v1/tablepropertiess", GetController().GetTablePropertiess)
 		v1.GET("/v1/tablepropertiess/:id", GetController().GetTableProperties)
 		v1.POST("/v1/tablepropertiess", GetController().PostTableProperties)
 		v1.PATCH("/v1/tablepropertiess/:id", GetController().UpdateTableProperties)
 		v1.PUT("/v1/tablepropertiess/:id", GetController().UpdateTableProperties)
 		v1.DELETE("/v1/tablepropertiess/:id", GetController().DeleteTableProperties)
+
+		v1.GET("/v1/tablerows", GetController().GetTableRows)
+		v1.GET("/v1/tablerows/:id", GetController().GetTableRow)
+		v1.POST("/v1/tablerows", GetController().PostTableRow)
+		v1.PATCH("/v1/tablerows/:id", GetController().UpdateTableRow)
+		v1.PUT("/v1/tablerows/:id", GetController().UpdateTableRow)
+		v1.DELETE("/v1/tablerows/:id", GetController().DeleteTableRow)
 
 		v1.GET("/v1/tablestyles", GetController().GetTableStyles)
 		v1.GET("/v1/tablestyles/:id", GetController().GetTableStyle)

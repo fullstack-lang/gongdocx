@@ -27,4 +27,5 @@ type Table struct {
 	Node            *Node
 	Content         string
 	TableProperties *TableProperties
+	TableRows       []*TableRow
 }

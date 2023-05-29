@@ -188,6 +188,7 @@ func walk(
 		table.Content = string(node_.Content)
 
 		var rows [][]string
+		nodeRowCounter_ := 0
 		for _, tableNode := range node_.Nodes {
 			if tableNode.XMLName.Local == "tblPr" {
 				nodeCounter_ := 0
@@ -221,13 +222,32 @@ func walk(
 			if tableNode.XMLName.Local != "tr" {
 				continue
 			}
+			node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeRowCounter_)}).Stage(gongdocxStage)
+			node.Nodes = append(node.Nodes, node__)
+			nodeRowCounter_ = nodeRowCounter_ + 1
+
+			tableRow := (&TableRow{Name: node__.Name}).Stage(gongdocxStage)
+			tableRow.Node = node
+			tableRow.Content = string(tableNode.Content)
+			table.TableRows = append(table.TableRows, tableRow)
+
 			var cols []string
+			nodeColumnCounter__ := 0
 			for _, tc := range tableNode.Nodes {
 				if tc.XMLName.Local != "tc" {
 					continue
 				}
+				node__ := (&Node{Name: fmt.Sprintf(node__.Name+".%d", nodeColumnCounter__)}).Stage(gongdocxStage)
+				node.Nodes = append(node__.Nodes, node__)
+				nodeColumnCounter__ = nodeColumnCounter__ + 1
+
+				tableColumn := (&TableColumn{Name: node__.Name}).Stage(gongdocxStage)
+				tableColumn.Node = node__
+				tableColumn.Content = string(tc.Content)
+				tableRow.TableColumns = append(tableRow.TableColumns, tableColumn)
+
 				var cbuf bytes.Buffer
-				if err := walk(zf, dummyNode, node, gongdocxStage, &tc, &cbuf); err != nil {
+				if err := walk(zf, tableColumn, node__, gongdocxStage, &tc, &cbuf); err != nil {
 					return err
 				}
 				cols = append(cols, strings.Replace(cbuf.String(), "\n", "", -1))
@@ -352,6 +372,12 @@ func walk(
 		paragraph.Node = node
 		paragraph.Content = string(node_.Content)
 
+		// check if the parent node is a paragraph
+		switch tableColumn := parentNode.(type) {
+		case *TableColumn:
+			tableColumn.Paragraphs = append(tableColumn.Paragraphs, paragraph)
+		}
+
 		for _, n := range node_.Nodes {
 
 			node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
@@ -389,7 +415,7 @@ func walk(
 			node.Nodes = append(node.Nodes, node__)
 			nodeCounter = nodeCounter + 1
 
-			if err := walk(zf, dummyNode, node__, gongdocxStage, &n, w); err != nil {
+			if err := walk(zf, parentNode, node__, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}

@@ -19,8 +19,12 @@
   import { RunePropertiesSortingComponent } from './runeproperties-sorting/runeproperties-sorting.component'
   import { TablesTableComponent } from './tables-table/tables-table.component'
   import { TableSortingComponent } from './table-sorting/table-sorting.component'
+  import { TableColumnsTableComponent } from './tablecolumns-table/tablecolumns-table.component'
+  import { TableColumnSortingComponent } from './tablecolumn-sorting/tablecolumn-sorting.component'
   import { TablePropertiessTableComponent } from './tablepropertiess-table/tablepropertiess-table.component'
   import { TablePropertiesSortingComponent } from './tableproperties-sorting/tableproperties-sorting.component'
+  import { TableRowsTableComponent } from './tablerows-table/tablerows-table.component'
+  import { TableRowSortingComponent } from './tablerow-sorting/tablerow-sorting.component'
   import { TableStylesTableComponent } from './tablestyles-table/tablestyles-table.component'
   import { TableStyleSortingComponent } from './tablestyle-sorting/tablestyle-sorting.component'
   import { TextsTableComponent } from './texts-table/texts-table.component'
@@ -47,8 +51,12 @@
   export const MapOfRunePropertiesSortingComponents: Map<string, any> = new Map([["RunePropertiesSortingComponent", RunePropertiesSortingComponent],])
   export const MapOfTablesComponents: Map<string, any> = new Map([["TablesTableComponent", TablesTableComponent],])
   export const MapOfTableSortingComponents: Map<string, any> = new Map([["TableSortingComponent", TableSortingComponent],])
+  export const MapOfTableColumnsComponents: Map<string, any> = new Map([["TableColumnsTableComponent", TableColumnsTableComponent],])
+  export const MapOfTableColumnSortingComponents: Map<string, any> = new Map([["TableColumnSortingComponent", TableColumnSortingComponent],])
   export const MapOfTablePropertiessComponents: Map<string, any> = new Map([["TablePropertiessTableComponent", TablePropertiessTableComponent],])
   export const MapOfTablePropertiesSortingComponents: Map<string, any> = new Map([["TablePropertiesSortingComponent", TablePropertiesSortingComponent],])
+  export const MapOfTableRowsComponents: Map<string, any> = new Map([["TableRowsTableComponent", TableRowsTableComponent],])
+  export const MapOfTableRowSortingComponents: Map<string, any> = new Map([["TableRowSortingComponent", TableRowSortingComponent],])
   export const MapOfTableStylesComponents: Map<string, any> = new Map([["TableStylesTableComponent", TableStylesTableComponent],])
   export const MapOfTableStyleSortingComponents: Map<string, any> = new Map([["TableStyleSortingComponent", TableStyleSortingComponent],])
   export const MapOfTextsComponents: Map<string, any> = new Map([["TextsTableComponent", TextsTableComponent],])
@@ -69,7 +77,9 @@ export const MapOfComponents: Map<string, any> =
       ["Rune", MapOfRunesComponents],
       ["RuneProperties", MapOfRunePropertiessComponents],
       ["Table", MapOfTablesComponents],
+      ["TableColumn", MapOfTableColumnsComponents],
       ["TableProperties", MapOfTablePropertiessComponents],
+      ["TableRow", MapOfTableRowsComponents],
       ["TableStyle", MapOfTableStylesComponents],
       ["Text", MapOfTextsComponents],
     ]
@@ -90,7 +100,9 @@ export const MapOfSortingComponents: Map<string, any> =
       ["Rune", MapOfRuneSortingComponents],
       ["RuneProperties", MapOfRunePropertiesSortingComponents],
       ["Table", MapOfTableSortingComponents],
+      ["TableColumn", MapOfTableColumnSortingComponents],
       ["TableProperties", MapOfTablePropertiesSortingComponents],
+      ["TableRow", MapOfTableRowSortingComponents],
       ["TableStyle", MapOfTableStyleSortingComponents],
       ["Text", MapOfTextSortingComponents],
     ]

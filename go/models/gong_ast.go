@@ -313,7 +313,9 @@ var __gong__map_ParagraphStyle = make(map[string]*ParagraphStyle)
 var __gong__map_Rune = make(map[string]*Rune)
 var __gong__map_RuneProperties = make(map[string]*RuneProperties)
 var __gong__map_Table = make(map[string]*Table)
+var __gong__map_TableColumn = make(map[string]*TableColumn)
 var __gong__map_TableProperties = make(map[string]*TableProperties)
+var __gong__map_TableRow = make(map[string]*TableRow)
 var __gong__map_TableStyle = make(map[string]*TableStyle)
 var __gong__map_Text = make(map[string]*Text)
 
@@ -528,10 +530,18 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 										instanceTable := (&Table{Name: instanceName}).Stage(stage)
 										instance = any(instanceTable)
 										__gong__map_Table[identifier] = instanceTable
+									case "TableColumn":
+										instanceTableColumn := (&TableColumn{Name: instanceName}).Stage(stage)
+										instance = any(instanceTableColumn)
+										__gong__map_TableColumn[identifier] = instanceTableColumn
 									case "TableProperties":
 										instanceTableProperties := (&TableProperties{Name: instanceName}).Stage(stage)
 										instance = any(instanceTableProperties)
 										__gong__map_TableProperties[identifier] = instanceTableProperties
+									case "TableRow":
+										instanceTableRow := (&TableRow{Name: instanceName}).Stage(stage)
+										instance = any(instanceTableRow)
+										__gong__map_TableRow[identifier] = instanceTableRow
 									case "TableStyle":
 										instanceTableStyle := (&TableStyle{Name: instanceName}).Stage(stage)
 										instance = any(instanceTableStyle)
@@ -616,7 +626,15 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 							switch fieldName {
 							// insertion point for date assign code
 							}
+						case "TableColumn":
+							switch fieldName {
+							// insertion point for date assign code
+							}
 						case "TableProperties":
+							switch fieldName {
+							// insertion point for date assign code
+							}
+						case "TableRow":
 							switch fieldName {
 							// insertion point for date assign code
 							}
@@ -710,10 +728,36 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					case "Table":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
+						case "TableRows":
+							// remove first and last char
+							targetIdentifier := ident.Name
+							target := __gong__map_TableRow[targetIdentifier]
+							__gong__map_Table[identifier].TableRows =
+								append(__gong__map_Table[identifier].TableRows, target)
+						}
+					case "TableColumn":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						case "Paragraphs":
+							// remove first and last char
+							targetIdentifier := ident.Name
+							target := __gong__map_Paragraph[targetIdentifier]
+							__gong__map_TableColumn[identifier].Paragraphs =
+								append(__gong__map_TableColumn[identifier].Paragraphs, target)
 						}
 					case "TableProperties":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
+						}
+					case "TableRow":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						case "TableColumns":
+							// remove first and last char
+							targetIdentifier := ident.Name
+							target := __gong__map_TableColumn[targetIdentifier]
+							__gong__map_TableRow[identifier].TableColumns =
+								append(__gong__map_TableRow[identifier].TableColumns, target)
 						}
 					case "TableStyle":
 						switch fieldName {
@@ -880,6 +924,18 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_Table[identifier].Content = fielValue
 				}
+			case "TableColumn":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_TableColumn[identifier].Name = fielValue
+				case "Content":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_TableColumn[identifier].Content = fielValue
+				}
 			case "TableProperties":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -891,6 +947,18 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					// remove first and last char
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_TableProperties[identifier].Content = fielValue
+				}
+			case "TableRow":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_TableRow[identifier].Name = fielValue
+				case "Content":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_TableRow[identifier].Content = fielValue
 				}
 			case "TableStyle":
 				switch fieldName {
@@ -1034,6 +1102,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					targetIdentifier := ident.Name
 					__gong__map_Table[identifier].TableProperties = __gong__map_TableProperties[targetIdentifier]
 				}
+			case "TableColumn":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Node":
+					targetIdentifier := ident.Name
+					__gong__map_TableColumn[identifier].Node = __gong__map_Node[targetIdentifier]
+				}
 			case "TableProperties":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -1043,6 +1118,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "TableStyle":
 					targetIdentifier := ident.Name
 					__gong__map_TableProperties[identifier].TableStyle = __gong__map_TableStyle[targetIdentifier]
+				}
+			case "TableRow":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Node":
+					targetIdentifier := ident.Name
+					__gong__map_TableRow[identifier].Node = __gong__map_Node[targetIdentifier]
 				}
 			case "TableStyle":
 				switch fieldName {
@@ -1126,7 +1208,15 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					switch fieldName {
 					// insertion point for enum assign code
 					}
+				case "TableColumn":
+					switch fieldName {
+					// insertion point for enum assign code
+					}
 				case "TableProperties":
+					switch fieldName {
+					// insertion point for enum assign code
+					}
+				case "TableRow":
 					switch fieldName {
 					// insertion point for enum assign code
 					}

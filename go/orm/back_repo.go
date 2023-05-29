@@ -41,7 +41,11 @@ type BackRepoStruct struct {
 
 	BackRepoTable BackRepoTableStruct
 
+	BackRepoTableColumn BackRepoTableColumnStruct
+
 	BackRepoTableProperties BackRepoTablePropertiesStruct
+
+	BackRepoTableRow BackRepoTableRowStruct
 
 	BackRepoTableStyle BackRepoTableStyleStruct
 
@@ -93,7 +97,9 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&RuneDB{},
 		&RunePropertiesDB{},
 		&TableDB{},
+		&TableColumnDB{},
 		&TablePropertiesDB{},
+		&TableRowDB{},
 		&TableStyleDB{},
 		&TextDB{},
 	)
@@ -186,10 +192,26 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		db:    db,
 		stage: stage,
 	}
+	backRepo.BackRepoTableColumn = BackRepoTableColumnStruct{
+		Map_TableColumnDBID_TableColumnPtr: make(map[uint]*models.TableColumn, 0),
+		Map_TableColumnDBID_TableColumnDB:  make(map[uint]*TableColumnDB, 0),
+		Map_TableColumnPtr_TableColumnDBID: make(map[*models.TableColumn]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
 	backRepo.BackRepoTableProperties = BackRepoTablePropertiesStruct{
 		Map_TablePropertiesDBID_TablePropertiesPtr: make(map[uint]*models.TableProperties, 0),
 		Map_TablePropertiesDBID_TablePropertiesDB:  make(map[uint]*TablePropertiesDB, 0),
 		Map_TablePropertiesPtr_TablePropertiesDBID: make(map[*models.TableProperties]uint, 0),
+
+		db:    db,
+		stage: stage,
+	}
+	backRepo.BackRepoTableRow = BackRepoTableRowStruct{
+		Map_TableRowDBID_TableRowPtr: make(map[uint]*models.TableRow, 0),
+		Map_TableRowDBID_TableRowDB:  make(map[uint]*TableRowDB, 0),
+		Map_TableRowPtr_TableRowDBID: make(map[*models.TableRow]uint, 0),
 
 		db:    db,
 		stage: stage,
@@ -265,7 +287,9 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoRune.CommitPhaseOne(stage)
 	backRepo.BackRepoRuneProperties.CommitPhaseOne(stage)
 	backRepo.BackRepoTable.CommitPhaseOne(stage)
+	backRepo.BackRepoTableColumn.CommitPhaseOne(stage)
 	backRepo.BackRepoTableProperties.CommitPhaseOne(stage)
+	backRepo.BackRepoTableRow.CommitPhaseOne(stage)
 	backRepo.BackRepoTableStyle.CommitPhaseOne(stage)
 	backRepo.BackRepoText.CommitPhaseOne(stage)
 
@@ -280,7 +304,9 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoRune.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoRuneProperties.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoTable.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoTableColumn.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoTableProperties.CommitPhaseTwo(backRepo)
+	backRepo.BackRepoTableRow.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoTableStyle.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoText.CommitPhaseTwo(backRepo)
 
@@ -300,7 +326,9 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoRune.CheckoutPhaseOne()
 	backRepo.BackRepoRuneProperties.CheckoutPhaseOne()
 	backRepo.BackRepoTable.CheckoutPhaseOne()
+	backRepo.BackRepoTableColumn.CheckoutPhaseOne()
 	backRepo.BackRepoTableProperties.CheckoutPhaseOne()
+	backRepo.BackRepoTableRow.CheckoutPhaseOne()
 	backRepo.BackRepoTableStyle.CheckoutPhaseOne()
 	backRepo.BackRepoText.CheckoutPhaseOne()
 
@@ -315,7 +343,9 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoRune.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoRuneProperties.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoTable.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoTableColumn.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoTableProperties.CheckoutPhaseTwo(backRepo)
+	backRepo.BackRepoTableRow.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoTableStyle.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoText.CheckoutPhaseTwo(backRepo)
 }
@@ -354,7 +384,9 @@ func (backRepo *BackRepoStruct) Backup(stage *models.StageStruct, dirPath string
 	backRepo.BackRepoRune.Backup(dirPath)
 	backRepo.BackRepoRuneProperties.Backup(dirPath)
 	backRepo.BackRepoTable.Backup(dirPath)
+	backRepo.BackRepoTableColumn.Backup(dirPath)
 	backRepo.BackRepoTableProperties.Backup(dirPath)
+	backRepo.BackRepoTableRow.Backup(dirPath)
 	backRepo.BackRepoTableStyle.Backup(dirPath)
 	backRepo.BackRepoText.Backup(dirPath)
 }
@@ -377,7 +409,9 @@ func (backRepo *BackRepoStruct) BackupXL(stage *models.StageStruct, dirPath stri
 	backRepo.BackRepoRune.BackupXL(file)
 	backRepo.BackRepoRuneProperties.BackupXL(file)
 	backRepo.BackRepoTable.BackupXL(file)
+	backRepo.BackRepoTableColumn.BackupXL(file)
 	backRepo.BackRepoTableProperties.BackupXL(file)
+	backRepo.BackRepoTableRow.BackupXL(file)
 	backRepo.BackRepoTableStyle.BackupXL(file)
 	backRepo.BackRepoText.BackupXL(file)
 
@@ -414,7 +448,9 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoRune.RestorePhaseOne(dirPath)
 	backRepo.BackRepoRuneProperties.RestorePhaseOne(dirPath)
 	backRepo.BackRepoTable.RestorePhaseOne(dirPath)
+	backRepo.BackRepoTableColumn.RestorePhaseOne(dirPath)
 	backRepo.BackRepoTableProperties.RestorePhaseOne(dirPath)
+	backRepo.BackRepoTableRow.RestorePhaseOne(dirPath)
 	backRepo.BackRepoTableStyle.RestorePhaseOne(dirPath)
 	backRepo.BackRepoText.RestorePhaseOne(dirPath)
 
@@ -433,7 +469,9 @@ func (backRepo *BackRepoStruct) Restore(stage *models.StageStruct, dirPath strin
 	backRepo.BackRepoRune.RestorePhaseTwo()
 	backRepo.BackRepoRuneProperties.RestorePhaseTwo()
 	backRepo.BackRepoTable.RestorePhaseTwo()
+	backRepo.BackRepoTableColumn.RestorePhaseTwo()
 	backRepo.BackRepoTableProperties.RestorePhaseTwo()
+	backRepo.BackRepoTableRow.RestorePhaseTwo()
 	backRepo.BackRepoTableStyle.RestorePhaseTwo()
 	backRepo.BackRepoText.RestorePhaseTwo()
 
@@ -473,7 +511,9 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.BackRepoRune.RestoreXLPhaseOne(file)
 	backRepo.BackRepoRuneProperties.RestoreXLPhaseOne(file)
 	backRepo.BackRepoTable.RestoreXLPhaseOne(file)
+	backRepo.BackRepoTableColumn.RestoreXLPhaseOne(file)
 	backRepo.BackRepoTableProperties.RestoreXLPhaseOne(file)
+	backRepo.BackRepoTableRow.RestoreXLPhaseOne(file)
 	backRepo.BackRepoTableStyle.RestoreXLPhaseOne(file)
 	backRepo.BackRepoText.RestoreXLPhaseOne(file)
 
