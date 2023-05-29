@@ -25,6 +25,9 @@ import { ParagraphPropertiesService } from './paragraphproperties.service'
 import { RuneDB } from './rune-db'
 import { RuneService } from './rune.service'
 
+import { RunePropertiesDB } from './runeproperties-db'
+import { RunePropertiesService } from './runeproperties.service'
+
 import { TextDB } from './text-db'
 import { TextService } from './text.service'
 
@@ -52,6 +55,9 @@ export class FrontRepo { // insertion point sub template
   Runes_array = new Array<RuneDB>(); // array of repo instances
   Runes = new Map<number, RuneDB>(); // map of repo instances
   Runes_batch = new Map<number, RuneDB>(); // same but only in last GET (for finding repo instances to delete)
+  RunePropertiess_array = new Array<RunePropertiesDB>(); // array of repo instances
+  RunePropertiess = new Map<number, RunePropertiesDB>(); // map of repo instances
+  RunePropertiess_batch = new Map<number, RunePropertiesDB>(); // same but only in last GET (for finding repo instances to delete)
   Texts_array = new Array<TextDB>(); // array of repo instances
   Texts = new Map<number, TextDB>(); // map of repo instances
   Texts_batch = new Map<number, TextDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -124,6 +130,7 @@ export class FrontRepoService {
     private paragraphService: ParagraphService,
     private paragraphpropertiesService: ParagraphPropertiesService,
     private runeService: RuneService,
+    private runepropertiesService: RunePropertiesService,
     private textService: TextService,
   ) { }
 
@@ -162,6 +169,7 @@ export class FrontRepoService {
     Observable<ParagraphDB[]>,
     Observable<ParagraphPropertiesDB[]>,
     Observable<RuneDB[]>,
+    Observable<RunePropertiesDB[]>,
     Observable<TextDB[]>,
   ] = [ // insertion point sub template
       this.documentService.getDocuments(this.GONG__StackPath),
@@ -171,6 +179,7 @@ export class FrontRepoService {
       this.paragraphService.getParagraphs(this.GONG__StackPath),
       this.paragraphpropertiesService.getParagraphPropertiess(this.GONG__StackPath),
       this.runeService.getRunes(this.GONG__StackPath),
+      this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ];
 
@@ -192,6 +201,7 @@ export class FrontRepoService {
       this.paragraphService.getParagraphs(this.GONG__StackPath),
       this.paragraphpropertiesService.getParagraphPropertiess(this.GONG__StackPath),
       this.runeService.getRunes(this.GONG__StackPath),
+      this.runepropertiesService.getRunePropertiess(this.GONG__StackPath),
       this.textService.getTexts(this.GONG__StackPath),
     ]
 
@@ -208,6 +218,7 @@ export class FrontRepoService {
             paragraphs_,
             paragraphpropertiess_,
             runes_,
+            runepropertiess_,
             texts_,
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
@@ -226,6 +237,8 @@ export class FrontRepoService {
             paragraphpropertiess = paragraphpropertiess_ as ParagraphPropertiesDB[]
             var runes: RuneDB[]
             runes = runes_ as RuneDB[]
+            var runepropertiess: RunePropertiesDB[]
+            runepropertiess = runepropertiess_ as RunePropertiesDB[]
             var texts: TextDB[]
             texts = texts_ as TextDB[]
 
@@ -464,6 +477,39 @@ export class FrontRepoService {
             });
 
             // init the array
+            this.frontRepo.RunePropertiess_array = runepropertiess
+
+            // clear the map that counts RuneProperties in the GET
+            this.frontRepo.RunePropertiess_batch.clear()
+
+            runepropertiess.forEach(
+              runeproperties => {
+                this.frontRepo.RunePropertiess.set(runeproperties.ID, runeproperties)
+                this.frontRepo.RunePropertiess_batch.set(runeproperties.ID, runeproperties)
+              }
+            )
+
+            // clear runepropertiess that are absent from the batch
+            this.frontRepo.RunePropertiess.forEach(
+              runeproperties => {
+                if (this.frontRepo.RunePropertiess_batch.get(runeproperties.ID) == undefined) {
+                  this.frontRepo.RunePropertiess.delete(runeproperties.ID)
+                }
+              }
+            )
+
+            // sort RunePropertiess_array array
+            this.frontRepo.RunePropertiess_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
+            // init the array
             this.frontRepo.Texts_array = texts
 
             // clear the map that counts Text in the GET
@@ -604,6 +650,20 @@ export class FrontRepoService {
                   let _node = this.frontRepo.Nodes.get(rune.NodeID.Int64)
                   if (_node) {
                     rune.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+            runepropertiess.forEach(
+              runeproperties => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(runeproperties.NodeID.Int64)
+                  if (_node) {
+                    runeproperties.Node = _node
                   }
                 }
 
@@ -1053,6 +1113,64 @@ export class FrontRepoService {
     )
   }
 
+  // RunePropertiesPull performs a GET on RuneProperties of the stack and redeem association pointers 
+  RunePropertiesPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.runepropertiesService.getRunePropertiess(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            runepropertiess,
+          ]) => {
+            // init the array
+            this.frontRepo.RunePropertiess_array = runepropertiess
+
+            // clear the map that counts RuneProperties in the GET
+            this.frontRepo.RunePropertiess_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            runepropertiess.forEach(
+              runeproperties => {
+                this.frontRepo.RunePropertiess.set(runeproperties.ID, runeproperties)
+                this.frontRepo.RunePropertiess_batch.set(runeproperties.ID, runeproperties)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Node redeeming
+                {
+                  let _node = this.frontRepo.Nodes.get(runeproperties.NodeID.Int64)
+                  if (_node) {
+                    runeproperties.Node = _node
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear runepropertiess that are absent from the GET
+            this.frontRepo.RunePropertiess.forEach(
+              runeproperties => {
+                if (this.frontRepo.RunePropertiess_batch.get(runeproperties.ID) == undefined) {
+                  this.frontRepo.RunePropertiess.delete(runeproperties.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
+
   // TextPull performs a GET on Text of the stack and redeem association pointers 
   TextPull(): Observable<FrontRepo> {
     return new Observable<FrontRepo>(
@@ -1134,6 +1252,9 @@ export function getParagraphPropertiesUniqueID(id: number): number {
 export function getRuneUniqueID(id: number): number {
   return 59 * id
 }
-export function getTextUniqueID(id: number): number {
+export function getRunePropertiesUniqueID(id: number): number {
   return 61 * id
+}
+export function getTextUniqueID(id: number): number {
+  return 67 * id
 }

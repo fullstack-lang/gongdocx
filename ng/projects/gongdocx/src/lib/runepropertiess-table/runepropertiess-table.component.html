@@ -3,7 +3,7 @@
         <mat-label>Filter</mat-label>
         <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
     </mat-form-field>
-    <h1 *ngIf="dialogData">rune</h1>
+    <h1 *ngIf="dialogData">runeproperties</h1>
     <table class="table" mat-table [dataSource]="matTableDataSource" matSort>
         <!-- Checkbox Column, only used when the component is used to select items for a field that is a slice of pointers -->
         <ng-container matColumnDef="select">
@@ -21,34 +21,55 @@
         <!-- -->
         <ng-container matColumnDef="Name" sticky>
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
-            <td mat-cell *matCellDef="let Rune">
-                {{Rune.Name}}
-            </td>
-        </ng-container>
-        <!-- -->
-        <ng-container matColumnDef="Content">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Content </th>
-            <td mat-cell *matCellDef="let Rune">
-                {{Rune.Content}}
+            <td mat-cell *matCellDef="let RuneProperties">
+                {{RuneProperties.Name}}
             </td>
         </ng-container>
         <!-- -->
         <ng-container matColumnDef="Node">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Node </th>
-            <td mat-cell *matCellDef="let Rune">
-                {{ Rune.Node ? Rune.Node.Name : ''}}
+            <td mat-cell *matCellDef="let RuneProperties">
+                {{ RuneProperties.Node ? RuneProperties.Node.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="IsBold">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> IsBold </th>
+            <td mat-cell *matCellDef="let RuneProperties">
+                <mat-checkbox [checked]="RuneProperties.IsBold" disabled=true></mat-checkbox>
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="IsStrike">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> IsStrike </th>
+            <td mat-cell *matCellDef="let RuneProperties">
+                <mat-checkbox [checked]="RuneProperties.IsStrike" disabled=true></mat-checkbox>
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="IsItalic">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> IsItalic </th>
+            <td mat-cell *matCellDef="let RuneProperties">
+                <mat-checkbox [checked]="RuneProperties.IsItalic" disabled=true></mat-checkbox>
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="Content">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Content </th>
+            <td mat-cell *matCellDef="let RuneProperties">
+                {{RuneProperties.Content}}
             </td>
         </ng-container>
 
         <ng-container matColumnDef="ID" sticky>
             <th mat-header-cell *matHeaderCellDef mat-sort-header> ID. </th>
-            <td mat-cell *matCellDef="let Rune"> {{Rune.ID}} </td>
+            <td mat-cell *matCellDef="let RuneProperties"> {{RuneProperties.ID}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Delete" sticky>
             <th mat-header-cell *matHeaderCellDef> Delete </th>
-            <td mat-cell *matCellDef="let rune;  let j = index;">
-                <i class="material-icons my-delete-button" [ngStyle]="{'color':'rgba(0,0,0,.50)'}" (click)="deleteRune(rune.ID, rune); $event.stopPropagation()">delete</i>
+            <td mat-cell *matCellDef="let runeproperties;  let j = index;">
+                <i class="material-icons my-delete-button" [ngStyle]="{'color':'rgba(0,0,0,.50)'}" (click)="deleteRuneProperties(runeproperties.ID, runeproperties); $event.stopPropagation()">delete</i>
             </td>
         </ng-container>
 

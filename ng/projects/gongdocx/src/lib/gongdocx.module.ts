@@ -67,6 +67,10 @@ import { RunesTableComponent } from './runes-table/runes-table.component'
 import { RuneSortingComponent } from './rune-sorting/rune-sorting.component'
 import { RuneDetailComponent } from './rune-detail/rune-detail.component'
 
+import { RunePropertiessTableComponent } from './runepropertiess-table/runepropertiess-table.component'
+import { RunePropertiesSortingComponent } from './runeproperties-sorting/runeproperties-sorting.component'
+import { RunePropertiesDetailComponent } from './runeproperties-detail/runeproperties-detail.component'
+
 import { TextsTableComponent } from './texts-table/texts-table.component'
 import { TextSortingComponent } from './text-sorting/text-sorting.component'
 import { TextDetailComponent } from './text-detail/text-detail.component'
@@ -102,6 +106,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		RunesTableComponent,
 		RuneSortingComponent,
 		RuneDetailComponent,
+
+		RunePropertiessTableComponent,
+		RunePropertiesSortingComponent,
+		RunePropertiesDetailComponent,
 
 		TextsTableComponent,
 		TextSortingComponent,
@@ -173,6 +181,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 		RunesTableComponent,
 		RuneSortingComponent,
 		RuneDetailComponent,
+
+		RunePropertiessTableComponent,
+		RunePropertiesSortingComponent,
+		RunePropertiesDetailComponent,
 
 		TextsTableComponent,
 		TextSortingComponent,

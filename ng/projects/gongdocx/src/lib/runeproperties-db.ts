@@ -4,9 +4,9 @@ import { NodeDB } from './node-db'
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
 
-export class RuneDB {
+export class RunePropertiesDB {
 
-	static GONGSTRUCT_NAME = "Rune"
+	static GONGSTRUCT_NAME = "RuneProperties"
 
 	CreatedAt?: string
 	DeletedAt?: string
@@ -14,6 +14,9 @@ export class RuneDB {
 
 	// insertion point for basic fields declarations
 	Name: string = ""
+	IsBold: boolean = false
+	IsStrike: boolean = false
+	IsItalic: boolean = false
 	Content: string = ""
 
 	// insertion point for other declarations

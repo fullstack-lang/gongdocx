@@ -25,6 +25,8 @@ import { ParagraphPropertiesService } from '../paragraphproperties.service'
 import { getParagraphPropertiesUniqueID } from '../front-repo.service'
 import { RuneService } from '../rune.service'
 import { getRuneUniqueID } from '../front-repo.service'
+import { RunePropertiesService } from '../runeproperties.service'
+import { getRunePropertiesUniqueID } from '../front-repo.service'
 import { TextService } from '../text.service'
 import { getTextUniqueID } from '../front-repo.service'
 
@@ -179,6 +181,7 @@ export class SidebarComponent implements OnInit {
     private paragraphService: ParagraphService,
     private paragraphpropertiesService: ParagraphPropertiesService,
     private runeService: RuneService,
+    private runepropertiesService: RunePropertiesService,
     private textService: TextService,
 
     private routeService: RouteService,
@@ -265,6 +268,14 @@ export class SidebarComponent implements OnInit {
     )
     // observable for changes in structs
     this.runeService.RuneServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
+    // observable for changes in structs
+    this.runepropertiesService.RunePropertiesServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
           this.refresh()
@@ -845,6 +856,85 @@ export class SidebarComponent implements OnInit {
               children: new Array<GongNode>()
             }
             NodeGongNodeAssociation.children.push(runeGongNodeInstance_Node)
+          }
+
+        }
+      )
+
+      /**
+      * fill up the RuneProperties part of the mat tree
+      */
+      let runepropertiesGongNodeStruct: GongNode = {
+        name: "RuneProperties",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "RuneProperties",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(runepropertiesGongNodeStruct)
+
+      this.frontRepo.RunePropertiess_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.RunePropertiess_array.forEach(
+        runepropertiesDB => {
+          let runepropertiesGongNodeInstance: GongNode = {
+            name: runepropertiesDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: runepropertiesDB.ID,
+            uniqueIdPerStack: getRunePropertiesUniqueID(runepropertiesDB.ID),
+            structName: "RuneProperties",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          runepropertiesGongNodeStruct.children!.push(runepropertiesGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the association Node
+          */
+          let NodeGongNodeAssociation: GongNode = {
+            name: "(Node) Node",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: runepropertiesDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "RuneProperties",
+            associationField: "Node",
+            associatedStructName: "Node",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          runepropertiesGongNodeInstance.children!.push(NodeGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Node
+            */
+          if (runepropertiesDB.Node != undefined) {
+            let runepropertiesGongNodeInstance_Node: GongNode = {
+              name: runepropertiesDB.Node.Name,
+              type: GongNodeType.INSTANCE,
+              id: runepropertiesDB.Node.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getRunePropertiesUniqueID(runepropertiesDB.ID)
+                + 5 * getNodeUniqueID(runepropertiesDB.Node.ID),
+              structName: "Node",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NodeGongNodeAssociation.children.push(runepropertiesGongNodeInstance_Node)
           }
 
         }

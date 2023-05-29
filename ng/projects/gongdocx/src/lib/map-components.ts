@@ -13,6 +13,8 @@
   import { ParagraphPropertiesSortingComponent } from './paragraphproperties-sorting/paragraphproperties-sorting.component'
   import { RunesTableComponent } from './runes-table/runes-table.component'
   import { RuneSortingComponent } from './rune-sorting/rune-sorting.component'
+  import { RunePropertiessTableComponent } from './runepropertiess-table/runepropertiess-table.component'
+  import { RunePropertiesSortingComponent } from './runeproperties-sorting/runeproperties-sorting.component'
   import { TextsTableComponent } from './texts-table/texts-table.component'
   import { TextSortingComponent } from './text-sorting/text-sorting.component'
 
@@ -31,6 +33,8 @@
   export const MapOfParagraphPropertiesSortingComponents: Map<string, any> = new Map([["ParagraphPropertiesSortingComponent", ParagraphPropertiesSortingComponent],])
   export const MapOfRunesComponents: Map<string, any> = new Map([["RunesTableComponent", RunesTableComponent],])
   export const MapOfRuneSortingComponents: Map<string, any> = new Map([["RuneSortingComponent", RuneSortingComponent],])
+  export const MapOfRunePropertiessComponents: Map<string, any> = new Map([["RunePropertiessTableComponent", RunePropertiessTableComponent],])
+  export const MapOfRunePropertiesSortingComponents: Map<string, any> = new Map([["RunePropertiesSortingComponent", RunePropertiesSortingComponent],])
   export const MapOfTextsComponents: Map<string, any> = new Map([["TextsTableComponent", TextsTableComponent],])
   export const MapOfTextSortingComponents: Map<string, any> = new Map([["TextSortingComponent", TextSortingComponent],])
 
@@ -46,6 +50,7 @@ export const MapOfComponents: Map<string, any> =
       ["Paragraph", MapOfParagraphsComponents],
       ["ParagraphProperties", MapOfParagraphPropertiessComponents],
       ["Rune", MapOfRunesComponents],
+      ["RuneProperties", MapOfRunePropertiessComponents],
       ["Text", MapOfTextsComponents],
     ]
   )
@@ -62,6 +67,7 @@ export const MapOfSortingComponents: Map<string, any> =
       ["Paragraph", MapOfParagraphSortingComponents],
       ["ParagraphProperties", MapOfParagraphPropertiesSortingComponents],
       ["Rune", MapOfRuneSortingComponents],
+      ["RuneProperties", MapOfRunePropertiesSortingComponents],
       ["Text", MapOfTextSortingComponents],
     ]
   )

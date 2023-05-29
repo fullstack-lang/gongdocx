@@ -90,6 +90,13 @@ func registerControllers(r *gin.Engine) {
 		v1.PUT("/v1/runes/:id", GetController().UpdateRune)
 		v1.DELETE("/v1/runes/:id", GetController().DeleteRune)
 
+		v1.GET("/v1/runepropertiess", GetController().GetRunePropertiess)
+		v1.GET("/v1/runepropertiess/:id", GetController().GetRuneProperties)
+		v1.POST("/v1/runepropertiess", GetController().PostRuneProperties)
+		v1.PATCH("/v1/runepropertiess/:id", GetController().UpdateRuneProperties)
+		v1.PUT("/v1/runepropertiess/:id", GetController().UpdateRuneProperties)
+		v1.DELETE("/v1/runepropertiess/:id", GetController().DeleteRuneProperties)
+
 		v1.GET("/v1/texts", GetController().GetTexts)
 		v1.GET("/v1/texts/:id", GetController().GetText)
 		v1.POST("/v1/texts", GetController().PostText)

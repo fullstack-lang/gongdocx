@@ -344,18 +344,66 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(rune.Name))
 		initializerStatements += setValueField
 
-		if rune.RuneStyle != "" {
-			setValueField = StringEnumInitStatement
-			setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
-			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "RuneStyle")
-			setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", "models."+rune.RuneStyle.ToCodeString())
-			initializerStatements += setValueField
-		}
-
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Content")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(rune.Content))
+		initializerStatements += setValueField
+
+	}
+
+	map_RuneProperties_Identifiers := make(map[*RuneProperties]string)
+	_ = map_RuneProperties_Identifiers
+
+	runepropertiesOrdered := []*RuneProperties{}
+	for runeproperties := range stage.RunePropertiess {
+		runepropertiesOrdered = append(runepropertiesOrdered, runeproperties)
+	}
+	sort.Slice(runepropertiesOrdered[:], func(i, j int) bool {
+		return runepropertiesOrdered[i].Name < runepropertiesOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of RuneProperties"
+	for idx, runeproperties := range runepropertiesOrdered {
+
+		id = generatesIdentifier("RuneProperties", idx, runeproperties.Name)
+		map_RuneProperties_Identifiers[runeproperties] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "RuneProperties")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", runeproperties.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// RuneProperties values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(runeproperties.Name))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "IsBold")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%t", runeproperties.IsBold))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "IsStrike")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%t", runeproperties.IsStrike))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "IsItalic")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%t", runeproperties.IsItalic))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Content")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(runeproperties.Content))
 		initializerStatements += setValueField
 
 	}
@@ -520,6 +568,24 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[rune.Node])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
+	for idx, runeproperties := range runepropertiesOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("RuneProperties", idx, runeproperties.Name)
+		map_RuneProperties_Identifiers[runeproperties] = id
+
+		// Initialisation of values
+		if runeproperties.Node != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Node")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Node_Identifiers[runeproperties.Node])
 			pointersInitializesStatements += setPointerField
 		}
 

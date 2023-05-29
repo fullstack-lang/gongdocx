@@ -58,6 +58,12 @@ export * from './lib/runes-table/runes-table.component'
 export * from './lib/rune-db'
 export * from './lib/rune.service'
 
+export * from './lib/runeproperties-detail/runeproperties-detail.component'
+export * from './lib/runeproperties-sorting/runeproperties-sorting.component'
+export * from './lib/runepropertiess-table/runepropertiess-table.component'
+export * from './lib/runeproperties-db'
+export * from './lib/runeproperties.service'
+
 export * from './lib/text-detail/text-detail.component'
 export * from './lib/text-sorting/text-sorting.component'
 export * from './lib/texts-table/texts-table.component'
@@ -65,4 +71,3 @@ export * from './lib/text-db'
 export * from './lib/text.service'
 
 
-export * from './lib/RuneStyle'

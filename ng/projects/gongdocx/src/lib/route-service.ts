@@ -23,6 +23,9 @@ import { ParagraphPropertiesDetailComponent } from './paragraphproperties-detail
 import { RunesTableComponent } from './runes-table/runes-table.component'
 import { RuneDetailComponent } from './rune-detail/rune-detail.component'
 
+import { RunePropertiessTableComponent } from './runepropertiess-table/runepropertiess-table.component'
+import { RunePropertiesDetailComponent } from './runeproperties-detail/runeproperties-detail.component'
+
 import { TextsTableComponent } from './texts-table/texts-table.component'
 import { TextDetailComponent } from './text-detail/text-detail.component'
 
@@ -288,6 +291,39 @@ export class RouteService {
         return route
     }
 
+    getRunePropertiesTablePath(): string {
+        return this.getPathRoot() + '-runepropertiess/:GONG__StackPath'
+    }
+    getRunePropertiesTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRunePropertiesTablePath(), component: RunePropertiessTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getRunePropertiesAdderPath(): string {
+        return this.getPathRoot() + '-runeproperties-adder/:GONG__StackPath'
+    }
+    getRunePropertiesAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRunePropertiesAdderPath(), component: RunePropertiesDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getRunePropertiesAdderForUsePath(): string {
+        return this.getPathRoot() + '-runeproperties-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getRunePropertiesAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRunePropertiesAdderForUsePath(), component: RunePropertiesDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getRunePropertiesDetailPath(): string {
+        return this.getPathRoot() + '-runeproperties-detail/:id/:GONG__StackPath'
+    }
+    getRunePropertiesDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getRunePropertiesDetailPath(), component: RunePropertiesDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
     getTextTablePath(): string {
         return this.getPathRoot() + '-texts/:GONG__StackPath'
     }
@@ -361,6 +397,11 @@ export class RouteService {
             this.getRuneAdderRoute(stackPath),
             this.getRuneAdderForUseRoute(stackPath),
             this.getRuneDetailRoute(stackPath),
+
+            this.getRunePropertiesTableRoute(stackPath),
+            this.getRunePropertiesAdderRoute(stackPath),
+            this.getRunePropertiesAdderForUseRoute(stackPath),
+            this.getRunePropertiesDetailRoute(stackPath),
 
             this.getTextTableRoute(stackPath),
             this.getTextAdderRoute(stackPath),

@@ -310,6 +310,7 @@ var __gong__map_Node = make(map[string]*Node)
 var __gong__map_Paragraph = make(map[string]*Paragraph)
 var __gong__map_ParagraphProperties = make(map[string]*ParagraphProperties)
 var __gong__map_Rune = make(map[string]*Rune)
+var __gong__map_RuneProperties = make(map[string]*RuneProperties)
 var __gong__map_Text = make(map[string]*Text)
 
 // Parser needs to be configured for having the [Name1.Name2] or [pkg.Name1] ...
@@ -511,6 +512,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 										instanceRune := (&Rune{Name: instanceName}).Stage(stage)
 										instance = any(instanceRune)
 										__gong__map_Rune[identifier] = instanceRune
+									case "RuneProperties":
+										instanceRuneProperties := (&RuneProperties{Name: instanceName}).Stage(stage)
+										instance = any(instanceRuneProperties)
+										__gong__map_RuneProperties[identifier] = instanceRuneProperties
 									case "Text":
 										instanceText := (&Text{Name: instanceName}).Stage(stage)
 										instance = any(instanceText)
@@ -576,6 +581,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 							// insertion point for date assign code
 							}
 						case "Rune":
+							switch fieldName {
+							// insertion point for date assign code
+							}
+						case "RuneProperties":
 							switch fieldName {
 							// insertion point for date assign code
 							}
@@ -645,6 +654,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 						// insertion point for slice of pointers assign code
 						}
 					case "Rune":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						}
+					case "RuneProperties":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
 						}
@@ -769,6 +782,18 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_Rune[identifier].Content = fielValue
 				}
+			case "RuneProperties":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_RuneProperties[identifier].Name = fielValue
+				case "Content":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_RuneProperties[identifier].Content = fielValue
+				}
 			case "Text":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -838,6 +863,34 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					targetIdentifier := ident.Name
 					__gong__map_Rune[identifier].Node = __gong__map_Node[targetIdentifier]
 				}
+			case "RuneProperties":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Node":
+					targetIdentifier := ident.Name
+					__gong__map_RuneProperties[identifier].Node = __gong__map_Node[targetIdentifier]
+				case "IsBold":
+					// convert string to boolean
+					fielValue, err := strconv.ParseBool(ident.Name)
+					if err != nil {
+						log.Fatalln(err)
+					}
+					__gong__map_RuneProperties[identifier].IsBold = fielValue
+				case "IsStrike":
+					// convert string to boolean
+					fielValue, err := strconv.ParseBool(ident.Name)
+					if err != nil {
+						log.Fatalln(err)
+					}
+					__gong__map_RuneProperties[identifier].IsStrike = fielValue
+				case "IsItalic":
+					// convert string to boolean
+					fielValue, err := strconv.ParseBool(ident.Name)
+					if err != nil {
+						log.Fatalln(err)
+					}
+					__gong__map_RuneProperties[identifier].IsItalic = fielValue
+				}
 			case "Text":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -900,13 +953,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Rune":
 					switch fieldName {
 					// insertion point for enum assign code
-					case "RuneStyle":
-						var val RuneStyle
-						err := (&val).FromCodeString(enumValue)
-						if err != nil {
-							log.Fatalln(err)
-						}
-						__gong__map_Rune[identifier].RuneStyle = RuneStyle(val)
+					}
+				case "RuneProperties":
+					switch fieldName {
+					// insertion point for enum assign code
 					}
 				case "Text":
 					switch fieldName {

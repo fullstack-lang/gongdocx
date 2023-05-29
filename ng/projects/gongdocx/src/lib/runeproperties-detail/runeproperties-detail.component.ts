@@ -2,8 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 
-import { RuneDB } from '../rune-db'
-import { RuneService } from '../rune.service'
+import { RunePropertiesDB } from '../runeproperties-db'
+import { RunePropertiesService } from '../runeproperties.service'
 
 import { FrontRepoService, FrontRepo, SelectionMode, DialogData } from '../front-repo.service'
 import { MapOfComponents } from '../map-components'
@@ -17,25 +17,28 @@ import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from '@angu
 
 import { NullInt64 } from '../null-int64'
 
-// RuneDetailComponent is initilizaed from different routes
-// RuneDetailComponentState detail different cases 
-enum RuneDetailComponentState {
+// RunePropertiesDetailComponent is initilizaed from different routes
+// RunePropertiesDetailComponentState detail different cases 
+enum RunePropertiesDetailComponentState {
 	CREATE_INSTANCE,
 	UPDATE_INSTANCE,
 	// insertion point for declarations of enum values of state
 }
 
 @Component({
-	selector: 'app-rune-detail',
-	templateUrl: './rune-detail.component.html',
-	styleUrls: ['./rune-detail.component.css'],
+	selector: 'app-runeproperties-detail',
+	templateUrl: './runeproperties-detail.component.html',
+	styleUrls: ['./runeproperties-detail.component.css'],
 })
-export class RuneDetailComponent implements OnInit {
+export class RunePropertiesDetailComponent implements OnInit {
 
 	// insertion point for declarations
+	IsBoldFormControl: UntypedFormControl = new UntypedFormControl(false);
+	IsStrikeFormControl: UntypedFormControl = new UntypedFormControl(false);
+	IsItalicFormControl: UntypedFormControl = new UntypedFormControl(false);
 
-	// the RuneDB of interest
-	rune: RuneDB = new RuneDB
+	// the RunePropertiesDB of interest
+	runeproperties: RunePropertiesDB = new RunePropertiesDB
 
 	// front repo
 	frontRepo: FrontRepo = new FrontRepo
@@ -46,7 +49,7 @@ export class RuneDetailComponent implements OnInit {
 	mapFields_displayAsTextArea = new Map<string, boolean>()
 
 	// the state at initialization (CREATION, UPDATE or CREATE with one association set)
-	state: RuneDetailComponentState = RuneDetailComponentState.CREATE_INSTANCE
+	state: RunePropertiesDetailComponentState = RunePropertiesDetailComponentState.CREATE_INSTANCE
 
 	// in UDPATE state, if is the id of the instance to update
 	// in CREATE state with one association set, this is the id of the associated instance
@@ -59,7 +62,7 @@ export class RuneDetailComponent implements OnInit {
 	GONG__StackPath: string = ""
 
 	constructor(
-		private runeService: RuneService,
+		private runepropertiesService: RunePropertiesService,
 		private frontRepoService: FrontRepoService,
 		public dialog: MatDialog,
 		private activatedRoute: ActivatedRoute,
@@ -85,10 +88,10 @@ export class RuneDetailComponent implements OnInit {
 
 		const association = this.activatedRoute.snapshot.paramMap.get('association');
 		if (this.id == 0) {
-			this.state = RuneDetailComponentState.CREATE_INSTANCE
+			this.state = RunePropertiesDetailComponentState.CREATE_INSTANCE
 		} else {
 			if (this.originStruct == undefined) {
-				this.state = RuneDetailComponentState.UPDATE_INSTANCE
+				this.state = RunePropertiesDetailComponentState.UPDATE_INSTANCE
 			} else {
 				switch (this.originStructFieldName) {
 					// insertion point for state computation
@@ -98,13 +101,13 @@ export class RuneDetailComponent implements OnInit {
 			}
 		}
 
-		this.getRune()
+		this.getRuneProperties()
 
 		// observable for changes in structs
-		this.runeService.RuneServiceChanged.subscribe(
+		this.runepropertiesService.RunePropertiesServiceChanged.subscribe(
 			message => {
 				if (message == "post" || message == "update" || message == "delete") {
-					this.getRune()
+					this.getRuneProperties()
 				}
 			}
 		)
@@ -112,20 +115,20 @@ export class RuneDetailComponent implements OnInit {
 		// insertion point for initialisation of enums list
 	}
 
-	getRune(): void {
+	getRuneProperties(): void {
 
 		this.frontRepoService.pull(this.GONG__StackPath).subscribe(
 			frontRepo => {
 				this.frontRepo = frontRepo
 
 				switch (this.state) {
-					case RuneDetailComponentState.CREATE_INSTANCE:
-						this.rune = new (RuneDB)
+					case RunePropertiesDetailComponentState.CREATE_INSTANCE:
+						this.runeproperties = new (RunePropertiesDB)
 						break;
-					case RuneDetailComponentState.UPDATE_INSTANCE:
-						let rune = frontRepo.Runes.get(this.id)
-						console.assert(rune != undefined, "missing rune with id:" + this.id)
-						this.rune = rune!
+					case RunePropertiesDetailComponentState.UPDATE_INSTANCE:
+						let runeproperties = frontRepo.RunePropertiess.get(this.id)
+						console.assert(runeproperties != undefined, "missing runeproperties with id:" + this.id)
+						this.runeproperties = runeproperties!
 						break;
 					// insertion point for init of association field
 					default:
@@ -133,6 +136,9 @@ export class RuneDetailComponent implements OnInit {
 				}
 
 				// insertion point for recovery of form controls value for bool fields
+				this.IsBoldFormControl.setValue(this.runeproperties.IsBold)
+				this.IsStrikeFormControl.setValue(this.runeproperties.IsStrike)
+				this.IsItalicFormControl.setValue(this.runeproperties.IsItalic)
 			}
 		)
 
@@ -145,32 +151,35 @@ export class RuneDetailComponent implements OnInit {
 		// pointers fields, after the translation, are nulled in order to perform serialization
 
 		// insertion point for translation/nullation of each field
-		if (this.rune.NodeID == undefined) {
-			this.rune.NodeID = new NullInt64
+		if (this.runeproperties.NodeID == undefined) {
+			this.runeproperties.NodeID = new NullInt64
 		}
-		if (this.rune.Node != undefined) {
-			this.rune.NodeID.Int64 = this.rune.Node.ID
-			this.rune.NodeID.Valid = true
+		if (this.runeproperties.Node != undefined) {
+			this.runeproperties.NodeID.Int64 = this.runeproperties.Node.ID
+			this.runeproperties.NodeID.Valid = true
 		} else {
-			this.rune.NodeID.Int64 = 0
-			this.rune.NodeID.Valid = true
+			this.runeproperties.NodeID.Int64 = 0
+			this.runeproperties.NodeID.Valid = true
 		}
+		this.runeproperties.IsBold = this.IsBoldFormControl.value
+		this.runeproperties.IsStrike = this.IsStrikeFormControl.value
+		this.runeproperties.IsItalic = this.IsItalicFormControl.value
 
 		// save from the front pointer space to the non pointer space for serialization
 
 		// insertion point for translation/nullation of each pointers
 
 		switch (this.state) {
-			case RuneDetailComponentState.UPDATE_INSTANCE:
-				this.runeService.updateRune(this.rune, this.GONG__StackPath)
-					.subscribe(rune => {
-						this.runeService.RuneServiceChanged.next("update")
+			case RunePropertiesDetailComponentState.UPDATE_INSTANCE:
+				this.runepropertiesService.updateRuneProperties(this.runeproperties, this.GONG__StackPath)
+					.subscribe(runeproperties => {
+						this.runepropertiesService.RunePropertiesServiceChanged.next("update")
 					});
 				break;
 			default:
-				this.runeService.postRune(this.rune, this.GONG__StackPath).subscribe(rune => {
-					this.runeService.RuneServiceChanged.next("post")
-					this.rune = new (RuneDB) // reset fields
+				this.runepropertiesService.postRuneProperties(this.runeproperties, this.GONG__StackPath).subscribe(runeproperties => {
+					this.runepropertiesService.RunePropertiesServiceChanged.next("post")
+					this.runeproperties = new (RunePropertiesDB) // reset fields
 				});
 		}
 	}
@@ -193,7 +202,7 @@ export class RuneDetailComponent implements OnInit {
 		dialogConfig.height = "50%"
 		if (selectionMode == SelectionMode.ONE_MANY_ASSOCIATION_MODE) {
 
-			dialogData.ID = this.rune.ID!
+			dialogData.ID = this.runeproperties.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
@@ -210,14 +219,14 @@ export class RuneDetailComponent implements OnInit {
 			});
 		}
 		if (selectionMode == SelectionMode.MANY_MANY_ASSOCIATION_MODE) {
-			dialogData.ID = this.rune.ID!
+			dialogData.ID = this.runeproperties.ID!
 			dialogData.ReversePointer = reverseField
 			dialogData.OrderingMode = false
 			dialogData.SelectionMode = selectionMode
 			dialogData.GONG__StackPath = this.GONG__StackPath
 
 			// set up the source
-			dialogData.SourceStruct = "Rune"
+			dialogData.SourceStruct = "RuneProperties"
 			dialogData.SourceField = sourceField
 
 			// set up the intermediate struct
@@ -247,7 +256,7 @@ export class RuneDetailComponent implements OnInit {
 		// dialogConfig.disableClose = true;
 		dialogConfig.autoFocus = true;
 		dialogConfig.data = {
-			ID: this.rune.ID,
+			ID: this.runeproperties.ID,
 			ReversePointer: reverseField,
 			OrderingMode: true,
 			GONG__StackPath: this.GONG__StackPath,
@@ -264,8 +273,8 @@ export class RuneDetailComponent implements OnInit {
 	}
 
 	fillUpNameIfEmpty(event: { value: { Name: string; }; }) {
-		if (this.rune.Name == "") {
-			this.rune.Name = event.value.Name
+		if (this.runeproperties.Name == "") {
+			this.runeproperties.Name = event.value.Name
 		}
 	}
 

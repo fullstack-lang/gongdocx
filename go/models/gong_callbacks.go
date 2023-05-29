@@ -33,6 +33,10 @@ func AfterCreateFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterRuneCreateCallback != nil {
 			stage.OnAfterRuneCreateCallback.OnAfterCreate(stage, target)
 		}
+	case *RuneProperties:
+		if stage.OnAfterRunePropertiesCreateCallback != nil {
+			stage.OnAfterRunePropertiesCreateCallback.OnAfterCreate(stage, target)
+		}
 	case *Text:
 		if stage.OnAfterTextCreateCallback != nil {
 			stage.OnAfterTextCreateCallback.OnAfterCreate(stage, target)
@@ -81,6 +85,11 @@ func AfterUpdateFromFront[Type Gongstruct](stage *StageStruct, old, new *Type) {
 		newTarget := any(new).(*Rune)
 		if stage.OnAfterRuneUpdateCallback != nil {
 			stage.OnAfterRuneUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
+		}
+	case *RuneProperties:
+		newTarget := any(new).(*RuneProperties)
+		if stage.OnAfterRunePropertiesUpdateCallback != nil {
+			stage.OnAfterRunePropertiesUpdateCallback.OnAfterUpdate(stage, oldTarget, newTarget)
 		}
 	case *Text:
 		newTarget := any(new).(*Text)
@@ -132,6 +141,11 @@ func AfterDeleteFromFront[Type Gongstruct](stage *StageStruct, staged, front *Ty
 			staged := any(staged).(*Rune)
 			stage.OnAfterRuneDeleteCallback.OnAfterDelete(stage, staged, front)
 		}
+	case *RuneProperties:
+		if stage.OnAfterRunePropertiesDeleteCallback != nil {
+			staged := any(staged).(*RuneProperties)
+			stage.OnAfterRunePropertiesDeleteCallback.OnAfterDelete(stage, staged, front)
+		}
 	case *Text:
 		if stage.OnAfterTextDeleteCallback != nil {
 			staged := any(staged).(*Text)
@@ -175,6 +189,10 @@ func AfterReadFromFront[Type Gongstruct](stage *StageStruct, instance *Type) {
 		if stage.OnAfterRuneReadCallback != nil {
 			stage.OnAfterRuneReadCallback.OnAfterRead(stage, target)
 		}
+	case *RuneProperties:
+		if stage.OnAfterRunePropertiesReadCallback != nil {
+			stage.OnAfterRunePropertiesReadCallback.OnAfterRead(stage, target)
+		}
 	case *Text:
 		if stage.OnAfterTextReadCallback != nil {
 			stage.OnAfterTextReadCallback.OnAfterRead(stage, target)
@@ -211,6 +229,9 @@ func SetCallbackAfterUpdateFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *Rune:
 		stage.OnAfterRuneUpdateCallback = any(callback).(OnAfterUpdateInterface[Rune])
 	
+	case *RuneProperties:
+		stage.OnAfterRunePropertiesUpdateCallback = any(callback).(OnAfterUpdateInterface[RuneProperties])
+	
 	case *Text:
 		stage.OnAfterTextUpdateCallback = any(callback).(OnAfterUpdateInterface[Text])
 	
@@ -241,6 +262,9 @@ func SetCallbackAfterCreateFromFront[Type Gongstruct](stage *StageStruct, callba
 	
 	case *Rune:
 		stage.OnAfterRuneCreateCallback = any(callback).(OnAfterCreateInterface[Rune])
+	
+	case *RuneProperties:
+		stage.OnAfterRunePropertiesCreateCallback = any(callback).(OnAfterCreateInterface[RuneProperties])
 	
 	case *Text:
 		stage.OnAfterTextCreateCallback = any(callback).(OnAfterCreateInterface[Text])
@@ -273,6 +297,9 @@ func SetCallbackAfterDeleteFromFront[Type Gongstruct](stage *StageStruct, callba
 	case *Rune:
 		stage.OnAfterRuneDeleteCallback = any(callback).(OnAfterDeleteInterface[Rune])
 	
+	case *RuneProperties:
+		stage.OnAfterRunePropertiesDeleteCallback = any(callback).(OnAfterDeleteInterface[RuneProperties])
+	
 	case *Text:
 		stage.OnAfterTextDeleteCallback = any(callback).(OnAfterDeleteInterface[Text])
 	
@@ -303,6 +330,9 @@ func SetCallbackAfterReadFromFront[Type Gongstruct](stage *StageStruct, callback
 	
 	case *Rune:
 		stage.OnAfterRuneReadCallback = any(callback).(OnAfterReadInterface[Rune])
+	
+	case *RuneProperties:
+		stage.OnAfterRunePropertiesReadCallback = any(callback).(OnAfterReadInterface[RuneProperties])
 	
 	case *Text:
 		stage.OnAfterTextReadCallback = any(callback).(OnAfterReadInterface[Text])

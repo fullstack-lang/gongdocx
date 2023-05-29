@@ -20,6 +20,7 @@ func SerializeStage(stage *StageStruct, filename string) {
 		SerializeExcelize[Paragraph](stage, f)
 		SerializeExcelize[ParagraphProperties](stage, f)
 		SerializeExcelize[Rune](stage, f)
+		SerializeExcelize[RuneProperties](stage, f)
 		SerializeExcelize[Text](stage, f)
 	}
 

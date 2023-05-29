@@ -412,17 +412,28 @@ func (zf *file) walk(
 			if n.XMLName.Local != "rPr" {
 				continue
 			}
+
+			nodeCounter_ := 0
+			node___ := (&Node{Name: fmt.Sprintf(node__.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
+			node.Nodes = append(node__.Nodes, node___)
+			nodeCounter_ = nodeCounter_ + 1
+
+			runeProperties := (&RuneProperties{Name: node__.Name}).Stage(gongdocxStage)
+			runeProperties.Node = node__
+			runeProperties.Content = string(n.Content)
+
 			for _, nn := range n.Nodes {
+
 				switch nn.XMLName.Local {
 				case "b":
 					bold = true
-					rune_.RuneStyle = BOLD
+					runeProperties.IsBold = true
 				case "i":
 					italic = true
-					rune_.RuneStyle = ITALIC
+					runeProperties.IsItalic = true
 				case "strike":
 					strike = true
-					rune_.RuneStyle = STRIKE
+					runeProperties.IsStrike = true
 				}
 			}
 		}
