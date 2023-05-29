@@ -59,11 +59,11 @@ var map_DocLink_Identifier_NewDiagram_2 map[string]any = map[string]any{
 
 	"ref_models.NoteOnParagraphProperties": ref_models.NoteOnParagraphProperties,
 
+	"ref_models.NoteOnParagraphStyle": ref_models.NoteOnParagraphStyle,
+
 	"ref_models.NoteOnRunProperties": ref_models.NoteOnRunProperties,
 
 	"ref_models.NoteOnRune": ref_models.NoteOnRune,
-
-	"ref_models.NoteOnStyle": ref_models.NoteOnStyle,
 
 	"ref_models.Paragraph": &(ref_models.Paragraph{}),
 
@@ -170,6 +170,8 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__NoteShape__000001_NoteOnStyle := (&models.NoteShape{Name: `NoteOnStyle`}).Stage(stage)
 
 	// Declarations of staged instances of NoteShapeLink
+	__NoteShapeLink__000000_ParagraphProperties := (&models.NoteShapeLink{Name: `ParagraphProperties`}).Stage(stage)
+	__NoteShapeLink__000001_ParagraphStyle := (&models.NoteShapeLink{Name: `ParagraphStyle`}).Stage(stage)
 
 	// Declarations of staged instances of Position
 	__Position__000000_Pos_NewDiagram_2_Paragraph := (&models.Position{Name: `Pos-NewDiagram_2-Paragraph`}).Stage(stage)
@@ -208,10 +210,10 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.Paragraph.Name]
-	__Field__000001_Name.Identifier = `ref_models.Paragraph.Name`
+	//gong:ident [ref_models.ParagraphStyle.Name]
+	__Field__000001_Name.Identifier = `ref_models.ParagraphStyle.Name`
 	__Field__000001_Name.FieldTypeAsString = ``
-	__Field__000001_Name.Structname = `Paragraph`
+	__Field__000001_Name.Structname = `ParagraphStyle`
 	__Field__000001_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -219,10 +221,10 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.ParagraphStyle.Name]
-	__Field__000002_Name.Identifier = `ref_models.ParagraphStyle.Name`
+	//gong:ident [ref_models.Paragraph.Name]
+	__Field__000002_Name.Identifier = `ref_models.Paragraph.Name`
 	__Field__000002_Name.FieldTypeAsString = ``
-	__Field__000002_Name.Structname = `ParagraphStyle`
+	__Field__000002_Name.Structname = `Paragraph`
 	__Field__000002_Name.Fieldtypename = `string`
 
 	// Field values setup
@@ -256,7 +258,7 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__GongStructShape__000000_NewDiagram_2_Paragraph.Identifier = `ref_models.Paragraph`
 	__GongStructShape__000000_NewDiagram_2_Paragraph.ShowNbInstances = true
 	__GongStructShape__000000_NewDiagram_2_Paragraph.NbInstances = 9
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Width = 240.000000
+	__GongStructShape__000000_NewDiagram_2_Paragraph.Width = 353.000000
 	__GongStructShape__000000_NewDiagram_2_Paragraph.Heigth = 78.000000
 	__GongStructShape__000000_NewDiagram_2_Paragraph.IsSelected = false
 
@@ -269,7 +271,7 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Identifier = `ref_models.ParagraphProperties`
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.ShowNbInstances = true
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.NbInstances = 9
-	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Width = 240.000000
+	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Width = 353.000000
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Heigth = 78.000000
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.IsSelected = false
 
@@ -282,7 +284,7 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Identifier = `ref_models.ParagraphStyle`
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.ShowNbInstances = true
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.NbInstances = 2
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Width = 240.000000
+	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Width = 351.000000
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Heigth = 108.000000
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.IsSelected = false
 
@@ -301,13 +303,13 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__Link__000000_ParagraphProperties.FieldOffsetX = 10.000000
 	__Link__000000_ParagraphProperties.FieldOffsetY = -19.000000
 	__Link__000000_ParagraphProperties.TargetMultiplicity = models.ZERO_ONE
-	__Link__000000_ParagraphProperties.TargetMultiplicityOffsetX = -35.000000
-	__Link__000000_ParagraphProperties.TargetMultiplicityOffsetY = -11.000000
+	__Link__000000_ParagraphProperties.TargetMultiplicityOffsetX = -41.000000
+	__Link__000000_ParagraphProperties.TargetMultiplicityOffsetY = -18.000000
 	__Link__000000_ParagraphProperties.SourceMultiplicity = models.MANY
 	__Link__000000_ParagraphProperties.SourceMultiplicityOffsetX = -21.000000
 	__Link__000000_ParagraphProperties.SourceMultiplicityOffsetY = 26.000000
 	__Link__000000_ParagraphProperties.StartOrientation = models.ORIENTATION_VERTICAL
-	__Link__000000_ParagraphProperties.StartRatio = 0.466667
+	__Link__000000_ParagraphProperties.StartRatio = 0.430595
 	__Link__000000_ParagraphProperties.EndOrientation = models.ORIENTATION_VERTICAL
 	__Link__000000_ParagraphProperties.EndRatio = 0.437500
 	__Link__000000_ParagraphProperties.CornerOffsetRatio = 1.615385
@@ -328,15 +330,15 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 	__Link__000001_ParagraphStyle.FieldOffsetY = -18.000000
 	__Link__000001_ParagraphStyle.TargetMultiplicity = models.ZERO_ONE
 	__Link__000001_ParagraphStyle.TargetMultiplicityOffsetX = -42.000000
-	__Link__000001_ParagraphStyle.TargetMultiplicityOffsetY = -13.000000
+	__Link__000001_ParagraphStyle.TargetMultiplicityOffsetY = -20.000000
 	__Link__000001_ParagraphStyle.SourceMultiplicity = models.MANY
 	__Link__000001_ParagraphStyle.SourceMultiplicityOffsetX = -22.000000
 	__Link__000001_ParagraphStyle.SourceMultiplicityOffsetY = 27.000000
 	__Link__000001_ParagraphStyle.StartOrientation = models.ORIENTATION_VERTICAL
-	__Link__000001_ParagraphStyle.StartRatio = 0.416667
+	__Link__000001_ParagraphStyle.StartRatio = 0.422096
 	__Link__000001_ParagraphStyle.EndOrientation = models.ORIENTATION_VERTICAL
 	__Link__000001_ParagraphStyle.EndRatio = 0.433333
-	__Link__000001_ParagraphStyle.CornerOffsetRatio = 1.346154
+	__Link__000001_ParagraphStyle.CornerOffsetRatio = 1.782051
 
 	// NoteShape values setup
 	__NoteShape__000000_NoteOnParagraphProperties.Name = `NoteOnParagraphProperties`
@@ -345,7 +347,8 @@ func NewDiagram_2Injection(stage *models.StageStruct) {
 
 	//gong:ident [ref_models.NoteOnParagraphProperties]
 	__NoteShape__000000_NoteOnParagraphProperties.Identifier = `ref_models.NoteOnParagraphProperties`
-	__NoteShape__000000_NoteOnParagraphProperties.Body = `
+	__NoteShape__000000_NoteOnParagraphProperties.Body = `[models.ParagraphProperties]
+-
 The "w:pPr" node represents paragraph properties within a Word document's XML
 structure, and is found within a "w:p" (paragraph) node in the document.xml
 file.
@@ -361,7 +364,9 @@ the end of a section).
 When parsing a "w:pPr" node, your code should use the information it provides to
 format the paragraph appropriately in your data structure or output format.
 `
-	__NoteShape__000000_NoteOnParagraphProperties.BodyHTML = `<p>The &quot;w:pPr&quot; node represents paragraph properties within a Word document&apos;s XML
+	__NoteShape__000000_NoteOnParagraphProperties.BodyHTML = `<p><a href="/models#ParagraphProperties">models.ParagraphProperties</a>
+-
+The &quot;w:pPr&quot; node represents paragraph properties within a Word document&apos;s XML
 structure, and is found within a &quot;w:p&quot; (paragraph) node in the document.xml
 file.
 -
@@ -376,8 +381,8 @@ the end of a section).
 When parsing a &quot;w:pPr&quot; node, your code should use the information it provides to
 format the paragraph appropriately in your data structure or output format.
 `
-	__NoteShape__000000_NoteOnParagraphProperties.X = 726.000000
-	__NoteShape__000000_NoteOnParagraphProperties.Y = 67.000000
+	__NoteShape__000000_NoteOnParagraphProperties.X = 585.000000
+	__NoteShape__000000_NoteOnParagraphProperties.Y = 66.000000
 	__NoteShape__000000_NoteOnParagraphProperties.Width = 666.000000
 	__NoteShape__000000_NoteOnParagraphProperties.Heigth = 302.000000
 	__NoteShape__000000_NoteOnParagraphProperties.Matched = false
@@ -387,9 +392,10 @@ format the paragraph appropriately in your data structure or output format.
 
 	// comment added to overcome the problem with the comment map association
 
-	//gong:ident [ref_models.NoteOnStyle]
-	__NoteShape__000001_NoteOnStyle.Identifier = `ref_models.NoteOnStyle`
-	__NoteShape__000001_NoteOnStyle.Body = `
+	//gong:ident [ref_models.NoteOnParagraphStyle]
+	__NoteShape__000001_NoteOnStyle.Identifier = `ref_models.NoteOnParagraphStyle`
+	__NoteShape__000001_NoteOnStyle.Body = `[models.ParagraphStyle]
+-
 The "w:pStyle" element, found within the paragraph properties ("w:pPr") node in
 a Word document's XML structure, defines the paragraph style for a given
 paragraph ("w:p").
@@ -410,7 +416,9 @@ When parsing a "w:pStyle" node, your code should map the style ID to the
 corresponding style in the styles.xml file and apply the associated formatting
 to the paragraph.
 `
-	__NoteShape__000001_NoteOnStyle.BodyHTML = `<p>The &quot;w:pStyle&quot; element, found within the paragraph properties (&quot;w:pPr&quot;) node in
+	__NoteShape__000001_NoteOnStyle.BodyHTML = `<p><a href="/models#ParagraphStyle">models.ParagraphStyle</a>
+-
+The &quot;w:pStyle&quot; element, found within the paragraph properties (&quot;w:pPr&quot;) node in
 a Word document&apos;s XML structure, defines the paragraph style for a given
 paragraph (&quot;w:p&quot;).
 -
@@ -436,8 +444,26 @@ to the paragraph.
 	__NoteShape__000001_NoteOnStyle.Heigth = 368.000000
 	__NoteShape__000001_NoteOnStyle.Matched = false
 
+	// NoteShapeLink values setup
+	__NoteShapeLink__000000_ParagraphProperties.Name = `ParagraphProperties`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.ParagraphProperties]
+	__NoteShapeLink__000000_ParagraphProperties.Identifier = `ref_models.ParagraphProperties`
+	__NoteShapeLink__000000_ParagraphProperties.Type = models.NOTE_SHAPE_LINK_TO_GONG_STRUCT_OR_ENUM_SHAPE
+
+	// NoteShapeLink values setup
+	__NoteShapeLink__000001_ParagraphStyle.Name = `ParagraphStyle`
+
+	// comment added to overcome the problem with the comment map association
+
+	//gong:ident [ref_models.ParagraphStyle]
+	__NoteShapeLink__000001_ParagraphStyle.Identifier = `ref_models.ParagraphStyle`
+	__NoteShapeLink__000001_ParagraphStyle.Type = models.NOTE_SHAPE_LINK_TO_GONG_STRUCT_OR_ENUM_SHAPE
+
 	// Position values setup
-	__Position__000000_Pos_NewDiagram_2_Paragraph.X = 64.000000
+	__Position__000000_Pos_NewDiagram_2_Paragraph.X = 65.000000
 	__Position__000000_Pos_NewDiagram_2_Paragraph.Y = 71.000000
 	__Position__000000_Pos_NewDiagram_2_Paragraph.Name = `Pos-NewDiagram_2-Paragraph`
 
@@ -468,17 +494,17 @@ to the paragraph.
 	__Classdiagram__000000_NewDiagram_2.NoteShapes = append(__Classdiagram__000000_NewDiagram_2.NoteShapes, __NoteShape__000000_NoteOnParagraphProperties)
 	__Classdiagram__000000_NewDiagram_2.NoteShapes = append(__Classdiagram__000000_NewDiagram_2.NoteShapes, __NoteShape__000001_NoteOnStyle)
 	__GongStructShape__000000_NewDiagram_2_Paragraph.Position = __Position__000000_Pos_NewDiagram_2_Paragraph
-	__GongStructShape__000000_NewDiagram_2_Paragraph.Fields = append(__GongStructShape__000000_NewDiagram_2_Paragraph.Fields, __Field__000001_Name)
+	__GongStructShape__000000_NewDiagram_2_Paragraph.Fields = append(__GongStructShape__000000_NewDiagram_2_Paragraph.Fields, __Field__000002_Name)
 	__GongStructShape__000000_NewDiagram_2_Paragraph.Links = append(__GongStructShape__000000_NewDiagram_2_Paragraph.Links, __Link__000000_ParagraphProperties)
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Position = __Position__000001_Pos_NewDiagram_2_ParagraphProperties
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Fields = append(__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Fields, __Field__000003_Name)
 	__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Links = append(__GongStructShape__000001_NewDiagram_2_ParagraphProperties.Links, __Link__000001_ParagraphStyle)
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Position = __Position__000002_Pos_NewDiagram_2_ParagraphStyle
-	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields = append(__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields, __Field__000002_Name)
+	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields = append(__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields, __Field__000001_Name)
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields = append(__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields, __Field__000000_Content)
 	__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields = append(__GongStructShape__000002_NewDiagram_2_ParagraphStyle.Fields, __Field__000004_ValAttr)
 	__Link__000000_ParagraphProperties.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_Paragraph_and_NewDiagram_2_ParagraphProperties
 	__Link__000001_ParagraphStyle.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_NewDiagram_2_in_middle_between_NewDiagram_2_ParagraphProperties_and_NewDiagram_2_ParagraphStyle
+	__NoteShape__000000_NoteOnParagraphProperties.NoteShapeLinks = append(__NoteShape__000000_NoteOnParagraphProperties.NoteShapeLinks, __NoteShapeLink__000000_ParagraphProperties)
+	__NoteShape__000001_NoteOnStyle.NoteShapeLinks = append(__NoteShape__000001_NoteOnStyle.NoteShapeLinks, __NoteShapeLink__000001_ParagraphStyle)
 }
-
-

@@ -1,6 +1,7 @@
 package models
 
-// GONGNOTE(NoteOnParagraphProperties)
+// GONGNOTE(NoteOnParagraphProperties) [models.ParagraphProperties]
+// -
 // The "w:pPr" node represents paragraph properties within a Word document's XML
 // structure, and is found within a "w:p" (paragraph) node in the document.xml
 // file.

@@ -63,7 +63,7 @@ var map_DocLink_Identifier_NewDiagram_1 map[string]any = map[string]any{
 
 	"ref_models.NoteOnRune": ref_models.NoteOnRune,
 
-	"ref_models.NoteOnStyle": ref_models.NoteOnStyle,
+	"ref_models.NoteOnStyle": ref_models.NoteOnParagraphStyle,
 
 	"ref_models.Paragraph": &(ref_models.Paragraph{}),
 
@@ -770,5 +770,3 @@ the &quot;w:t&quot; nodes.
 	__Link__000004_Root.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_NewDiagram_1_in_middle_between_NewDiagram_1_Document_and_NewDiagram_1_Node
 	__NoteShape__000002_NoteOnParagraph.NoteShapeLinks = append(__NoteShape__000002_NoteOnParagraph.NoteShapeLinks, __NoteShapeLink__000000_Paragraph)
 }
-
-

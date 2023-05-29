@@ -1,6 +1,7 @@
 package models
 
-// GONGNOTE(NoteOnStyle)
+// GONGNOTE(NoteOnParagraphStyle) [models.ParagraphStyle]
+// -
 // The "w:pStyle" element, found within the paragraph properties ("w:pPr") node in
 // a Word document's XML structure, defines the paragraph style for a given
 // paragraph ("w:p").
@@ -20,7 +21,7 @@ package models
 // When parsing a "w:pStyle" node, your code should map the style ID to the
 // corresponding style in the styles.xml file and apply the associated formatting
 // to the paragraph.
-const NoteOnStyle = ""
+const NoteOnParagraphStyle = ""
 
 type ParagraphStyle struct {
 	Name    string

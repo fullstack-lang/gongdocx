@@ -63,7 +63,7 @@ var map_DocLink_Identifier_NewDiagram map[string]any = map[string]any{
 
 	"ref_models.NoteOnRune": ref_models.NoteOnRune,
 
-	"ref_models.NoteOnStyle": ref_models.NoteOnStyle,
+	"ref_models.NoteOnStyle": ref_models.NoteOnParagraphStyle,
 
 	"ref_models.Paragraph": &(ref_models.Paragraph{}),
 
@@ -453,5 +453,3 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__Link__000002_Nodes.Middlevertice = __Vertice__000003_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Node_and_NewDiagram_Node
 	__Link__000003_Root.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_NewDiagram_in_middle_between_NewDiagram_Document_and_NewDiagram_Node
 }
-
-

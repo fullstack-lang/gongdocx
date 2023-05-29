@@ -63,7 +63,7 @@ var map_DocLink_Identifier_NewDiagram_3 map[string]any = map[string]any{
 
 	"ref_models.NoteOnRune": ref_models.NoteOnRune,
 
-	"ref_models.NoteOnStyle": ref_models.NoteOnStyle,
+	"ref_models.NoteOnStyle": ref_models.NoteOnParagraphStyle,
 
 	"ref_models.Paragraph": &(ref_models.Paragraph{}),
 
@@ -410,5 +410,3 @@ the &quot;w:t&quot; nodes.
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields = append(__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields, __Field__000003_IsItalic)
 	__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields = append(__GongStructShape__000001_NewDiagram_3_RuneProperties.Fields, __Field__000001_Content)
 }
-
-
