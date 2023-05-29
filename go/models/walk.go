@@ -56,12 +56,8 @@ func walk(
 	case "pPr":
 		code := false
 
-		node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
-		node.Nodes = append(node.Nodes, node__)
-		nodeCounter = nodeCounter + 1
-
-		paragraphproperties_ := (&ParagraphProperties{Name: node__.Name}).Stage(gongdocxStage)
-		paragraphproperties_.Node = node__
+		paragraphproperties_ := (&ParagraphProperties{Name: node.Name}).Stage(gongdocxStage)
+		paragraphproperties_.Node = node
 		paragraphproperties_.Content = string(node_.Content)
 
 		// check if the parent node is a paragraph
@@ -71,6 +67,7 @@ func walk(
 		}
 
 		for _, n := range node_.Nodes {
+
 			switch n.XMLName.Local {
 			case "ind":
 				if left, ok := attr(n.Attrs, "left"); ok {
@@ -81,12 +78,12 @@ func walk(
 			case "pStyle":
 
 				nodeCounter_ := 0
-				node___ := (&Node{Name: fmt.Sprintf(node__.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
-				node.Nodes = append(node__.Nodes, node___)
+				node___ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter_)}).Stage(gongdocxStage)
+				node.Nodes = append(node.Nodes, node___)
 				nodeCounter_ = nodeCounter_ + 1
 
 				paragraphStyle := (&ParagraphStyle{Name: node___.Name}).Stage(gongdocxStage)
-				paragraphStyle.Node = node__
+				paragraphStyle.Node = node
 				paragraphStyle.Content = string(n.Content)
 
 				if val, ok := attr(n.Attrs, "val"); ok {
@@ -169,7 +166,7 @@ func walk(
 			fmt.Fprint(w, "`")
 		}
 		for _, n := range node_.Nodes {
-			if err := walk(zf, dummyNode, node__, gongdocxStage, &n, w); err != nil {
+			if err := walk(zf, dummyNode, node, gongdocxStage, &n, w); err != nil {
 				return err
 			}
 		}
