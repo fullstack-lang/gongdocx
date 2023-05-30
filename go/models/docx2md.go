@@ -288,7 +288,7 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 	if err != nil {
 		return err
 	}
-	fmt.Print(buf.String())
+	// fmt.Print(buf.String())
 
 	return nil
 }

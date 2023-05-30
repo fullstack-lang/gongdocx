@@ -291,7 +291,7 @@ func walk(
 			for j := 0; j < maxcol; j++ {
 				// // foo.Fprint(w, "|")
 				if j < len(row) {
-					width := runewidth.StringWidth(row[j])
+					// width := runewidth.StringWidth(row[j])
 					// // foo.Fprint(w, escape(row[j], "|"))
 					// // foo.Fprint(w, strings.Repeat(" ", widths[j]-width))
 				} else {
