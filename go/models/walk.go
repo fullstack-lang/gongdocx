@@ -23,26 +23,26 @@ func walk(
 
 	switch node_.XMLName.Local {
 	case "hyperlink":
-		fmt.Fprint(w, "[")
+		// foo.Fprint(w, "[")
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
 			if err := walk(zf, dummyNode, node, gongdocxStage, &n, &cbuf); err != nil {
 				return err
 			}
 		}
-		fmt.Fprint(w, escape(cbuf.String(), "[]"))
-		fmt.Fprint(w, "]")
+		// foo.Fprint(w, escape(cbuf.String(), "[]"))
+		// foo.Fprint(w, "]")
 
-		fmt.Fprint(w, "(")
+		// foo.Fprint(w, "(")
 		if id, ok := attr(node_.Attrs, "id"); ok {
 			for _, rel := range zf.rels.Relationship {
 				if id == rel.ID {
-					fmt.Fprint(w, escape(rel.Target, "()"))
+					// foo.Fprint(w, escape(rel.Target, "()"))
 					break
 				}
 			}
 		}
-		fmt.Fprint(w, ")")
+		// foo.Fprint(w, ")")
 	case "t":
 		node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
 		node.Nodes = append(node.Nodes, node__)
@@ -62,7 +62,7 @@ func walk(
 			rune_.Text = text
 		}
 
-		fmt.Fprint(w, string(node_.Content))
+		// foo.Fprint(w, string(node_.Content))
 	case "pPr":
 		code := false
 
@@ -82,7 +82,7 @@ func walk(
 			case "ind":
 				if left, ok := attr(n.Attrs, "left"); ok {
 					if i, err := strconv.Atoi(left); err == nil && i > 0 {
-						fmt.Fprint(w, strings.Repeat("  ", i/360))
+						// foo.Fprint(w, strings.Repeat("  ", i/360))
 					}
 				}
 			case "pStyle":
@@ -104,13 +104,13 @@ func walk(
 
 					if strings.HasPrefix(val, "Heading") {
 						if i, err := strconv.Atoi(val[7:]); err == nil && i > 0 {
-							fmt.Fprint(w, strings.Repeat("#", i)+" ")
+							// foo.Fprint(w, strings.Repeat("#", i)+" ")
 						}
 					} else if val == "Code" {
 						code = true
 					} else {
 						if i, err := strconv.Atoi(val); err == nil && i > 0 {
-							fmt.Fprint(w, strings.Repeat("#", i)+" ")
+							// foo.Fprint(w, strings.Repeat("#", i)+" ")
 						}
 					}
 				}
@@ -158,7 +158,7 @@ func walk(
 					break
 				}
 
-				fmt.Fprint(w, strings.Repeat("  ", ind))
+				// foo.Fprint(w, strings.Repeat("  ", ind))
 				switch numFmt {
 				case "decimal", "aiueoFullWidth":
 					key := fmt.Sprintf("%s:%d", numID, ind)
@@ -168,14 +168,14 @@ func walk(
 					} else {
 						zf.list[key] = cur + 1
 					}
-					fmt.Fprintf(w, "%d. ", zf.list[key])
+					// foo.Fprintf(w, "%d. ", zf.list[key])
 				case "bullet":
-					fmt.Fprint(w, "* ")
+					// foo.Fprint(w, "* ")
 				}
 			}
 		}
 		if code {
-			fmt.Fprint(w, "`")
+			// foo.Fprint(w, "`")
 		}
 		for _, n := range node_.Nodes {
 			if err := walk(zf, dummyNode, node, gongdocxStage, &n, w); err != nil {
@@ -183,7 +183,7 @@ func walk(
 			}
 		}
 		if code {
-			fmt.Fprint(w, "`")
+			// foo.Fprint(w, "`")
 		}
 	case "tbl":
 
@@ -278,29 +278,29 @@ func walk(
 		for i, row := range rows {
 			if i == 0 {
 				for j := 0; j < maxcol; j++ {
-					fmt.Fprint(w, "|")
-					fmt.Fprint(w, strings.Repeat(" ", widths[j]))
+					// // foo.Fprint(w, "|")
+					// // foo.Fprint(w, strings.Repeat(" ", widths[j]))
 				}
-				fmt.Fprint(w, "|\n")
+				// // foo.Fprint(w, "|\n")
 				for j := 0; j < maxcol; j++ {
-					fmt.Fprint(w, "|")
-					fmt.Fprint(w, strings.Repeat("-", widths[j]))
+					// // foo.Fprint(w, "|")
+					// // foo.Fprint(w, strings.Repeat("-", widths[j]))
 				}
-				fmt.Fprint(w, "|\n")
+				// // foo.Fprint(w, "|\n")
 			}
 			for j := 0; j < maxcol; j++ {
-				fmt.Fprint(w, "|")
+				// // foo.Fprint(w, "|")
 				if j < len(row) {
 					width := runewidth.StringWidth(row[j])
-					fmt.Fprint(w, escape(row[j], "|"))
-					fmt.Fprint(w, strings.Repeat(" ", widths[j]-width))
+					// // foo.Fprint(w, escape(row[j], "|"))
+					// // foo.Fprint(w, strings.Repeat(" ", widths[j]-width))
 				} else {
-					fmt.Fprint(w, strings.Repeat(" ", widths[j]))
+					// // foo.Fprint(w, strings.Repeat(" ", widths[j]))
 				}
 			}
-			fmt.Fprint(w, "|\n")
+			// // foo.Fprint(w, "|\n")
 		}
-		fmt.Fprint(w, "\n")
+		// // foo.Fprint(w, "\n")
 	case "r":
 
 		rune_ := (&Rune{Name: node.Name}).Stage(gongdocxStage)
@@ -347,13 +347,13 @@ func walk(
 			}
 		}
 		if strike {
-			fmt.Fprint(w, "~~")
+			// // foo.Fprint(w, "~~")
 		}
 		if bold {
-			fmt.Fprint(w, "**")
+			// // foo.Fprint(w, "**")
 		}
 		if italic {
-			fmt.Fprint(w, "*")
+			// // foo.Fprint(w, "*")
 		}
 		var cbuf bytes.Buffer
 		for _, n := range node_.Nodes {
@@ -361,15 +361,15 @@ func walk(
 				return err
 			}
 		}
-		fmt.Fprint(w, escape(cbuf.String(), `*~\`))
+		// // foo.Fprint(w, escape(cbuf.String(), `*~\`))
 		if italic {
-			fmt.Fprint(w, "*")
+			// // foo.Fprint(w, "*")
 		}
 		if bold {
-			fmt.Fprint(w, "**")
+			// // foo.Fprint(w, "**")
 		}
 		if strike {
-			fmt.Fprint(w, "~~")
+			// // foo.Fprint(w, "~~")
 		}
 	case "p":
 		paragraph := (&Paragraph{Name: node.Name}).Stage(gongdocxStage)
@@ -392,7 +392,7 @@ func walk(
 				return err
 			}
 		}
-		fmt.Fprintln(w)
+		// // foo.Fprintln(w)
 	case "blip":
 		if id, ok := attr(node_.Attrs, "embed"); ok {
 			for _, rel := range zf.rels.Relationship {
@@ -412,7 +412,7 @@ func walk(
 				return err
 			}
 		}
-		fmt.Fprintln(w, "\n```\n"+cbuf.String()+"```")
+		// foo.Fprintln(w, "\n```\n"+cbuf.String()+"```")
 	default:
 		for _, n := range node_.Nodes {
 			node__ := (&Node{Name: fmt.Sprintf(node.Name+".%d", nodeCounter)}).Stage(gongdocxStage)
