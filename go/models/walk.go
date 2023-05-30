@@ -189,7 +189,7 @@ func walk(
 
 		table := (&Table{Name: node.Name}).Stage(gongdocxStage)
 		table.Node = node
-		table.Content = string(node_.Content)
+		// table.Content = string(node_.Content)
 
 		var rows [][]string
 		nodeRowCounter_ := 0
@@ -232,7 +232,7 @@ func walk(
 
 			tableRow := (&TableRow{Name: node__.Name}).Stage(gongdocxStage)
 			tableRow.Node = node
-			tableRow.Content = string(tableNode.Content)
+			// tableRow.Content = string(tableNode.Content)
 			table.TableRows = append(table.TableRows, tableRow)
 
 			var cols []string
@@ -247,7 +247,7 @@ func walk(
 
 				tableColumn := (&TableColumn{Name: node__.Name}).Stage(gongdocxStage)
 				tableColumn.Node = node__
-				tableColumn.Content = string(tc.Content)
+				// tableColumn.Content = string(tc.Content)
 				tableRow.TableColumns = append(tableRow.TableColumns, tableColumn)
 
 				var cbuf bytes.Buffer
@@ -374,7 +374,7 @@ func walk(
 	case "p":
 		paragraph := (&Paragraph{Name: node.Name}).Stage(gongdocxStage)
 		paragraph.Node = node
-		paragraph.Content = string(node_.Content)
+		// paragraph.Content = string(node_.Content)
 
 		// check if the parent node is a paragraph
 		switch tableColumn := parentNode.(type) {
