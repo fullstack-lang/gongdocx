@@ -54,6 +54,20 @@ type ParagraphPointersEnconding struct {
 	// This field is generated into another field to enable AS ONE association
 	ParagraphPropertiesID sql.NullInt64
 
+	// field Next is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	NextID sql.NullInt64
+
+	// field Previous is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	PreviousID sql.NullInt64
+
+	// Implementation of a reverse ID for field Body{}.Paragraphs []*Paragraph
+	Body_ParagraphsDBID sql.NullInt64
+
+	// implementation of the index of the withing the slice
+	Body_ParagraphsDBID_Index sql.NullInt64
+
 	// Implementation of a reverse ID for field TableColumn{}.Paragraphs []*Paragraph
 	TableColumn_ParagraphsDBID sql.NullInt64
 
@@ -265,6 +279,24 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 			}
 		}
 
+		// commit pointer value paragraph.Next translates to updating the paragraph.NextID
+		paragraphDB.NextID.Valid = true // allow for a 0 value (nil association)
+		if paragraph.Next != nil {
+			if NextId, ok := backRepo.BackRepoParagraph.Map_ParagraphPtr_ParagraphDBID[paragraph.Next]; ok {
+				paragraphDB.NextID.Int64 = int64(NextId)
+				paragraphDB.NextID.Valid = true
+			}
+		}
+
+		// commit pointer value paragraph.Previous translates to updating the paragraph.PreviousID
+		paragraphDB.PreviousID.Valid = true // allow for a 0 value (nil association)
+		if paragraph.Previous != nil {
+			if PreviousId, ok := backRepo.BackRepoParagraph.Map_ParagraphPtr_ParagraphDBID[paragraph.Previous]; ok {
+				paragraphDB.PreviousID.Int64 = int64(PreviousId)
+				paragraphDB.PreviousID.Valid = true
+			}
+		}
+
 		query := backRepoParagraph.db.Save(&paragraphDB)
 		if query.Error != nil {
 			return query.Error
@@ -407,6 +439,14 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 		return runeDB_i.Paragraph_RunesDBID_Index.Int64 < runeDB_j.Paragraph_RunesDBID_Index.Int64
 	})
 
+	// Next field
+	if paragraphDB.NextID.Int64 != 0 {
+		paragraph.Next = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(paragraphDB.NextID.Int64)]
+	}
+	// Previous field
+	if paragraphDB.PreviousID.Int64 != 0 {
+		paragraph.Previous = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(paragraphDB.PreviousID.Int64)]
+	}
 	return
 }
 
@@ -639,6 +679,24 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseTwo() {
 		if paragraphDB.ParagraphPropertiesID.Int64 != 0 {
 			paragraphDB.ParagraphPropertiesID.Int64 = int64(BackRepoParagraphPropertiesid_atBckpTime_newID[uint(paragraphDB.ParagraphPropertiesID.Int64)])
 			paragraphDB.ParagraphPropertiesID.Valid = true
+		}
+
+		// reindexing Next field
+		if paragraphDB.NextID.Int64 != 0 {
+			paragraphDB.NextID.Int64 = int64(BackRepoParagraphid_atBckpTime_newID[uint(paragraphDB.NextID.Int64)])
+			paragraphDB.NextID.Valid = true
+		}
+
+		// reindexing Previous field
+		if paragraphDB.PreviousID.Int64 != 0 {
+			paragraphDB.PreviousID.Int64 = int64(BackRepoParagraphid_atBckpTime_newID[uint(paragraphDB.PreviousID.Int64)])
+			paragraphDB.PreviousID.Valid = true
+		}
+
+		// This reindex paragraph.Paragraphs
+		if paragraphDB.Body_ParagraphsDBID.Int64 != 0 {
+			paragraphDB.Body_ParagraphsDBID.Int64 =
+				int64(BackRepoBodyid_atBckpTime_newID[uint(paragraphDB.Body_ParagraphsDBID.Int64)])
 		}
 
 		// This reindex paragraph.Paragraphs

@@ -10,6 +10,7 @@ import { MapOfComponents } from '../map-components'
 import { MapOfSortingComponents } from '../map-components'
 
 // insertion point for imports
+import { BodyDB } from '../body-db'
 import { TableColumnDB } from '../tablecolumn-db'
 
 import { Router, ActivatedRoute } from '@angular/router';
@@ -24,6 +25,7 @@ enum ParagraphDetailComponentState {
 	CREATE_INSTANCE,
 	UPDATE_INSTANCE,
 	// insertion point for declarations of enum values of state
+	CREATE_INSTANCE_WITH_ASSOCIATION_Body_Paragraphs_SET,
 	CREATE_INSTANCE_WITH_ASSOCIATION_TableColumn_Paragraphs_SET,
 }
 
@@ -95,6 +97,10 @@ export class ParagraphDetailComponent implements OnInit {
 				switch (this.originStructFieldName) {
 					// insertion point for state computation
 					case "Paragraphs":
+						// console.log("Paragraph" + " is instanciated with back pointer to instance " + this.id + " Body association Paragraphs")
+						this.state = ParagraphDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Body_Paragraphs_SET
+						break;
+					case "Paragraphs":
 						// console.log("Paragraph" + " is instanciated with back pointer to instance " + this.id + " TableColumn association Paragraphs")
 						this.state = ParagraphDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_TableColumn_Paragraphs_SET
 						break;
@@ -134,6 +140,10 @@ export class ParagraphDetailComponent implements OnInit {
 						this.paragraph = paragraph!
 						break;
 					// insertion point for init of association field
+					case ParagraphDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_Body_Paragraphs_SET:
+						this.paragraph = new (ParagraphDB)
+						this.paragraph.Body_Paragraphs_reverse = frontRepo.Bodys.get(this.id)!
+						break;
 					case ParagraphDetailComponentState.CREATE_INSTANCE_WITH_ASSOCIATION_TableColumn_Paragraphs_SET:
 						this.paragraph = new (ParagraphDB)
 						this.paragraph.TableColumn_Paragraphs_reverse = frontRepo.TableColumns.get(this.id)!
@@ -175,10 +185,42 @@ export class ParagraphDetailComponent implements OnInit {
 			this.paragraph.ParagraphPropertiesID.Int64 = 0
 			this.paragraph.ParagraphPropertiesID.Valid = true
 		}
+		if (this.paragraph.NextID == undefined) {
+			this.paragraph.NextID = new NullInt64
+		}
+		if (this.paragraph.Next != undefined) {
+			this.paragraph.NextID.Int64 = this.paragraph.Next.ID
+			this.paragraph.NextID.Valid = true
+		} else {
+			this.paragraph.NextID.Int64 = 0
+			this.paragraph.NextID.Valid = true
+		}
+		if (this.paragraph.PreviousID == undefined) {
+			this.paragraph.PreviousID = new NullInt64
+		}
+		if (this.paragraph.Previous != undefined) {
+			this.paragraph.PreviousID.Int64 = this.paragraph.Previous.ID
+			this.paragraph.PreviousID.Valid = true
+		} else {
+			this.paragraph.PreviousID.Int64 = 0
+			this.paragraph.PreviousID.Valid = true
+		}
 
 		// save from the front pointer space to the non pointer space for serialization
 
 		// insertion point for translation/nullation of each pointers
+		if (this.paragraph.Body_Paragraphs_reverse != undefined) {
+			if (this.paragraph.Body_ParagraphsDBID == undefined) {
+				this.paragraph.Body_ParagraphsDBID = new NullInt64
+			}
+			this.paragraph.Body_ParagraphsDBID.Int64 = this.paragraph.Body_Paragraphs_reverse.ID
+			this.paragraph.Body_ParagraphsDBID.Valid = true
+			if (this.paragraph.Body_ParagraphsDBID_Index == undefined) {
+				this.paragraph.Body_ParagraphsDBID_Index = new NullInt64
+			}
+			this.paragraph.Body_ParagraphsDBID_Index.Valid = true
+			this.paragraph.Body_Paragraphs_reverse = new BodyDB // very important, otherwise, circular JSON
+		}
 		if (this.paragraph.TableColumn_Paragraphs_reverse != undefined) {
 			if (this.paragraph.TableColumn_ParagraphsDBID == undefined) {
 				this.paragraph.TableColumn_ParagraphsDBID = new NullInt64

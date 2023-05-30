@@ -47,6 +47,27 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="Next">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Next </th>
+            <td mat-cell *matCellDef="let Paragraph">
+                {{ Paragraph.Next ? Paragraph.Next.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="Previous">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Previous </th>
+            <td mat-cell *matCellDef="let Paragraph">
+                {{ Paragraph.Previous ? Paragraph.Previous.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="Body_Paragraphs">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> <-- (Body) Paragraphs </th>
+            <td mat-cell *matCellDef="let paragraph">
+                {{frontRepo.Bodys.get(paragraph.Body_ParagraphsDBID.Int64)?.Name}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="TableColumn_Paragraphs">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> <-- (TableColumn) Paragraphs </th>
             <td mat-cell *matCellDef="let paragraph">

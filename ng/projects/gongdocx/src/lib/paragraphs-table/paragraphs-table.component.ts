@@ -84,6 +84,19 @@ export class ParagraphsTableComponent implements OnInit {
         case 'ParagraphProperties':
           return (paragraphDB.ParagraphProperties ? paragraphDB.ParagraphProperties.Name : '');
 
+        case 'Next':
+          return (paragraphDB.Next ? paragraphDB.Next.Name : '');
+
+        case 'Previous':
+          return (paragraphDB.Previous ? paragraphDB.Previous.Name : '');
+
+        case 'Body_Paragraphs':
+          if (this.frontRepo.Bodys.get(paragraphDB.Body_ParagraphsDBID.Int64) != undefined) {
+            return this.frontRepo.Bodys.get(paragraphDB.Body_ParagraphsDBID.Int64)!.Name
+          } else {
+            return ""
+          }
+
         case 'TableColumn_Paragraphs':
           if (this.frontRepo.TableColumns.get(paragraphDB.TableColumn_ParagraphsDBID.Int64) != undefined) {
             return this.frontRepo.TableColumns.get(paragraphDB.TableColumn_ParagraphsDBID.Int64)!.Name
@@ -113,6 +126,16 @@ export class ParagraphsTableComponent implements OnInit {
       if (paragraphDB.ParagraphProperties) {
         mergedContent += paragraphDB.ParagraphProperties.Name.toLowerCase()
       }
+      if (paragraphDB.Next) {
+        mergedContent += paragraphDB.Next.Name.toLowerCase()
+      }
+      if (paragraphDB.Previous) {
+        mergedContent += paragraphDB.Previous.Name.toLowerCase()
+      }
+      if (paragraphDB.Body_ParagraphsDBID.Int64 != 0) {
+        mergedContent += this.frontRepo.Bodys.get(paragraphDB.Body_ParagraphsDBID.Int64)!.Name.toLowerCase()
+      }
+
       if (paragraphDB.TableColumn_ParagraphsDBID.Int64 != 0) {
         mergedContent += this.frontRepo.TableColumns.get(paragraphDB.TableColumn_ParagraphsDBID.Int64)!.Name.toLowerCase()
       }
@@ -175,6 +198,9 @@ export class ParagraphsTableComponent implements OnInit {
         "Content",
         "Node",
         "ParagraphProperties",
+        "Next",
+        "Previous",
+        "Body_Paragraphs",
         "TableColumn_Paragraphs",
       ]
     } else {
@@ -183,6 +209,9 @@ export class ParagraphsTableComponent implements OnInit {
         "Content",
         "Node",
         "ParagraphProperties",
+        "Next",
+        "Previous",
+        "Body_Paragraphs",
         "TableColumn_Paragraphs",
       ]
       this.selection = new SelectionModel<ParagraphDB>(allowMultiSelect, this.initialSelection);

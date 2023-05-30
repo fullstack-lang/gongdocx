@@ -2,6 +2,7 @@
 import { NodeDB } from './node-db'
 import { ParagraphPropertiesDB } from './paragraphproperties-db'
 import { RuneDB } from './rune-db'
+import { BodyDB } from './body-db'
 import { TableColumnDB } from './tablecolumn-db'
 
 // usefull for managing pointer ID values that can be nullable
@@ -27,6 +28,16 @@ export class ParagraphDB {
 	ParagraphPropertiesID: NullInt64 = new NullInt64 // if pointer is null, ParagraphProperties.ID = 0
 
 	Runes?: Array<RuneDB>
+	Next?: ParagraphDB
+	NextID: NullInt64 = new NullInt64 // if pointer is null, Next.ID = 0
+
+	Previous?: ParagraphDB
+	PreviousID: NullInt64 = new NullInt64 // if pointer is null, Previous.ID = 0
+
+	Body_ParagraphsDBID: NullInt64 = new NullInt64
+	Body_ParagraphsDBID_Index: NullInt64  = new NullInt64 // store the index of the paragraph instance in Body.Paragraphs
+	Body_Paragraphs_reverse?: BodyDB 
+
 	TableColumn_ParagraphsDBID: NullInt64 = new NullInt64
 	TableColumn_ParagraphsDBID_Index: NullInt64  = new NullInt64 // store the index of the paragraph instance in TableColumn.Paragraphs
 	TableColumn_Paragraphs_reverse?: TableColumnDB 

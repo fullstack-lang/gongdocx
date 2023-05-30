@@ -5,6 +5,9 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 
 	switch target := any(instance).(type) {
 	// insertion point for stage
+	case *Body:
+		ok = stage.IsStagedBody(target)
+
 	case *Document:
 		ok = stage.IsStagedDocument(target)
 
@@ -57,6 +60,13 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 }
 
 // insertion point for stage per struct
+	func (stage *StageStruct) IsStagedBody(body *Body) (ok bool) {
+
+		_, ok = stage.Bodys[body]
+	
+		return
+	}
+
 	func (stage *StageStruct) IsStagedDocument(document *Document) (ok bool) {
 
 		_, ok = stage.Documents[document]
@@ -171,6 +181,9 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point for stage branch
+	case *Body:
+		stage.StageBranchBody(target)
+
 	case *Document:
 		stage.StageBranchDocument(target)
 
@@ -222,6 +235,30 @@ func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 }
 
 // insertion point for stage branch per struct
+func (stage *StageStruct) StageBranchBody(body *Body) {
+
+	// check if instance is already staged
+	if IsStaged(stage, body) {
+		return
+	}
+
+	body.Stage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if body.LastParagraph != nil {
+		StageBranch(stage, body.LastParagraph)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _paragraph := range body.Paragraphs {
+		StageBranch(stage, _paragraph)
+	}
+	for _, _table := range body.Tables {
+		StageBranch(stage, _table)
+	}
+
+}
+
 func (stage *StageStruct) StageBranchDocument(document *Document) {
 
 	// check if instance is already staged
@@ -309,6 +346,12 @@ func (stage *StageStruct) StageBranchParagraph(paragraph *Paragraph) {
 	}
 	if paragraph.ParagraphProperties != nil {
 		StageBranch(stage, paragraph.ParagraphProperties)
+	}
+	if paragraph.Next != nil {
+		StageBranch(stage, paragraph.Next)
+	}
+	if paragraph.Previous != nil {
+		StageBranch(stage, paragraph.Previous)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
@@ -531,6 +574,9 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 
 	switch target := any(instance).(type) {
 	// insertion point for unstage branch
+	case *Body:
+		stage.UnstageBranchBody(target)
+
 	case *Document:
 		stage.UnstageBranchDocument(target)
 
@@ -582,6 +628,30 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 }
 
 // insertion point for unstage branch per struct
+func (stage *StageStruct) UnstageBranchBody(body *Body) {
+
+	// check if instance is already staged
+	if ! IsStaged(stage, body) {
+		return
+	}
+
+	body.Unstage(stage)
+
+	//insertion point for the staging of instances referenced by pointers
+	if body.LastParagraph != nil {
+		UnstageBranch(stage, body.LastParagraph)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _paragraph := range body.Paragraphs {
+		UnstageBranch(stage, _paragraph)
+	}
+	for _, _table := range body.Tables {
+		UnstageBranch(stage, _table)
+	}
+
+}
+
 func (stage *StageStruct) UnstageBranchDocument(document *Document) {
 
 	// check if instance is already staged
@@ -669,6 +739,12 @@ func (stage *StageStruct) UnstageBranchParagraph(paragraph *Paragraph) {
 	}
 	if paragraph.ParagraphProperties != nil {
 		UnstageBranch(stage, paragraph.ParagraphProperties)
+	}
+	if paragraph.Next != nil {
+		UnstageBranch(stage, paragraph.Next)
+	}
+	if paragraph.Previous != nil {
+		UnstageBranch(stage, paragraph.Previous)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers

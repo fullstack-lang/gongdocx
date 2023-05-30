@@ -30,6 +30,14 @@ type GongStructInterface interface {
 // StageStruct enables storage of staged instances
 // swagger:ignore
 type StageStruct struct { // insertion point for definition of arrays registering instances
+	Bodys           map[*Body]any
+	Bodys_mapString map[string]*Body
+
+	OnAfterBodyCreateCallback OnAfterCreateInterface[Body]
+	OnAfterBodyUpdateCallback OnAfterUpdateInterface[Body]
+	OnAfterBodyDeleteCallback OnAfterDeleteInterface[Body]
+	OnAfterBodyReadCallback   OnAfterReadInterface[Body]
+
 	Documents           map[*Document]any
 	Documents_mapString map[string]*Document
 
@@ -214,6 +222,8 @@ type BackRepoInterface interface {
 	BackupXL(stage *StageStruct, dirPath string)
 	RestoreXL(stage *StageStruct, dirPath string)
 	// insertion point for Commit and Checkout signatures
+	CommitBody(body *Body)
+	CheckoutBody(body *Body)
 	CommitDocument(document *Document)
 	CheckoutDocument(document *Document)
 	CommitDocx(docx *Docx)
@@ -262,6 +272,9 @@ func GetDefaultStage() *StageStruct {
 func NewStage() (stage *StageStruct) {
 
 	stage = &StageStruct{ // insertion point for array initiatialisation
+		Bodys:           make(map[*Body]any),
+		Bodys_mapString: make(map[string]*Body),
+
 		Documents:           make(map[*Document]any),
 		Documents_mapString: make(map[string]*Document),
 
@@ -318,12 +331,21 @@ func NewStage() (stage *StageStruct) {
 	return
 }
 
+func (stage *StageStruct) CommitWithSuspendedCallbacks() {
+
+	tmp := stage.OnInitCommitFromBackCallback
+	stage.OnInitCommitFromBackCallback = nil
+	stage.Commit()
+	stage.OnInitCommitFromBackCallback = tmp
+}
+
 func (stage *StageStruct) Commit() {
 	if stage.BackRepo != nil {
 		stage.BackRepo.Commit(stage)
 	}
 
 	// insertion point for computing the map of number of instances per gongstruct
+	stage.Map_GongStructName_InstancesNb["Body"] = len(stage.Bodys)
 	stage.Map_GongStructName_InstancesNb["Document"] = len(stage.Documents)
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
@@ -348,6 +370,7 @@ func (stage *StageStruct) Checkout() {
 	}
 
 	// insertion point for computing the map of number of instances per gongstruct
+	stage.Map_GongStructName_InstancesNb["Body"] = len(stage.Bodys)
 	stage.Map_GongStructName_InstancesNb["Document"] = len(stage.Documents)
 	stage.Map_GongStructName_InstancesNb["Docx"] = len(stage.Docxs)
 	stage.Map_GongStructName_InstancesNb["File"] = len(stage.Files)
@@ -395,6 +418,46 @@ func (stage *StageStruct) RestoreXL(dirPath string) {
 }
 
 // insertion point for cumulative sub template with model space calls
+// Stage puts body to the model stage
+func (body *Body) Stage(stage *StageStruct) *Body {
+	stage.Bodys[body] = __member
+	stage.Bodys_mapString[body.Name] = body
+
+	return body
+}
+
+// Unstage removes body off the model stage
+func (body *Body) Unstage(stage *StageStruct) *Body {
+	delete(stage.Bodys, body)
+	delete(stage.Bodys_mapString, body.Name)
+	return body
+}
+
+// commit body to the back repo (if it is already staged)
+func (body *Body) Commit(stage *StageStruct) *Body {
+	if _, ok := stage.Bodys[body]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CommitBody(body)
+		}
+	}
+	return body
+}
+
+// Checkout body to the back repo (if it is already staged)
+func (body *Body) Checkout(stage *StageStruct) *Body {
+	if _, ok := stage.Bodys[body]; ok {
+		if stage.BackRepo != nil {
+			stage.BackRepo.CheckoutBody(body)
+		}
+	}
+	return body
+}
+
+// for satisfaction of GongStruct interface
+func (body *Body) GetName() (res string) {
+	return body.Name
+}
+
 // Stage puts document to the model stage
 func (document *Document) Stage(stage *StageStruct) *Document {
 	stage.Documents[document] = __member
@@ -997,6 +1060,7 @@ func (text *Text) GetName() (res string) {
 
 // swagger:ignore
 type AllModelsStructCreateInterface interface { // insertion point for Callbacks on creation
+	CreateORMBody(Body *Body)
 	CreateORMDocument(Document *Document)
 	CreateORMDocx(Docx *Docx)
 	CreateORMFile(File *File)
@@ -1015,6 +1079,7 @@ type AllModelsStructCreateInterface interface { // insertion point for Callbacks
 }
 
 type AllModelsStructDeleteInterface interface { // insertion point for Callbacks on deletion
+	DeleteORMBody(Body *Body)
 	DeleteORMDocument(Document *Document)
 	DeleteORMDocx(Docx *Docx)
 	DeleteORMFile(File *File)
@@ -1033,6 +1098,9 @@ type AllModelsStructDeleteInterface interface { // insertion point for Callbacks
 }
 
 func (stage *StageStruct) Reset() { // insertion point for array reset
+	stage.Bodys = make(map[*Body]any)
+	stage.Bodys_mapString = make(map[string]*Body)
+
 	stage.Documents = make(map[*Document]any)
 	stage.Documents_mapString = make(map[string]*Document)
 
@@ -1081,6 +1149,9 @@ func (stage *StageStruct) Reset() { // insertion point for array reset
 }
 
 func (stage *StageStruct) Nil() { // insertion point for array nil
+	stage.Bodys = nil
+	stage.Bodys_mapString = nil
+
 	stage.Documents = nil
 	stage.Documents_mapString = nil
 
@@ -1129,6 +1200,10 @@ func (stage *StageStruct) Nil() { // insertion point for array nil
 }
 
 func (stage *StageStruct) Unstage() { // insertion point for array nil
+	for body := range stage.Bodys {
+		body.Unstage(stage)
+	}
+
 	for document := range stage.Documents {
 		document.Unstage(stage)
 	}
@@ -1197,7 +1272,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
 	// insertion point for generic types
-	Document | Docx | File | Node | Paragraph | ParagraphProperties | ParagraphStyle | Rune | RuneProperties | Table | TableColumn | TableProperties | TableRow | TableStyle | Text
+	Body | Document | Docx | File | Node | Paragraph | ParagraphProperties | ParagraphStyle | Rune | RuneProperties | Table | TableColumn | TableProperties | TableRow | TableStyle | Text
 }
 
 // Gongstruct is the type parameter for generated generic function that allows
@@ -1206,13 +1281,14 @@ type Gongstruct interface {
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
 	// insertion point for generic types
-	*Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *ParagraphStyle | *Rune | *RuneProperties | *Table | *TableColumn | *TableProperties | *TableRow | *TableStyle | *Text
+	*Body | *Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *ParagraphStyle | *Rune | *RuneProperties | *Table | *TableColumn | *TableProperties | *TableRow | *TableStyle | *Text
 	GetName() string
 }
 
 type GongstructSet interface {
 	map[any]any |
 		// insertion point for generic types
+		map[*Body]any |
 		map[*Document]any |
 		map[*Docx]any |
 		map[*File]any |
@@ -1234,6 +1310,7 @@ type GongstructSet interface {
 type GongstructMapString interface {
 	map[any]any |
 		// insertion point for generic types
+		map[string]*Body |
 		map[string]*Document |
 		map[string]*Docx |
 		map[string]*File |
@@ -1259,6 +1336,8 @@ func GongGetSet[Type GongstructSet](stage *StageStruct) *Type {
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
+	case map[*Body]any:
+		return any(&stage.Bodys).(*Type)
 	case map[*Document]any:
 		return any(&stage.Documents).(*Type)
 	case map[*Docx]any:
@@ -1301,6 +1380,8 @@ func GongGetMap[Type GongstructMapString](stage *StageStruct) *Type {
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
+	case map[string]*Body:
+		return any(&stage.Bodys_mapString).(*Type)
 	case map[string]*Document:
 		return any(&stage.Documents_mapString).(*Type)
 	case map[string]*Docx:
@@ -1343,6 +1424,8 @@ func GetGongstructInstancesSet[Type Gongstruct](stage *StageStruct) *map[*Type]a
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
+	case Body:
+		return any(&stage.Bodys).(*map[*Type]any)
 	case Document:
 		return any(&stage.Documents).(*map[*Type]any)
 	case Docx:
@@ -1385,6 +1468,8 @@ func GetGongstructInstancesMap[Type Gongstruct](stage *StageStruct) *map[string]
 
 	switch any(ret).(type) {
 	// insertion point for generic get functions
+	case Body:
+		return any(&stage.Bodys_mapString).(*map[string]*Type)
 	case Document:
 		return any(&stage.Documents_mapString).(*map[string]*Type)
 	case Docx:
@@ -1429,6 +1514,16 @@ func GetAssociationName[Type Gongstruct]() *Type {
 
 	switch any(ret).(type) {
 	// insertion point for instance with special fields
+	case Body:
+		return any(&Body{
+			// Initialisation of associations
+			// field is initialized with an instance of Paragraph with the name of the field
+			Paragraphs: []*Paragraph{{Name: "Paragraphs"}},
+			// field is initialized with an instance of Table with the name of the field
+			Tables: []*Table{{Name: "Tables"}},
+			// field is initialized with an instance of Paragraph with the name of the field
+			LastParagraph: &Paragraph{Name: "LastParagraph"},
+		}).(*Type)
 	case Document:
 		return any(&Document{
 			// Initialisation of associations
@@ -1462,6 +1557,10 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			ParagraphProperties: &ParagraphProperties{Name: "ParagraphProperties"},
 			// field is initialized with an instance of Rune with the name of the field
 			Runes: []*Rune{{Name: "Runes"}},
+			// field is initialized with an instance of Paragraph with the name of the field
+			Next: &Paragraph{Name: "Next"},
+			// field is initialized with an instance of Paragraph with the name of the field
+			Previous: &Paragraph{Name: "Previous"},
 		}).(*Type)
 	case ParagraphProperties:
 		return any(&ParagraphProperties{
@@ -1557,6 +1656,28 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 
 	switch any(ret).(type) {
 	// insertion point of functions that provide maps for reverse associations
+	// reverse maps of direct associations of Body
+	case Body:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "LastParagraph":
+			res := make(map[*Paragraph][]*Body)
+			for body := range stage.Bodys {
+				if body.LastParagraph != nil {
+					paragraph_ := body.LastParagraph
+					var bodys []*Body
+					_, ok := res[paragraph_]
+					if ok {
+						bodys = res[paragraph_]
+					} else {
+						bodys = make([]*Body, 0)
+					}
+					bodys = append(bodys, body)
+					res[paragraph_] = bodys
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		}
 	// reverse maps of direct associations of Document
 	case Document:
 		switch fieldname {
@@ -1646,6 +1767,40 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 					}
 					paragraphs = append(paragraphs, paragraph)
 					res[paragraphproperties_] = paragraphs
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "Next":
+			res := make(map[*Paragraph][]*Paragraph)
+			for paragraph := range stage.Paragraphs {
+				if paragraph.Next != nil {
+					paragraph_ := paragraph.Next
+					var paragraphs []*Paragraph
+					_, ok := res[paragraph_]
+					if ok {
+						paragraphs = res[paragraph_]
+					} else {
+						paragraphs = make([]*Paragraph, 0)
+					}
+					paragraphs = append(paragraphs, paragraph)
+					res[paragraph_] = paragraphs
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "Previous":
+			res := make(map[*Paragraph][]*Paragraph)
+			for paragraph := range stage.Paragraphs {
+				if paragraph.Previous != nil {
+					paragraph_ := paragraph.Previous
+					var paragraphs []*Paragraph
+					_, ok := res[paragraph_]
+					if ok {
+						paragraphs = res[paragraph_]
+					} else {
+						paragraphs = make([]*Paragraph, 0)
+					}
+					paragraphs = append(paragraphs, paragraph)
+					res[paragraph_] = paragraphs
 				}
 			}
 			return any(res).(map[*End][]*Start)
@@ -1971,6 +2126,27 @@ func GetSliceOfPointersReverseMap[Start, End Gongstruct](fieldname string, stage
 
 	switch any(ret).(type) {
 	// insertion point of functions that provide maps for reverse associations
+	// reverse maps of direct associations of Body
+	case Body:
+		switch fieldname {
+		// insertion point for per direct association field
+		case "Paragraphs":
+			res := make(map[*Paragraph]*Body)
+			for body := range stage.Bodys {
+				for _, paragraph_ := range body.Paragraphs {
+					res[paragraph_] = body
+				}
+			}
+			return any(res).(map[*End]*Start)
+		case "Tables":
+			res := make(map[*Table]*Body)
+			for body := range stage.Bodys {
+				for _, table_ := range body.Tables {
+					res[table_] = body
+				}
+			}
+			return any(res).(map[*End]*Start)
+		}
 	// reverse maps of direct associations of Document
 	case Document:
 		switch fieldname {
@@ -2106,6 +2282,8 @@ func GetGongstructName[Type Gongstruct]() (res string) {
 
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct name
+	case Body:
+		res = "Body"
 	case Document:
 		res = "Document"
 	case Docx:
@@ -2147,6 +2325,8 @@ func GetFields[Type Gongstruct]() (res []string) {
 
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct name
+	case Body:
+		res = []string{"Name", "Paragraphs", "Tables", "LastParagraph"}
 	case Document:
 		res = []string{"Name", "File", "Root"}
 	case Docx:
@@ -2156,7 +2336,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Node:
 		res = []string{"Name", "Nodes"}
 	case Paragraph:
-		res = []string{"Name", "Content", "Node", "ParagraphProperties", "Runes"}
+		res = []string{"Name", "Content", "Node", "ParagraphProperties", "Runes", "Next", "Previous"}
 	case ParagraphProperties:
 		res = []string{"Name", "Content", "ParagraphStyle", "Node"}
 	case ParagraphStyle:
@@ -2186,6 +2366,30 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 
 	switch any(ret).(type) {
 	// insertion point for generic get gongstruct field value
+	case Body:
+		switch fieldName {
+		// string value of fields
+		case "Name":
+			res = any(instance).(Body).Name
+		case "Paragraphs":
+			for idx, __instance__ := range any(instance).(Body).Paragraphs {
+				if idx > 0 {
+					res += "\n"
+				}
+				res += __instance__.Name
+			}
+		case "Tables":
+			for idx, __instance__ := range any(instance).(Body).Tables {
+				if idx > 0 {
+					res += "\n"
+				}
+				res += __instance__.Name
+			}
+		case "LastParagraph":
+			if any(instance).(Body).LastParagraph != nil {
+				res = any(instance).(Body).LastParagraph.Name
+			}
+		}
 	case Document:
 		switch fieldName {
 		// string value of fields
@@ -2253,6 +2457,14 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 					res += "\n"
 				}
 				res += __instance__.Name
+			}
+		case "Next":
+			if any(instance).(Paragraph).Next != nil {
+				res = any(instance).(Paragraph).Next.Name
+			}
+		case "Previous":
+			if any(instance).(Paragraph).Previous != nil {
+				res = any(instance).(Paragraph).Previous.Name
 			}
 		}
 	case ParagraphProperties:

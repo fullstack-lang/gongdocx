@@ -16,6 +16,12 @@ export * from './lib/push_from_front_nb.service'
 export * from './lib/route-service'
 
 
+export * from './lib/body-detail/body-detail.component'
+export * from './lib/body-sorting/body-sorting.component'
+export * from './lib/bodys-table/bodys-table.component'
+export * from './lib/body-db'
+export * from './lib/body.service'
+
 export * from './lib/document-detail/document-detail.component'
 export * from './lib/document-sorting/document-sorting.component'
 export * from './lib/documents-table/documents-table.component'

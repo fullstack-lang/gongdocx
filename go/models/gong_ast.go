@@ -303,6 +303,7 @@ func ParseAstFileFromAst(stage *StageStruct, inFile *ast.File, fset *token.FileS
 var __gong__map_Indentifiers_gongstructName = make(map[string]string)
 
 // insertion point for identifiers maps
+var __gong__map_Body = make(map[string]*Body)
 var __gong__map_Document = make(map[string]*Document)
 var __gong__map_Docx = make(map[string]*Docx)
 var __gong__map_File = make(map[string]*File)
@@ -490,6 +491,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 									// this is the place where an instance is created
 									switch gongstructName {
 									// insertion point for identifiers
+									case "Body":
+										instanceBody := (&Body{Name: instanceName}).Stage(stage)
+										instance = any(instanceBody)
+										__gong__map_Body[identifier] = instanceBody
 									case "Document":
 										instanceDocument := (&Document{Name: instanceName}).Stage(stage)
 										instance = any(instanceDocument)
@@ -586,6 +591,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 						}
 						switch gongstructName {
 						// insertion point for basic lit assignments
+						case "Body":
+							switch fieldName {
+							// insertion point for date assign code
+							}
 						case "Document":
 							switch fieldName {
 							// insertion point for date assign code
@@ -671,6 +680,22 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					}
 					switch gongstructName {
 					// insertion point for slice of pointers assignments
+					case "Body":
+						switch fieldName {
+						// insertion point for slice of pointers assign code
+						case "Paragraphs":
+							// remove first and last char
+							targetIdentifier := ident.Name
+							target := __gong__map_Paragraph[targetIdentifier]
+							__gong__map_Body[identifier].Paragraphs =
+								append(__gong__map_Body[identifier].Paragraphs, target)
+						case "Tables":
+							// remove first and last char
+							targetIdentifier := ident.Name
+							target := __gong__map_Table[targetIdentifier]
+							__gong__map_Body[identifier].Tables =
+								append(__gong__map_Body[identifier].Tables, target)
+						}
 					case "Document":
 						switch fieldName {
 						// insertion point for slice of pointers assign code
@@ -816,6 +841,14 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 
 			switch gongstructName {
 			// insertion point for basic lit assignments
+			case "Body":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "Name":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_Body[identifier].Name = fielValue
+				}
 			case "Document":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -1002,6 +1035,13 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 			}
 			switch gongstructName {
 			// insertion point for bool & pointers assignments
+			case "Body":
+				switch fieldName {
+				// insertion point for field dependant code
+				case "LastParagraph":
+					targetIdentifier := ident.Name
+					__gong__map_Body[identifier].LastParagraph = __gong__map_Paragraph[targetIdentifier]
+				}
 			case "Document":
 				switch fieldName {
 				// insertion point for field dependant code
@@ -1033,6 +1073,12 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "ParagraphProperties":
 					targetIdentifier := ident.Name
 					__gong__map_Paragraph[identifier].ParagraphProperties = __gong__map_ParagraphProperties[targetIdentifier]
+				case "Next":
+					targetIdentifier := ident.Name
+					__gong__map_Paragraph[identifier].Next = __gong__map_Paragraph[targetIdentifier]
+				case "Previous":
+					targetIdentifier := ident.Name
+					__gong__map_Paragraph[identifier].Previous = __gong__map_Paragraph[targetIdentifier]
 				}
 			case "ParagraphProperties":
 				switch fieldName {
@@ -1175,6 +1221,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				_ = enumValue
 				switch gongstructName {
 				// insertion point for enums assignments
+				case "Body":
+					switch fieldName {
+					// insertion point for enum assign code
+					}
 				case "Document":
 					switch fieldName {
 					// insertion point for enum assign code

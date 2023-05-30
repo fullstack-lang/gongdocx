@@ -14,8 +14,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 const allowMultiSelect = true;
 
 import { ActivatedRoute, Router, RouterState } from '@angular/router';
-import { TableDB } from '../table-db'
-import { TableService } from '../table.service'
+import { BodyDB } from '../body-db'
+import { BodyService } from '../body.service'
 
 // insertion point for additional imports
 
@@ -31,26 +31,26 @@ enum TableComponentMode {
 
 // generated table component
 @Component({
-  selector: 'app-tablestable',
-  templateUrl: './tables-table.component.html',
-  styleUrls: ['./tables-table.component.css'],
+  selector: 'app-bodystable',
+  templateUrl: './bodys-table.component.html',
+  styleUrls: ['./bodys-table.component.css'],
 })
-export class TablesTableComponent implements OnInit {
+export class BodysTableComponent implements OnInit {
 
   @Input() GONG__StackPath: string = ""
 
   // mode at invocation
   mode: TableComponentMode = TableComponentMode.DISPLAY_MODE
 
-  // used if the component is called as a selection component of Table instances
-  selection: SelectionModel<TableDB> = new (SelectionModel)
-  initialSelection = new Array<TableDB>()
+  // used if the component is called as a selection component of Body instances
+  selection: SelectionModel<BodyDB> = new (SelectionModel)
+  initialSelection = new Array<BodyDB>()
 
   // the data source for the table
-  tables: TableDB[] = []
-  matTableDataSource: MatTableDataSource<TableDB> = new (MatTableDataSource)
+  bodys: BodyDB[] = []
+  matTableDataSource: MatTableDataSource<BodyDB> = new (MatTableDataSource)
 
-  // front repo, that will be referenced by this.tables
+  // front repo, that will be referenced by this.bodys
   frontRepo: FrontRepo = new (FrontRepo)
 
   // displayedColumns is referenced by the MatTable component for specify what columns
@@ -66,30 +66,17 @@ export class TablesTableComponent implements OnInit {
   ngAfterViewInit() {
 
     // enable sorting on all fields (including pointers and reverse pointer)
-    this.matTableDataSource.sortingDataAccessor = (tableDB: TableDB, property: string) => {
+    this.matTableDataSource.sortingDataAccessor = (bodyDB: BodyDB, property: string) => {
       switch (property) {
         case 'ID':
-          return tableDB.ID
+          return bodyDB.ID
 
         // insertion point for specific sorting accessor
         case 'Name':
-          return tableDB.Name;
+          return bodyDB.Name;
 
-        case 'Node':
-          return (tableDB.Node ? tableDB.Node.Name : '');
-
-        case 'Content':
-          return tableDB.Content;
-
-        case 'TableProperties':
-          return (tableDB.TableProperties ? tableDB.TableProperties.Name : '');
-
-        case 'Body_Tables':
-          if (this.frontRepo.Bodys.get(tableDB.Body_TablesDBID.Int64) != undefined) {
-            return this.frontRepo.Bodys.get(tableDB.Body_TablesDBID.Int64)!.Name
-          } else {
-            return ""
-          }
+        case 'LastParagraph':
+          return (bodyDB.LastParagraph ? bodyDB.LastParagraph.Name : '');
 
         default:
           console.assert(false, "Unknown field")
@@ -98,25 +85,17 @@ export class TablesTableComponent implements OnInit {
     };
 
     // enable filtering on all fields (including pointers and reverse pointer, which is not done by default)
-    this.matTableDataSource.filterPredicate = (tableDB: TableDB, filter: string) => {
+    this.matTableDataSource.filterPredicate = (bodyDB: BodyDB, filter: string) => {
 
       // filtering is based on finding a lower case filter into a concatenated string
-      // the tableDB properties
+      // the bodyDB properties
       let mergedContent = ""
 
       // insertion point for merging of fields
-      mergedContent += tableDB.Name.toLowerCase()
-      if (tableDB.Node) {
-        mergedContent += tableDB.Node.Name.toLowerCase()
+      mergedContent += bodyDB.Name.toLowerCase()
+      if (bodyDB.LastParagraph) {
+        mergedContent += bodyDB.LastParagraph.Name.toLowerCase()
       }
-      mergedContent += tableDB.Content.toLowerCase()
-      if (tableDB.TableProperties) {
-        mergedContent += tableDB.TableProperties.Name.toLowerCase()
-      }
-      if (tableDB.Body_TablesDBID.Int64 != 0) {
-        mergedContent += this.frontRepo.Bodys.get(tableDB.Body_TablesDBID.Int64)!.Name.toLowerCase()
-      }
-
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
       return isSelected
@@ -132,11 +111,11 @@ export class TablesTableComponent implements OnInit {
   }
 
   constructor(
-    private tableService: TableService,
+    private bodyService: BodyService,
     private frontRepoService: FrontRepoService,
 
-    // not null if the component is called as a selection component of table instances
-    public dialogRef: MatDialogRef<TablesTableComponent>,
+    // not null if the component is called as a selection component of body instances
+    public dialogRef: MatDialogRef<BodysTableComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: DialogData,
 
     private router: Router,
@@ -162,30 +141,24 @@ export class TablesTableComponent implements OnInit {
     }
 
     // observable for changes in structs
-    this.tableService.TableServiceChanged.subscribe(
+    this.bodyService.BodyServiceChanged.subscribe(
       message => {
         if (message == "post" || message == "update" || message == "delete") {
-          this.getTables()
+          this.getBodys()
         }
       }
     )
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Delete', // insertion point for columns to display
         "Name",
-        "Node",
-        "Content",
-        "TableProperties",
-        "Body_Tables",
+        "LastParagraph",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
-        "Node",
-        "Content",
-        "TableProperties",
-        "Body_Tables",
+        "LastParagraph",
       ]
-      this.selection = new SelectionModel<TableDB>(allowMultiSelect, this.initialSelection);
+      this.selection = new SelectionModel<BodyDB>(allowMultiSelect, this.initialSelection);
     }
 
   }
@@ -196,84 +169,84 @@ export class TablesTableComponent implements OnInit {
       this.GONG__StackPath = stackPath
     }
 
-    this.getTables()
+    this.getBodys()
 
-    this.matTableDataSource = new MatTableDataSource(this.tables)
+    this.matTableDataSource = new MatTableDataSource(this.bodys)
   }
 
-  getTables(): void {
+  getBodys(): void {
     this.frontRepoService.pull(this.GONG__StackPath).subscribe(
       frontRepo => {
         this.frontRepo = frontRepo
 
-        this.tables = this.frontRepo.Tables_array;
+        this.bodys = this.frontRepo.Bodys_array;
 
         // insertion point for time duration Recoveries
         // insertion point for enum int Recoveries
 
         // in case the component is called as a selection component
         if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
-          for (let table of this.tables) {
+          for (let body of this.bodys) {
             let ID = this.dialogData.ID
-            let revPointer = table[this.dialogData.ReversePointer as keyof TableDB] as unknown as NullInt64
+            let revPointer = body[this.dialogData.ReversePointer as keyof BodyDB] as unknown as NullInt64
             if (revPointer.Int64 == ID) {
-              this.initialSelection.push(table)
+              this.initialSelection.push(body)
             }
-            this.selection = new SelectionModel<TableDB>(allowMultiSelect, this.initialSelection);
+            this.selection = new SelectionModel<BodyDB>(allowMultiSelect, this.initialSelection);
           }
         }
 
         if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
-          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, TableDB>
+          let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, BodyDB>
           let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
-          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to TableDB
+          // we associates on sourceInstance of type SourceStruct with a MANY MANY associations to BodyDB
           // the field name is sourceField
-          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as TableDB[]
+          let sourceFieldArray = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]! as unknown as BodyDB[]
           if (sourceFieldArray != null) {
             for (let associationInstance of sourceFieldArray) {
-              let table = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as TableDB
-              this.initialSelection.push(table)
+              let body = associationInstance[this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as BodyDB
+              this.initialSelection.push(body)
             }
           }
 
-          this.selection = new SelectionModel<TableDB>(allowMultiSelect, this.initialSelection);
+          this.selection = new SelectionModel<BodyDB>(allowMultiSelect, this.initialSelection);
         }
 
         // update the mat table data source
-        this.matTableDataSource.data = this.tables
+        this.matTableDataSource.data = this.bodys
       }
     )
   }
 
-  // newTable initiate a new table
-  // create a new Table objet
-  newTable() {
+  // newBody initiate a new body
+  // create a new Body objet
+  newBody() {
   }
 
-  deleteTable(tableID: number, table: TableDB) {
-    // list of tables is truncated of table before the delete
-    this.tables = this.tables.filter(h => h !== table);
+  deleteBody(bodyID: number, body: BodyDB) {
+    // list of bodys is truncated of body before the delete
+    this.bodys = this.bodys.filter(h => h !== body);
 
-    this.tableService.deleteTable(tableID, this.GONG__StackPath).subscribe(
-      table => {
-        this.tableService.TableServiceChanged.next("delete")
+    this.bodyService.deleteBody(bodyID, this.GONG__StackPath).subscribe(
+      body => {
+        this.bodyService.BodyServiceChanged.next("delete")
       }
     );
   }
 
-  editTable(tableID: number, table: TableDB) {
+  editBody(bodyID: number, body: BodyDB) {
 
   }
 
   // set editor outlet
-  setEditorRouterOutlet(tableID: number) {
+  setEditorRouterOutlet(bodyID: number) {
     let outletName = this.routeService.getEditorOutlet(this.GONG__StackPath)
-    let fullPath = this.routeService.getPathRoot() + "-" + "table" + "-detail"
+    let fullPath = this.routeService.getPathRoot() + "-" + "body" + "-detail"
 
     let outletConf: any = {}
-    outletConf[outletName] = [fullPath, tableID, this.GONG__StackPath]
+    outletConf[outletName] = [fullPath, bodyID, this.GONG__StackPath]
 
     this.router.navigate([{ outlets: outletConf }])
   }
@@ -281,7 +254,7 @@ export class TablesTableComponent implements OnInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.tables.length;
+    const numRows = this.bodys.length;
     return numSelected === numRows;
   }
 
@@ -289,39 +262,39 @@ export class TablesTableComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.tables.forEach(row => this.selection.select(row));
+      this.bodys.forEach(row => this.selection.select(row));
   }
 
   save() {
 
     if (this.mode == TableComponentMode.ONE_MANY_ASSOCIATION_MODE) {
 
-      let toUpdate = new Set<TableDB>()
+      let toUpdate = new Set<BodyDB>()
 
-      // reset all initial selection of table that belong to table
-      for (let table of this.initialSelection) {
-        let index = table[this.dialogData.ReversePointer as keyof TableDB] as unknown as NullInt64
+      // reset all initial selection of body that belong to body
+      for (let body of this.initialSelection) {
+        let index = body[this.dialogData.ReversePointer as keyof BodyDB] as unknown as NullInt64
         index.Int64 = 0
         index.Valid = true
-        toUpdate.add(table)
+        toUpdate.add(body)
 
       }
 
-      // from selection, set table that belong to table
-      for (let table of this.selection.selected) {
+      // from selection, set body that belong to body
+      for (let body of this.selection.selected) {
         let ID = this.dialogData.ID as number
-        let reversePointer = table[this.dialogData.ReversePointer as keyof TableDB] as unknown as NullInt64
+        let reversePointer = body[this.dialogData.ReversePointer as keyof BodyDB] as unknown as NullInt64
         reversePointer.Int64 = ID
         reversePointer.Valid = true
-        toUpdate.add(table)
+        toUpdate.add(body)
       }
 
 
-      // update all table (only update selection & initial selection)
-      for (let table of toUpdate) {
-        this.tableService.updateTable(table, this.GONG__StackPath)
-          .subscribe(table => {
-            this.tableService.TableServiceChanged.next("update")
+      // update all body (only update selection & initial selection)
+      for (let body of toUpdate) {
+        this.bodyService.updateBody(body, this.GONG__StackPath)
+          .subscribe(body => {
+            this.bodyService.BodyServiceChanged.next("update")
           });
       }
     }
@@ -329,26 +302,26 @@ export class TablesTableComponent implements OnInit {
     if (this.mode == TableComponentMode.MANY_MANY_ASSOCIATION_MODE) {
 
       // get the source instance via the map of instances in the front repo
-      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, TableDB>
+      let mapOfSourceInstances = this.frontRepo[this.dialogData.SourceStruct + "s" as keyof FrontRepo] as Map<number, BodyDB>
       let sourceInstance = mapOfSourceInstances.get(this.dialogData.ID)!
 
       // First, parse all instance of the association struct and remove the instance
       // that have unselect
-      let unselectedTable = new Set<number>()
-      for (let table of this.initialSelection) {
-        if (this.selection.selected.includes(table)) {
-          // console.log("table " + table.Name + " is still selected")
+      let unselectedBody = new Set<number>()
+      for (let body of this.initialSelection) {
+        if (this.selection.selected.includes(body)) {
+          // console.log("body " + body.Name + " is still selected")
         } else {
-          console.log("table " + table.Name + " has been unselected")
-          unselectedTable.add(table.ID)
-          console.log("is unselected " + unselectedTable.has(table.ID))
+          console.log("body " + body.Name + " has been unselected")
+          unselectedBody.add(body.ID)
+          console.log("is unselected " + unselectedBody.has(body.ID))
         }
       }
 
       // delete the association instance
       let associationInstance = sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]
-      let table = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as TableDB
-      if (unselectedTable.has(table.ID)) {
+      let body = associationInstance![this.dialogData.IntermediateStructField as keyof typeof associationInstance] as unknown as BodyDB
+      if (unselectedBody.has(body.ID)) {
         this.frontRepoService.deleteService(this.dialogData.IntermediateStruct, associationInstance)
 
 
@@ -356,38 +329,38 @@ export class TablesTableComponent implements OnInit {
 
       // is the source array is empty create it
       if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] == undefined) {
-        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<TableDB>) = new Array<TableDB>()
+        (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance] as unknown as Array<BodyDB>) = new Array<BodyDB>()
       }
 
       // second, parse all instance of the selected
       if (sourceInstance[this.dialogData.SourceField as keyof typeof sourceInstance]) {
         this.selection.selected.forEach(
-          table => {
-            if (!this.initialSelection.includes(table)) {
-              // console.log("table " + table.Name + " has been added to the selection")
+          body => {
+            if (!this.initialSelection.includes(body)) {
+              // console.log("body " + body.Name + " has been added to the selection")
 
               let associationInstance = {
-                Name: sourceInstance["Name"] + "-" + table.Name,
+                Name: sourceInstance["Name"] + "-" + body.Name,
               }
 
               let index = associationInstance[this.dialogData.IntermediateStructField + "ID" as keyof typeof associationInstance] as unknown as NullInt64
-              index.Int64 = table.ID
+              index.Int64 = body.ID
               index.Valid = true
 
               let indexDB = associationInstance[this.dialogData.IntermediateStructField + "DBID" as keyof typeof associationInstance] as unknown as NullInt64
-              indexDB.Int64 = table.ID
+              indexDB.Int64 = body.ID
               index.Valid = true
 
               this.frontRepoService.postService(this.dialogData.IntermediateStruct, associationInstance)
 
             } else {
-              // console.log("table " + table.Name + " is still selected")
+              // console.log("body " + body.Name + " is still selected")
             }
           }
         )
       }
 
-      // this.selection = new SelectionModel<TableDB>(allowMultiSelect, this.initialSelection);
+      // this.selection = new SelectionModel<BodyDB>(allowMultiSelect, this.initialSelection);
     }
 
     // why pizza ?

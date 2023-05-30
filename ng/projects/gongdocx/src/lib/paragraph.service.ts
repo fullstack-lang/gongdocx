@@ -16,6 +16,7 @@ import { ParagraphDB } from './paragraph-db';
 // insertion point for imports
 import { NodeDB } from './node-db'
 import { ParagraphPropertiesDB } from './paragraphproperties-db'
+import { BodyDB } from './body-db'
 import { TableColumnDB } from './tablecolumn-db'
 
 @Injectable({
@@ -76,6 +77,10 @@ export class ParagraphService {
     paragraphdb.Node = new NodeDB
     paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
     paragraphdb.Runes = []
+    paragraphdb.Next = new ParagraphDB
+    paragraphdb.Previous = new ParagraphDB
+    let _Body_Paragraphs_reverse = paragraphdb.Body_Paragraphs_reverse
+    paragraphdb.Body_Paragraphs_reverse = new BodyDB
     let _TableColumn_Paragraphs_reverse = paragraphdb.TableColumn_Paragraphs_reverse
     paragraphdb.TableColumn_Paragraphs_reverse = new TableColumnDB
 
@@ -88,6 +93,7 @@ export class ParagraphService {
     return this.http.post<ParagraphDB>(this.paragraphsUrl, paragraphdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+        paragraphdb.Body_Paragraphs_reverse = _Body_Paragraphs_reverse
         paragraphdb.TableColumn_Paragraphs_reverse = _TableColumn_Paragraphs_reverse
         // this.log(`posted paragraphdb id=${paragraphdb.ID}`)
       }),
@@ -121,6 +127,10 @@ export class ParagraphService {
     paragraphdb.Node = new NodeDB
     paragraphdb.ParagraphProperties = new ParagraphPropertiesDB
     paragraphdb.Runes = []
+    paragraphdb.Next = new ParagraphDB
+    paragraphdb.Previous = new ParagraphDB
+    let _Body_Paragraphs_reverse = paragraphdb.Body_Paragraphs_reverse
+    paragraphdb.Body_Paragraphs_reverse = new BodyDB
     let _TableColumn_Paragraphs_reverse = paragraphdb.TableColumn_Paragraphs_reverse
     paragraphdb.TableColumn_Paragraphs_reverse = new TableColumnDB
 
@@ -133,6 +143,7 @@ export class ParagraphService {
     return this.http.put<ParagraphDB>(url, paragraphdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+        paragraphdb.Body_Paragraphs_reverse = _Body_Paragraphs_reverse
         paragraphdb.TableColumn_Paragraphs_reverse = _TableColumn_Paragraphs_reverse
         // this.log(`updated paragraphdb id=${paragraphdb.ID}`)
       }),

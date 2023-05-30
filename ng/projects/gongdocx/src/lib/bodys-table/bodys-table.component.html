@@ -3,7 +3,7 @@
         <mat-label>Filter</mat-label>
         <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
     </mat-form-field>
-    <h1 *ngIf="dialogData">table</h1>
+    <h1 *ngIf="dialogData">body</h1>
     <table class="table" mat-table [dataSource]="matTableDataSource" matSort>
         <!-- Checkbox Column, only used when the component is used to select items for a field that is a slice of pointers -->
         <ng-container matColumnDef="select">
@@ -21,48 +21,27 @@
         <!-- -->
         <ng-container matColumnDef="Name" sticky>
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
-            <td mat-cell *matCellDef="let Table">
-                {{Table.Name}}
+            <td mat-cell *matCellDef="let Body">
+                {{Body.Name}}
             </td>
         </ng-container>
         <!-- -->
-        <ng-container matColumnDef="Node">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Node </th>
-            <td mat-cell *matCellDef="let Table">
-                {{ Table.Node ? Table.Node.Name : ''}}
-            </td>
-        </ng-container>
-        <!-- -->
-        <ng-container matColumnDef="Content">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Content </th>
-            <td mat-cell *matCellDef="let Table">
-                {{Table.Content}}
-            </td>
-        </ng-container>
-        <!-- -->
-        <ng-container matColumnDef="TableProperties">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> TableProperties </th>
-            <td mat-cell *matCellDef="let Table">
-                {{ Table.TableProperties ? Table.TableProperties.Name : ''}}
-            </td>
-        </ng-container>
-        <!-- -->
-        <ng-container matColumnDef="Body_Tables">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> <-- (Body) Tables </th>
-            <td mat-cell *matCellDef="let table">
-                {{frontRepo.Bodys.get(table.Body_TablesDBID.Int64)?.Name}}
+        <ng-container matColumnDef="LastParagraph">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> LastParagraph </th>
+            <td mat-cell *matCellDef="let Body">
+                {{ Body.LastParagraph ? Body.LastParagraph.Name : ''}}
             </td>
         </ng-container>
 
         <ng-container matColumnDef="ID" sticky>
             <th mat-header-cell *matHeaderCellDef mat-sort-header> ID. </th>
-            <td mat-cell *matCellDef="let Table"> {{Table.ID}} </td>
+            <td mat-cell *matCellDef="let Body"> {{Body.ID}} </td>
         </ng-container>
 
         <ng-container matColumnDef="Delete" sticky>
             <th mat-header-cell *matHeaderCellDef> Delete </th>
-            <td mat-cell *matCellDef="let table;  let j = index;">
-                <i class="material-icons my-delete-button" [ngStyle]="{'color':'rgba(0,0,0,.50)'}" (click)="deleteTable(table.ID, table); $event.stopPropagation()">delete</i>
+            <td mat-cell *matCellDef="let body;  let j = index;">
+                <i class="material-icons my-delete-button" [ngStyle]="{'color':'rgba(0,0,0,.50)'}" (click)="deleteBody(body.ID, body); $event.stopPropagation()">delete</i>
             </td>
         </ng-container>
 

@@ -1,4 +1,6 @@
 // insertion point sub template for components imports 
+  import { BodysTableComponent } from './bodys-table/bodys-table.component'
+  import { BodySortingComponent } from './body-sorting/body-sorting.component'
   import { DocumentsTableComponent } from './documents-table/documents-table.component'
   import { DocumentSortingComponent } from './document-sorting/document-sorting.component'
   import { DocxsTableComponent } from './docxs-table/docxs-table.component'
@@ -31,6 +33,8 @@
   import { TextSortingComponent } from './text-sorting/text-sorting.component'
 
 // insertion point sub template for map of components per struct 
+  export const MapOfBodysComponents: Map<string, any> = new Map([["BodysTableComponent", BodysTableComponent],])
+  export const MapOfBodySortingComponents: Map<string, any> = new Map([["BodySortingComponent", BodySortingComponent],])
   export const MapOfDocumentsComponents: Map<string, any> = new Map([["DocumentsTableComponent", DocumentsTableComponent],])
   export const MapOfDocumentSortingComponents: Map<string, any> = new Map([["DocumentSortingComponent", DocumentSortingComponent],])
   export const MapOfDocxsComponents: Map<string, any> = new Map([["DocxsTableComponent", DocxsTableComponent],])
@@ -67,6 +71,7 @@ export const MapOfComponents: Map<string, any> =
   new Map(
     [
       // insertion point sub template for map of components 
+      ["Body", MapOfBodysComponents],
       ["Document", MapOfDocumentsComponents],
       ["Docx", MapOfDocxsComponents],
       ["File", MapOfFilesComponents],
@@ -90,6 +95,7 @@ export const MapOfSortingComponents: Map<string, any> =
   new Map(
     [
     // insertion point sub template for map of sorting components 
+      ["Body", MapOfBodySortingComponents],
       ["Document", MapOfDocumentSortingComponents],
       ["Docx", MapOfDocxSortingComponents],
       ["File", MapOfFileSortingComponents],

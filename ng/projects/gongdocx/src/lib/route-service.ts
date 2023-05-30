@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Route, Router, Routes } from '@angular/router';
 
 // insertion point for imports
+import { BodysTableComponent } from './bodys-table/bodys-table.component'
+import { BodyDetailComponent } from './body-detail/body-detail.component'
+
 import { DocumentsTableComponent } from './documents-table/documents-table.component'
 import { DocumentDetailComponent } from './document-detail/document-detail.component'
 
@@ -78,6 +81,39 @@ export class RouteService {
         return this.getPathRoot() + '_editor' + '_' + stackPath
     }
     // insertion point for per gongstruct route/path getters
+    getBodyTablePath(): string {
+        return this.getPathRoot() + '-bodys/:GONG__StackPath'
+    }
+    getBodyTableRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getBodyTablePath(), component: BodysTableComponent, outlet: this.getTableOutlet(stackPath) }
+        return route
+    }
+    getBodyAdderPath(): string {
+        return this.getPathRoot() + '-body-adder/:GONG__StackPath'
+    }
+    getBodyAdderRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getBodyAdderPath(), component: BodyDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getBodyAdderForUsePath(): string {
+        return this.getPathRoot() + '-body-adder/:id/:originStruct/:originStructFieldName/:GONG__StackPath'
+    }
+    getBodyAdderForUseRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getBodyAdderForUsePath(), component: BodyDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+    getBodyDetailPath(): string {
+        return this.getPathRoot() + '-body-detail/:id/:GONG__StackPath'
+    }
+    getBodyDetailRoute(stackPath: string): Route {
+        let route: Route =
+            { path: this.getBodyDetailPath(), component: BodyDetailComponent, outlet: this.getEditorOutlet(stackPath) }
+        return route
+    }
+
     getDocumentTablePath(): string {
         return this.getPathRoot() + '-documents/:GONG__StackPath'
     }
@@ -579,6 +615,11 @@ export class RouteService {
 
         this.addRoutes([
             // insertion point for all routes getter
+            this.getBodyTableRoute(stackPath),
+            this.getBodyAdderRoute(stackPath),
+            this.getBodyAdderForUseRoute(stackPath),
+            this.getBodyDetailRoute(stackPath),
+
             this.getDocumentTableRoute(stackPath),
             this.getDocumentAdderRoute(stackPath),
             this.getDocumentAdderForUseRoute(stackPath),

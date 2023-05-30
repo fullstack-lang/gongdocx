@@ -377,9 +377,19 @@ func walk(
 		// paragraph.Content = string(node_.Content)
 
 		// check if the parent node is a paragraph
-		switch tableColumn := parentNode.(type) {
+		switch parentNodeTyped := parentNode.(type) {
 		case *TableColumn:
-			tableColumn.Paragraphs = append(tableColumn.Paragraphs, paragraph)
+			parentNodeTyped.Paragraphs = append(parentNodeTyped.Paragraphs, paragraph)
+		case *Body:
+			parentNodeTyped.Paragraphs = append(parentNodeTyped.Paragraphs, paragraph)
+
+			// make the link
+			if parentNodeTyped.LastParagraph != nil {
+				parentNodeTyped.LastParagraph.Next = paragraph
+				paragraph.Previous = parentNodeTyped.LastParagraph
+			}
+
+			parentNodeTyped.LastParagraph = paragraph
 		}
 
 		for _, n := range node_.Nodes {

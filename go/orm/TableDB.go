@@ -53,6 +53,12 @@ type TablePointersEnconding struct {
 	// field TableProperties is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	TablePropertiesID sql.NullInt64
+
+	// Implementation of a reverse ID for field Body{}.Tables []*Table
+	Body_TablesDBID sql.NullInt64
+
+	// implementation of the index of the withing the slice
+	Body_TablesDBID_Index sql.NullInt64
 }
 
 // TableDB describes a table in the database
@@ -633,6 +639,12 @@ func (backRepoTable *BackRepoTableStruct) RestorePhaseTwo() {
 		if tableDB.TablePropertiesID.Int64 != 0 {
 			tableDB.TablePropertiesID.Int64 = int64(BackRepoTablePropertiesid_atBckpTime_newID[uint(tableDB.TablePropertiesID.Int64)])
 			tableDB.TablePropertiesID.Valid = true
+		}
+
+		// This reindex table.Tables
+		if tableDB.Body_TablesDBID.Int64 != 0 {
+			tableDB.Body_TablesDBID.Int64 =
+				int64(BackRepoBodyid_atBckpTime_newID[uint(tableDB.Body_TablesDBID.Int64)])
 		}
 
 		// update databse with new index encoding

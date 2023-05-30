@@ -283,8 +283,9 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 		embed: embed,
 		list:  make(map[string]int),
 	}
-	var dummyNode *Node
-	err = walk(zf, dummyNode, node, gongdocx_stage, node_, &buf)
+
+	body := (&Body{Name: f.Name}).Stage(gongdocx_stage)
+	err = walk(zf, body, node, gongdocx_stage, node_, &buf)
 	if err != nil {
 		return err
 	}

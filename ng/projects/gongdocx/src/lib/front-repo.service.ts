@@ -4,6 +4,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 
 // insertion point sub template for services imports 
+import { BodyDB } from './body-db'
+import { BodyService } from './body.service'
+
 import { DocumentDB } from './document-db'
 import { DocumentService } from './document.service'
 
@@ -52,6 +55,9 @@ import { TextService } from './text.service'
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
 export class FrontRepo { // insertion point sub template 
+  Bodys_array = new Array<BodyDB>(); // array of repo instances
+  Bodys = new Map<number, BodyDB>(); // map of repo instances
+  Bodys_batch = new Map<number, BodyDB>(); // same but only in last GET (for finding repo instances to delete)
   Documents_array = new Array<DocumentDB>(); // array of repo instances
   Documents = new Map<number, DocumentDB>(); // map of repo instances
   Documents_batch = new Map<number, DocumentDB>(); // same but only in last GET (for finding repo instances to delete)
@@ -159,6 +165,7 @@ export class FrontRepoService {
 
   constructor(
     private http: HttpClient, // insertion point sub template 
+    private bodyService: BodyService,
     private documentService: DocumentService,
     private docxService: DocxService,
     private fileService: FileService,
@@ -204,6 +211,7 @@ export class FrontRepoService {
 
   // typing of observable can be messy in typescript. Therefore, one force the type
   observableFrontRepo: [ // insertion point sub template 
+    Observable<BodyDB[]>,
     Observable<DocumentDB[]>,
     Observable<DocxDB[]>,
     Observable<FileDB[]>,
@@ -220,6 +228,7 @@ export class FrontRepoService {
     Observable<TableStyleDB[]>,
     Observable<TextDB[]>,
   ] = [ // insertion point sub template
+      this.bodyService.getBodys(this.GONG__StackPath),
       this.documentService.getDocuments(this.GONG__StackPath),
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
@@ -248,6 +257,7 @@ export class FrontRepoService {
     this.GONG__StackPath = GONG__StackPath
 
     this.observableFrontRepo = [ // insertion point sub template
+      this.bodyService.getBodys(this.GONG__StackPath),
       this.documentService.getDocuments(this.GONG__StackPath),
       this.docxService.getDocxs(this.GONG__StackPath),
       this.fileService.getFiles(this.GONG__StackPath),
@@ -271,6 +281,7 @@ export class FrontRepoService {
           this.observableFrontRepo
         ).subscribe(
           ([ // insertion point sub template for declarations 
+            bodys_,
             documents_,
             docxs_,
             files_,
@@ -289,6 +300,8 @@ export class FrontRepoService {
           ]) => {
             // Typing can be messy with many items. Therefore, type casting is necessary here
             // insertion point sub template for type casting 
+            var bodys: BodyDB[]
+            bodys = bodys_ as BodyDB[]
             var documents: DocumentDB[]
             documents = documents_ as DocumentDB[]
             var docxs: DocxDB[]
@@ -323,6 +336,39 @@ export class FrontRepoService {
             // 
             // First Step: init map of instances
             // insertion point sub template for init 
+            // init the array
+            this.frontRepo.Bodys_array = bodys
+
+            // clear the map that counts Body in the GET
+            this.frontRepo.Bodys_batch.clear()
+
+            bodys.forEach(
+              body => {
+                this.frontRepo.Bodys.set(body.ID, body)
+                this.frontRepo.Bodys_batch.set(body.ID, body)
+              }
+            )
+
+            // clear bodys that are absent from the batch
+            this.frontRepo.Bodys.forEach(
+              body => {
+                if (this.frontRepo.Bodys_batch.get(body.ID) == undefined) {
+                  this.frontRepo.Bodys.delete(body.ID)
+                }
+              }
+            )
+
+            // sort Bodys_array array
+            this.frontRepo.Bodys_array.sort((t1, t2) => {
+              if (t1.Name > t2.Name) {
+                return 1;
+              }
+              if (t1.Name < t2.Name) {
+                return -1;
+              }
+              return 0;
+            });
+
             // init the array
             this.frontRepo.Documents_array = documents
 
@@ -822,6 +868,20 @@ export class FrontRepoService {
             // 
             // Second Step: redeem pointers between instances (thanks to maps in the First Step)
             // insertion point sub template for redeem 
+            bodys.forEach(
+              body => {
+                // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field LastParagraph redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(body.LastParagraphID.Int64)
+                  if (_paragraph) {
+                    body.LastParagraph = _paragraph
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
             documents.forEach(
               document => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
@@ -907,8 +967,35 @@ export class FrontRepoService {
                     paragraph.ParagraphProperties = _paragraphproperties
                   }
                 }
+                // insertion point for pointer field Next redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(paragraph.NextID.Int64)
+                  if (_paragraph) {
+                    paragraph.Next = _paragraph
+                  }
+                }
+                // insertion point for pointer field Previous redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(paragraph.PreviousID.Int64)
+                  if (_paragraph) {
+                    paragraph.Previous = _paragraph
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Body.Paragraphs redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(paragraph.Body_ParagraphsDBID.Int64)
+                  if (_body) {
+                    if (_body.Paragraphs == undefined) {
+                      _body.Paragraphs = new Array<ParagraphDB>()
+                    }
+                    _body.Paragraphs.push(paragraph)
+                    if (paragraph.Body_Paragraphs_reverse == undefined) {
+                      paragraph.Body_Paragraphs_reverse = _body
+                    }
+                  }
+                }
                 // insertion point for slice of pointer field TableColumn.Paragraphs redeeming
                 {
                   let _tablecolumn = this.frontRepo.TableColumns.get(paragraph.TableColumn_ParagraphsDBID.Int64)
@@ -1033,6 +1120,19 @@ export class FrontRepoService {
                 }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Body.Tables redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(table.Body_TablesDBID.Int64)
+                  if (_body) {
+                    if (_body.Tables == undefined) {
+                      _body.Tables = new Array<TableDB>()
+                    }
+                    _body.Tables.push(table)
+                    if (table.Body_Tables_reverse == undefined) {
+                      table.Body_Tables_reverse = _body
+                    }
+                  }
+                }
               }
             )
             tablecolumns.forEach(
@@ -1148,6 +1248,64 @@ export class FrontRepoService {
   }
 
   // insertion point for pull per struct 
+
+  // BodyPull performs a GET on Body of the stack and redeem association pointers 
+  BodyPull(): Observable<FrontRepo> {
+    return new Observable<FrontRepo>(
+      (observer) => {
+        combineLatest([
+          this.bodyService.getBodys(this.GONG__StackPath)
+        ]).subscribe(
+          ([ // insertion point sub template 
+            bodys,
+          ]) => {
+            // init the array
+            this.frontRepo.Bodys_array = bodys
+
+            // clear the map that counts Body in the GET
+            this.frontRepo.Bodys_batch.clear()
+
+            // 
+            // First Step: init map of instances
+            // insertion point sub template 
+            bodys.forEach(
+              body => {
+                this.frontRepo.Bodys.set(body.ID, body)
+                this.frontRepo.Bodys_batch.set(body.ID, body)
+
+                // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field LastParagraph redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(body.LastParagraphID.Int64)
+                  if (_paragraph) {
+                    body.LastParagraph = _paragraph
+                  }
+                }
+
+                // insertion point for redeeming ONE-MANY associations
+              }
+            )
+
+            // clear bodys that are absent from the GET
+            this.frontRepo.Bodys.forEach(
+              body => {
+                if (this.frontRepo.Bodys_batch.get(body.ID) == undefined) {
+                  this.frontRepo.Bodys.delete(body.ID)
+                }
+              }
+            )
+
+            // 
+            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // insertion point sub template 
+
+            // hand over control flow to observer
+            observer.next(this.frontRepo)
+          }
+        )
+      }
+    )
+  }
 
   // DocumentPull performs a GET on Document of the stack and redeem association pointers 
   DocumentPull(): Observable<FrontRepo> {
@@ -1432,8 +1590,35 @@ export class FrontRepoService {
                     paragraph.ParagraphProperties = _paragraphproperties
                   }
                 }
+                // insertion point for pointer field Next redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(paragraph.NextID.Int64)
+                  if (_paragraph) {
+                    paragraph.Next = _paragraph
+                  }
+                }
+                // insertion point for pointer field Previous redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(paragraph.PreviousID.Int64)
+                  if (_paragraph) {
+                    paragraph.Previous = _paragraph
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Body.Paragraphs redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(paragraph.Body_ParagraphsDBID.Int64)
+                  if (_body) {
+                    if (_body.Paragraphs == undefined) {
+                      _body.Paragraphs = new Array<ParagraphDB>()
+                    }
+                    _body.Paragraphs.push(paragraph)
+                    if (paragraph.Body_Paragraphs_reverse == undefined) {
+                      paragraph.Body_Paragraphs_reverse = _body
+                    }
+                  }
+                }
                 // insertion point for slice of pointer field TableColumn.Paragraphs redeeming
                 {
                   let _tablecolumn = this.frontRepo.TableColumns.get(paragraph.TableColumn_ParagraphsDBID.Int64)
@@ -1778,6 +1963,19 @@ export class FrontRepoService {
                 }
 
                 // insertion point for redeeming ONE-MANY associations
+                // insertion point for slice of pointer field Body.Tables redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(table.Body_TablesDBID.Int64)
+                  if (_body) {
+                    if (_body.Tables == undefined) {
+                      _body.Tables = new Array<TableDB>()
+                    }
+                    _body.Tables.push(table)
+                    if (table.Body_Tables_reverse == undefined) {
+                      table.Body_Tables_reverse = _body
+                    }
+                  }
+                }
               }
             )
 
@@ -2127,48 +2325,51 @@ export class FrontRepoService {
 }
 
 // insertion point for get unique ID per struct 
-export function getDocumentUniqueID(id: number): number {
+export function getBodyUniqueID(id: number): number {
   return 31 * id
 }
-export function getDocxUniqueID(id: number): number {
+export function getDocumentUniqueID(id: number): number {
   return 37 * id
 }
-export function getFileUniqueID(id: number): number {
+export function getDocxUniqueID(id: number): number {
   return 41 * id
 }
-export function getNodeUniqueID(id: number): number {
+export function getFileUniqueID(id: number): number {
   return 43 * id
 }
-export function getParagraphUniqueID(id: number): number {
+export function getNodeUniqueID(id: number): number {
   return 47 * id
 }
-export function getParagraphPropertiesUniqueID(id: number): number {
+export function getParagraphUniqueID(id: number): number {
   return 53 * id
 }
-export function getParagraphStyleUniqueID(id: number): number {
+export function getParagraphPropertiesUniqueID(id: number): number {
   return 59 * id
 }
-export function getRuneUniqueID(id: number): number {
+export function getParagraphStyleUniqueID(id: number): number {
   return 61 * id
 }
-export function getRunePropertiesUniqueID(id: number): number {
+export function getRuneUniqueID(id: number): number {
   return 67 * id
 }
-export function getTableUniqueID(id: number): number {
+export function getRunePropertiesUniqueID(id: number): number {
   return 71 * id
 }
-export function getTableColumnUniqueID(id: number): number {
+export function getTableUniqueID(id: number): number {
   return 73 * id
 }
-export function getTablePropertiesUniqueID(id: number): number {
+export function getTableColumnUniqueID(id: number): number {
   return 79 * id
 }
-export function getTableRowUniqueID(id: number): number {
+export function getTablePropertiesUniqueID(id: number): number {
   return 83 * id
 }
-export function getTableStyleUniqueID(id: number): number {
+export function getTableRowUniqueID(id: number): number {
   return 89 * id
 }
-export function getTextUniqueID(id: number): number {
+export function getTableStyleUniqueID(id: number): number {
   return 97 * id
+}
+export function getTextUniqueID(id: number): number {
+  return 101 * id
 }

@@ -11,6 +11,8 @@ import { CommitNbFromBackService } from '../commitnbfromback.service'
 import { GongstructSelectionService } from '../gongstruct-selection.service'
 
 // insertion point for per struct import code
+import { BodyService } from '../body.service'
+import { getBodyUniqueID } from '../front-repo.service'
 import { DocumentService } from '../document.service'
 import { getDocumentUniqueID } from '../front-repo.service'
 import { DocxService } from '../docx.service'
@@ -186,6 +188,7 @@ export class SidebarComponent implements OnInit {
     private gongstructSelectionService: GongstructSelectionService,
 
     // insertion point for per struct service declaration
+    private bodyService: BodyService,
     private documentService: DocumentService,
     private docxService: DocxService,
     private fileService: FileService,
@@ -236,6 +239,14 @@ export class SidebarComponent implements OnInit {
     )
 
     // insertion point for per struct observable for refresh trigger
+    // observable for changes in structs
+    this.bodyService.BodyServiceChanged.subscribe(
+      message => {
+        if (message == "post" || message == "update" || message == "delete") {
+          this.refresh()
+        }
+      }
+    )
     // observable for changes in structs
     this.documentService.DocumentServiceChanged.subscribe(
       message => {
@@ -380,6 +391,149 @@ export class SidebarComponent implements OnInit {
       this.gongNodeTree = new Array<GongNode>();
 
       // insertion point for per struct tree construction
+      /**
+      * fill up the Body part of the mat tree
+      */
+      let bodyGongNodeStruct: GongNode = {
+        name: "Body",
+        type: GongNodeType.STRUCT,
+        id: 0,
+        uniqueIdPerStack: 13 * nonInstanceNodeId,
+        structName: "Body",
+        associationField: "",
+        associatedStructName: "",
+        children: new Array<GongNode>()
+      }
+      nonInstanceNodeId = nonInstanceNodeId + 1
+      this.gongNodeTree.push(bodyGongNodeStruct)
+
+      this.frontRepo.Bodys_array.sort((t1, t2) => {
+        if (t1.Name > t2.Name) {
+          return 1;
+        }
+        if (t1.Name < t2.Name) {
+          return -1;
+        }
+        return 0;
+      });
+
+      this.frontRepo.Bodys_array.forEach(
+        bodyDB => {
+          let bodyGongNodeInstance: GongNode = {
+            name: bodyDB.Name,
+            type: GongNodeType.INSTANCE,
+            id: bodyDB.ID,
+            uniqueIdPerStack: getBodyUniqueID(bodyDB.ID),
+            structName: "Body",
+            associationField: "",
+            associatedStructName: "",
+            children: new Array<GongNode>()
+          }
+          bodyGongNodeStruct.children!.push(bodyGongNodeInstance)
+
+          // insertion point for per field code
+          /**
+          * let append a node for the slide of pointer Paragraphs
+          */
+          let ParagraphsGongNodeAssociation: GongNode = {
+            name: "(Paragraph) Paragraphs",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: bodyDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "Body",
+            associationField: "Paragraphs",
+            associatedStructName: "Paragraph",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          bodyGongNodeInstance.children.push(ParagraphsGongNodeAssociation)
+
+          bodyDB.Paragraphs?.forEach(paragraphDB => {
+            let paragraphNode: GongNode = {
+              name: paragraphDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getBodyUniqueID(bodyDB.ID)
+                + 11 * getParagraphUniqueID(paragraphDB.ID),
+              structName: "Paragraph",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            ParagraphsGongNodeAssociation.children.push(paragraphNode)
+          })
+
+          /**
+          * let append a node for the slide of pointer Tables
+          */
+          let TablesGongNodeAssociation: GongNode = {
+            name: "(Table) Tables",
+            type: GongNodeType.ONE__ZERO_MANY_ASSOCIATION,
+            id: bodyDB.ID,
+            uniqueIdPerStack: 19 * nonInstanceNodeId,
+            structName: "Body",
+            associationField: "Tables",
+            associatedStructName: "Table",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          bodyGongNodeInstance.children.push(TablesGongNodeAssociation)
+
+          bodyDB.Tables?.forEach(tableDB => {
+            let tableNode: GongNode = {
+              name: tableDB.Name,
+              type: GongNodeType.INSTANCE,
+              id: tableDB.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                7 * getBodyUniqueID(bodyDB.ID)
+                + 11 * getTableUniqueID(tableDB.ID),
+              structName: "Table",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            TablesGongNodeAssociation.children.push(tableNode)
+          })
+
+          /**
+          * let append a node for the association LastParagraph
+          */
+          let LastParagraphGongNodeAssociation: GongNode = {
+            name: "(Paragraph) LastParagraph",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: bodyDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Body",
+            associationField: "LastParagraph",
+            associatedStructName: "Paragraph",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          bodyGongNodeInstance.children!.push(LastParagraphGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation LastParagraph
+            */
+          if (bodyDB.LastParagraph != undefined) {
+            let bodyGongNodeInstance_LastParagraph: GongNode = {
+              name: bodyDB.LastParagraph.Name,
+              type: GongNodeType.INSTANCE,
+              id: bodyDB.LastParagraph.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getBodyUniqueID(bodyDB.ID)
+                + 5 * getParagraphUniqueID(bodyDB.LastParagraph.ID),
+              structName: "Paragraph",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            LastParagraphGongNodeAssociation.children.push(bodyGongNodeInstance_LastParagraph)
+          }
+
+        }
+      )
+
       /**
       * fill up the Document part of the mat tree
       */
@@ -832,6 +986,76 @@ export class SidebarComponent implements OnInit {
             }
             RunesGongNodeAssociation.children.push(runeNode)
           })
+
+          /**
+          * let append a node for the association Next
+          */
+          let NextGongNodeAssociation: GongNode = {
+            name: "(Paragraph) Next",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: paragraphDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Paragraph",
+            associationField: "Next",
+            associatedStructName: "Paragraph",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphGongNodeInstance.children!.push(NextGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Next
+            */
+          if (paragraphDB.Next != undefined) {
+            let paragraphGongNodeInstance_Next: GongNode = {
+              name: paragraphDB.Next.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphDB.Next.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getParagraphUniqueID(paragraphDB.ID)
+                + 5 * getParagraphUniqueID(paragraphDB.Next.ID),
+              structName: "Paragraph",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            NextGongNodeAssociation.children.push(paragraphGongNodeInstance_Next)
+          }
+
+          /**
+          * let append a node for the association Previous
+          */
+          let PreviousGongNodeAssociation: GongNode = {
+            name: "(Paragraph) Previous",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: paragraphDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Paragraph",
+            associationField: "Previous",
+            associatedStructName: "Paragraph",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphGongNodeInstance.children!.push(PreviousGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Previous
+            */
+          if (paragraphDB.Previous != undefined) {
+            let paragraphGongNodeInstance_Previous: GongNode = {
+              name: paragraphDB.Previous.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphDB.Previous.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getParagraphUniqueID(paragraphDB.ID)
+                + 5 * getParagraphUniqueID(paragraphDB.Previous.ID),
+              structName: "Paragraph",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            PreviousGongNodeAssociation.children.push(paragraphGongNodeInstance_Previous)
+          }
 
         }
       )

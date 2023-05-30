@@ -39,6 +39,10 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { GongstructSelectionService } from './gongstruct-selection.service'
 
 // insertion point for imports 
+import { BodysTableComponent } from './bodys-table/bodys-table.component'
+import { BodySortingComponent } from './body-sorting/body-sorting.component'
+import { BodyDetailComponent } from './body-detail/body-detail.component'
+
 import { DocumentsTableComponent } from './documents-table/documents-table.component'
 import { DocumentSortingComponent } from './document-sorting/document-sorting.component'
 import { DocumentDetailComponent } from './document-detail/document-detail.component'
@@ -103,6 +107,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 @NgModule({
 	declarations: [
 		// insertion point for declarations 
+		BodysTableComponent,
+		BodySortingComponent,
+		BodyDetailComponent,
+
 		DocumentsTableComponent,
 		DocumentSortingComponent,
 		DocumentDetailComponent,
@@ -202,6 +210,10 @@ import { TextDetailComponent } from './text-detail/text-detail.component'
 	],
 	exports: [
 		// insertion point for declarations 
+		BodysTableComponent,
+		BodySortingComponent,
+		BodyDetailComponent,
+
 		DocumentsTableComponent,
 		DocumentSortingComponent,
 		DocumentDetailComponent,

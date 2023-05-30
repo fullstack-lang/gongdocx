@@ -110,6 +110,38 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	_ = setValueField 
 
 	// insertion initialization of objects to stage
+	map_Body_Identifiers := make(map[*Body]string)
+	_ = map_Body_Identifiers
+
+	bodyOrdered := []*Body{}
+	for body := range stage.Bodys {
+		bodyOrdered = append(bodyOrdered, body)
+	}
+	sort.Slice(bodyOrdered[:], func(i, j int) bool {
+		return bodyOrdered[i].Name < bodyOrdered[j].Name
+	})
+	identifiersDecl += "\n\n	// Declarations of staged instances of Body"
+	for idx, body := range bodyOrdered {
+
+		id = generatesIdentifier("Body", idx, body.Name)
+		map_Body_Identifiers[body] = id
+
+		decl = IdentifiersDecls
+		decl = strings.ReplaceAll(decl, "{{Identifier}}", id)
+		decl = strings.ReplaceAll(decl, "{{GeneratedStructName}}", "Body")
+		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", body.Name)
+		identifiersDecl += decl
+
+		initializerStatements += "\n\n	// Body values setup"
+		// Initialisation of values
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Name")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(body.Name))
+		initializerStatements += setValueField
+
+	}
+
 	map_Document_Identifiers := make(map[*Document]string)
 	_ = map_Document_Identifiers
 
@@ -693,6 +725,40 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	}
 
 	// insertion initialization of objects to stage
+	for idx, body := range bodyOrdered {
+		var setPointerField string
+		_ = setPointerField
+
+		id = generatesIdentifier("Body", idx, body.Name)
+		map_Body_Identifiers[body] = id
+
+		// Initialisation of values
+		for _, _paragraph := range body.Paragraphs {
+			setPointerField = SliceOfPointersFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Paragraphs")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Paragraph_Identifiers[_paragraph])
+			pointersInitializesStatements += setPointerField
+		}
+
+		for _, _table := range body.Tables {
+			setPointerField = SliceOfPointersFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Tables")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Table_Identifiers[_table])
+			pointersInitializesStatements += setPointerField
+		}
+
+		if body.LastParagraph != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "LastParagraph")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Paragraph_Identifiers[body.LastParagraph])
+			pointersInitializesStatements += setPointerField
+		}
+
+	}
+
 	for idx, document := range documentOrdered {
 		var setPointerField string
 		_ = setPointerField
@@ -794,6 +860,22 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Runes")
 			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Rune_Identifiers[_rune])
+			pointersInitializesStatements += setPointerField
+		}
+
+		if paragraph.Next != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Next")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Paragraph_Identifiers[paragraph.Next])
+			pointersInitializesStatements += setPointerField
+		}
+
+		if paragraph.Previous != nil {
+			setPointerField = PointerFieldInitStatement
+			setPointerField = strings.ReplaceAll(setPointerField, "{{Identifier}}", id)
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldName}}", "Previous")
+			setPointerField = strings.ReplaceAll(setPointerField, "{{GeneratedFieldNameValue}}", map_Paragraph_Identifiers[paragraph.Previous])
 			pointersInitializesStatements += setPointerField
 		}
 

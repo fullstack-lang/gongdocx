@@ -11,23 +11,21 @@ import { BehaviorSubject } from 'rxjs';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
-import { TableDB } from './table-db';
+import { BodyDB } from './body-db';
 
 // insertion point for imports
-import { NodeDB } from './node-db'
-import { TablePropertiesDB } from './tableproperties-db'
-import { BodyDB } from './body-db'
+import { ParagraphDB } from './paragraph-db'
 
 @Injectable({
   providedIn: 'root'
 })
-export class TableService {
+export class BodyService {
 
   // Kamar Raïmo: Adding a way to communicate between components that share information
   // so that they are notified of a change.
-  TableServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
+  BodyServiceChanged: BehaviorSubject<string> = new BehaviorSubject("");
 
-  private tablesUrl: string
+  private bodysUrl: string
 
   constructor(
     private http: HttpClient,
@@ -41,43 +39,41 @@ export class TableService {
     origin = origin.replace("4200", "8080")
 
     // compute path to the service
-    this.tablesUrl = origin + '/api/github.com/fullstack-lang/gongdocx/go/v1/tables';
+    this.bodysUrl = origin + '/api/github.com/fullstack-lang/gongdocx/go/v1/bodys';
   }
 
-  /** GET tables from the server */
-  getTables(GONG__StackPath: string): Observable<TableDB[]> {
+  /** GET bodys from the server */
+  getBodys(GONG__StackPath: string): Observable<BodyDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
-    return this.http.get<TableDB[]>(this.tablesUrl, { params: params })
+    return this.http.get<BodyDB[]>(this.bodysUrl, { params: params })
       .pipe(
         tap(),
-		// tap(_ => this.log('fetched tables')),
-        catchError(this.handleError<TableDB[]>('getTables', []))
+		// tap(_ => this.log('fetched bodys')),
+        catchError(this.handleError<BodyDB[]>('getBodys', []))
       );
   }
 
-  /** GET table by id. Will 404 if id not found */
-  getTable(id: number, GONG__StackPath: string): Observable<TableDB> {
+  /** GET body by id. Will 404 if id not found */
+  getBody(id: number, GONG__StackPath: string): Observable<BodyDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
 
-    const url = `${this.tablesUrl}/${id}`;
-    return this.http.get<TableDB>(url, { params: params }).pipe(
-      // tap(_ => this.log(`fetched table id=${id}`)),
-      catchError(this.handleError<TableDB>(`getTable id=${id}`))
+    const url = `${this.bodysUrl}/${id}`;
+    return this.http.get<BodyDB>(url, { params: params }).pipe(
+      // tap(_ => this.log(`fetched body id=${id}`)),
+      catchError(this.handleError<BodyDB>(`getBody id=${id}`))
     );
   }
 
-  /** POST: add a new table to the server */
-  postTable(tabledb: TableDB, GONG__StackPath: string): Observable<TableDB> {
+  /** POST: add a new body to the server */
+  postBody(bodydb: BodyDB, GONG__StackPath: string): Observable<BodyDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    tabledb.Node = new NodeDB
-    tabledb.TableProperties = new TablePropertiesDB
-    tabledb.TableRows = []
-    let _Body_Tables_reverse = tabledb.Body_Tables_reverse
-    tabledb.Body_Tables_reverse = new BodyDB
+    bodydb.Paragraphs = []
+    bodydb.Tables = []
+    bodydb.LastParagraph = new ParagraphDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -85,20 +81,19 @@ export class TableService {
       params: params
     }
 
-    return this.http.post<TableDB>(this.tablesUrl, tabledb, httpOptions).pipe(
+    return this.http.post<BodyDB>(this.bodysUrl, bodydb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        tabledb.Body_Tables_reverse = _Body_Tables_reverse
-        // this.log(`posted tabledb id=${tabledb.ID}`)
+        // this.log(`posted bodydb id=${bodydb.ID}`)
       }),
-      catchError(this.handleError<TableDB>('postTable'))
+      catchError(this.handleError<BodyDB>('postBody'))
     );
   }
 
-  /** DELETE: delete the tabledb from the server */
-  deleteTable(tabledb: TableDB | number, GONG__StackPath: string): Observable<TableDB> {
-    const id = typeof tabledb === 'number' ? tabledb : tabledb.ID;
-    const url = `${this.tablesUrl}/${id}`;
+  /** DELETE: delete the bodydb from the server */
+  deleteBody(bodydb: BodyDB | number, GONG__StackPath: string): Observable<BodyDB> {
+    const id = typeof bodydb === 'number' ? bodydb : bodydb.ID;
+    const url = `${this.bodysUrl}/${id}`;
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -106,23 +101,21 @@ export class TableService {
       params: params
     };
 
-    return this.http.delete<TableDB>(url, httpOptions).pipe(
-      tap(_ => this.log(`deleted tabledb id=${id}`)),
-      catchError(this.handleError<TableDB>('deleteTable'))
+    return this.http.delete<BodyDB>(url, httpOptions).pipe(
+      tap(_ => this.log(`deleted bodydb id=${id}`)),
+      catchError(this.handleError<BodyDB>('deleteBody'))
     );
   }
 
-  /** PUT: update the tabledb on the server */
-  updateTable(tabledb: TableDB, GONG__StackPath: string): Observable<TableDB> {
-    const id = typeof tabledb === 'number' ? tabledb : tabledb.ID;
-    const url = `${this.tablesUrl}/${id}`;
+  /** PUT: update the bodydb on the server */
+  updateBody(bodydb: BodyDB, GONG__StackPath: string): Observable<BodyDB> {
+    const id = typeof bodydb === 'number' ? bodydb : bodydb.ID;
+    const url = `${this.bodysUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
-    tabledb.Node = new NodeDB
-    tabledb.TableProperties = new TablePropertiesDB
-    tabledb.TableRows = []
-    let _Body_Tables_reverse = tabledb.Body_Tables_reverse
-    tabledb.Body_Tables_reverse = new BodyDB
+    bodydb.Paragraphs = []
+    bodydb.Tables = []
+    bodydb.LastParagraph = new ParagraphDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -130,13 +123,12 @@ export class TableService {
       params: params
     };
 
-    return this.http.put<TableDB>(url, tabledb, httpOptions).pipe(
+    return this.http.put<BodyDB>(url, bodydb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
-        tabledb.Body_Tables_reverse = _Body_Tables_reverse
-        // this.log(`updated tabledb id=${tabledb.ID}`)
+        // this.log(`updated bodydb id=${bodydb.ID}`)
       }),
-      catchError(this.handleError<TableDB>('updateTable'))
+      catchError(this.handleError<BodyDB>('updateBody'))
     );
   }
 
@@ -146,11 +138,11 @@ export class TableService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation in TableService', result?: T) {
+  private handleError<T>(operation = 'operation in BodyService', result?: T) {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
-      console.error("TableService" + error); // log to console instead
+      console.error("BodyService" + error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
       this.log(`${operation} failed: ${error.message}`);

@@ -26,4 +26,8 @@ type Paragraph struct {
 	Node                *Node
 	ParagraphProperties *ParagraphProperties
 	Runes               []*Rune
+
+	// navigation
+	Next     *Paragraph
+	Previous *Paragraph
 }
