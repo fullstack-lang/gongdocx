@@ -9,6 +9,8 @@ type Docx struct {
 	Name string
 
 	Files []*File
+
+	Document *Document
 }
 
 func NewDocx(gongdocx_stage *StageStruct, path string, embed bool) (docx *Docx) {

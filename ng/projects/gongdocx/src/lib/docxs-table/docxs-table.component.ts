@@ -75,6 +75,9 @@ export class DocxsTableComponent implements OnInit {
         case 'Name':
           return docxDB.Name;
 
+        case 'Document':
+          return (docxDB.Document ? docxDB.Document.Name : '');
+
         default:
           console.assert(false, "Unknown field")
           return "";
@@ -90,6 +93,9 @@ export class DocxsTableComponent implements OnInit {
 
       // insertion point for merging of fields
       mergedContent += docxDB.Name.toLowerCase()
+      if (docxDB.Document) {
+        mergedContent += docxDB.Document.Name.toLowerCase()
+      }
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
       return isSelected
@@ -145,10 +151,12 @@ export class DocxsTableComponent implements OnInit {
     if (this.mode == TableComponentMode.DISPLAY_MODE) {
       this.displayedColumns = ['ID', 'Delete', // insertion point for columns to display
         "Name",
+        "Document",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
+        "Document",
       ]
       this.selection = new SelectionModel<DocxDB>(allowMultiSelect, this.initialSelection);
     }

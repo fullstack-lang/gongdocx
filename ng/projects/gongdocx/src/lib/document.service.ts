@@ -16,6 +16,7 @@ import { DocumentDB } from './document-db';
 // insertion point for imports
 import { FileDB } from './file-db'
 import { NodeDB } from './node-db'
+import { BodyDB } from './body-db'
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +75,7 @@ export class DocumentService {
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     documentdb.File = new FileDB
     documentdb.Root = new NodeDB
+    documentdb.Body = new BodyDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -115,6 +117,7 @@ export class DocumentService {
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     documentdb.File = new FileDB
     documentdb.Root = new NodeDB
+    documentdb.Body = new BodyDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {

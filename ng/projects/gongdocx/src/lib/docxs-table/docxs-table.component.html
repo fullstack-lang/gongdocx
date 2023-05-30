@@ -25,6 +25,13 @@
                 {{Docx.Name}}
             </td>
         </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="Document">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Document </th>
+            <td mat-cell *matCellDef="let Docx">
+                {{ Docx.Document ? Docx.Document.Name : ''}}
+            </td>
+        </ng-container>
 
         <ng-container matColumnDef="ID" sticky>
             <th mat-header-cell *matHeaderCellDef mat-sort-header> ID. </th>

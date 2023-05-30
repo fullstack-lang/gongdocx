@@ -14,6 +14,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { DocxDB } from './docx-db';
 
 // insertion point for imports
+import { DocumentDB } from './document-db'
 
 @Injectable({
   providedIn: 'root'
@@ -71,6 +72,7 @@ export class DocxService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     docxdb.Files = []
+    docxdb.Document = new DocumentDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -111,6 +113,7 @@ export class DocxService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     docxdb.Files = []
+    docxdb.Document = new DocumentDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {

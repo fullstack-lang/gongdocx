@@ -30,4 +30,5 @@ type Document struct {
 	Name string
 	File *File
 	Root *Node
+	Body *Body
 }

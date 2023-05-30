@@ -145,6 +145,16 @@ export class DocxDetailComponent implements OnInit {
 		// pointers fields, after the translation, are nulled in order to perform serialization
 
 		// insertion point for translation/nullation of each field
+		if (this.docx.DocumentID == undefined) {
+			this.docx.DocumentID = new NullInt64
+		}
+		if (this.docx.Document != undefined) {
+			this.docx.DocumentID.Int64 = this.docx.Document.ID
+			this.docx.DocumentID.Valid = true
+		} else {
+			this.docx.DocumentID.Int64 = 0
+			this.docx.DocumentID.Valid = true
+		}
 
 		// save from the front pointer space to the non pointer space for serialization
 

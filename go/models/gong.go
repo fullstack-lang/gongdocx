@@ -1531,12 +1531,16 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			File: &File{Name: "File"},
 			// field is initialized with an instance of Node with the name of the field
 			Root: &Node{Name: "Root"},
+			// field is initialized with an instance of Body with the name of the field
+			Body: &Body{Name: "Body"},
 		}).(*Type)
 	case Docx:
 		return any(&Docx{
 			// Initialisation of associations
 			// field is initialized with an instance of File with the name of the field
 			Files: []*File{{Name: "Files"}},
+			// field is initialized with an instance of Document with the name of the field
+			Document: &Document{Name: "Document"},
 		}).(*Type)
 	case File:
 		return any(&File{
@@ -1716,11 +1720,45 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 				}
 			}
 			return any(res).(map[*End][]*Start)
+		case "Body":
+			res := make(map[*Body][]*Document)
+			for document := range stage.Documents {
+				if document.Body != nil {
+					body_ := document.Body
+					var documents []*Document
+					_, ok := res[body_]
+					if ok {
+						documents = res[body_]
+					} else {
+						documents = make([]*Document, 0)
+					}
+					documents = append(documents, document)
+					res[body_] = documents
+				}
+			}
+			return any(res).(map[*End][]*Start)
 		}
 	// reverse maps of direct associations of Docx
 	case Docx:
 		switch fieldname {
 		// insertion point for per direct association field
+		case "Document":
+			res := make(map[*Document][]*Docx)
+			for docx := range stage.Docxs {
+				if docx.Document != nil {
+					document_ := docx.Document
+					var docxs []*Docx
+					_, ok := res[document_]
+					if ok {
+						docxs = res[document_]
+					} else {
+						docxs = make([]*Docx, 0)
+					}
+					docxs = append(docxs, docx)
+					res[document_] = docxs
+				}
+			}
+			return any(res).(map[*End][]*Start)
 		}
 	// reverse maps of direct associations of File
 	case File:
@@ -2328,9 +2366,9 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Body:
 		res = []string{"Name", "Paragraphs", "Tables", "LastParagraph"}
 	case Document:
-		res = []string{"Name", "File", "Root"}
+		res = []string{"Name", "File", "Root", "Body"}
 	case Docx:
-		res = []string{"Name", "Files"}
+		res = []string{"Name", "Files", "Document"}
 	case File:
 		res = []string{"Name"}
 	case Node:
@@ -2403,6 +2441,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			if any(instance).(Document).Root != nil {
 				res = any(instance).(Document).Root.Name
 			}
+		case "Body":
+			if any(instance).(Document).Body != nil {
+				res = any(instance).(Document).Body.Name
+			}
 		}
 	case Docx:
 		switch fieldName {
@@ -2415,6 +2457,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 					res += "\n"
 				}
 				res += __instance__.Name
+			}
+		case "Document":
+			if any(instance).(Docx).Document != nil {
+				res = any(instance).(Docx).Document.Name
 			}
 		}
 	case File:

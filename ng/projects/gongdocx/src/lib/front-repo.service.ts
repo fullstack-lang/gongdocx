@@ -899,6 +899,13 @@ export class FrontRepoService {
                     document.Root = _node
                   }
                 }
+                // insertion point for pointer field Body redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(document.BodyID.Int64)
+                  if (_body) {
+                    document.Body = _body
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
               }
@@ -906,6 +913,13 @@ export class FrontRepoService {
             docxs.forEach(
               docx => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
+                // insertion point for pointer field Document redeeming
+                {
+                  let _document = this.frontRepo.Documents.get(docx.DocumentID.Int64)
+                  if (_document) {
+                    docx.Document = _document
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
               }
@@ -1346,6 +1360,13 @@ export class FrontRepoService {
                     document.Root = _node
                   }
                 }
+                // insertion point for pointer field Body redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(document.BodyID.Int64)
+                  if (_body) {
+                    document.Body = _body
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
               }
@@ -1397,6 +1418,13 @@ export class FrontRepoService {
                 this.frontRepo.Docxs_batch.set(docx.ID, docx)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
+                // insertion point for pointer field Document redeeming
+                {
+                  let _document = this.frontRepo.Documents.get(docx.DocumentID.Int64)
+                  if (_document) {
+                    docx.Document = _document
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
               }

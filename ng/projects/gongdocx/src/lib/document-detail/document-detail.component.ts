@@ -165,6 +165,16 @@ export class DocumentDetailComponent implements OnInit {
 			this.document.RootID.Int64 = 0
 			this.document.RootID.Valid = true
 		}
+		if (this.document.BodyID == undefined) {
+			this.document.BodyID = new NullInt64
+		}
+		if (this.document.Body != undefined) {
+			this.document.BodyID.Int64 = this.document.Body.ID
+			this.document.BodyID.Valid = true
+		} else {
+			this.document.BodyID.Int64 = 0
+			this.document.BodyID.Valid = true
+		}
 
 		// save from the front pointer space to the non pointer space for serialization
 

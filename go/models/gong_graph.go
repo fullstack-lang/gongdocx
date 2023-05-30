@@ -275,6 +275,9 @@ func (stage *StageStruct) StageBranchDocument(document *Document) {
 	if document.Root != nil {
 		StageBranch(stage, document.Root)
 	}
+	if document.Body != nil {
+		StageBranch(stage, document.Body)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 
@@ -290,6 +293,9 @@ func (stage *StageStruct) StageBranchDocx(docx *Docx) {
 	docx.Stage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
+	if docx.Document != nil {
+		StageBranch(stage, docx.Document)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _file := range docx.Files {
@@ -668,6 +674,9 @@ func (stage *StageStruct) UnstageBranchDocument(document *Document) {
 	if document.Root != nil {
 		UnstageBranch(stage, document.Root)
 	}
+	if document.Body != nil {
+		UnstageBranch(stage, document.Body)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 
@@ -683,6 +692,9 @@ func (stage *StageStruct) UnstageBranchDocx(docx *Docx) {
 	docx.Unstage(stage)
 
 	//insertion point for the staging of instances referenced by pointers
+	if docx.Document != nil {
+		UnstageBranch(stage, docx.Document)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _file := range docx.Files {

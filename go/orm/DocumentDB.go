@@ -53,6 +53,10 @@ type DocumentPointersEnconding struct {
 	// field Root is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	RootID sql.NullInt64
+
+	// field Body is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	BodyID sql.NullInt64
 }
 
 // DocumentDB describes a document in the database
@@ -234,6 +238,15 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 			}
 		}
 
+		// commit pointer value document.Body translates to updating the document.BodyID
+		documentDB.BodyID.Valid = true // allow for a 0 value (nil association)
+		if document.Body != nil {
+			if BodyId, ok := backRepo.BackRepoBody.Map_BodyPtr_BodyDBID[document.Body]; ok {
+				documentDB.BodyID.Int64 = int64(BodyId)
+				documentDB.BodyID.Valid = true
+			}
+		}
+
 		query := backRepoDocument.db.Save(&documentDB)
 		if query.Error != nil {
 			return query.Error
@@ -348,6 +361,10 @@ func (backRepoDocument *BackRepoDocumentStruct) CheckoutPhaseTwoInstance(backRep
 	// Root field
 	if documentDB.RootID.Int64 != 0 {
 		document.Root = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(documentDB.RootID.Int64)]
+	}
+	// Body field
+	if documentDB.BodyID.Int64 != 0 {
+		document.Body = backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(documentDB.BodyID.Int64)]
 	}
 	return
 }
@@ -573,6 +590,12 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseTwo() {
 		if documentDB.RootID.Int64 != 0 {
 			documentDB.RootID.Int64 = int64(BackRepoNodeid_atBckpTime_newID[uint(documentDB.RootID.Int64)])
 			documentDB.RootID.Valid = true
+		}
+
+		// reindexing Body field
+		if documentDB.BodyID.Int64 != 0 {
+			documentDB.BodyID.Int64 = int64(BackRepoBodyid_atBckpTime_newID[uint(documentDB.BodyID.Int64)])
+			documentDB.BodyID.Valid = true
 		}
 
 		// update databse with new index encoding

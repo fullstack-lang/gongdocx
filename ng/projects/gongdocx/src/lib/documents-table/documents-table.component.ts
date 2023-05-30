@@ -81,6 +81,9 @@ export class DocumentsTableComponent implements OnInit {
         case 'Root':
           return (documentDB.Root ? documentDB.Root.Name : '');
 
+        case 'Body':
+          return (documentDB.Body ? documentDB.Body.Name : '');
+
         default:
           console.assert(false, "Unknown field")
           return "";
@@ -101,6 +104,9 @@ export class DocumentsTableComponent implements OnInit {
       }
       if (documentDB.Root) {
         mergedContent += documentDB.Root.Name.toLowerCase()
+      }
+      if (documentDB.Body) {
+        mergedContent += documentDB.Body.Name.toLowerCase()
       }
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
@@ -159,12 +165,14 @@ export class DocumentsTableComponent implements OnInit {
         "Name",
         "File",
         "Root",
+        "Body",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
         "Name",
         "File",
         "Root",
+        "Body",
       ]
       this.selection = new SelectionModel<DocumentDB>(allowMultiSelect, this.initialSelection);
     }

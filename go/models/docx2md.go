@@ -264,6 +264,7 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 
 	// match to the File
 	document := (&Document{Name: f.Name}).Stage(gongdocx_stage)
+	docx.Document = document
 
 	file_ := (*GetGongstructInstancesMap[File](gongdocx_stage))["word/document.xml"]
 	document.File = file_
@@ -285,6 +286,7 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 	}
 
 	body := (&Body{Name: f.Name}).Stage(gongdocx_stage)
+	document.Body = body
 	err = walk(zf, body, node, gongdocx_stage, node_, &buf)
 	if err != nil {
 		return err

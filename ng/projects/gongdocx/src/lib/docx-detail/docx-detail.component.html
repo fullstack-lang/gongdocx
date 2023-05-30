@@ -34,6 +34,16 @@
             </button>
         </mat-grid-tile>
     </mat-grid-list>
+    <mat-form-field class="detail-full-width">
+        <mat-label>Document</mat-label>
+        <mat-select [compareWith]="compareObjects" [(value)]="docx.Document" (selectionChange)="fillUpNameIfEmpty($event)">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let document of frontRepo.Documents_array" [value]="document">
+                {{document.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
             Save docx

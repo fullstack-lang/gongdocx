@@ -45,6 +45,10 @@ type DocxAPI struct {
 // reverse pointers of slice of poitners to Struct
 type DocxPointersEnconding struct {
 	// insertion for pointer fields encoding declaration
+
+	// field Document is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	DocumentID sql.NullInt64
 }
 
 // DocxDB describes a docx in the database
@@ -227,6 +231,15 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// commit pointer value docx.Document translates to updating the docx.DocumentID
+		docxDB.DocumentID.Valid = true // allow for a 0 value (nil association)
+		if docx.Document != nil {
+			if DocumentId, ok := backRepo.BackRepoDocument.Map_DocumentPtr_DocumentDBID[docx.Document]; ok {
+				docxDB.DocumentID.Int64 = int64(DocumentId)
+				docxDB.DocumentID.Valid = true
+			}
+		}
+
 		query := backRepoDocx.db.Save(&docxDB)
 		if query.Error != nil {
 			return query.Error
@@ -361,6 +374,10 @@ func (backRepoDocx *BackRepoDocxStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 		return fileDB_i.Docx_FilesDBID_Index.Int64 < fileDB_j.Docx_FilesDBID_Index.Int64
 	})
 
+	// Document field
+	if docxDB.DocumentID.Int64 != 0 {
+		docx.Document = backRepo.BackRepoDocument.Map_DocumentDBID_DocumentPtr[uint(docxDB.DocumentID.Int64)]
+	}
 	return
 }
 
@@ -575,6 +592,12 @@ func (backRepoDocx *BackRepoDocxStruct) RestorePhaseTwo() {
 		_ = docxDB
 
 		// insertion point for reindexing pointers encoding
+		// reindexing Document field
+		if docxDB.DocumentID.Int64 != 0 {
+			docxDB.DocumentID.Int64 = int64(BackRepoDocumentid_atBckpTime_newID[uint(docxDB.DocumentID.Int64)])
+			docxDB.DocumentID.Valid = true
+		}
+
 		// update databse with new index encoding
 		query := backRepoDocx.db.Model(docxDB).Updates(*docxDB)
 		if query.Error != nil {

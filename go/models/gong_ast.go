@@ -1051,10 +1051,16 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Root":
 					targetIdentifier := ident.Name
 					__gong__map_Document[identifier].Root = __gong__map_Node[targetIdentifier]
+				case "Body":
+					targetIdentifier := ident.Name
+					__gong__map_Document[identifier].Body = __gong__map_Body[targetIdentifier]
 				}
 			case "Docx":
 				switch fieldName {
 				// insertion point for field dependant code
+				case "Document":
+					targetIdentifier := ident.Name
+					__gong__map_Docx[identifier].Document = __gong__map_Document[targetIdentifier]
 				}
 			case "File":
 				switch fieldName {

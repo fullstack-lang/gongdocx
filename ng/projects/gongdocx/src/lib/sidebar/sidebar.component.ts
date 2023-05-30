@@ -645,6 +645,41 @@ export class SidebarComponent implements OnInit {
             RootGongNodeAssociation.children.push(documentGongNodeInstance_Root)
           }
 
+          /**
+          * let append a node for the association Body
+          */
+          let BodyGongNodeAssociation: GongNode = {
+            name: "(Body) Body",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: documentDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Document",
+            associationField: "Body",
+            associatedStructName: "Body",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          documentGongNodeInstance.children!.push(BodyGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Body
+            */
+          if (documentDB.Body != undefined) {
+            let documentGongNodeInstance_Body: GongNode = {
+              name: documentDB.Body.Name,
+              type: GongNodeType.INSTANCE,
+              id: documentDB.Body.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getDocumentUniqueID(documentDB.ID)
+                + 5 * getBodyUniqueID(documentDB.Body.ID),
+              structName: "Body",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            BodyGongNodeAssociation.children.push(documentGongNodeInstance_Body)
+          }
+
         }
       )
 
@@ -720,6 +755,41 @@ export class SidebarComponent implements OnInit {
             }
             FilesGongNodeAssociation.children.push(fileNode)
           })
+
+          /**
+          * let append a node for the association Document
+          */
+          let DocumentGongNodeAssociation: GongNode = {
+            name: "(Document) Document",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: docxDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Docx",
+            associationField: "Document",
+            associatedStructName: "Document",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          docxGongNodeInstance.children!.push(DocumentGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation Document
+            */
+          if (docxDB.Document != undefined) {
+            let docxGongNodeInstance_Document: GongNode = {
+              name: docxDB.Document.Name,
+              type: GongNodeType.INSTANCE,
+              id: docxDB.Document.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getDocxUniqueID(docxDB.ID)
+                + 5 * getDocumentUniqueID(docxDB.Document.ID),
+              structName: "Document",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            DocumentGongNodeAssociation.children.push(docxGongNodeInstance_Document)
+          }
 
         }
       )
