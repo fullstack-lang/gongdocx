@@ -49,6 +49,10 @@ type TextPointersEnconding struct {
 	// field Node is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	NodeID sql.NullInt64
+
+	// field EnclosingRune is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	EnclosingRuneID sql.NullInt64
 }
 
 // TextDB describes a text in the database
@@ -234,6 +238,15 @@ func (backRepoText *BackRepoTextStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// commit pointer value text.EnclosingRune translates to updating the text.EnclosingRuneID
+		textDB.EnclosingRuneID.Valid = true // allow for a 0 value (nil association)
+		if text.EnclosingRune != nil {
+			if EnclosingRuneId, ok := backRepo.BackRepoRune.Map_RunePtr_RuneDBID[text.EnclosingRune]; ok {
+				textDB.EnclosingRuneID.Int64 = int64(EnclosingRuneId)
+				textDB.EnclosingRuneID.Valid = true
+			}
+		}
+
 		query := backRepoText.db.Save(&textDB)
 		if query.Error != nil {
 			return query.Error
@@ -344,6 +357,10 @@ func (backRepoText *BackRepoTextStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// Node field
 	if textDB.NodeID.Int64 != 0 {
 		text.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(textDB.NodeID.Int64)]
+	}
+	// EnclosingRune field
+	if textDB.EnclosingRuneID.Int64 != 0 {
+		text.EnclosingRune = backRepo.BackRepoRune.Map_RuneDBID_RunePtr[uint(textDB.EnclosingRuneID.Int64)]
 	}
 	return
 }
@@ -579,6 +596,12 @@ func (backRepoText *BackRepoTextStruct) RestorePhaseTwo() {
 		if textDB.NodeID.Int64 != 0 {
 			textDB.NodeID.Int64 = int64(BackRepoNodeid_atBckpTime_newID[uint(textDB.NodeID.Int64)])
 			textDB.NodeID.Valid = true
+		}
+
+		// reindexing EnclosingRune field
+		if textDB.EnclosingRuneID.Int64 != 0 {
+			textDB.EnclosingRuneID.Int64 = int64(BackRepoRuneid_atBckpTime_newID[uint(textDB.EnclosingRuneID.Int64)])
+			textDB.EnclosingRuneID.Valid = true
 		}
 
 		// update databse with new index encoding

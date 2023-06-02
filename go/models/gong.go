@@ -1565,6 +1565,10 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			Next: &Paragraph{Name: "Next"},
 			// field is initialized with an instance of Paragraph with the name of the field
 			Previous: &Paragraph{Name: "Previous"},
+			// field is initialized with an instance of Body with the name of the field
+			EnclosingBody: &Body{Name: "EnclosingBody"},
+			// field is initialized with an instance of TableColumn with the name of the field
+			EnclosingTableColumn: &TableColumn{Name: "EnclosingTableColumn"},
 		}).(*Type)
 	case ParagraphProperties:
 		return any(&ParagraphProperties{
@@ -1589,6 +1593,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			Text: &Text{Name: "Text"},
 			// field is initialized with an instance of RuneProperties with the name of the field
 			RuneProperties: &RuneProperties{Name: "RuneProperties"},
+			// field is initialized with an instance of Paragraph with the name of the field
+			EnclosingParagraph: &Paragraph{Name: "EnclosingParagraph"},
 		}).(*Type)
 	case RuneProperties:
 		return any(&RuneProperties{
@@ -1641,6 +1647,8 @@ func GetAssociationName[Type Gongstruct]() *Type {
 			// Initialisation of associations
 			// field is initialized with an instance of Node with the name of the field
 			Node: &Node{Name: "Node"},
+			// field is initialized with an instance of Rune with the name of the field
+			EnclosingRune: &Rune{Name: "EnclosingRune"},
 		}).(*Type)
 	default:
 		return nil
@@ -1842,6 +1850,40 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 				}
 			}
 			return any(res).(map[*End][]*Start)
+		case "EnclosingBody":
+			res := make(map[*Body][]*Paragraph)
+			for paragraph := range stage.Paragraphs {
+				if paragraph.EnclosingBody != nil {
+					body_ := paragraph.EnclosingBody
+					var paragraphs []*Paragraph
+					_, ok := res[body_]
+					if ok {
+						paragraphs = res[body_]
+					} else {
+						paragraphs = make([]*Paragraph, 0)
+					}
+					paragraphs = append(paragraphs, paragraph)
+					res[body_] = paragraphs
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "EnclosingTableColumn":
+			res := make(map[*TableColumn][]*Paragraph)
+			for paragraph := range stage.Paragraphs {
+				if paragraph.EnclosingTableColumn != nil {
+					tablecolumn_ := paragraph.EnclosingTableColumn
+					var paragraphs []*Paragraph
+					_, ok := res[tablecolumn_]
+					if ok {
+						paragraphs = res[tablecolumn_]
+					} else {
+						paragraphs = make([]*Paragraph, 0)
+					}
+					paragraphs = append(paragraphs, paragraph)
+					res[tablecolumn_] = paragraphs
+				}
+			}
+			return any(res).(map[*End][]*Start)
 		}
 	// reverse maps of direct associations of ParagraphProperties
 	case ParagraphProperties:
@@ -1956,6 +1998,23 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 					}
 					runes = append(runes, rune)
 					res[runeproperties_] = runes
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "EnclosingParagraph":
+			res := make(map[*Paragraph][]*Rune)
+			for rune := range stage.Runes {
+				if rune.EnclosingParagraph != nil {
+					paragraph_ := rune.EnclosingParagraph
+					var runes []*Rune
+					_, ok := res[paragraph_]
+					if ok {
+						runes = res[paragraph_]
+					} else {
+						runes = make([]*Rune, 0)
+					}
+					runes = append(runes, rune)
+					res[paragraph_] = runes
 				}
 			}
 			return any(res).(map[*End][]*Start)
@@ -2144,6 +2203,23 @@ func GetPointerReverseMap[Start, End Gongstruct](fieldname string, stage *StageS
 					}
 					texts = append(texts, text)
 					res[node_] = texts
+				}
+			}
+			return any(res).(map[*End][]*Start)
+		case "EnclosingRune":
+			res := make(map[*Rune][]*Text)
+			for text := range stage.Texts {
+				if text.EnclosingRune != nil {
+					rune_ := text.EnclosingRune
+					var texts []*Text
+					_, ok := res[rune_]
+					if ok {
+						texts = res[rune_]
+					} else {
+						texts = make([]*Text, 0)
+					}
+					texts = append(texts, text)
+					res[rune_] = texts
 				}
 			}
 			return any(res).(map[*End][]*Start)
@@ -2374,13 +2450,13 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case Node:
 		res = []string{"Name", "Nodes"}
 	case Paragraph:
-		res = []string{"Name", "Content", "Node", "ParagraphProperties", "Runes", "Next", "Previous"}
+		res = []string{"Name", "Content", "Node", "ParagraphProperties", "Runes", "Text", "Next", "Previous", "EnclosingBody", "EnclosingTableColumn"}
 	case ParagraphProperties:
 		res = []string{"Name", "Content", "ParagraphStyle", "Node"}
 	case ParagraphStyle:
 		res = []string{"Name", "Node", "Content", "ValAttr"}
 	case Rune:
-		res = []string{"Name", "Content", "Node", "Text", "RuneProperties"}
+		res = []string{"Name", "Content", "Node", "Text", "RuneProperties", "EnclosingParagraph"}
 	case RuneProperties:
 		res = []string{"Name", "Node", "IsBold", "IsStrike", "IsItalic", "Content"}
 	case Table:
@@ -2394,7 +2470,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case TableStyle:
 		res = []string{"Name", "Node", "Content", "Val"}
 	case Text:
-		res = []string{"Name", "Content", "Node", "PreserveWhiteSpace"}
+		res = []string{"Name", "Content", "Node", "PreserveWhiteSpace", "EnclosingRune"}
 	}
 	return
 }
@@ -2504,6 +2580,8 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 				}
 				res += __instance__.Name
 			}
+		case "Text":
+			res = any(instance).(Paragraph).Text
 		case "Next":
 			if any(instance).(Paragraph).Next != nil {
 				res = any(instance).(Paragraph).Next.Name
@@ -2511,6 +2589,14 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "Previous":
 			if any(instance).(Paragraph).Previous != nil {
 				res = any(instance).(Paragraph).Previous.Name
+			}
+		case "EnclosingBody":
+			if any(instance).(Paragraph).EnclosingBody != nil {
+				res = any(instance).(Paragraph).EnclosingBody.Name
+			}
+		case "EnclosingTableColumn":
+			if any(instance).(Paragraph).EnclosingTableColumn != nil {
+				res = any(instance).(Paragraph).EnclosingTableColumn.Name
 			}
 		}
 	case ParagraphProperties:
@@ -2561,6 +2647,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		case "RuneProperties":
 			if any(instance).(Rune).RuneProperties != nil {
 				res = any(instance).(Rune).RuneProperties.Name
+			}
+		case "EnclosingParagraph":
+			if any(instance).(Rune).EnclosingParagraph != nil {
+				res = any(instance).(Rune).EnclosingParagraph.Name
 			}
 		}
 	case RuneProperties:
@@ -2685,6 +2775,10 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			}
 		case "PreserveWhiteSpace":
 			res = fmt.Sprintf("%t", any(instance).(Text).PreserveWhiteSpace)
+		case "EnclosingRune":
+			if any(instance).(Text).EnclosingRune != nil {
+				res = any(instance).(Text).EnclosingRune.Name
+			}
 		}
 	}
 	return

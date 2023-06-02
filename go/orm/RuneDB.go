@@ -58,6 +58,10 @@ type RunePointersEnconding struct {
 	// This field is generated into another field to enable AS ONE association
 	RunePropertiesID sql.NullInt64
 
+	// field EnclosingParagraph is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	EnclosingParagraphID sql.NullInt64
+
 	// Implementation of a reverse ID for field Paragraph{}.Runes []*Rune
 	Paragraph_RunesDBID sql.NullInt64
 
@@ -259,6 +263,15 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// commit pointer value rune.EnclosingParagraph translates to updating the rune.EnclosingParagraphID
+		runeDB.EnclosingParagraphID.Valid = true // allow for a 0 value (nil association)
+		if rune.EnclosingParagraph != nil {
+			if EnclosingParagraphId, ok := backRepo.BackRepoParagraph.Map_ParagraphPtr_ParagraphDBID[rune.EnclosingParagraph]; ok {
+				runeDB.EnclosingParagraphID.Int64 = int64(EnclosingParagraphId)
+				runeDB.EnclosingParagraphID.Valid = true
+			}
+		}
+
 		query := backRepoRune.db.Save(&runeDB)
 		if query.Error != nil {
 			return query.Error
@@ -377,6 +390,10 @@ func (backRepoRune *BackRepoRuneStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// RuneProperties field
 	if runeDB.RunePropertiesID.Int64 != 0 {
 		rune.RuneProperties = backRepo.BackRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[uint(runeDB.RunePropertiesID.Int64)]
+	}
+	// EnclosingParagraph field
+	if runeDB.EnclosingParagraphID.Int64 != 0 {
+		rune.EnclosingParagraph = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(runeDB.EnclosingParagraphID.Int64)]
 	}
 	return
 }
@@ -616,6 +633,12 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 		if runeDB.RunePropertiesID.Int64 != 0 {
 			runeDB.RunePropertiesID.Int64 = int64(BackRepoRunePropertiesid_atBckpTime_newID[uint(runeDB.RunePropertiesID.Int64)])
 			runeDB.RunePropertiesID.Valid = true
+		}
+
+		// reindexing EnclosingParagraph field
+		if runeDB.EnclosingParagraphID.Int64 != 0 {
+			runeDB.EnclosingParagraphID.Int64 = int64(BackRepoParagraphid_atBckpTime_newID[uint(runeDB.EnclosingParagraphID.Int64)])
+			runeDB.EnclosingParagraphID.Valid = true
 		}
 
 		// This reindex rune.Runes

@@ -995,6 +995,20 @@ export class FrontRepoService {
                     paragraph.Previous = _paragraph
                   }
                 }
+                // insertion point for pointer field EnclosingBody redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(paragraph.EnclosingBodyID.Int64)
+                  if (_body) {
+                    paragraph.EnclosingBody = _body
+                  }
+                }
+                // insertion point for pointer field EnclosingTableColumn redeeming
+                {
+                  let _tablecolumn = this.frontRepo.TableColumns.get(paragraph.EnclosingTableColumnID.Int64)
+                  if (_tablecolumn) {
+                    paragraph.EnclosingTableColumn = _tablecolumn
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
                 // insertion point for slice of pointer field Body.Paragraphs redeeming
@@ -1082,6 +1096,13 @@ export class FrontRepoService {
                   let _runeproperties = this.frontRepo.RunePropertiess.get(rune.RunePropertiesID.Int64)
                   if (_runeproperties) {
                     rune.RuneProperties = _runeproperties
+                  }
+                }
+                // insertion point for pointer field EnclosingParagraph redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(rune.EnclosingParagraphID.Int64)
+                  if (_paragraph) {
+                    rune.EnclosingParagraph = _paragraph
                   }
                 }
 
@@ -1246,6 +1267,13 @@ export class FrontRepoService {
                   let _node = this.frontRepo.Nodes.get(text.NodeID.Int64)
                   if (_node) {
                     text.Node = _node
+                  }
+                }
+                // insertion point for pointer field EnclosingRune redeeming
+                {
+                  let _rune = this.frontRepo.Runes.get(text.EnclosingRuneID.Int64)
+                  if (_rune) {
+                    text.EnclosingRune = _rune
                   }
                 }
 
@@ -1632,6 +1660,20 @@ export class FrontRepoService {
                     paragraph.Previous = _paragraph
                   }
                 }
+                // insertion point for pointer field EnclosingBody redeeming
+                {
+                  let _body = this.frontRepo.Bodys.get(paragraph.EnclosingBodyID.Int64)
+                  if (_body) {
+                    paragraph.EnclosingBody = _body
+                  }
+                }
+                // insertion point for pointer field EnclosingTableColumn redeeming
+                {
+                  let _tablecolumn = this.frontRepo.TableColumns.get(paragraph.EnclosingTableColumnID.Int64)
+                  if (_tablecolumn) {
+                    paragraph.EnclosingTableColumn = _tablecolumn
+                  }
+                }
 
                 // insertion point for redeeming ONE-MANY associations
                 // insertion point for slice of pointer field Body.Paragraphs redeeming
@@ -1851,6 +1893,13 @@ export class FrontRepoService {
                   let _runeproperties = this.frontRepo.RunePropertiess.get(rune.RunePropertiesID.Int64)
                   if (_runeproperties) {
                     rune.RuneProperties = _runeproperties
+                  }
+                }
+                // insertion point for pointer field EnclosingParagraph redeeming
+                {
+                  let _paragraph = this.frontRepo.Paragraphs.get(rune.EnclosingParagraphID.Int64)
+                  if (_paragraph) {
+                    rune.EnclosingParagraph = _paragraph
                   }
                 }
 
@@ -2323,6 +2372,13 @@ export class FrontRepoService {
                   let _node = this.frontRepo.Nodes.get(text.NodeID.Int64)
                   if (_node) {
                     text.Node = _node
+                  }
+                }
+                // insertion point for pointer field EnclosingRune redeeming
+                {
+                  let _rune = this.frontRepo.Runes.get(text.EnclosingRuneID.Int64)
+                  if (_rune) {
+                    text.EnclosingRune = _rune
                   }
                 }
 

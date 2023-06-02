@@ -892,6 +892,10 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 					// remove first and last char
 					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
 					__gong__map_Paragraph[identifier].Content = fielValue
+				case "Text":
+					// remove first and last char
+					fielValue := basicLit.Value[1 : len(basicLit.Value)-1]
+					__gong__map_Paragraph[identifier].Text = fielValue
 				}
 			case "ParagraphProperties":
 				switch fieldName {
@@ -1085,6 +1089,12 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "Previous":
 					targetIdentifier := ident.Name
 					__gong__map_Paragraph[identifier].Previous = __gong__map_Paragraph[targetIdentifier]
+				case "EnclosingBody":
+					targetIdentifier := ident.Name
+					__gong__map_Paragraph[identifier].EnclosingBody = __gong__map_Body[targetIdentifier]
+				case "EnclosingTableColumn":
+					targetIdentifier := ident.Name
+					__gong__map_Paragraph[identifier].EnclosingTableColumn = __gong__map_TableColumn[targetIdentifier]
 				}
 			case "ParagraphProperties":
 				switch fieldName {
@@ -1115,6 +1125,9 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 				case "RuneProperties":
 					targetIdentifier := ident.Name
 					__gong__map_Rune[identifier].RuneProperties = __gong__map_RuneProperties[targetIdentifier]
+				case "EnclosingParagraph":
+					targetIdentifier := ident.Name
+					__gong__map_Rune[identifier].EnclosingParagraph = __gong__map_Paragraph[targetIdentifier]
 				}
 			case "RuneProperties":
 				switch fieldName {
@@ -1198,6 +1211,9 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 						log.Fatalln(err)
 					}
 					__gong__map_Text[identifier].PreserveWhiteSpace = fielValue
+				case "EnclosingRune":
+					targetIdentifier := ident.Name
+					__gong__map_Text[identifier].EnclosingRune = __gong__map_Rune[targetIdentifier]
 				}
 			}
 		case *ast.SelectorExpr:

@@ -158,6 +158,16 @@ export class TextDetailComponent implements OnInit {
 			this.text.NodeID.Valid = true
 		}
 		this.text.PreserveWhiteSpace = this.PreserveWhiteSpaceFormControl.value
+		if (this.text.EnclosingRuneID == undefined) {
+			this.text.EnclosingRuneID = new NullInt64
+		}
+		if (this.text.EnclosingRune != undefined) {
+			this.text.EnclosingRuneID.Int64 = this.text.EnclosingRune.ID
+			this.text.EnclosingRuneID.Valid = true
+		} else {
+			this.text.EnclosingRuneID.Int64 = 0
+			this.text.EnclosingRuneID.Valid = true
+		}
 
 		// save from the front pointer space to the non pointer space for serialization
 

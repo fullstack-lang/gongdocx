@@ -47,6 +47,13 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="Text">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Text </th>
+            <td mat-cell *matCellDef="let Paragraph">
+                {{Paragraph.Text}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="Next">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Next </th>
             <td mat-cell *matCellDef="let Paragraph">
@@ -58,6 +65,20 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Previous </th>
             <td mat-cell *matCellDef="let Paragraph">
                 {{ Paragraph.Previous ? Paragraph.Previous.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="EnclosingBody">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> EnclosingBody </th>
+            <td mat-cell *matCellDef="let Paragraph">
+                {{ Paragraph.EnclosingBody ? Paragraph.EnclosingBody.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
+        <ng-container matColumnDef="EnclosingTableColumn">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> EnclosingTableColumn </th>
+            <td mat-cell *matCellDef="let Paragraph">
+                {{ Paragraph.EnclosingTableColumn ? Paragraph.EnclosingTableColumn.Name : ''}}
             </td>
         </ng-container>
         <!-- -->

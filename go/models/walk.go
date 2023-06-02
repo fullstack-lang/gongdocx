@@ -60,6 +60,8 @@ func walk(
 		switch rune_ := parentNode.(type) {
 		case *Rune:
 			rune_.Text = text
+			text.EnclosingRune = rune_
+			rune_.EnclosingParagraph.Text = rune_.EnclosingParagraph.Text + text.Content
 		}
 
 		// foo.Fprint(w, string(node_.Content))
@@ -311,6 +313,7 @@ func walk(
 		switch paragraph := parentNode.(type) {
 		case *Paragraph:
 			paragraph.Runes = append(paragraph.Runes, rune_)
+			rune_.EnclosingParagraph = paragraph
 		}
 
 		bold := false
@@ -380,8 +383,10 @@ func walk(
 		switch parentNodeTyped := parentNode.(type) {
 		case *TableColumn:
 			parentNodeTyped.Paragraphs = append(parentNodeTyped.Paragraphs, paragraph)
+			paragraph.EnclosingTableColumn = parentNodeTyped
 		case *Body:
 			parentNodeTyped.Paragraphs = append(parentNodeTyped.Paragraphs, paragraph)
+			paragraph.EnclosingBody = parentNodeTyped
 
 			// make the link
 			if parentNodeTyped.LastParagraph != nil {

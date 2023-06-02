@@ -1,5 +1,6 @@
 // insertion point for imports
 import { NodeDB } from './node-db'
+import { RuneDB } from './rune-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -20,5 +21,8 @@ export class TextDB {
 	// insertion point for other declarations
 	Node?: NodeDB
 	NodeID: NullInt64 = new NullInt64 // if pointer is null, Node.ID = 0
+
+	EnclosingRune?: RuneDB
+	EnclosingRuneID: NullInt64 = new NullInt64 // if pointer is null, EnclosingRune.ID = 0
 
 }

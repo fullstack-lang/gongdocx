@@ -205,6 +205,26 @@ export class ParagraphDetailComponent implements OnInit {
 			this.paragraph.PreviousID.Int64 = 0
 			this.paragraph.PreviousID.Valid = true
 		}
+		if (this.paragraph.EnclosingBodyID == undefined) {
+			this.paragraph.EnclosingBodyID = new NullInt64
+		}
+		if (this.paragraph.EnclosingBody != undefined) {
+			this.paragraph.EnclosingBodyID.Int64 = this.paragraph.EnclosingBody.ID
+			this.paragraph.EnclosingBodyID.Valid = true
+		} else {
+			this.paragraph.EnclosingBodyID.Int64 = 0
+			this.paragraph.EnclosingBodyID.Valid = true
+		}
+		if (this.paragraph.EnclosingTableColumnID == undefined) {
+			this.paragraph.EnclosingTableColumnID = new NullInt64
+		}
+		if (this.paragraph.EnclosingTableColumn != undefined) {
+			this.paragraph.EnclosingTableColumnID.Int64 = this.paragraph.EnclosingTableColumn.ID
+			this.paragraph.EnclosingTableColumnID.Valid = true
+		} else {
+			this.paragraph.EnclosingTableColumnID.Int64 = 0
+			this.paragraph.EnclosingTableColumnID.Valid = true
+		}
 
 		// save from the front pointer space to the non pointer space for serialization
 

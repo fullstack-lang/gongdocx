@@ -19,6 +19,7 @@ export class ParagraphDB {
 	// insertion point for basic fields declarations
 	Name: string = ""
 	Content: string = ""
+	Text: string = ""
 
 	// insertion point for other declarations
 	Node?: NodeDB
@@ -33,6 +34,12 @@ export class ParagraphDB {
 
 	Previous?: ParagraphDB
 	PreviousID: NullInt64 = new NullInt64 // if pointer is null, Previous.ID = 0
+
+	EnclosingBody?: BodyDB
+	EnclosingBodyID: NullInt64 = new NullInt64 // if pointer is null, EnclosingBody.ID = 0
+
+	EnclosingTableColumn?: TableColumnDB
+	EnclosingTableColumnID: NullInt64 = new NullInt64 // if pointer is null, EnclosingTableColumn.ID = 0
 
 	Body_ParagraphsDBID: NullInt64 = new NullInt64
 	Body_ParagraphsDBID_Index: NullInt64  = new NullInt64 // store the index of the paragraph instance in Body.Paragraphs

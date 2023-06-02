@@ -54,6 +54,13 @@
             </td>
         </ng-container>
         <!-- -->
+        <ng-container matColumnDef="EnclosingParagraph">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> EnclosingParagraph </th>
+            <td mat-cell *matCellDef="let Rune">
+                {{ Rune.EnclosingParagraph ? Rune.EnclosingParagraph.Name : ''}}
+            </td>
+        </ng-container>
+        <!-- -->
         <ng-container matColumnDef="Paragraph_Runes">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> <-- (Paragraph) Runes </th>
             <td mat-cell *matCellDef="let rune">

@@ -77,6 +77,7 @@ export class RuneService {
     runedb.Node = new NodeDB
     runedb.Text = new TextDB
     runedb.RuneProperties = new RunePropertiesDB
+    runedb.EnclosingParagraph = new ParagraphDB
     let _Paragraph_Runes_reverse = runedb.Paragraph_Runes_reverse
     runedb.Paragraph_Runes_reverse = new ParagraphDB
 
@@ -122,6 +123,7 @@ export class RuneService {
     runedb.Node = new NodeDB
     runedb.Text = new TextDB
     runedb.RuneProperties = new RunePropertiesDB
+    runedb.EnclosingParagraph = new ParagraphDB
     let _Paragraph_Runes_reverse = runedb.Paragraph_Runes_reverse
     runedb.Paragraph_Runes_reverse = new ParagraphDB
 

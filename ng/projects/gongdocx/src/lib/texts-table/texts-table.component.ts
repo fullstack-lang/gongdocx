@@ -84,6 +84,9 @@ export class TextsTableComponent implements OnInit {
         case 'PreserveWhiteSpace':
           return textDB.PreserveWhiteSpace ? "true" : "false";
 
+        case 'EnclosingRune':
+          return (textDB.EnclosingRune ? textDB.EnclosingRune.Name : '');
+
         default:
           console.assert(false, "Unknown field")
           return "";
@@ -102,6 +105,9 @@ export class TextsTableComponent implements OnInit {
       mergedContent += textDB.Content.toLowerCase()
       if (textDB.Node) {
         mergedContent += textDB.Node.Name.toLowerCase()
+      }
+      if (textDB.EnclosingRune) {
+        mergedContent += textDB.EnclosingRune.Name.toLowerCase()
       }
 
       let isSelected = mergedContent.includes(filter.toLowerCase())
@@ -161,6 +167,7 @@ export class TextsTableComponent implements OnInit {
         "Content",
         "Node",
         "PreserveWhiteSpace",
+        "EnclosingRune",
       ]
     } else {
       this.displayedColumns = ['select', 'ID', // insertion point for columns to display
@@ -168,6 +175,7 @@ export class TextsTableComponent implements OnInit {
         "Content",
         "Node",
         "PreserveWhiteSpace",
+        "EnclosingRune",
       ]
       this.selection = new SelectionModel<TextDB>(allowMultiSelect, this.initialSelection);
     }

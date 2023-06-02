@@ -74,6 +74,26 @@
             </button>
         </mat-grid-tile>
     </mat-grid-list>
+    <mat-grid-list *ngIf='!isATextArea("Text")' cols="5" rowHeight="1:1">
+        <mat-grid-tile [colspan]="3">
+            <mat-form-field mat-form-field class="detail-full-width">
+                <mat-label>Text</mat-label>
+                <input name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="paragraph.Text">
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <button mat-raised-button (click)="toggleTextArea('Text')">
+                <mat-icon>
+                    expand_more
+                </mat-icon>
+            </button>
+        </mat-grid-tile>
+    </mat-grid-list>
+    <mat-form-field *ngIf='isATextArea("Text")' mat-form-field class="detail-full-width">
+        <mat-label>Text</mat-label>
+        <textarea name="" [ngModelOptions]="{standalone: true}" matInput [(ngModel)]="paragraph.Text"></textarea>
+    </mat-form-field>
+
     <mat-form-field class="detail-full-width">
         <mat-label>Next</mat-label>
         <mat-select [compareWith]="compareObjects" [(value)]="paragraph.Next" (selectionChange)="fillUpNameIfEmpty($event)">
@@ -90,6 +110,26 @@
             <mat-option>None</mat-option>
             <mat-option *ngFor="let paragraph of frontRepo.Paragraphs_array" [value]="paragraph">
                 {{paragraph.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="detail-full-width">
+        <mat-label>EnclosingBody</mat-label>
+        <mat-select [compareWith]="compareObjects" [(value)]="paragraph.EnclosingBody" (selectionChange)="fillUpNameIfEmpty($event)">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let body of frontRepo.Bodys_array" [value]="body">
+                {{body.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="detail-full-width">
+        <mat-label>EnclosingTableColumn</mat-label>
+        <mat-select [compareWith]="compareObjects" [(value)]="paragraph.EnclosingTableColumn" (selectionChange)="fillUpNameIfEmpty($event)">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let tablecolumn of frontRepo.TableColumns_array" [value]="tablecolumn">
+                {{tablecolumn.Name}}
             </mat-option>
         </mat-select>
     </mat-form-field>

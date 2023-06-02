@@ -28,4 +28,7 @@ type Text struct {
 	Content            string
 	Node               *Node
 	PreserveWhiteSpace bool
+
+	// navigation
+	EnclosingRune *Rune
 }

@@ -79,6 +79,8 @@ export class ParagraphService {
     paragraphdb.Runes = []
     paragraphdb.Next = new ParagraphDB
     paragraphdb.Previous = new ParagraphDB
+    paragraphdb.EnclosingBody = new BodyDB
+    paragraphdb.EnclosingTableColumn = new TableColumnDB
     let _Body_Paragraphs_reverse = paragraphdb.Body_Paragraphs_reverse
     paragraphdb.Body_Paragraphs_reverse = new BodyDB
     let _TableColumn_Paragraphs_reverse = paragraphdb.TableColumn_Paragraphs_reverse
@@ -129,6 +131,8 @@ export class ParagraphService {
     paragraphdb.Runes = []
     paragraphdb.Next = new ParagraphDB
     paragraphdb.Previous = new ParagraphDB
+    paragraphdb.EnclosingBody = new BodyDB
+    paragraphdb.EnclosingTableColumn = new TableColumnDB
     let _Body_Paragraphs_reverse = paragraphdb.Body_Paragraphs_reverse
     paragraphdb.Body_Paragraphs_reverse = new BodyDB
     let _TableColumn_Paragraphs_reverse = paragraphdb.TableColumn_Paragraphs_reverse

@@ -359,6 +359,12 @@ func (stage *StageStruct) StageBranchParagraph(paragraph *Paragraph) {
 	if paragraph.Previous != nil {
 		StageBranch(stage, paragraph.Previous)
 	}
+	if paragraph.EnclosingBody != nil {
+		StageBranch(stage, paragraph.EnclosingBody)
+	}
+	if paragraph.EnclosingTableColumn != nil {
+		StageBranch(stage, paragraph.EnclosingTableColumn)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _rune := range paragraph.Runes {
@@ -424,6 +430,9 @@ func (stage *StageStruct) StageBranchRune(rune *Rune) {
 	}
 	if rune.RuneProperties != nil {
 		StageBranch(stage, rune.RuneProperties)
+	}
+	if rune.EnclosingParagraph != nil {
+		StageBranch(stage, rune.EnclosingParagraph)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
@@ -565,6 +574,9 @@ func (stage *StageStruct) StageBranchText(text *Text) {
 	//insertion point for the staging of instances referenced by pointers
 	if text.Node != nil {
 		StageBranch(stage, text.Node)
+	}
+	if text.EnclosingRune != nil {
+		StageBranch(stage, text.EnclosingRune)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
@@ -758,6 +770,12 @@ func (stage *StageStruct) UnstageBranchParagraph(paragraph *Paragraph) {
 	if paragraph.Previous != nil {
 		UnstageBranch(stage, paragraph.Previous)
 	}
+	if paragraph.EnclosingBody != nil {
+		UnstageBranch(stage, paragraph.EnclosingBody)
+	}
+	if paragraph.EnclosingTableColumn != nil {
+		UnstageBranch(stage, paragraph.EnclosingTableColumn)
+	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _rune := range paragraph.Runes {
@@ -823,6 +841,9 @@ func (stage *StageStruct) UnstageBranchRune(rune *Rune) {
 	}
 	if rune.RuneProperties != nil {
 		UnstageBranch(stage, rune.RuneProperties)
+	}
+	if rune.EnclosingParagraph != nil {
+		UnstageBranch(stage, rune.EnclosingParagraph)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers
@@ -964,6 +985,9 @@ func (stage *StageStruct) UnstageBranchText(text *Text) {
 	//insertion point for the staging of instances referenced by pointers
 	if text.Node != nil {
 		UnstageBranch(stage, text.Node)
+	}
+	if text.EnclosingRune != nil {
+		UnstageBranch(stage, text.EnclosingRune)
 	}
 
 	//insertion point for the staging of instances referenced by slice of pointers

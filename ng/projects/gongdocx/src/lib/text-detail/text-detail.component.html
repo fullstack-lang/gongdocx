@@ -54,6 +54,16 @@
     <!-- -->
     <mat-checkbox [formControl]="PreserveWhiteSpaceFormControl">PreserveWhiteSpace</mat-checkbox>
 
+    <mat-form-field class="detail-full-width">
+        <mat-label>EnclosingRune</mat-label>
+        <mat-select [compareWith]="compareObjects" [(value)]="text.EnclosingRune" (selectionChange)="fillUpNameIfEmpty($event)">
+            <mat-option>None</mat-option>
+            <mat-option *ngFor="let rune of frontRepo.Runes_array" [value]="rune">
+                {{rune.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
     <div class="details__save">
         <button mat-raised-button color="primary" (click)="save()">
             Save text

@@ -27,7 +27,11 @@ type Paragraph struct {
 	ParagraphProperties *ParagraphProperties
 	Runes               []*Rune
 
+	Text string // collated text of all runes
+
 	// navigation
-	Next     *Paragraph
-	Previous *Paragraph
+	Next                 *Paragraph
+	Previous             *Paragraph
+	EnclosingBody        *Body
+	EnclosingTableColumn *TableColumn
 }

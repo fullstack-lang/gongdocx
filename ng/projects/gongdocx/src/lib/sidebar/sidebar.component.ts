@@ -1127,6 +1127,76 @@ export class SidebarComponent implements OnInit {
             PreviousGongNodeAssociation.children.push(paragraphGongNodeInstance_Previous)
           }
 
+          /**
+          * let append a node for the association EnclosingBody
+          */
+          let EnclosingBodyGongNodeAssociation: GongNode = {
+            name: "(Body) EnclosingBody",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: paragraphDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Paragraph",
+            associationField: "EnclosingBody",
+            associatedStructName: "Body",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphGongNodeInstance.children!.push(EnclosingBodyGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation EnclosingBody
+            */
+          if (paragraphDB.EnclosingBody != undefined) {
+            let paragraphGongNodeInstance_EnclosingBody: GongNode = {
+              name: paragraphDB.EnclosingBody.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphDB.EnclosingBody.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getParagraphUniqueID(paragraphDB.ID)
+                + 5 * getBodyUniqueID(paragraphDB.EnclosingBody.ID),
+              structName: "Body",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            EnclosingBodyGongNodeAssociation.children.push(paragraphGongNodeInstance_EnclosingBody)
+          }
+
+          /**
+          * let append a node for the association EnclosingTableColumn
+          */
+          let EnclosingTableColumnGongNodeAssociation: GongNode = {
+            name: "(TableColumn) EnclosingTableColumn",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: paragraphDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Paragraph",
+            associationField: "EnclosingTableColumn",
+            associatedStructName: "TableColumn",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          paragraphGongNodeInstance.children!.push(EnclosingTableColumnGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation EnclosingTableColumn
+            */
+          if (paragraphDB.EnclosingTableColumn != undefined) {
+            let paragraphGongNodeInstance_EnclosingTableColumn: GongNode = {
+              name: paragraphDB.EnclosingTableColumn.Name,
+              type: GongNodeType.INSTANCE,
+              id: paragraphDB.EnclosingTableColumn.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getParagraphUniqueID(paragraphDB.ID)
+                + 5 * getTableColumnUniqueID(paragraphDB.EnclosingTableColumn.ID),
+              structName: "TableColumn",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            EnclosingTableColumnGongNodeAssociation.children.push(paragraphGongNodeInstance_EnclosingTableColumn)
+          }
+
         }
       )
 
@@ -1467,6 +1537,41 @@ export class SidebarComponent implements OnInit {
               children: new Array<GongNode>()
             }
             RunePropertiesGongNodeAssociation.children.push(runeGongNodeInstance_RuneProperties)
+          }
+
+          /**
+          * let append a node for the association EnclosingParagraph
+          */
+          let EnclosingParagraphGongNodeAssociation: GongNode = {
+            name: "(Paragraph) EnclosingParagraph",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: runeDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Rune",
+            associationField: "EnclosingParagraph",
+            associatedStructName: "Paragraph",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          runeGongNodeInstance.children!.push(EnclosingParagraphGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation EnclosingParagraph
+            */
+          if (runeDB.EnclosingParagraph != undefined) {
+            let runeGongNodeInstance_EnclosingParagraph: GongNode = {
+              name: runeDB.EnclosingParagraph.Name,
+              type: GongNodeType.INSTANCE,
+              id: runeDB.EnclosingParagraph.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getRuneUniqueID(runeDB.ID)
+                + 5 * getParagraphUniqueID(runeDB.EnclosingParagraph.ID),
+              structName: "Paragraph",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            EnclosingParagraphGongNodeAssociation.children.push(runeGongNodeInstance_EnclosingParagraph)
           }
 
         }
@@ -2186,6 +2291,41 @@ export class SidebarComponent implements OnInit {
               children: new Array<GongNode>()
             }
             NodeGongNodeAssociation.children.push(textGongNodeInstance_Node)
+          }
+
+          /**
+          * let append a node for the association EnclosingRune
+          */
+          let EnclosingRuneGongNodeAssociation: GongNode = {
+            name: "(Rune) EnclosingRune",
+            type: GongNodeType.ONE__ZERO_ONE_ASSOCIATION,
+            id: textDB.ID,
+            uniqueIdPerStack: 17 * nonInstanceNodeId,
+            structName: "Text",
+            associationField: "EnclosingRune",
+            associatedStructName: "Rune",
+            children: new Array<GongNode>()
+          }
+          nonInstanceNodeId = nonInstanceNodeId + 1
+          textGongNodeInstance.children!.push(EnclosingRuneGongNodeAssociation)
+
+          /**
+            * let append a node for the instance behind the asssociation EnclosingRune
+            */
+          if (textDB.EnclosingRune != undefined) {
+            let textGongNodeInstance_EnclosingRune: GongNode = {
+              name: textDB.EnclosingRune.Name,
+              type: GongNodeType.INSTANCE,
+              id: textDB.EnclosingRune.ID,
+              uniqueIdPerStack: // godel numbering (thank you kurt)
+                3 * getTextUniqueID(textDB.ID)
+                + 5 * getRuneUniqueID(textDB.EnclosingRune.ID),
+              structName: "Rune",
+              associationField: "",
+              associatedStructName: "",
+              children: new Array<GongNode>()
+            }
+            EnclosingRuneGongNodeAssociation.children.push(textGongNodeInstance_EnclosingRune)
           }
 
         }

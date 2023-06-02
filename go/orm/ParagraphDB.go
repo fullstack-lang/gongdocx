@@ -62,6 +62,14 @@ type ParagraphPointersEnconding struct {
 	// This field is generated into another field to enable AS ONE association
 	PreviousID sql.NullInt64
 
+	// field EnclosingBody is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	EnclosingBodyID sql.NullInt64
+
+	// field EnclosingTableColumn is a pointer to another Struct (optional or 0..1)
+	// This field is generated into another field to enable AS ONE association
+	EnclosingTableColumnID sql.NullInt64
+
 	// Implementation of a reverse ID for field Body{}.Paragraphs []*Paragraph
 	Body_ParagraphsDBID sql.NullInt64
 
@@ -91,6 +99,9 @@ type ParagraphDB struct {
 
 	// Declation for basic field paragraphDB.Content
 	Content_Data sql.NullString
+
+	// Declation for basic field paragraphDB.Text
+	Text_Data sql.NullString
 	// encoding of pointers
 	ParagraphPointersEnconding
 }
@@ -115,6 +126,8 @@ type ParagraphWOP struct {
 	Name string `xlsx:"1"`
 
 	Content string `xlsx:"2"`
+
+	Text string `xlsx:"3"`
 	// insertion for WOP pointer fields
 }
 
@@ -123,6 +136,7 @@ var Paragraph_Fields = []string{
 	"ID",
 	"Name",
 	"Content",
+	"Text",
 }
 
 type BackRepoParagraphStruct struct {
@@ -297,6 +311,24 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 			}
 		}
 
+		// commit pointer value paragraph.EnclosingBody translates to updating the paragraph.EnclosingBodyID
+		paragraphDB.EnclosingBodyID.Valid = true // allow for a 0 value (nil association)
+		if paragraph.EnclosingBody != nil {
+			if EnclosingBodyId, ok := backRepo.BackRepoBody.Map_BodyPtr_BodyDBID[paragraph.EnclosingBody]; ok {
+				paragraphDB.EnclosingBodyID.Int64 = int64(EnclosingBodyId)
+				paragraphDB.EnclosingBodyID.Valid = true
+			}
+		}
+
+		// commit pointer value paragraph.EnclosingTableColumn translates to updating the paragraph.EnclosingTableColumnID
+		paragraphDB.EnclosingTableColumnID.Valid = true // allow for a 0 value (nil association)
+		if paragraph.EnclosingTableColumn != nil {
+			if EnclosingTableColumnId, ok := backRepo.BackRepoTableColumn.Map_TableColumnPtr_TableColumnDBID[paragraph.EnclosingTableColumn]; ok {
+				paragraphDB.EnclosingTableColumnID.Int64 = int64(EnclosingTableColumnId)
+				paragraphDB.EnclosingTableColumnID.Valid = true
+			}
+		}
+
 		query := backRepoParagraph.db.Save(&paragraphDB)
 		if query.Error != nil {
 			return query.Error
@@ -447,6 +479,14 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 	if paragraphDB.PreviousID.Int64 != 0 {
 		paragraph.Previous = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(paragraphDB.PreviousID.Int64)]
 	}
+	// EnclosingBody field
+	if paragraphDB.EnclosingBodyID.Int64 != 0 {
+		paragraph.EnclosingBody = backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(paragraphDB.EnclosingBodyID.Int64)]
+	}
+	// EnclosingTableColumn field
+	if paragraphDB.EnclosingTableColumnID.Int64 != 0 {
+		paragraph.EnclosingTableColumn = backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnPtr[uint(paragraphDB.EnclosingTableColumnID.Int64)]
+	}
 	return
 }
 
@@ -486,6 +526,9 @@ func (paragraphDB *ParagraphDB) CopyBasicFieldsFromParagraph(paragraph *models.P
 
 	paragraphDB.Content_Data.String = paragraph.Content
 	paragraphDB.Content_Data.Valid = true
+
+	paragraphDB.Text_Data.String = paragraph.Text
+	paragraphDB.Text_Data.Valid = true
 }
 
 // CopyBasicFieldsFromParagraphWOP
@@ -497,6 +540,9 @@ func (paragraphDB *ParagraphDB) CopyBasicFieldsFromParagraphWOP(paragraph *Parag
 
 	paragraphDB.Content_Data.String = paragraph.Content
 	paragraphDB.Content_Data.Valid = true
+
+	paragraphDB.Text_Data.String = paragraph.Text
+	paragraphDB.Text_Data.Valid = true
 }
 
 // CopyBasicFieldsToParagraph
@@ -504,6 +550,7 @@ func (paragraphDB *ParagraphDB) CopyBasicFieldsToParagraph(paragraph *models.Par
 	// insertion point for checkout of basic fields (back repo to stage)
 	paragraph.Name = paragraphDB.Name_Data.String
 	paragraph.Content = paragraphDB.Content_Data.String
+	paragraph.Text = paragraphDB.Text_Data.String
 }
 
 // CopyBasicFieldsToParagraphWOP
@@ -512,6 +559,7 @@ func (paragraphDB *ParagraphDB) CopyBasicFieldsToParagraphWOP(paragraph *Paragra
 	// insertion point for checkout of basic fields (back repo to stage)
 	paragraph.Name = paragraphDB.Name_Data.String
 	paragraph.Content = paragraphDB.Content_Data.String
+	paragraph.Text = paragraphDB.Text_Data.String
 }
 
 // Backup generates a json file from a slice of all ParagraphDB instances in the backrepo
@@ -691,6 +739,18 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseTwo() {
 		if paragraphDB.PreviousID.Int64 != 0 {
 			paragraphDB.PreviousID.Int64 = int64(BackRepoParagraphid_atBckpTime_newID[uint(paragraphDB.PreviousID.Int64)])
 			paragraphDB.PreviousID.Valid = true
+		}
+
+		// reindexing EnclosingBody field
+		if paragraphDB.EnclosingBodyID.Int64 != 0 {
+			paragraphDB.EnclosingBodyID.Int64 = int64(BackRepoBodyid_atBckpTime_newID[uint(paragraphDB.EnclosingBodyID.Int64)])
+			paragraphDB.EnclosingBodyID.Valid = true
+		}
+
+		// reindexing EnclosingTableColumn field
+		if paragraphDB.EnclosingTableColumnID.Int64 != 0 {
+			paragraphDB.EnclosingTableColumnID.Int64 = int64(BackRepoTableColumnid_atBckpTime_newID[uint(paragraphDB.EnclosingTableColumnID.Int64)])
+			paragraphDB.EnclosingTableColumnID.Valid = true
 		}
 
 		// This reindex paragraph.Paragraphs

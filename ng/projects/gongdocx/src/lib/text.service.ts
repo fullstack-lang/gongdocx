@@ -15,6 +15,7 @@ import { TextDB } from './text-db';
 
 // insertion point for imports
 import { NodeDB } from './node-db'
+import { RuneDB } from './rune-db'
 
 @Injectable({
   providedIn: 'root'
@@ -72,6 +73,7 @@ export class TextService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     textdb.Node = new NodeDB
+    textdb.EnclosingRune = new RuneDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {
@@ -112,6 +114,7 @@ export class TextService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     textdb.Node = new NodeDB
+    textdb.EnclosingRune = new RuneDB
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
     let httpOptions = {

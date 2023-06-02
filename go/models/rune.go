@@ -28,4 +28,7 @@ type Rune struct {
 	Node           *Node
 	Text           *Text
 	RuneProperties *RuneProperties
+
+	// navigation
+	EnclosingParagraph *Paragraph
 }

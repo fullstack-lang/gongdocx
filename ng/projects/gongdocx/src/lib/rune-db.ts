@@ -29,6 +29,9 @@ export class RuneDB {
 	RuneProperties?: RunePropertiesDB
 	RunePropertiesID: NullInt64 = new NullInt64 // if pointer is null, RuneProperties.ID = 0
 
+	EnclosingParagraph?: ParagraphDB
+	EnclosingParagraphID: NullInt64 = new NullInt64 // if pointer is null, EnclosingParagraph.ID = 0
+
 	Paragraph_RunesDBID: NullInt64 = new NullInt64
 	Paragraph_RunesDBID_Index: NullInt64  = new NullInt64 // store the index of the rune instance in Paragraph.Runes
 	Paragraph_Runes_reverse?: ParagraphDB 

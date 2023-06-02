@@ -84,11 +84,20 @@ export class ParagraphsTableComponent implements OnInit {
         case 'ParagraphProperties':
           return (paragraphDB.ParagraphProperties ? paragraphDB.ParagraphProperties.Name : '');
 
+        case 'Text':
+          return paragraphDB.Text;
+
         case 'Next':
           return (paragraphDB.Next ? paragraphDB.Next.Name : '');
 
         case 'Previous':
           return (paragraphDB.Previous ? paragraphDB.Previous.Name : '');
+
+        case 'EnclosingBody':
+          return (paragraphDB.EnclosingBody ? paragraphDB.EnclosingBody.Name : '');
+
+        case 'EnclosingTableColumn':
+          return (paragraphDB.EnclosingTableColumn ? paragraphDB.EnclosingTableColumn.Name : '');
 
         case 'Body_Paragraphs':
           if (this.frontRepo.Bodys.get(paragraphDB.Body_ParagraphsDBID.Int64) != undefined) {
@@ -126,11 +135,18 @@ export class ParagraphsTableComponent implements OnInit {
       if (paragraphDB.ParagraphProperties) {
         mergedContent += paragraphDB.ParagraphProperties.Name.toLowerCase()
       }
+      mergedContent += paragraphDB.Text.toLowerCase()
       if (paragraphDB.Next) {
         mergedContent += paragraphDB.Next.Name.toLowerCase()
       }
       if (paragraphDB.Previous) {
         mergedContent += paragraphDB.Previous.Name.toLowerCase()
+      }
+      if (paragraphDB.EnclosingBody) {
+        mergedContent += paragraphDB.EnclosingBody.Name.toLowerCase()
+      }
+      if (paragraphDB.EnclosingTableColumn) {
+        mergedContent += paragraphDB.EnclosingTableColumn.Name.toLowerCase()
       }
       if (paragraphDB.Body_ParagraphsDBID.Int64 != 0) {
         mergedContent += this.frontRepo.Bodys.get(paragraphDB.Body_ParagraphsDBID.Int64)!.Name.toLowerCase()
@@ -198,8 +214,11 @@ export class ParagraphsTableComponent implements OnInit {
         "Content",
         "Node",
         "ParagraphProperties",
+        "Text",
         "Next",
         "Previous",
+        "EnclosingBody",
+        "EnclosingTableColumn",
         "Body_Paragraphs",
         "TableColumn_Paragraphs",
       ]
@@ -209,8 +228,11 @@ export class ParagraphsTableComponent implements OnInit {
         "Content",
         "Node",
         "ParagraphProperties",
+        "Text",
         "Next",
         "Previous",
+        "EnclosingBody",
+        "EnclosingTableColumn",
         "Body_Paragraphs",
         "TableColumn_Paragraphs",
       ]
