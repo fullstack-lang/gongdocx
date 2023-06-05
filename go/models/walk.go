@@ -61,7 +61,9 @@ func walk(
 		case *Rune:
 			rune_.Text = text
 			text.EnclosingRune = rune_
-			rune_.EnclosingParagraph.Text = rune_.EnclosingParagraph.Text + text.Content
+			if rune_.EnclosingParagraph != nil {
+				rune_.EnclosingParagraph.Text = rune_.EnclosingParagraph.Text + text.Content
+			}
 		}
 
 		// foo.Fprint(w, string(node_.Content))
