@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"time"
 
 	gongdocx_go "github.com/fullstack-lang/gongdocx/go"
 	gongdocx_fullstack "github.com/fullstack-lang/gongdocx/go/fullstack"
@@ -20,6 +22,8 @@ var (
 	diagrams         = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams")
 	embeddedDiagrams = flag.Bool("embeddedDiagrams", false, "parse/analysis go/models and go/embeddedDiagrams")
 	style            = flag.String("style", "", "style for extracting instances")
+
+	xls = flag.String("xls", "", "output file")
 )
 
 // InjectionGateway is the singloton that stores all functions
@@ -59,6 +63,12 @@ func main() {
 	for _, arg := range flag.Args() {
 		gongdocx_models.NewDocx(gongdocxStage, arg, embed)
 	}
+
+	if *xls != "" {
+		fileName := fmt.Sprintf("%s_%s.xlsx", *xls, time.Now().Local().Format("2006-01-02-15-04"))
+		gongdocx_models.SerializeStage(gongdocxStage, fileName)
+	}
+
 	gongdocxStage.Commit()
 
 	if *style != "" {

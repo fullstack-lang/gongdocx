@@ -10,6 +10,8 @@
             "args": [
                 "-style",
                 "Titre2",
+                "-xls",
+                "test",
                 "samples/test.docx",
             ]
         },
