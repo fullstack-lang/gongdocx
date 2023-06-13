@@ -1,9 +1,7 @@
-
-
 .parent {
     position: absolute;
-    width: 3000px;
-    /* height: 8000px; */
+    width: 3000;
+    height: 8000;
     /* z-index: 100; */
     pointer-events: none;
 }
@@ -26,4 +24,10 @@
     width: 3000px;
     height: 8000px;
     pointer-events: auto;
+}
+
+.downloadbutton {
+    position: absolute;
+    pointer-events: auto;
+    cursor: crosshair;
 }

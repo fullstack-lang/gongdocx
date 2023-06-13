@@ -34,12 +34,16 @@ func (docSVGMapper *DocSVGMapper) GenerateSvg(
 
 	var selectedDiagram *gongdoc_models.Classdiagram
 
-	for diagramPackage := range *gongdoc_models.GetGongstructInstancesSet[gongdoc_models.DiagramPackage](gongdocStage) {
+	var diagramPackage *gongdoc_models.DiagramPackage
+	for diagramPackage = range *gongdoc_models.GetGongstructInstancesSet[gongdoc_models.DiagramPackage](gongdocStage) {
 
 		selectedDiagram = diagramPackage.SelectedClassdiagram
 		if selectedDiagram == nil {
 			return
 		}
+	}
+	if diagramPackage == nil {
+		return
 	}
 
 	svg := new(gongsvg_models.SVG).Stage(gongsvgStage)

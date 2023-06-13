@@ -98,7 +98,7 @@ export class RectComponent implements OnInit, OnDestroy, DoCheck, OnChanges {
             return // we don't want the move move to be interpreted by the rect
           }
 
-          if (this.rectDragging || this.Rect.IsSelected) {
+          if (this.PointAtMouseDown && (this.rectDragging || this.Rect.IsSelected)) {
             const deltaX = shapeMouseEvent.Point.X - this.PointAtMouseDown!.X
             const deltaY = shapeMouseEvent.Point.Y - this.PointAtMouseDown!.Y
             this.distanceMoved = Math.sqrt(deltaX * deltaX + deltaY * deltaY)

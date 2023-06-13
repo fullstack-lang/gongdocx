@@ -72,6 +72,7 @@ export class NodeService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     nodedb.Children = []
+    nodedb.Buttons = []
     let _Node_Children_reverse = nodedb.Node_Children_reverse
     nodedb.Node_Children_reverse = new NodeDB
     let _Tree_RootNodes_reverse = nodedb.Tree_RootNodes_reverse
@@ -118,6 +119,7 @@ export class NodeService {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
     nodedb.Children = []
+    nodedb.Buttons = []
     let _Node_Children_reverse = nodedb.Node_Children_reverse
     nodedb.Node_Children_reverse = new NodeDB
     let _Tree_RootNodes_reverse = nodedb.Tree_RootNodes_reverse

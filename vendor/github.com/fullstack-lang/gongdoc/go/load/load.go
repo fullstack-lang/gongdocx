@@ -50,6 +50,9 @@ func Load(
 	gongdocStage := gongdoc_fullstack.NewStackInstance(r, pkgPath)
 	gongsvgStage := gongsvg_fullstack.NewStackInstance(r, pkgPath)
 
+	gongdoc_models.SetOrchestratorOnAfterUpdate[gongdoc_models.Button](gongdocStage)
+	gongdoc_models.SetOrchestratorOnAfterUpdate[gongdoc_models.Node](gongdocStage)
+
 	gongsvg_models.SetOrchestratorOnAfterUpdate[gongsvg_models.Rect](gongsvgStage)
 	gongsvg_models.SetOrchestratorOnAfterUpdate[gongsvg_models.Link](gongsvgStage)
 	gongsvg_models.SetOrchestratorOnAfterUpdate[gongsvg_models.LinkAnchoredText](gongsvgStage)
@@ -62,6 +65,9 @@ func Load(
 
 	gongdocStage.OnInitCommitFromFrontCallback = beforeCommitImplementation
 	gongdocStage.OnInitCommitFromBackCallback = beforeCommitImplementation
+
+	diagramPackageCallbackSingloton := new(DiagramPackageCallbacksSingloton)
+	gongdocStage.OnAfterDiagramPackageUpdateCallback = diagramPackageCallbackSingloton
 
 	modelPackage, _ := gong_models.LoadEmbedded(gongStage, goModelsDir)
 

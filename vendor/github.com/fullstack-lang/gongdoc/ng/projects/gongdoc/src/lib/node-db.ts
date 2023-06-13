@@ -1,4 +1,5 @@
 // insertion point for imports
+import { ButtonDB } from './button-db'
 import { TreeDB } from './tree-db'
 
 // usefull for managing pointer ID values that can be nullable
@@ -18,17 +19,11 @@ export class NodeDB {
 	HasCheckboxButton: boolean = false
 	IsChecked: boolean = false
 	IsCheckboxDisabled: boolean = false
-	HasAddChildButton: boolean = false
-	HasEditButton: boolean = false
 	IsInEditMode: boolean = false
-	HasDrawButton: boolean = false
-	HasDrawOffButton: boolean = false
-	IsInDrawMode: boolean = false
-	IsSaved: boolean = false
-	HasDeleteButton: boolean = false
 
 	// insertion point for other declarations
 	Children?: Array<NodeDB>
+	Buttons?: Array<ButtonDB>
 	Node_ChildrenDBID: NullInt64 = new NullInt64
 	Node_ChildrenDBID_Index: NullInt64  = new NullInt64 // store the index of the node instance in Node.Children
 	Node_Children_reverse?: NodeDB 

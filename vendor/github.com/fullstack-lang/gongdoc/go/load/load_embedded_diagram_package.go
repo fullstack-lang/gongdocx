@@ -32,7 +32,7 @@ func LoadEmbeddedDiagramPackage(gongdocStage *gongdoc_models.StageStruct, goMode
 	}
 	diagramPackageAst, ok := pkgsParser["diagrams"]
 	if !ok {
-		gongdoc_node2gongdoc.FillUpNodeTree(diagramPackage)
+		gongdoc_node2gongdoc.FillUpNodeTree(gongdocStage, diagramPackage)
 		gongdocStage.Commit()
 		return diagramPackage, nil
 	}
@@ -46,6 +46,6 @@ func LoadEmbeddedDiagramPackage(gongdocStage *gongdoc_models.StageStruct, goMode
 		diagramPackage.UnmarshallOneDiagram(gongdocStage, diagramName, inFile, fset)
 	}
 
-	gongdoc_node2gongdoc.FillUpNodeTree(diagramPackage)
+	gongdoc_node2gongdoc.FillUpNodeTree(gongdocStage, diagramPackage)
 	return diagramPackage, nil
 }

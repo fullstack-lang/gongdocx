@@ -1,5 +1,21 @@
 <div class="parent">
 
+    <style>
+        .parent {
+            position: absolute;
+            width: 3000px;
+            height: 8000px;
+            pointer-events: none;
+        }
+
+        .child {
+            position: absolute;
+            width: 3000px;
+            height: 8000px;
+            pointer-events: none;
+        }
+    </style>
+
     <div *ngFor="let elt of Layer?.Rects" class="child">
         <lib-rect [GONG__StackPath]="GONG__StackPath" [Rect]="elt">
         </lib-rect>

@@ -1,4 +1,25 @@
 <svg>
+        <style>
+svg {
+    position: absolute;
+    width: 3000px;
+    height: 8000px;
+
+    pointer-events: none;
+}
+
+.overlay {
+    pointer-events: auto;
+}
+
+.anchored-text {
+    pointer-events: none;
+}
+
+.anchored-rect {
+    pointer-events: none;
+}
+        </style>
     <g>
         <rect   
         class="overlay"
