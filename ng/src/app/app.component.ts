@@ -16,7 +16,8 @@ export class AppComponent implements OnInit {
 
   views: string[] = [this.default];
 
-  GONG__StackPath = "github.com/fullstack-lang/gongdocx/go/models"
+  DataStack = "gongdocx"
+  ModelStacks = "github.com/fullstack-lang/gongdocx/go/models"
 
   constructor(
   ) {

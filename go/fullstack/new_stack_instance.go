@@ -1,3 +1,4 @@
+// do not modify, generated file
 package fullstack
 
 import (
@@ -44,6 +45,25 @@ func NewStackInstance(
 	}
 
 	controllers.Register(r)
+
+	// add orchestration
+	// insertion point
+	models.SetOrchestratorOnAfterUpdate[models.Body](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Document](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Docx](stage)
+	models.SetOrchestratorOnAfterUpdate[models.File](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Node](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Paragraph](stage)
+	models.SetOrchestratorOnAfterUpdate[models.ParagraphProperties](stage)
+	models.SetOrchestratorOnAfterUpdate[models.ParagraphStyle](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Rune](stage)
+	models.SetOrchestratorOnAfterUpdate[models.RuneProperties](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Table](stage)
+	models.SetOrchestratorOnAfterUpdate[models.TableColumn](stage)
+	models.SetOrchestratorOnAfterUpdate[models.TableProperties](stage)
+	models.SetOrchestratorOnAfterUpdate[models.TableRow](stage)
+	models.SetOrchestratorOnAfterUpdate[models.TableStyle](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Text](stage)
 
 	return
 }

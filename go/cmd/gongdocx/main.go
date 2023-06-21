@@ -58,7 +58,7 @@ func main() {
 	r := gongdocx_static.ServeStaticFiles(*logGINFlag)
 
 	// setup stack
-	gongdocxStage := gongdocx_fullstack.NewStackInstance(r, "github.com/fullstack-lang/gongdocx/go/models")
+	gongdocxStage := gongdocx_fullstack.NewStackInstance(r, "gongdocx")
 
 	for _, arg := range flag.Args() {
 		gongdocx_models.NewDocx(gongdocxStage, arg, embed)
