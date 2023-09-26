@@ -338,6 +338,9 @@ func (backRepoLink *BackRepoLinkStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				linkDB.StartID.Int64 = int64(StartId)
 				linkDB.StartID.Valid = true
 			}
+		} else {
+			linkDB.StartID.Int64 = 0
+			linkDB.StartID.Valid = true
 		}
 
 		// commit pointer value link.End translates to updating the link.EndID
@@ -347,6 +350,9 @@ func (backRepoLink *BackRepoLinkStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				linkDB.EndID.Int64 = int64(EndId)
 				linkDB.EndID.Valid = true
 			}
+		} else {
+			linkDB.EndID.Int64 = 0
+			linkDB.EndID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers link.TextAtArrowEnd into the back repo.
@@ -514,10 +520,12 @@ func (backRepoLink *BackRepoLinkStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 
 	// insertion point for checkout of pointer encoding
 	// Start field
+	link.Start = nil
 	if linkDB.StartID.Int64 != 0 {
 		link.Start = backRepo.BackRepoRect.Map_RectDBID_RectPtr[uint(linkDB.StartID.Int64)]
 	}
 	// End field
+	link.End = nil
 	if linkDB.EndID.Int64 != 0 {
 		link.End = backRepo.BackRepoRect.Map_RectDBID_RectPtr[uint(linkDB.EndID.Int64)]
 	}
@@ -985,6 +993,39 @@ func (backRepoLink *BackRepoLinkStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoLink.ResetReversePointers commits all staged instances of Link to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoLink *BackRepoLinkStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, link := range backRepoLink.Map_LinkDBID_LinkPtr {
+		backRepoLink.ResetReversePointersInstance(backRepo, idx, link)
+	}
+
+	return
+}
+
+func (backRepoLink *BackRepoLinkStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Link) (Error error) {
+
+	// fetch matching linkDB
+	if linkDB, ok := backRepoLink.Map_LinkDBID_LinkDB[idx]; ok {
+		_ = linkDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if linkDB.Layer_LinksDBID.Int64 != 0 {
+			linkDB.Layer_LinksDBID.Int64 = 0
+			linkDB.Layer_LinksDBID.Valid = true
+
+			// save the reset
+			if q := backRepoLink.db.Save(linkDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

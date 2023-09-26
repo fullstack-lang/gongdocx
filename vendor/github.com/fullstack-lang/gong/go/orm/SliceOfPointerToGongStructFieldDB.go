@@ -237,6 +237,9 @@ func (backRepoSliceOfPointerToGongStructField *BackRepoSliceOfPointerToGongStruc
 				sliceofpointertogongstructfieldDB.GongStructID.Int64 = int64(GongStructId)
 				sliceofpointertogongstructfieldDB.GongStructID.Valid = true
 			}
+		} else {
+			sliceofpointertogongstructfieldDB.GongStructID.Int64 = 0
+			sliceofpointertogongstructfieldDB.GongStructID.Valid = true
 		}
 
 		query := backRepoSliceOfPointerToGongStructField.db.Save(&sliceofpointertogongstructfieldDB)
@@ -347,6 +350,7 @@ func (backRepoSliceOfPointerToGongStructField *BackRepoSliceOfPointerToGongStruc
 
 	// insertion point for checkout of pointer encoding
 	// GongStruct field
+	sliceofpointertogongstructfield.GongStruct = nil
 	if sliceofpointertogongstructfieldDB.GongStructID.Int64 != 0 {
 		sliceofpointertogongstructfield.GongStruct = backRepo.BackRepoGongStruct.Map_GongStructDBID_GongStructPtr[uint(sliceofpointertogongstructfieldDB.GongStructID.Int64)]
 	}
@@ -599,6 +603,39 @@ func (backRepoSliceOfPointerToGongStructField *BackRepoSliceOfPointerToGongStruc
 		}
 	}
 
+}
+
+// BackRepoSliceOfPointerToGongStructField.ResetReversePointers commits all staged instances of SliceOfPointerToGongStructField to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoSliceOfPointerToGongStructField *BackRepoSliceOfPointerToGongStructFieldStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, sliceofpointertogongstructfield := range backRepoSliceOfPointerToGongStructField.Map_SliceOfPointerToGongStructFieldDBID_SliceOfPointerToGongStructFieldPtr {
+		backRepoSliceOfPointerToGongStructField.ResetReversePointersInstance(backRepo, idx, sliceofpointertogongstructfield)
+	}
+
+	return
+}
+
+func (backRepoSliceOfPointerToGongStructField *BackRepoSliceOfPointerToGongStructFieldStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.SliceOfPointerToGongStructField) (Error error) {
+
+	// fetch matching sliceofpointertogongstructfieldDB
+	if sliceofpointertogongstructfieldDB, ok := backRepoSliceOfPointerToGongStructField.Map_SliceOfPointerToGongStructFieldDBID_SliceOfPointerToGongStructFieldDB[idx]; ok {
+		_ = sliceofpointertogongstructfieldDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if sliceofpointertogongstructfieldDB.GongStruct_SliceOfPointerToGongStructFieldsDBID.Int64 != 0 {
+			sliceofpointertogongstructfieldDB.GongStruct_SliceOfPointerToGongStructFieldsDBID.Int64 = 0
+			sliceofpointertogongstructfieldDB.GongStruct_SliceOfPointerToGongStructFieldsDBID.Valid = true
+
+			// save the reset
+			if q := backRepoSliceOfPointerToGongStructField.db.Save(sliceofpointertogongstructfieldDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

@@ -231,6 +231,9 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CommitPhaseTwoInstance(bac
 				tablecolumnDB.NodeID.Int64 = int64(NodeId)
 				tablecolumnDB.NodeID.Valid = true
 			}
+		} else {
+			tablecolumnDB.NodeID.Int64 = 0
+			tablecolumnDB.NodeID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers tablecolumn.Paragraphs into the back repo.
@@ -360,6 +363,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CheckoutPhaseTwoInstance(b
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	tablecolumn.Node = nil
 	if tablecolumnDB.NodeID.Int64 != 0 {
 		tablecolumn.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablecolumnDB.NodeID.Int64)]
 	}
@@ -631,6 +635,39 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoTableColumn.ResetReversePointers commits all staged instances of TableColumn to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoTableColumn *BackRepoTableColumnStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, tablecolumn := range backRepoTableColumn.Map_TableColumnDBID_TableColumnPtr {
+		backRepoTableColumn.ResetReversePointersInstance(backRepo, idx, tablecolumn)
+	}
+
+	return
+}
+
+func (backRepoTableColumn *BackRepoTableColumnStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.TableColumn) (Error error) {
+
+	// fetch matching tablecolumnDB
+	if tablecolumnDB, ok := backRepoTableColumn.Map_TableColumnDBID_TableColumnDB[idx]; ok {
+		_ = tablecolumnDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if tablecolumnDB.TableRow_TableColumnsDBID.Int64 != 0 {
+			tablecolumnDB.TableRow_TableColumnsDBID.Int64 = 0
+			tablecolumnDB.TableRow_TableColumnsDBID.Valid = true
+
+			// save the reset
+			if q := backRepoTableColumn.db.Save(tablecolumnDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

@@ -237,6 +237,9 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 				pointertogongstructfieldDB.GongStructID.Int64 = int64(GongStructId)
 				pointertogongstructfieldDB.GongStructID.Valid = true
 			}
+		} else {
+			pointertogongstructfieldDB.GongStructID.Int64 = 0
+			pointertogongstructfieldDB.GongStructID.Valid = true
 		}
 
 		query := backRepoPointerToGongStructField.db.Save(&pointertogongstructfieldDB)
@@ -347,6 +350,7 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 
 	// insertion point for checkout of pointer encoding
 	// GongStruct field
+	pointertogongstructfield.GongStruct = nil
 	if pointertogongstructfieldDB.GongStructID.Int64 != 0 {
 		pointertogongstructfield.GongStruct = backRepo.BackRepoGongStruct.Map_GongStructDBID_GongStructPtr[uint(pointertogongstructfieldDB.GongStructID.Int64)]
 	}
@@ -599,6 +603,39 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 		}
 	}
 
+}
+
+// BackRepoPointerToGongStructField.ResetReversePointers commits all staged instances of PointerToGongStructField to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, pointertogongstructfield := range backRepoPointerToGongStructField.Map_PointerToGongStructFieldDBID_PointerToGongStructFieldPtr {
+		backRepoPointerToGongStructField.ResetReversePointersInstance(backRepo, idx, pointertogongstructfield)
+	}
+
+	return
+}
+
+func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.PointerToGongStructField) (Error error) {
+
+	// fetch matching pointertogongstructfieldDB
+	if pointertogongstructfieldDB, ok := backRepoPointerToGongStructField.Map_PointerToGongStructFieldDBID_PointerToGongStructFieldDB[idx]; ok {
+		_ = pointertogongstructfieldDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64 != 0 {
+			pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64 = 0
+			pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Valid = true
+
+			// save the reset
+			if q := backRepoPointerToGongStructField.db.Save(pointertogongstructfieldDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

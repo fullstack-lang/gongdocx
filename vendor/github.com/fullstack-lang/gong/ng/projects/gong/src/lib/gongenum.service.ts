@@ -42,6 +42,10 @@ export class GongEnumService {
   }
 
   /** GET gongenums from the server */
+  // gets is more robust to refactoring
+  gets(GONG__StackPath: string): Observable<GongEnumDB[]> {
+    return this.getGongEnums(GONG__StackPath)
+  }
   getGongEnums(GONG__StackPath: string): Observable<GongEnumDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -55,6 +59,10 @@ export class GongEnumService {
   }
 
   /** GET gongenum by id. Will 404 if id not found */
+  // more robust API to refactoring
+  get(id: number, GONG__StackPath: string): Observable<GongEnumDB> {
+	return this.getGongEnum(id, GONG__StackPath)
+  }
   getGongEnum(id: number, GONG__StackPath: string): Observable<GongEnumDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -67,9 +75,13 @@ export class GongEnumService {
   }
 
   /** POST: add a new gongenum to the server */
+  post(gongenumdb: GongEnumDB, GONG__StackPath: string): Observable<GongEnumDB> {
+    return this.postGongEnum(gongenumdb, GONG__StackPath)	
+  }
   postGongEnum(gongenumdb: GongEnumDB, GONG__StackPath: string): Observable<GongEnumDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let GongEnumValues = gongenumdb.GongEnumValues
     gongenumdb.GongEnumValues = []
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -81,6 +93,7 @@ export class GongEnumService {
     return this.http.post<GongEnumDB>(this.gongenumsUrl, gongenumdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      gongenumdb.GongEnumValues = GongEnumValues
         // this.log(`posted gongenumdb id=${gongenumdb.ID}`)
       }),
       catchError(this.handleError<GongEnumDB>('postGongEnum'))
@@ -88,6 +101,9 @@ export class GongEnumService {
   }
 
   /** DELETE: delete the gongenumdb from the server */
+  delete(gongenumdb: GongEnumDB | number, GONG__StackPath: string): Observable<GongEnumDB> {
+    return this.deleteGongEnum(gongenumdb, GONG__StackPath)
+  }
   deleteGongEnum(gongenumdb: GongEnumDB | number, GONG__StackPath: string): Observable<GongEnumDB> {
     const id = typeof gongenumdb === 'number' ? gongenumdb : gongenumdb.ID;
     const url = `${this.gongenumsUrl}/${id}`;
@@ -105,11 +121,15 @@ export class GongEnumService {
   }
 
   /** PUT: update the gongenumdb on the server */
+  update(gongenumdb: GongEnumDB, GONG__StackPath: string): Observable<GongEnumDB> {
+    return this.updateGongEnum(gongenumdb, GONG__StackPath)
+  }
   updateGongEnum(gongenumdb: GongEnumDB, GONG__StackPath: string): Observable<GongEnumDB> {
     const id = typeof gongenumdb === 'number' ? gongenumdb : gongenumdb.ID;
     const url = `${this.gongenumsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let GongEnumValues = gongenumdb.GongEnumValues
     gongenumdb.GongEnumValues = []
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -121,6 +141,7 @@ export class GongEnumService {
     return this.http.put<GongEnumDB>(url, gongenumdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      gongenumdb.GongEnumValues = GongEnumValues
         // this.log(`updated gongenumdb id=${gongenumdb.ID}`)
       }),
       catchError(this.handleError<GongEnumDB>('updateGongEnum'))

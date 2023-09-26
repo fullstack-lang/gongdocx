@@ -229,6 +229,9 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 				paragraphpropertiesDB.ParagraphStyleID.Int64 = int64(ParagraphStyleId)
 				paragraphpropertiesDB.ParagraphStyleID.Valid = true
 			}
+		} else {
+			paragraphpropertiesDB.ParagraphStyleID.Int64 = 0
+			paragraphpropertiesDB.ParagraphStyleID.Valid = true
 		}
 
 		// commit pointer value paragraphproperties.Node translates to updating the paragraphproperties.NodeID
@@ -238,6 +241,9 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 				paragraphpropertiesDB.NodeID.Int64 = int64(NodeId)
 				paragraphpropertiesDB.NodeID.Valid = true
 			}
+		} else {
+			paragraphpropertiesDB.NodeID.Int64 = 0
+			paragraphpropertiesDB.NodeID.Valid = true
 		}
 
 		query := backRepoParagraphProperties.db.Save(&paragraphpropertiesDB)
@@ -348,10 +354,12 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CheckoutPh
 
 	// insertion point for checkout of pointer encoding
 	// ParagraphStyle field
+	paragraphproperties.ParagraphStyle = nil
 	if paragraphpropertiesDB.ParagraphStyleID.Int64 != 0 {
 		paragraphproperties.ParagraphStyle = backRepo.BackRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStylePtr[uint(paragraphpropertiesDB.ParagraphStyleID.Int64)]
 	}
 	// Node field
+	paragraphproperties.Node = nil
 	if paragraphpropertiesDB.NodeID.Int64 != 0 {
 		paragraphproperties.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphpropertiesDB.NodeID.Int64)]
 	}
@@ -596,6 +604,30 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestorePha
 		}
 	}
 
+}
+
+// BackRepoParagraphProperties.ResetReversePointers commits all staged instances of ParagraphProperties to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, paragraphproperties := range backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr {
+		backRepoParagraphProperties.ResetReversePointersInstance(backRepo, idx, paragraphproperties)
+	}
+
+	return
+}
+
+func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.ParagraphProperties) (Error error) {
+
+	// fetch matching paragraphpropertiesDB
+	if paragraphpropertiesDB, ok := backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[idx]; ok {
+		_ = paragraphpropertiesDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

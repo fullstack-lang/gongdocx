@@ -550,6 +550,39 @@ func (backRepoFile *BackRepoFileStruct) RestorePhaseTwo() {
 
 }
 
+// BackRepoFile.ResetReversePointers commits all staged instances of File to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoFile *BackRepoFileStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, file := range backRepoFile.Map_FileDBID_FilePtr {
+		backRepoFile.ResetReversePointersInstance(backRepo, idx, file)
+	}
+
+	return
+}
+
+func (backRepoFile *BackRepoFileStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.File) (Error error) {
+
+	// fetch matching fileDB
+	if fileDB, ok := backRepoFile.Map_FileDBID_FileDB[idx]; ok {
+		_ = fileDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if fileDB.Docx_FilesDBID.Int64 != 0 {
+			fileDB.Docx_FilesDBID.Int64 = 0
+			fileDB.Docx_FilesDBID.Valid = true
+
+			// save the reset
+			if q := backRepoFile.db.Save(fileDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
+}
+
 // this field is used during the restauration process.
 // it stores the ID at the backup time and is used for renumbering
 var BackRepoFileid_atBckpTime_newID map[uint]uint

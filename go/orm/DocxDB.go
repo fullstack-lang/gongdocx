@@ -238,6 +238,9 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				docxDB.DocumentID.Int64 = int64(DocumentId)
 				docxDB.DocumentID.Valid = true
 			}
+		} else {
+			docxDB.DocumentID.Int64 = 0
+			docxDB.DocumentID.Valid = true
 		}
 
 		query := backRepoDocx.db.Save(&docxDB)
@@ -375,6 +378,7 @@ func (backRepoDocx *BackRepoDocxStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	})
 
 	// Document field
+	docx.Document = nil
 	if docxDB.DocumentID.Int64 != 0 {
 		docx.Document = backRepo.BackRepoDocument.Map_DocumentDBID_DocumentPtr[uint(docxDB.DocumentID.Int64)]
 	}
@@ -605,6 +609,30 @@ func (backRepoDocx *BackRepoDocxStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoDocx.ResetReversePointers commits all staged instances of Docx to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoDocx *BackRepoDocxStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, docx := range backRepoDocx.Map_DocxDBID_DocxPtr {
+		backRepoDocx.ResetReversePointersInstance(backRepo, idx, docx)
+	}
+
+	return
+}
+
+func (backRepoDocx *BackRepoDocxStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Docx) (Error error) {
+
+	// fetch matching docxDB
+	if docxDB, ok := backRepoDocx.Map_DocxDBID_DocxDB[idx]; ok {
+		_ = docxDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

@@ -263,6 +263,9 @@ func (backRepoGongStructShape *BackRepoGongStructShapeStruct) CommitPhaseTwoInst
 				gongstructshapeDB.PositionID.Int64 = int64(PositionId)
 				gongstructshapeDB.PositionID.Valid = true
 			}
+		} else {
+			gongstructshapeDB.PositionID.Int64 = 0
+			gongstructshapeDB.PositionID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers gongstructshape.Fields into the back repo.
@@ -411,6 +414,7 @@ func (backRepoGongStructShape *BackRepoGongStructShapeStruct) CheckoutPhaseTwoIn
 
 	// insertion point for checkout of pointer encoding
 	// Position field
+	gongstructshape.Position = nil
 	if gongstructshapeDB.PositionID.Int64 != 0 {
 		gongstructshape.Position = backRepo.BackRepoPosition.Map_PositionDBID_PositionPtr[uint(gongstructshapeDB.PositionID.Int64)]
 	}
@@ -749,6 +753,39 @@ func (backRepoGongStructShape *BackRepoGongStructShapeStruct) RestorePhaseTwo() 
 		}
 	}
 
+}
+
+// BackRepoGongStructShape.ResetReversePointers commits all staged instances of GongStructShape to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoGongStructShape *BackRepoGongStructShapeStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, gongstructshape := range backRepoGongStructShape.Map_GongStructShapeDBID_GongStructShapePtr {
+		backRepoGongStructShape.ResetReversePointersInstance(backRepo, idx, gongstructshape)
+	}
+
+	return
+}
+
+func (backRepoGongStructShape *BackRepoGongStructShapeStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.GongStructShape) (Error error) {
+
+	// fetch matching gongstructshapeDB
+	if gongstructshapeDB, ok := backRepoGongStructShape.Map_GongStructShapeDBID_GongStructShapeDB[idx]; ok {
+		_ = gongstructshapeDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if gongstructshapeDB.Classdiagram_GongStructShapesDBID.Int64 != 0 {
+			gongstructshapeDB.Classdiagram_GongStructShapesDBID.Int64 = 0
+			gongstructshapeDB.Classdiagram_GongStructShapesDBID.Valid = true
+
+			// save the reset
+			if q := backRepoGongStructShape.db.Save(gongstructshapeDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

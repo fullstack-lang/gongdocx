@@ -43,6 +43,10 @@ export class PolylineService {
   }
 
   /** GET polylines from the server */
+  // gets is more robust to refactoring
+  gets(GONG__StackPath: string): Observable<PolylineDB[]> {
+    return this.getPolylines(GONG__StackPath)
+  }
   getPolylines(GONG__StackPath: string): Observable<PolylineDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -56,6 +60,10 @@ export class PolylineService {
   }
 
   /** GET polyline by id. Will 404 if id not found */
+  // more robust API to refactoring
+  get(id: number, GONG__StackPath: string): Observable<PolylineDB> {
+	return this.getPolyline(id, GONG__StackPath)
+  }
   getPolyline(id: number, GONG__StackPath: string): Observable<PolylineDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -68,9 +76,13 @@ export class PolylineService {
   }
 
   /** POST: add a new polyline to the server */
+  post(polylinedb: PolylineDB, GONG__StackPath: string): Observable<PolylineDB> {
+    return this.postPolyline(polylinedb, GONG__StackPath)	
+  }
   postPolyline(polylinedb: PolylineDB, GONG__StackPath: string): Observable<PolylineDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animates = polylinedb.Animates
     polylinedb.Animates = []
     let _Layer_Polylines_reverse = polylinedb.Layer_Polylines_reverse
     polylinedb.Layer_Polylines_reverse = new LayerDB
@@ -84,6 +96,7 @@ export class PolylineService {
     return this.http.post<PolylineDB>(this.polylinesUrl, polylinedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      polylinedb.Animates = Animates
         polylinedb.Layer_Polylines_reverse = _Layer_Polylines_reverse
         // this.log(`posted polylinedb id=${polylinedb.ID}`)
       }),
@@ -92,6 +105,9 @@ export class PolylineService {
   }
 
   /** DELETE: delete the polylinedb from the server */
+  delete(polylinedb: PolylineDB | number, GONG__StackPath: string): Observable<PolylineDB> {
+    return this.deletePolyline(polylinedb, GONG__StackPath)
+  }
   deletePolyline(polylinedb: PolylineDB | number, GONG__StackPath: string): Observable<PolylineDB> {
     const id = typeof polylinedb === 'number' ? polylinedb : polylinedb.ID;
     const url = `${this.polylinesUrl}/${id}`;
@@ -109,11 +125,15 @@ export class PolylineService {
   }
 
   /** PUT: update the polylinedb on the server */
+  update(polylinedb: PolylineDB, GONG__StackPath: string): Observable<PolylineDB> {
+    return this.updatePolyline(polylinedb, GONG__StackPath)
+  }
   updatePolyline(polylinedb: PolylineDB, GONG__StackPath: string): Observable<PolylineDB> {
     const id = typeof polylinedb === 'number' ? polylinedb : polylinedb.ID;
     const url = `${this.polylinesUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animates = polylinedb.Animates
     polylinedb.Animates = []
     let _Layer_Polylines_reverse = polylinedb.Layer_Polylines_reverse
     polylinedb.Layer_Polylines_reverse = new LayerDB
@@ -127,6 +147,7 @@ export class PolylineService {
     return this.http.put<PolylineDB>(url, polylinedb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      polylinedb.Animates = Animates
         polylinedb.Layer_Polylines_reverse = _Layer_Polylines_reverse
         // this.log(`updated polylinedb id=${polylinedb.ID}`)
       }),

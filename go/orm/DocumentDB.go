@@ -227,6 +227,9 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 				documentDB.FileID.Int64 = int64(FileId)
 				documentDB.FileID.Valid = true
 			}
+		} else {
+			documentDB.FileID.Int64 = 0
+			documentDB.FileID.Valid = true
 		}
 
 		// commit pointer value document.Root translates to updating the document.RootID
@@ -236,6 +239,9 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 				documentDB.RootID.Int64 = int64(RootId)
 				documentDB.RootID.Valid = true
 			}
+		} else {
+			documentDB.RootID.Int64 = 0
+			documentDB.RootID.Valid = true
 		}
 
 		// commit pointer value document.Body translates to updating the document.BodyID
@@ -245,6 +251,9 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 				documentDB.BodyID.Int64 = int64(BodyId)
 				documentDB.BodyID.Valid = true
 			}
+		} else {
+			documentDB.BodyID.Int64 = 0
+			documentDB.BodyID.Valid = true
 		}
 
 		query := backRepoDocument.db.Save(&documentDB)
@@ -355,14 +364,17 @@ func (backRepoDocument *BackRepoDocumentStruct) CheckoutPhaseTwoInstance(backRep
 
 	// insertion point for checkout of pointer encoding
 	// File field
+	document.File = nil
 	if documentDB.FileID.Int64 != 0 {
 		document.File = backRepo.BackRepoFile.Map_FileDBID_FilePtr[uint(documentDB.FileID.Int64)]
 	}
 	// Root field
+	document.Root = nil
 	if documentDB.RootID.Int64 != 0 {
 		document.Root = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(documentDB.RootID.Int64)]
 	}
 	// Body field
+	document.Body = nil
 	if documentDB.BodyID.Int64 != 0 {
 		document.Body = backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(documentDB.BodyID.Int64)]
 	}
@@ -605,6 +617,30 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoDocument.ResetReversePointers commits all staged instances of Document to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoDocument *BackRepoDocumentStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, document := range backRepoDocument.Map_DocumentDBID_DocumentPtr {
+		backRepoDocument.ResetReversePointersInstance(backRepo, idx, document)
+	}
+
+	return
+}
+
+func (backRepoDocument *BackRepoDocumentStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Document) (Error error) {
+
+	// fetch matching documentDB
+	if documentDB, ok := backRepoDocument.Map_DocumentDBID_DocumentDB[idx]; ok {
+		_ = documentDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

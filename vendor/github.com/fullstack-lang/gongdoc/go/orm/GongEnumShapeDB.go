@@ -243,6 +243,9 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) CommitPhaseTwoInstance
 				gongenumshapeDB.PositionID.Int64 = int64(PositionId)
 				gongenumshapeDB.PositionID.Valid = true
 			}
+		} else {
+			gongenumshapeDB.PositionID.Int64 = 0
+			gongenumshapeDB.PositionID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers gongenumshape.GongEnumValueEntrys into the back repo.
@@ -372,6 +375,7 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) CheckoutPhaseTwoInstan
 
 	// insertion point for checkout of pointer encoding
 	// Position field
+	gongenumshape.Position = nil
 	if gongenumshapeDB.PositionID.Int64 != 0 {
 		gongenumshape.Position = backRepo.BackRepoPosition.Map_PositionDBID_PositionPtr[uint(gongenumshapeDB.PositionID.Int64)]
 	}
@@ -659,6 +663,39 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoGongEnumShape.ResetReversePointers commits all staged instances of GongEnumShape to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, gongenumshape := range backRepoGongEnumShape.Map_GongEnumShapeDBID_GongEnumShapePtr {
+		backRepoGongEnumShape.ResetReversePointersInstance(backRepo, idx, gongenumshape)
+	}
+
+	return
+}
+
+func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.GongEnumShape) (Error error) {
+
+	// fetch matching gongenumshapeDB
+	if gongenumshapeDB, ok := backRepoGongEnumShape.Map_GongEnumShapeDBID_GongEnumShapeDB[idx]; ok {
+		_ = gongenumshapeDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Int64 != 0 {
+			gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Int64 = 0
+			gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Valid = true
+
+			// save the reset
+			if q := backRepoGongEnumShape.db.Save(gongenumshapeDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

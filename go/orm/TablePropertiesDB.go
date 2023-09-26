@@ -229,6 +229,9 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseTwoInst
 				tablepropertiesDB.NodeID.Int64 = int64(NodeId)
 				tablepropertiesDB.NodeID.Valid = true
 			}
+		} else {
+			tablepropertiesDB.NodeID.Int64 = 0
+			tablepropertiesDB.NodeID.Valid = true
 		}
 
 		// commit pointer value tableproperties.TableStyle translates to updating the tableproperties.TableStyleID
@@ -238,6 +241,9 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseTwoInst
 				tablepropertiesDB.TableStyleID.Int64 = int64(TableStyleId)
 				tablepropertiesDB.TableStyleID.Valid = true
 			}
+		} else {
+			tablepropertiesDB.TableStyleID.Int64 = 0
+			tablepropertiesDB.TableStyleID.Valid = true
 		}
 
 		query := backRepoTableProperties.db.Save(&tablepropertiesDB)
@@ -348,10 +354,12 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CheckoutPhaseTwoIn
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	tableproperties.Node = nil
 	if tablepropertiesDB.NodeID.Int64 != 0 {
 		tableproperties.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablepropertiesDB.NodeID.Int64)]
 	}
 	// TableStyle field
+	tableproperties.TableStyle = nil
 	if tablepropertiesDB.TableStyleID.Int64 != 0 {
 		tableproperties.TableStyle = backRepo.BackRepoTableStyle.Map_TableStyleDBID_TableStylePtr[uint(tablepropertiesDB.TableStyleID.Int64)]
 	}
@@ -596,6 +604,30 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) RestorePhaseTwo() 
 		}
 	}
 
+}
+
+// BackRepoTableProperties.ResetReversePointers commits all staged instances of TableProperties to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoTableProperties *BackRepoTablePropertiesStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, tableproperties := range backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesPtr {
+		backRepoTableProperties.ResetReversePointersInstance(backRepo, idx, tableproperties)
+	}
+
+	return
+}
+
+func (backRepoTableProperties *BackRepoTablePropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.TableProperties) (Error error) {
+
+	// fetch matching tablepropertiesDB
+	if tablepropertiesDB, ok := backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[idx]; ok {
+		_ = tablepropertiesDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

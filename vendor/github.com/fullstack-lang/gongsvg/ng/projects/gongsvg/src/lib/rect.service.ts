@@ -43,6 +43,10 @@ export class RectService {
   }
 
   /** GET rects from the server */
+  // gets is more robust to refactoring
+  gets(GONG__StackPath: string): Observable<RectDB[]> {
+    return this.getRects(GONG__StackPath)
+  }
   getRects(GONG__StackPath: string): Observable<RectDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -56,6 +60,10 @@ export class RectService {
   }
 
   /** GET rect by id. Will 404 if id not found */
+  // more robust API to refactoring
+  get(id: number, GONG__StackPath: string): Observable<RectDB> {
+	return this.getRect(id, GONG__StackPath)
+  }
   getRect(id: number, GONG__StackPath: string): Observable<RectDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -68,11 +76,17 @@ export class RectService {
   }
 
   /** POST: add a new rect to the server */
+  post(rectdb: RectDB, GONG__StackPath: string): Observable<RectDB> {
+    return this.postRect(rectdb, GONG__StackPath)	
+  }
   postRect(rectdb: RectDB, GONG__StackPath: string): Observable<RectDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animations = rectdb.Animations
     rectdb.Animations = []
+    let RectAnchoredTexts = rectdb.RectAnchoredTexts
     rectdb.RectAnchoredTexts = []
+    let RectAnchoredRects = rectdb.RectAnchoredRects
     rectdb.RectAnchoredRects = []
     let _Layer_Rects_reverse = rectdb.Layer_Rects_reverse
     rectdb.Layer_Rects_reverse = new LayerDB
@@ -86,6 +100,9 @@ export class RectService {
     return this.http.post<RectDB>(this.rectsUrl, rectdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      rectdb.Animations = Animations
+	      rectdb.RectAnchoredTexts = RectAnchoredTexts
+	      rectdb.RectAnchoredRects = RectAnchoredRects
         rectdb.Layer_Rects_reverse = _Layer_Rects_reverse
         // this.log(`posted rectdb id=${rectdb.ID}`)
       }),
@@ -94,6 +111,9 @@ export class RectService {
   }
 
   /** DELETE: delete the rectdb from the server */
+  delete(rectdb: RectDB | number, GONG__StackPath: string): Observable<RectDB> {
+    return this.deleteRect(rectdb, GONG__StackPath)
+  }
   deleteRect(rectdb: RectDB | number, GONG__StackPath: string): Observable<RectDB> {
     const id = typeof rectdb === 'number' ? rectdb : rectdb.ID;
     const url = `${this.rectsUrl}/${id}`;
@@ -111,13 +131,19 @@ export class RectService {
   }
 
   /** PUT: update the rectdb on the server */
+  update(rectdb: RectDB, GONG__StackPath: string): Observable<RectDB> {
+    return this.updateRect(rectdb, GONG__StackPath)
+  }
   updateRect(rectdb: RectDB, GONG__StackPath: string): Observable<RectDB> {
     const id = typeof rectdb === 'number' ? rectdb : rectdb.ID;
     const url = `${this.rectsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animations = rectdb.Animations
     rectdb.Animations = []
+    let RectAnchoredTexts = rectdb.RectAnchoredTexts
     rectdb.RectAnchoredTexts = []
+    let RectAnchoredRects = rectdb.RectAnchoredRects
     rectdb.RectAnchoredRects = []
     let _Layer_Rects_reverse = rectdb.Layer_Rects_reverse
     rectdb.Layer_Rects_reverse = new LayerDB
@@ -131,6 +157,9 @@ export class RectService {
     return this.http.put<RectDB>(url, rectdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      rectdb.Animations = Animations
+	      rectdb.RectAnchoredTexts = RectAnchoredTexts
+	      rectdb.RectAnchoredRects = RectAnchoredRects
         rectdb.Layer_Rects_reverse = _Layer_Rects_reverse
         // this.log(`updated rectdb id=${rectdb.ID}`)
       }),

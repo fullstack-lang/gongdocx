@@ -246,6 +246,9 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitPhaseTwoInstan
 				runepropertiesDB.NodeID.Int64 = int64(NodeId)
 				runepropertiesDB.NodeID.Valid = true
 			}
+		} else {
+			runepropertiesDB.NodeID.Int64 = 0
+			runepropertiesDB.NodeID.Valid = true
 		}
 
 		query := backRepoRuneProperties.db.Save(&runepropertiesDB)
@@ -356,6 +359,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CheckoutPhaseTwoInst
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	runeproperties.Node = nil
 	if runepropertiesDB.NodeID.Int64 != 0 {
 		runeproperties.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(runepropertiesDB.NodeID.Int64)]
 	}
@@ -618,6 +622,30 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoRuneProperties.ResetReversePointers commits all staged instances of RuneProperties to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoRuneProperties *BackRepoRunePropertiesStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, runeproperties := range backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr {
+		backRepoRuneProperties.ResetReversePointersInstance(backRepo, idx, runeproperties)
+	}
+
+	return
+}
+
+func (backRepoRuneProperties *BackRepoRunePropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.RuneProperties) (Error error) {
+
+	// fetch matching runepropertiesDB
+	if runepropertiesDB, ok := backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[idx]; ok {
+		_ = runepropertiesDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

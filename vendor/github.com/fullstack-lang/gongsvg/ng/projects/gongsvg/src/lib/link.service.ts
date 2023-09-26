@@ -44,6 +44,10 @@ export class LinkService {
   }
 
   /** GET links from the server */
+  // gets is more robust to refactoring
+  gets(GONG__StackPath: string): Observable<LinkDB[]> {
+    return this.getLinks(GONG__StackPath)
+  }
   getLinks(GONG__StackPath: string): Observable<LinkDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -57,6 +61,10 @@ export class LinkService {
   }
 
   /** GET link by id. Will 404 if id not found */
+  // more robust API to refactoring
+  get(id: number, GONG__StackPath: string): Observable<LinkDB> {
+	return this.getLink(id, GONG__StackPath)
+  }
   getLink(id: number, GONG__StackPath: string): Observable<LinkDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -69,13 +77,21 @@ export class LinkService {
   }
 
   /** POST: add a new link to the server */
+  post(linkdb: LinkDB, GONG__StackPath: string): Observable<LinkDB> {
+    return this.postLink(linkdb, GONG__StackPath)	
+  }
   postLink(linkdb: LinkDB, GONG__StackPath: string): Observable<LinkDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Start = linkdb.Start
     linkdb.Start = new RectDB
+    let End = linkdb.End
     linkdb.End = new RectDB
+    let TextAtArrowEnd = linkdb.TextAtArrowEnd
     linkdb.TextAtArrowEnd = []
+    let TextAtArrowStart = linkdb.TextAtArrowStart
     linkdb.TextAtArrowStart = []
+    let ControlPoints = linkdb.ControlPoints
     linkdb.ControlPoints = []
     let _Layer_Links_reverse = linkdb.Layer_Links_reverse
     linkdb.Layer_Links_reverse = new LayerDB
@@ -89,6 +105,9 @@ export class LinkService {
     return this.http.post<LinkDB>(this.linksUrl, linkdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      linkdb.TextAtArrowEnd = TextAtArrowEnd
+	      linkdb.TextAtArrowStart = TextAtArrowStart
+	      linkdb.ControlPoints = ControlPoints
         linkdb.Layer_Links_reverse = _Layer_Links_reverse
         // this.log(`posted linkdb id=${linkdb.ID}`)
       }),
@@ -97,6 +116,9 @@ export class LinkService {
   }
 
   /** DELETE: delete the linkdb from the server */
+  delete(linkdb: LinkDB | number, GONG__StackPath: string): Observable<LinkDB> {
+    return this.deleteLink(linkdb, GONG__StackPath)
+  }
   deleteLink(linkdb: LinkDB | number, GONG__StackPath: string): Observable<LinkDB> {
     const id = typeof linkdb === 'number' ? linkdb : linkdb.ID;
     const url = `${this.linksUrl}/${id}`;
@@ -114,15 +136,23 @@ export class LinkService {
   }
 
   /** PUT: update the linkdb on the server */
+  update(linkdb: LinkDB, GONG__StackPath: string): Observable<LinkDB> {
+    return this.updateLink(linkdb, GONG__StackPath)
+  }
   updateLink(linkdb: LinkDB, GONG__StackPath: string): Observable<LinkDB> {
     const id = typeof linkdb === 'number' ? linkdb : linkdb.ID;
     const url = `${this.linksUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Start = linkdb.Start
     linkdb.Start = new RectDB
+    let End = linkdb.End
     linkdb.End = new RectDB
+    let TextAtArrowEnd = linkdb.TextAtArrowEnd
     linkdb.TextAtArrowEnd = []
+    let TextAtArrowStart = linkdb.TextAtArrowStart
     linkdb.TextAtArrowStart = []
+    let ControlPoints = linkdb.ControlPoints
     linkdb.ControlPoints = []
     let _Layer_Links_reverse = linkdb.Layer_Links_reverse
     linkdb.Layer_Links_reverse = new LayerDB
@@ -136,6 +166,9 @@ export class LinkService {
     return this.http.put<LinkDB>(url, linkdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      linkdb.TextAtArrowEnd = TextAtArrowEnd
+	      linkdb.TextAtArrowStart = TextAtArrowStart
+	      linkdb.ControlPoints = ControlPoints
         linkdb.Layer_Links_reverse = _Layer_Links_reverse
         // this.log(`updated linkdb id=${linkdb.ID}`)
       }),

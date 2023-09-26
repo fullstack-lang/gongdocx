@@ -231,6 +231,9 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CommitPhaseTwoInstance(backR
 				tablestyleDB.NodeID.Int64 = int64(NodeId)
 				tablestyleDB.NodeID.Valid = true
 			}
+		} else {
+			tablestyleDB.NodeID.Int64 = 0
+			tablestyleDB.NodeID.Valid = true
 		}
 
 		query := backRepoTableStyle.db.Save(&tablestyleDB)
@@ -341,6 +344,7 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CheckoutPhaseTwoInstance(bac
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	tablestyle.Node = nil
 	if tablestyleDB.NodeID.Int64 != 0 {
 		tablestyle.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablestyleDB.NodeID.Int64)]
 	}
@@ -587,6 +591,30 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoTableStyle.ResetReversePointers commits all staged instances of TableStyle to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoTableStyle *BackRepoTableStyleStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, tablestyle := range backRepoTableStyle.Map_TableStyleDBID_TableStylePtr {
+		backRepoTableStyle.ResetReversePointersInstance(backRepo, idx, tablestyle)
+	}
+
+	return
+}
+
+func (backRepoTableStyle *BackRepoTableStyleStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.TableStyle) (Error error) {
+
+	// fetch matching tablestyleDB
+	if tablestyleDB, ok := backRepoTableStyle.Map_TableStyleDBID_TableStyleDB[idx]; ok {
+		_ = tablestyleDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

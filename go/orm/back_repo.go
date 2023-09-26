@@ -1,3 +1,4 @@
+// do not modify, generated file
 package orm
 
 import (
@@ -7,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/fullstack-lang/gongdocx/go/models"
 
@@ -305,6 +305,24 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoTableStyle.CommitPhaseOne(stage)
 	backRepo.BackRepoText.CommitPhaseOne(stage)
 
+	// insertion point for per struct back repo for reseting the reverse pointers
+	backRepo.BackRepoBody.ResetReversePointers(backRepo)
+	backRepo.BackRepoDocument.ResetReversePointers(backRepo)
+	backRepo.BackRepoDocx.ResetReversePointers(backRepo)
+	backRepo.BackRepoFile.ResetReversePointers(backRepo)
+	backRepo.BackRepoNode.ResetReversePointers(backRepo)
+	backRepo.BackRepoParagraph.ResetReversePointers(backRepo)
+	backRepo.BackRepoParagraphProperties.ResetReversePointers(backRepo)
+	backRepo.BackRepoParagraphStyle.ResetReversePointers(backRepo)
+	backRepo.BackRepoRune.ResetReversePointers(backRepo)
+	backRepo.BackRepoRuneProperties.ResetReversePointers(backRepo)
+	backRepo.BackRepoTable.ResetReversePointers(backRepo)
+	backRepo.BackRepoTableColumn.ResetReversePointers(backRepo)
+	backRepo.BackRepoTableProperties.ResetReversePointers(backRepo)
+	backRepo.BackRepoTableRow.ResetReversePointers(backRepo)
+	backRepo.BackRepoTableStyle.ResetReversePointers(backRepo)
+	backRepo.BackRepoText.ResetReversePointers(backRepo)
+
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoBody.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoDocument.CommitPhaseTwo(backRepo)
@@ -363,25 +381,6 @@ func (backRepo *BackRepoStruct) Checkout(stage *models.StageStruct) {
 	backRepo.BackRepoTableRow.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoTableStyle.CheckoutPhaseTwo(backRepo)
 	backRepo.BackRepoText.CheckoutPhaseTwo(backRepo)
-}
-
-var _backRepo *BackRepoStruct
-
-var once sync.Once
-
-func GetDefaultBackRepo() *BackRepoStruct {
-	once.Do(func() {
-		_backRepo = NewBackRepo(models.GetDefaultStage(), "")
-	})
-	return _backRepo
-}
-
-func GetLastCommitFromBackNb() uint {
-	return GetDefaultBackRepo().GetLastCommitFromBackNb()
-}
-
-func GetLastPushFromFrontNb() uint {
-	return GetDefaultBackRepo().GetLastPushFromFrontNb()
 }
 
 // Backup the BackRepoStruct

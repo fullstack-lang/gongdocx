@@ -277,6 +277,9 @@ func (backRepoRectLinkLink *BackRepoRectLinkLinkStruct) CommitPhaseTwoInstance(b
 				rectlinklinkDB.StartID.Int64 = int64(StartId)
 				rectlinklinkDB.StartID.Valid = true
 			}
+		} else {
+			rectlinklinkDB.StartID.Int64 = 0
+			rectlinklinkDB.StartID.Valid = true
 		}
 
 		// commit pointer value rectlinklink.End translates to updating the rectlinklink.EndID
@@ -286,6 +289,9 @@ func (backRepoRectLinkLink *BackRepoRectLinkLinkStruct) CommitPhaseTwoInstance(b
 				rectlinklinkDB.EndID.Int64 = int64(EndId)
 				rectlinklinkDB.EndID.Valid = true
 			}
+		} else {
+			rectlinklinkDB.EndID.Int64 = 0
+			rectlinklinkDB.EndID.Valid = true
 		}
 
 		query := backRepoRectLinkLink.db.Save(&rectlinklinkDB)
@@ -396,10 +402,12 @@ func (backRepoRectLinkLink *BackRepoRectLinkLinkStruct) CheckoutPhaseTwoInstance
 
 	// insertion point for checkout of pointer encoding
 	// Start field
+	rectlinklink.Start = nil
 	if rectlinklinkDB.StartID.Int64 != 0 {
 		rectlinklink.Start = backRepo.BackRepoRect.Map_RectDBID_RectPtr[uint(rectlinklinkDB.StartID.Int64)]
 	}
 	// End field
+	rectlinklink.End = nil
 	if rectlinklinkDB.EndID.Int64 != 0 {
 		rectlinklink.End = backRepo.BackRepoLink.Map_LinkDBID_LinkPtr[uint(rectlinklinkDB.EndID.Int64)]
 	}
@@ -706,6 +714,39 @@ func (backRepoRectLinkLink *BackRepoRectLinkLinkStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoRectLinkLink.ResetReversePointers commits all staged instances of RectLinkLink to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoRectLinkLink *BackRepoRectLinkLinkStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, rectlinklink := range backRepoRectLinkLink.Map_RectLinkLinkDBID_RectLinkLinkPtr {
+		backRepoRectLinkLink.ResetReversePointersInstance(backRepo, idx, rectlinklink)
+	}
+
+	return
+}
+
+func (backRepoRectLinkLink *BackRepoRectLinkLinkStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.RectLinkLink) (Error error) {
+
+	// fetch matching rectlinklinkDB
+	if rectlinklinkDB, ok := backRepoRectLinkLink.Map_RectLinkLinkDBID_RectLinkLinkDB[idx]; ok {
+		_ = rectlinklinkDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if rectlinklinkDB.Layer_RectLinkLinksDBID.Int64 != 0 {
+			rectlinklinkDB.Layer_RectLinkLinksDBID.Int64 = 0
+			rectlinklinkDB.Layer_RectLinkLinksDBID.Valid = true
+
+			// save the reset
+			if q := backRepoRectLinkLink.db.Save(rectlinklinkDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

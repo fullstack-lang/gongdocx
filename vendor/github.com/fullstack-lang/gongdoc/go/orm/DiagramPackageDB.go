@@ -270,6 +270,9 @@ func (backRepoDiagramPackage *BackRepoDiagramPackageStruct) CommitPhaseTwoInstan
 				diagrampackageDB.SelectedClassdiagramID.Int64 = int64(SelectedClassdiagramId)
 				diagrampackageDB.SelectedClassdiagramID.Valid = true
 			}
+		} else {
+			diagrampackageDB.SelectedClassdiagramID.Int64 = 0
+			diagrampackageDB.SelectedClassdiagramID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers diagrampackage.Umlscs into the back repo.
@@ -426,6 +429,7 @@ func (backRepoDiagramPackage *BackRepoDiagramPackageStruct) CheckoutPhaseTwoInst
 	})
 
 	// SelectedClassdiagram field
+	diagrampackage.SelectedClassdiagram = nil
 	if diagrampackageDB.SelectedClassdiagramID.Int64 != 0 {
 		diagrampackage.SelectedClassdiagram = backRepo.BackRepoClassdiagram.Map_ClassdiagramDBID_ClassdiagramPtr[uint(diagrampackageDB.SelectedClassdiagramID.Int64)]
 	}
@@ -723,6 +727,30 @@ func (backRepoDiagramPackage *BackRepoDiagramPackageStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoDiagramPackage.ResetReversePointers commits all staged instances of DiagramPackage to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoDiagramPackage *BackRepoDiagramPackageStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, diagrampackage := range backRepoDiagramPackage.Map_DiagramPackageDBID_DiagramPackagePtr {
+		backRepoDiagramPackage.ResetReversePointersInstance(backRepo, idx, diagrampackage)
+	}
+
+	return
+}
+
+func (backRepoDiagramPackage *BackRepoDiagramPackageStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.DiagramPackage) (Error error) {
+
+	// fetch matching diagrampackageDB
+	if diagrampackageDB, ok := backRepoDiagramPackage.Map_DiagramPackageDBID_DiagramPackageDB[idx]; ok {
+		_ = diagrampackageDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

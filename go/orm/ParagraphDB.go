@@ -263,6 +263,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 				paragraphDB.NodeID.Int64 = int64(NodeId)
 				paragraphDB.NodeID.Valid = true
 			}
+		} else {
+			paragraphDB.NodeID.Int64 = 0
+			paragraphDB.NodeID.Valid = true
 		}
 
 		// commit pointer value paragraph.ParagraphProperties translates to updating the paragraph.ParagraphPropertiesID
@@ -272,6 +275,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 				paragraphDB.ParagraphPropertiesID.Int64 = int64(ParagraphPropertiesId)
 				paragraphDB.ParagraphPropertiesID.Valid = true
 			}
+		} else {
+			paragraphDB.ParagraphPropertiesID.Int64 = 0
+			paragraphDB.ParagraphPropertiesID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers paragraph.Runes into the back repo.
@@ -300,6 +306,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 				paragraphDB.NextID.Int64 = int64(NextId)
 				paragraphDB.NextID.Valid = true
 			}
+		} else {
+			paragraphDB.NextID.Int64 = 0
+			paragraphDB.NextID.Valid = true
 		}
 
 		// commit pointer value paragraph.Previous translates to updating the paragraph.PreviousID
@@ -309,6 +318,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 				paragraphDB.PreviousID.Int64 = int64(PreviousId)
 				paragraphDB.PreviousID.Valid = true
 			}
+		} else {
+			paragraphDB.PreviousID.Int64 = 0
+			paragraphDB.PreviousID.Valid = true
 		}
 
 		// commit pointer value paragraph.EnclosingBody translates to updating the paragraph.EnclosingBodyID
@@ -318,6 +330,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 				paragraphDB.EnclosingBodyID.Int64 = int64(EnclosingBodyId)
 				paragraphDB.EnclosingBodyID.Valid = true
 			}
+		} else {
+			paragraphDB.EnclosingBodyID.Int64 = 0
+			paragraphDB.EnclosingBodyID.Valid = true
 		}
 
 		// commit pointer value paragraph.EnclosingTableColumn translates to updating the paragraph.EnclosingTableColumnID
@@ -327,6 +342,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 				paragraphDB.EnclosingTableColumnID.Int64 = int64(EnclosingTableColumnId)
 				paragraphDB.EnclosingTableColumnID.Valid = true
 			}
+		} else {
+			paragraphDB.EnclosingTableColumnID.Int64 = 0
+			paragraphDB.EnclosingTableColumnID.Valid = true
 		}
 
 		query := backRepoParagraph.db.Save(&paragraphDB)
@@ -437,10 +455,12 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	paragraph.Node = nil
 	if paragraphDB.NodeID.Int64 != 0 {
 		paragraph.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphDB.NodeID.Int64)]
 	}
 	// ParagraphProperties field
+	paragraph.ParagraphProperties = nil
 	if paragraphDB.ParagraphPropertiesID.Int64 != 0 {
 		paragraph.ParagraphProperties = backRepo.BackRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr[uint(paragraphDB.ParagraphPropertiesID.Int64)]
 	}
@@ -472,18 +492,22 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 	})
 
 	// Next field
+	paragraph.Next = nil
 	if paragraphDB.NextID.Int64 != 0 {
 		paragraph.Next = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(paragraphDB.NextID.Int64)]
 	}
 	// Previous field
+	paragraph.Previous = nil
 	if paragraphDB.PreviousID.Int64 != 0 {
 		paragraph.Previous = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(paragraphDB.PreviousID.Int64)]
 	}
 	// EnclosingBody field
+	paragraph.EnclosingBody = nil
 	if paragraphDB.EnclosingBodyID.Int64 != 0 {
 		paragraph.EnclosingBody = backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(paragraphDB.EnclosingBodyID.Int64)]
 	}
 	// EnclosingTableColumn field
+	paragraph.EnclosingTableColumn = nil
 	if paragraphDB.EnclosingTableColumnID.Int64 != 0 {
 		paragraph.EnclosingTableColumn = backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnPtr[uint(paragraphDB.EnclosingTableColumnID.Int64)]
 	}
@@ -772,6 +796,48 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoParagraph.ResetReversePointers commits all staged instances of Paragraph to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoParagraph *BackRepoParagraphStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, paragraph := range backRepoParagraph.Map_ParagraphDBID_ParagraphPtr {
+		backRepoParagraph.ResetReversePointersInstance(backRepo, idx, paragraph)
+	}
+
+	return
+}
+
+func (backRepoParagraph *BackRepoParagraphStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Paragraph) (Error error) {
+
+	// fetch matching paragraphDB
+	if paragraphDB, ok := backRepoParagraph.Map_ParagraphDBID_ParagraphDB[idx]; ok {
+		_ = paragraphDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if paragraphDB.Body_ParagraphsDBID.Int64 != 0 {
+			paragraphDB.Body_ParagraphsDBID.Int64 = 0
+			paragraphDB.Body_ParagraphsDBID.Valid = true
+
+			// save the reset
+			if q := backRepoParagraph.db.Save(paragraphDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		if paragraphDB.TableColumn_ParagraphsDBID.Int64 != 0 {
+			paragraphDB.TableColumn_ParagraphsDBID.Int64 = 0
+			paragraphDB.TableColumn_ParagraphsDBID.Valid = true
+
+			// save the reset
+			if q := backRepoParagraph.db.Save(paragraphDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

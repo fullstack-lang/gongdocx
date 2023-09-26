@@ -43,6 +43,10 @@ export class CircleService {
   }
 
   /** GET circles from the server */
+  // gets is more robust to refactoring
+  gets(GONG__StackPath: string): Observable<CircleDB[]> {
+    return this.getCircles(GONG__StackPath)
+  }
   getCircles(GONG__StackPath: string): Observable<CircleDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -56,6 +60,10 @@ export class CircleService {
   }
 
   /** GET circle by id. Will 404 if id not found */
+  // more robust API to refactoring
+  get(id: number, GONG__StackPath: string): Observable<CircleDB> {
+	return this.getCircle(id, GONG__StackPath)
+  }
   getCircle(id: number, GONG__StackPath: string): Observable<CircleDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -68,9 +76,13 @@ export class CircleService {
   }
 
   /** POST: add a new circle to the server */
+  post(circledb: CircleDB, GONG__StackPath: string): Observable<CircleDB> {
+    return this.postCircle(circledb, GONG__StackPath)	
+  }
   postCircle(circledb: CircleDB, GONG__StackPath: string): Observable<CircleDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animations = circledb.Animations
     circledb.Animations = []
     let _Layer_Circles_reverse = circledb.Layer_Circles_reverse
     circledb.Layer_Circles_reverse = new LayerDB
@@ -84,6 +96,7 @@ export class CircleService {
     return this.http.post<CircleDB>(this.circlesUrl, circledb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      circledb.Animations = Animations
         circledb.Layer_Circles_reverse = _Layer_Circles_reverse
         // this.log(`posted circledb id=${circledb.ID}`)
       }),
@@ -92,6 +105,9 @@ export class CircleService {
   }
 
   /** DELETE: delete the circledb from the server */
+  delete(circledb: CircleDB | number, GONG__StackPath: string): Observable<CircleDB> {
+    return this.deleteCircle(circledb, GONG__StackPath)
+  }
   deleteCircle(circledb: CircleDB | number, GONG__StackPath: string): Observable<CircleDB> {
     const id = typeof circledb === 'number' ? circledb : circledb.ID;
     const url = `${this.circlesUrl}/${id}`;
@@ -109,11 +125,15 @@ export class CircleService {
   }
 
   /** PUT: update the circledb on the server */
+  update(circledb: CircleDB, GONG__StackPath: string): Observable<CircleDB> {
+    return this.updateCircle(circledb, GONG__StackPath)
+  }
   updateCircle(circledb: CircleDB, GONG__StackPath: string): Observable<CircleDB> {
     const id = typeof circledb === 'number' ? circledb : circledb.ID;
     const url = `${this.circlesUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animations = circledb.Animations
     circledb.Animations = []
     let _Layer_Circles_reverse = circledb.Layer_Circles_reverse
     circledb.Layer_Circles_reverse = new LayerDB
@@ -127,6 +147,7 @@ export class CircleService {
     return this.http.put<CircleDB>(url, circledb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      circledb.Animations = Animations
         circledb.Layer_Circles_reverse = _Layer_Circles_reverse
         // this.log(`updated circledb id=${circledb.ID}`)
       }),

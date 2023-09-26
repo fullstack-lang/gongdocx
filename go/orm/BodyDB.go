@@ -257,6 +257,9 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				bodyDB.LastParagraphID.Int64 = int64(LastParagraphId)
 				bodyDB.LastParagraphID.Valid = true
 			}
+		} else {
+			bodyDB.LastParagraphID.Int64 = 0
+			bodyDB.LastParagraphID.Valid = true
 		}
 
 		query := backRepoBody.db.Save(&bodyDB)
@@ -421,6 +424,7 @@ func (backRepoBody *BackRepoBodyStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	})
 
 	// LastParagraph field
+	body.LastParagraph = nil
 	if bodyDB.LastParagraphID.Int64 != 0 {
 		body.LastParagraph = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(bodyDB.LastParagraphID.Int64)]
 	}
@@ -651,6 +655,30 @@ func (backRepoBody *BackRepoBodyStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoBody.ResetReversePointers commits all staged instances of Body to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoBody *BackRepoBodyStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, body := range backRepoBody.Map_BodyDBID_BodyPtr {
+		backRepoBody.ResetReversePointersInstance(backRepo, idx, body)
+	}
+
+	return
+}
+
+func (backRepoBody *BackRepoBodyStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Body) (Error error) {
+
+	// fetch matching bodyDB
+	if bodyDB, ok := backRepoBody.Map_BodyDBID_BodyDB[idx]; ok {
+		_ = bodyDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

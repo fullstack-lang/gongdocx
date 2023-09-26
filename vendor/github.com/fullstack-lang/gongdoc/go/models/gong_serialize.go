@@ -1,3 +1,4 @@
+// generated code - do not edit
 package models
 
 import (
@@ -13,7 +14,6 @@ func SerializeStage(stage *StageStruct, filename string) {
 	f := excelize.NewFile()
 	{
 		// insertion point
-		SerializeExcelize[Button](stage, f)
 		SerializeExcelize[Classdiagram](stage, f)
 		SerializeExcelize[DiagramPackage](stage, f)
 		SerializeExcelize[Field](stage, f)
@@ -21,11 +21,9 @@ func SerializeStage(stage *StageStruct, filename string) {
 		SerializeExcelize[GongEnumValueEntry](stage, f)
 		SerializeExcelize[GongStructShape](stage, f)
 		SerializeExcelize[Link](stage, f)
-		SerializeExcelize[Node](stage, f)
 		SerializeExcelize[NoteShape](stage, f)
 		SerializeExcelize[NoteShapeLink](stage, f)
 		SerializeExcelize[Position](stage, f)
-		SerializeExcelize[Tree](stage, f)
 		SerializeExcelize[UmlState](stage, f)
 		SerializeExcelize[Umlsc](stage, f)
 		SerializeExcelize[Vertice](stage, f)
@@ -107,8 +105,7 @@ func SerializeExcelize[Type Gongstruct](stage *StageStruct, f *excelize.File) {
 	}
 	f.AutoFilter(sheetName,
 		fmt.Sprintf("%s%d", IntToLetters(int32(1)), line),
-		fmt.Sprintf("%s%d", IntToLetters(int32(len(GetFields[Type]()))), line),
-		"")
+		[]excelize.AutoFilterOptions{})
 
 	for instance := range set {
 		line = line + 1

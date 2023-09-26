@@ -5,23 +5,26 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	gongdocx_go "github.com/fullstack-lang/gongdocx/go"
 	gongdocx_fullstack "github.com/fullstack-lang/gongdocx/go/fullstack"
 	gongdocx_models "github.com/fullstack-lang/gongdocx/go/models"
+	gongdocx_orm "github.com/fullstack-lang/gongdocx/go/orm"
+	gongdocx_probe "github.com/fullstack-lang/gongdocx/go/probe"
 	gongdocx_static "github.com/fullstack-lang/gongdocx/go/static"
-
-	gongdoc_load "github.com/fullstack-lang/gongdoc/go/load"
 )
 
 var (
-	logDBFlag  = flag.Bool("logDB", false, "log mode for db")
 	logGINFlag = flag.Bool("logGIN", false, "log mode for gin")
 
 	diagrams         = flag.Bool("diagrams", true, "parse/analysis go/models and go/diagrams")
 	embeddedDiagrams = flag.Bool("embeddedDiagrams", false, "parse/analysis go/models and go/embeddedDiagrams")
-	style            = flag.String("style", "", "style for extracting instances")
+
+	port = flag.Int("port", 8080, "port server")
+
+	style = flag.String("style", "", "style for extracting instances")
 
 	xls = flag.String("xls", "", "output file")
 )
@@ -58,21 +61,24 @@ func main() {
 	r := gongdocx_static.ServeStaticFiles(*logGINFlag)
 
 	// setup stack
-	gongdocxStage := gongdocx_fullstack.NewStackInstance(r, "gongdocx")
+	var stage *gongdocx_models.StageStruct
+	var backRepo *gongdocx_orm.BackRepoStruct
+
+	stage, backRepo = gongdocx_fullstack.NewStackInstance(r, "gongdocx")
 
 	for _, arg := range flag.Args() {
-		gongdocx_models.NewDocx(gongdocxStage, arg, embed)
+		gongdocx_models.NewDocx(stage, arg, embed)
 	}
 
 	if *xls != "" {
 		fileName := fmt.Sprintf("%s_%s.xlsx", *xls, time.Now().Local().Format("2006-01-02-15-04"))
-		gongdocx_models.SerializeStage(gongdocxStage, fileName)
+		gongdocx_models.SerializeStage(stage, fileName)
 	}
 
-	gongdocxStage.Commit()
+	stage.Commit()
 
 	if *style != "" {
-		instances := gongdocx_models.ExtractStyleText(*style, gongdocxStage)
+		instances := gongdocx_models.ExtractStyleText(*style, stage)
 		log.Println("Instances of ", *style)
 
 		for _, instance := range instances {
@@ -81,15 +87,12 @@ func main() {
 
 	}
 
-	gongdoc_load.Load(
-		"gongdocx",
-		"github.com/fullstack-lang/gongdocx/go/models",
-		gongdocx_go.GoModelsDir,
-		gongdocx_go.GoDiagramsDir,
-		r,
-		*embeddedDiagrams,
-		&gongdocxStage.Map_GongStructName_InstancesNb)
+	gongdocx_probe.NewProbe(r, gongdocx_go.GoModelsDir, gongdocx_go.GoDiagramsDir,
+		*embeddedDiagrams, "gongdocx", stage, backRepo)
 
-	log.Printf("Server ready serve on localhost:8080")
-	r.Run()
+	log.Printf("Server ready serve on localhost:" + strconv.Itoa(*port))
+	err := r.Run(":" + strconv.Itoa(*port))
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }

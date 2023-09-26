@@ -315,6 +315,9 @@ func (backRepoLink *BackRepoLinkStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				linkDB.MiddleverticeID.Int64 = int64(MiddleverticeId)
 				linkDB.MiddleverticeID.Valid = true
 			}
+		} else {
+			linkDB.MiddleverticeID.Int64 = 0
+			linkDB.MiddleverticeID.Valid = true
 		}
 
 		query := backRepoLink.db.Save(&linkDB)
@@ -425,6 +428,7 @@ func (backRepoLink *BackRepoLinkStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 
 	// insertion point for checkout of pointer encoding
 	// Middlevertice field
+	link.Middlevertice = nil
 	if linkDB.MiddleverticeID.Int64 != 0 {
 		link.Middlevertice = backRepo.BackRepoVertice.Map_VerticeDBID_VerticePtr[uint(linkDB.MiddleverticeID.Int64)]
 	}
@@ -781,6 +785,39 @@ func (backRepoLink *BackRepoLinkStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoLink.ResetReversePointers commits all staged instances of Link to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoLink *BackRepoLinkStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, link := range backRepoLink.Map_LinkDBID_LinkPtr {
+		backRepoLink.ResetReversePointersInstance(backRepo, idx, link)
+	}
+
+	return
+}
+
+func (backRepoLink *BackRepoLinkStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Link) (Error error) {
+
+	// fetch matching linkDB
+	if linkDB, ok := backRepoLink.Map_LinkDBID_LinkDB[idx]; ok {
+		_ = linkDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if linkDB.GongStructShape_LinksDBID.Int64 != 0 {
+			linkDB.GongStructShape_LinksDBID.Int64 = 0
+			linkDB.GongStructShape_LinksDBID.Valid = true
+
+			// save the reset
+			if q := backRepoLink.db.Save(linkDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

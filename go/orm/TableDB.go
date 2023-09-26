@@ -235,6 +235,9 @@ func (backRepoTable *BackRepoTableStruct) CommitPhaseTwoInstance(backRepo *BackR
 				tableDB.NodeID.Int64 = int64(NodeId)
 				tableDB.NodeID.Valid = true
 			}
+		} else {
+			tableDB.NodeID.Int64 = 0
+			tableDB.NodeID.Valid = true
 		}
 
 		// commit pointer value table.TableProperties translates to updating the table.TablePropertiesID
@@ -244,6 +247,9 @@ func (backRepoTable *BackRepoTableStruct) CommitPhaseTwoInstance(backRepo *BackR
 				tableDB.TablePropertiesID.Int64 = int64(TablePropertiesId)
 				tableDB.TablePropertiesID.Valid = true
 			}
+		} else {
+			tableDB.TablePropertiesID.Int64 = 0
+			tableDB.TablePropertiesID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers table.TableRows into the back repo.
@@ -373,10 +379,12 @@ func (backRepoTable *BackRepoTableStruct) CheckoutPhaseTwoInstance(backRepo *Bac
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	table.Node = nil
 	if tableDB.NodeID.Int64 != 0 {
 		table.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tableDB.NodeID.Int64)]
 	}
 	// TableProperties field
+	table.TableProperties = nil
 	if tableDB.TablePropertiesID.Int64 != 0 {
 		table.TableProperties = backRepo.BackRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesPtr[uint(tableDB.TablePropertiesID.Int64)]
 	}
@@ -654,6 +662,39 @@ func (backRepoTable *BackRepoTableStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoTable.ResetReversePointers commits all staged instances of Table to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoTable *BackRepoTableStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, table := range backRepoTable.Map_TableDBID_TablePtr {
+		backRepoTable.ResetReversePointersInstance(backRepo, idx, table)
+	}
+
+	return
+}
+
+func (backRepoTable *BackRepoTableStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Table) (Error error) {
+
+	// fetch matching tableDB
+	if tableDB, ok := backRepoTable.Map_TableDBID_TableDB[idx]; ok {
+		_ = tableDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if tableDB.Body_TablesDBID.Int64 != 0 {
+			tableDB.Body_TablesDBID.Int64 = 0
+			tableDB.Body_TablesDBID.Valid = true
+
+			// save the reset
+			if q := backRepoTable.db.Save(tableDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

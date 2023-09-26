@@ -243,6 +243,9 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				runeDB.NodeID.Int64 = int64(NodeId)
 				runeDB.NodeID.Valid = true
 			}
+		} else {
+			runeDB.NodeID.Int64 = 0
+			runeDB.NodeID.Valid = true
 		}
 
 		// commit pointer value rune.Text translates to updating the rune.TextID
@@ -252,6 +255,9 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				runeDB.TextID.Int64 = int64(TextId)
 				runeDB.TextID.Valid = true
 			}
+		} else {
+			runeDB.TextID.Int64 = 0
+			runeDB.TextID.Valid = true
 		}
 
 		// commit pointer value rune.RuneProperties translates to updating the rune.RunePropertiesID
@@ -261,6 +267,9 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				runeDB.RunePropertiesID.Int64 = int64(RunePropertiesId)
 				runeDB.RunePropertiesID.Valid = true
 			}
+		} else {
+			runeDB.RunePropertiesID.Int64 = 0
+			runeDB.RunePropertiesID.Valid = true
 		}
 
 		// commit pointer value rune.EnclosingParagraph translates to updating the rune.EnclosingParagraphID
@@ -270,6 +279,9 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				runeDB.EnclosingParagraphID.Int64 = int64(EnclosingParagraphId)
 				runeDB.EnclosingParagraphID.Valid = true
 			}
+		} else {
+			runeDB.EnclosingParagraphID.Int64 = 0
+			runeDB.EnclosingParagraphID.Valid = true
 		}
 
 		query := backRepoRune.db.Save(&runeDB)
@@ -380,18 +392,22 @@ func (backRepoRune *BackRepoRuneStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	rune.Node = nil
 	if runeDB.NodeID.Int64 != 0 {
 		rune.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(runeDB.NodeID.Int64)]
 	}
 	// Text field
+	rune.Text = nil
 	if runeDB.TextID.Int64 != 0 {
 		rune.Text = backRepo.BackRepoText.Map_TextDBID_TextPtr[uint(runeDB.TextID.Int64)]
 	}
 	// RuneProperties field
+	rune.RuneProperties = nil
 	if runeDB.RunePropertiesID.Int64 != 0 {
 		rune.RuneProperties = backRepo.BackRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[uint(runeDB.RunePropertiesID.Int64)]
 	}
 	// EnclosingParagraph field
+	rune.EnclosingParagraph = nil
 	if runeDB.EnclosingParagraphID.Int64 != 0 {
 		rune.EnclosingParagraph = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(runeDB.EnclosingParagraphID.Int64)]
 	}
@@ -654,6 +670,39 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoRune.ResetReversePointers commits all staged instances of Rune to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoRune *BackRepoRuneStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, rune := range backRepoRune.Map_RuneDBID_RunePtr {
+		backRepoRune.ResetReversePointersInstance(backRepo, idx, rune)
+	}
+
+	return
+}
+
+func (backRepoRune *BackRepoRuneStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Rune) (Error error) {
+
+	// fetch matching runeDB
+	if runeDB, ok := backRepoRune.Map_RuneDBID_RuneDB[idx]; ok {
+		_ = runeDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if runeDB.Paragraph_RunesDBID.Int64 != 0 {
+			runeDB.Paragraph_RunesDBID.Int64 = 0
+			runeDB.Paragraph_RunesDBID.Valid = true
+
+			// save the reset
+			if q := backRepoRune.db.Save(runeDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

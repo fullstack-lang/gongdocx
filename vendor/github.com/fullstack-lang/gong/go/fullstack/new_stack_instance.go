@@ -1,3 +1,4 @@
+// do not modify, generated file
 package fullstack
 
 import (
@@ -24,26 +25,42 @@ func NewStackInstance(
 	stackPath string,
 	// filesnames is an optional parameter for the name of the database
 	filenames ...string) (
-	stage *models.StageStruct) {
+	stage *models.StageStruct,
+	backRepo *orm.BackRepoStruct) {
 
 	// temporary
 	if stackPath == "" {
 		stage = models.GetDefaultStage()
 	} else {
-		stage = models.NewStage()
+		stage = models.NewStage(stackPath)
 	}
 
 	if len(filenames) == 0 {
 		filenames = append(filenames, ":memory:")
 	}
 
-	backRepo := orm.NewBackRepo(stage, filenames[0])
+	backRepo = orm.NewBackRepo(stage, filenames[0])
 
 	if stackPath != "" {
 		controllers.GetController().AddBackRepo(backRepo, stackPath)
 	}
 
 	controllers.Register(r)
+
+	// add orchestration
+	// insertion point
+	models.SetOrchestratorOnAfterUpdate[models.GongBasicField](stage)
+	models.SetOrchestratorOnAfterUpdate[models.GongEnum](stage)
+	models.SetOrchestratorOnAfterUpdate[models.GongEnumValue](stage)
+	models.SetOrchestratorOnAfterUpdate[models.GongLink](stage)
+	models.SetOrchestratorOnAfterUpdate[models.GongNote](stage)
+	models.SetOrchestratorOnAfterUpdate[models.GongStruct](stage)
+	models.SetOrchestratorOnAfterUpdate[models.GongTimeField](stage)
+	models.SetOrchestratorOnAfterUpdate[models.Meta](stage)
+	models.SetOrchestratorOnAfterUpdate[models.MetaReference](stage)
+	models.SetOrchestratorOnAfterUpdate[models.ModelPkg](stage)
+	models.SetOrchestratorOnAfterUpdate[models.PointerToGongStructField](stage)
+	models.SetOrchestratorOnAfterUpdate[models.SliceOfPointerToGongStructField](stage)
 
 	return
 }

@@ -1,3 +1,4 @@
+// generated code - do not edit
 package controllers
 
 import (
@@ -33,7 +34,6 @@ func GetController() *Controller {
 		_controllerSingloton = &Controller{
 			Map_BackRepos: make(map[string]*gong_orm.BackRepoStruct),
 		}
-		_controllerSingloton.Map_BackRepos[""] = gong_orm.GetDefaultBackRepo()
 	})
 	return _controllerSingloton
 }

@@ -232,7 +232,7 @@ func (c *Cell) IsTime() bool {
 	return c.parsedNumFmt.isTimeFormat
 }
 
-//GetTime returns the value of a Cell as a time.Time
+// GetTime returns the value of a Cell as a time.Time
 func (c *Cell) GetTime(date1904 bool) (t time.Time, err error) {
 	f, err := c.Float()
 	if err != nil {
@@ -307,7 +307,7 @@ func (c *Cell) SetDateTime(t time.Time) {
 func (c *Cell) SetDateWithOptions(t time.Time, options DateTimeOptions) {
 	c.updatable()
 	_, offset := t.In(options.Location).Zone()
-	t = time.Unix(t.Unix()+int64(offset), 0)
+	t = time.Unix(t.Unix()+int64(offset), int64(t.Nanosecond()))
 	c.SetDateTimeWithFormat(TimeToExcelTime(t.In(timeLocationUTC), c.date1904), options.ExcelTimeFormat)
 	c.modified = true
 }

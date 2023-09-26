@@ -231,6 +231,9 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseTwoInstance(backRepo 
 				tablerowDB.NodeID.Int64 = int64(NodeId)
 				tablerowDB.NodeID.Valid = true
 			}
+		} else {
+			tablerowDB.NodeID.Int64 = 0
+			tablerowDB.NodeID.Valid = true
 		}
 
 		// This loop encodes the slice of pointers tablerow.TableColumns into the back repo.
@@ -360,6 +363,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) CheckoutPhaseTwoInstance(backRep
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	tablerow.Node = nil
 	if tablerowDB.NodeID.Int64 != 0 {
 		tablerow.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablerowDB.NodeID.Int64)]
 	}
@@ -631,6 +635,39 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoTableRow.ResetReversePointers commits all staged instances of TableRow to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoTableRow *BackRepoTableRowStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, tablerow := range backRepoTableRow.Map_TableRowDBID_TableRowPtr {
+		backRepoTableRow.ResetReversePointersInstance(backRepo, idx, tablerow)
+	}
+
+	return
+}
+
+func (backRepoTableRow *BackRepoTableRowStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.TableRow) (Error error) {
+
+	// fetch matching tablerowDB
+	if tablerowDB, ok := backRepoTableRow.Map_TableRowDBID_TableRowDB[idx]; ok {
+		_ = tablerowDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		if tablerowDB.Table_TableRowsDBID.Int64 != 0 {
+			tablerowDB.Table_TableRowsDBID.Int64 = 0
+			tablerowDB.Table_TableRowsDBID.Valid = true
+
+			// save the reset
+			if q := backRepoTableRow.db.Save(tablerowDB); q.Error != nil {
+				return q.Error
+			}
+		}
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

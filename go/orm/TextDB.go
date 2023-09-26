@@ -236,6 +236,9 @@ func (backRepoText *BackRepoTextStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				textDB.NodeID.Int64 = int64(NodeId)
 				textDB.NodeID.Valid = true
 			}
+		} else {
+			textDB.NodeID.Int64 = 0
+			textDB.NodeID.Valid = true
 		}
 
 		// commit pointer value text.EnclosingRune translates to updating the text.EnclosingRuneID
@@ -245,6 +248,9 @@ func (backRepoText *BackRepoTextStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				textDB.EnclosingRuneID.Int64 = int64(EnclosingRuneId)
 				textDB.EnclosingRuneID.Valid = true
 			}
+		} else {
+			textDB.EnclosingRuneID.Int64 = 0
+			textDB.EnclosingRuneID.Valid = true
 		}
 
 		query := backRepoText.db.Save(&textDB)
@@ -355,10 +361,12 @@ func (backRepoText *BackRepoTextStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	text.Node = nil
 	if textDB.NodeID.Int64 != 0 {
 		text.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(textDB.NodeID.Int64)]
 	}
 	// EnclosingRune field
+	text.EnclosingRune = nil
 	if textDB.EnclosingRuneID.Int64 != 0 {
 		text.EnclosingRune = backRepo.BackRepoRune.Map_RuneDBID_RunePtr[uint(textDB.EnclosingRuneID.Int64)]
 	}
@@ -611,6 +619,30 @@ func (backRepoText *BackRepoTextStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoText.ResetReversePointers commits all staged instances of Text to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoText *BackRepoTextStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, text := range backRepoText.Map_TextDBID_TextPtr {
+		backRepoText.ResetReversePointersInstance(backRepo, idx, text)
+	}
+
+	return
+}
+
+func (backRepoText *BackRepoTextStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Text) (Error error) {
+
+	// fetch matching textDB
+	if textDB, ok := backRepoText.Map_TextDBID_TextDB[idx]; ok {
+		_ = textDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.

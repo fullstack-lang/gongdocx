@@ -43,6 +43,10 @@ export class RectAnchoredTextService {
   }
 
   /** GET rectanchoredtexts from the server */
+  // gets is more robust to refactoring
+  gets(GONG__StackPath: string): Observable<RectAnchoredTextDB[]> {
+    return this.getRectAnchoredTexts(GONG__StackPath)
+  }
   getRectAnchoredTexts(GONG__StackPath: string): Observable<RectAnchoredTextDB[]> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -56,6 +60,10 @@ export class RectAnchoredTextService {
   }
 
   /** GET rectanchoredtext by id. Will 404 if id not found */
+  // more robust API to refactoring
+  get(id: number, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
+	return this.getRectAnchoredText(id, GONG__StackPath)
+  }
   getRectAnchoredText(id: number, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
 
     let params = new HttpParams().set("GONG__StackPath", GONG__StackPath)
@@ -68,9 +76,13 @@ export class RectAnchoredTextService {
   }
 
   /** POST: add a new rectanchoredtext to the server */
+  post(rectanchoredtextdb: RectAnchoredTextDB, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
+    return this.postRectAnchoredText(rectanchoredtextdb, GONG__StackPath)	
+  }
   postRectAnchoredText(rectanchoredtextdb: RectAnchoredTextDB, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animates = rectanchoredtextdb.Animates
     rectanchoredtextdb.Animates = []
     let _Rect_RectAnchoredTexts_reverse = rectanchoredtextdb.Rect_RectAnchoredTexts_reverse
     rectanchoredtextdb.Rect_RectAnchoredTexts_reverse = new RectDB
@@ -84,6 +96,7 @@ export class RectAnchoredTextService {
     return this.http.post<RectAnchoredTextDB>(this.rectanchoredtextsUrl, rectanchoredtextdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      rectanchoredtextdb.Animates = Animates
         rectanchoredtextdb.Rect_RectAnchoredTexts_reverse = _Rect_RectAnchoredTexts_reverse
         // this.log(`posted rectanchoredtextdb id=${rectanchoredtextdb.ID}`)
       }),
@@ -92,6 +105,9 @@ export class RectAnchoredTextService {
   }
 
   /** DELETE: delete the rectanchoredtextdb from the server */
+  delete(rectanchoredtextdb: RectAnchoredTextDB | number, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
+    return this.deleteRectAnchoredText(rectanchoredtextdb, GONG__StackPath)
+  }
   deleteRectAnchoredText(rectanchoredtextdb: RectAnchoredTextDB | number, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
     const id = typeof rectanchoredtextdb === 'number' ? rectanchoredtextdb : rectanchoredtextdb.ID;
     const url = `${this.rectanchoredtextsUrl}/${id}`;
@@ -109,11 +125,15 @@ export class RectAnchoredTextService {
   }
 
   /** PUT: update the rectanchoredtextdb on the server */
+  update(rectanchoredtextdb: RectAnchoredTextDB, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
+    return this.updateRectAnchoredText(rectanchoredtextdb, GONG__StackPath)
+  }
   updateRectAnchoredText(rectanchoredtextdb: RectAnchoredTextDB, GONG__StackPath: string): Observable<RectAnchoredTextDB> {
     const id = typeof rectanchoredtextdb === 'number' ? rectanchoredtextdb : rectanchoredtextdb.ID;
     const url = `${this.rectanchoredtextsUrl}/${id}`;
 
     // insertion point for reset of pointers and reverse pointers (to avoid circular JSON)
+    let Animates = rectanchoredtextdb.Animates
     rectanchoredtextdb.Animates = []
     let _Rect_RectAnchoredTexts_reverse = rectanchoredtextdb.Rect_RectAnchoredTexts_reverse
     rectanchoredtextdb.Rect_RectAnchoredTexts_reverse = new RectDB
@@ -127,6 +147,7 @@ export class RectAnchoredTextService {
     return this.http.put<RectAnchoredTextDB>(url, rectanchoredtextdb, httpOptions).pipe(
       tap(_ => {
         // insertion point for restoration of reverse pointers
+	      rectanchoredtextdb.Animates = Animates
         rectanchoredtextdb.Rect_RectAnchoredTexts_reverse = _Rect_RectAnchoredTexts_reverse
         // this.log(`updated rectanchoredtextdb id=${rectanchoredtextdb.ID}`)
       }),

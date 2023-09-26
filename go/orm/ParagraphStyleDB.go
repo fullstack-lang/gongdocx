@@ -231,6 +231,9 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitPhaseTwoInstan
 				paragraphstyleDB.NodeID.Int64 = int64(NodeId)
 				paragraphstyleDB.NodeID.Valid = true
 			}
+		} else {
+			paragraphstyleDB.NodeID.Int64 = 0
+			paragraphstyleDB.NodeID.Valid = true
 		}
 
 		query := backRepoParagraphStyle.db.Save(&paragraphstyleDB)
@@ -341,6 +344,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CheckoutPhaseTwoInst
 
 	// insertion point for checkout of pointer encoding
 	// Node field
+	paragraphstyle.Node = nil
 	if paragraphstyleDB.NodeID.Int64 != 0 {
 		paragraphstyle.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphstyleDB.NodeID.Int64)]
 	}
@@ -587,6 +591,30 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) RestorePhaseTwo() {
 		}
 	}
 
+}
+
+// BackRepoParagraphStyle.ResetReversePointers commits all staged instances of ParagraphStyle to the BackRepo
+// Phase Two is the update of instance with the field in the database
+func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) ResetReversePointers(backRepo *BackRepoStruct) (Error error) {
+
+	for idx, paragraphstyle := range backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStylePtr {
+		backRepoParagraphStyle.ResetReversePointersInstance(backRepo, idx, paragraphstyle)
+	}
+
+	return
+}
+
+func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.ParagraphStyle) (Error error) {
+
+	// fetch matching paragraphstyleDB
+	if paragraphstyleDB, ok := backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[idx]; ok {
+		_ = paragraphstyleDB // to avoid unused variable error if there are no reverse to reset
+
+		// insertion point for reverse pointers reset
+		// end of insertion point for reverse pointers reset
+	}
+
+	return
 }
 
 // this field is used during the restauration process.
