@@ -91,8 +91,8 @@ func (controller *Controller) GetRunes(c *gin.Context) {
 
 		// insertion point for updating fields
 		runeAPI.ID = runeDB.ID
-		runeDB.CopyBasicFieldsToRune(&runeAPI.Rune)
-		runeAPI.RunePointersEnconding = runeDB.RunePointersEnconding
+		runeDB.CopyBasicFieldsToRune_WOP(&runeAPI.Rune_WOP)
+		runeAPI.RunePointersEncoding = runeDB.RunePointersEncoding
 		runeAPIs = append(runeAPIs, runeAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostRune(c *gin.Context) {
 
 	// Create rune
 	runeDB := orm.RuneDB{}
-	runeDB.RunePointersEnconding = input.RunePointersEnconding
-	runeDB.CopyBasicFieldsFromRune(&input.Rune)
+	runeDB.RunePointersEncoding = input.RunePointersEncoding
+	runeDB.CopyBasicFieldsFromRune_WOP(&input.Rune_WOP)
 
 	query := db.Create(&runeDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetRune(c *gin.Context) {
 
 	var runeAPI orm.RuneAPI
 	runeAPI.ID = runeDB.ID
-	runeAPI.RunePointersEnconding = runeDB.RunePointersEnconding
-	runeDB.CopyBasicFieldsToRune(&runeAPI.Rune)
+	runeAPI.RunePointersEncoding = runeDB.RunePointersEncoding
+	runeDB.CopyBasicFieldsToRune_WOP(&runeAPI.Rune_WOP)
 
 	c.JSON(http.StatusOK, runeAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateRune(c *gin.Context) {
 	}
 
 	// update
-	runeDB.CopyBasicFieldsFromRune(&input.Rune)
-	runeDB.RunePointersEnconding = input.RunePointersEnconding
+	runeDB.CopyBasicFieldsFromRune_WOP(&input.Rune_WOP)
+	runeDB.RunePointersEncoding = input.RunePointersEncoding
 
 	query = db.Model(&runeDB).Updates(runeDB)
 	if query.Error != nil {

@@ -91,8 +91,8 @@ func (controller *Controller) GetBodys(c *gin.Context) {
 
 		// insertion point for updating fields
 		bodyAPI.ID = bodyDB.ID
-		bodyDB.CopyBasicFieldsToBody(&bodyAPI.Body)
-		bodyAPI.BodyPointersEnconding = bodyDB.BodyPointersEnconding
+		bodyDB.CopyBasicFieldsToBody_WOP(&bodyAPI.Body_WOP)
+		bodyAPI.BodyPointersEncoding = bodyDB.BodyPointersEncoding
 		bodyAPIs = append(bodyAPIs, bodyAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostBody(c *gin.Context) {
 
 	// Create body
 	bodyDB := orm.BodyDB{}
-	bodyDB.BodyPointersEnconding = input.BodyPointersEnconding
-	bodyDB.CopyBasicFieldsFromBody(&input.Body)
+	bodyDB.BodyPointersEncoding = input.BodyPointersEncoding
+	bodyDB.CopyBasicFieldsFromBody_WOP(&input.Body_WOP)
 
 	query := db.Create(&bodyDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetBody(c *gin.Context) {
 
 	var bodyAPI orm.BodyAPI
 	bodyAPI.ID = bodyDB.ID
-	bodyAPI.BodyPointersEnconding = bodyDB.BodyPointersEnconding
-	bodyDB.CopyBasicFieldsToBody(&bodyAPI.Body)
+	bodyAPI.BodyPointersEncoding = bodyDB.BodyPointersEncoding
+	bodyDB.CopyBasicFieldsToBody_WOP(&bodyAPI.Body_WOP)
 
 	c.JSON(http.StatusOK, bodyAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateBody(c *gin.Context) {
 	}
 
 	// update
-	bodyDB.CopyBasicFieldsFromBody(&input.Body)
-	bodyDB.BodyPointersEnconding = input.BodyPointersEnconding
+	bodyDB.CopyBasicFieldsFromBody_WOP(&input.Body_WOP)
+	bodyDB.BodyPointersEncoding = input.BodyPointersEncoding
 
 	query = db.Model(&bodyDB).Updates(bodyDB)
 	if query.Error != nil {

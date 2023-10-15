@@ -35,16 +35,19 @@ var dummy_Node_sort sort.Float64Slice
 type NodeAPI struct {
 	gorm.Model
 
-	models.Node
+	models.Node_WOP
 
 	// encoding of pointers
-	NodePointersEnconding
+	NodePointersEncoding
 }
 
-// NodePointersEnconding encodes pointers to Struct and
+// NodePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type NodePointersEnconding struct {
+type NodePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
+
+	// field Nodes is a slice of pointers to another Struct (optional or 0..1)
+	Nodes IntSlice`gorm:"type:TEXT"`
 
 	// Implementation of a reverse ID for field Node{}.Nodes []*Node
 	Node_NodesDBID sql.NullInt64
@@ -67,7 +70,7 @@ type NodeDB struct {
 	// Declation for basic field nodeDB.Name
 	Name_Data sql.NullString
 	// encoding of pointers
-	NodePointersEnconding
+	NodePointersEncoding
 }
 
 // NodeDBs arrays nodeDBs
@@ -156,7 +159,7 @@ func (backRepoNode *BackRepoNodeStruct) CommitDeleteInstance(id uint) (Error err
 	nodeDB := backRepoNode.Map_NodeDBID_NodeDB[id]
 	query := backRepoNode.db.Unscoped().Delete(&nodeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -182,7 +185,7 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseOneInstance(node *models.Node
 
 	query := backRepoNode.db.Create(&nodeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -233,9 +236,19 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// 1. reset
+		nodeDB.NodePointersEncoding.Nodes = make([]int, 0)
+		// 2. encode
+		for _, nodeAssocEnd := range node.Nodes {
+			nodeAssocEnd_DB :=
+				backRepo.BackRepoNode.GetNodeDBFromNodePtr(nodeAssocEnd)
+			nodeDB.NodePointersEncoding.Nodes =
+				append(nodeDB.NodePointersEncoding.Nodes, int(nodeAssocEnd_DB.ID))
+		}
+
 		query := backRepoNode.db.Save(&nodeDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -389,7 +402,7 @@ func (backRepo *BackRepoStruct) CheckoutNode(node *models.Node) {
 			nodeDB.ID = id
 
 			if err := backRepo.BackRepoNode.db.First(&nodeDB, id).Error; err != nil {
-				log.Panicln("CheckoutNode : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutNode : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoNode.CheckoutPhaseOneInstance(&nodeDB)
 			backRepo.BackRepoNode.CheckoutPhaseTwoInstance(backRepo, &nodeDB)
@@ -399,6 +412,14 @@ func (backRepo *BackRepoStruct) CheckoutNode(node *models.Node) {
 
 // CopyBasicFieldsFromNode
 func (nodeDB *NodeDB) CopyBasicFieldsFromNode(node *models.Node) {
+	// insertion point for fields commit
+
+	nodeDB.Name_Data.String = node.Name
+	nodeDB.Name_Data.Valid = true
+}
+
+// CopyBasicFieldsFromNode_WOP
+func (nodeDB *NodeDB) CopyBasicFieldsFromNode_WOP(node *models.Node_WOP) {
 	// insertion point for fields commit
 
 	nodeDB.Name_Data.String = node.Name
@@ -415,6 +436,12 @@ func (nodeDB *NodeDB) CopyBasicFieldsFromNodeWOP(node *NodeWOP) {
 
 // CopyBasicFieldsToNode
 func (nodeDB *NodeDB) CopyBasicFieldsToNode(node *models.Node) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	node.Name = nodeDB.Name_Data.String
+}
+
+// CopyBasicFieldsToNode_WOP
+func (nodeDB *NodeDB) CopyBasicFieldsToNode_WOP(node *models.Node_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	node.Name = nodeDB.Name_Data.String
 }
@@ -445,12 +472,12 @@ func (backRepoNode *BackRepoNodeStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Node ", filename, " ", err.Error())
+		log.Fatal("Cannot json Node ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Node file", err.Error())
+		log.Fatal("Cannot write the json Node file", err.Error())
 	}
 }
 
@@ -470,7 +497,7 @@ func (backRepoNode *BackRepoNodeStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Node")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -495,13 +522,13 @@ func (backRepoNode *BackRepoNodeStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Node"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoNode.rowVisitorNode)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -523,7 +550,7 @@ func (backRepoNode *BackRepoNodeStruct) rowVisitorNode(row *xlsx.Row) error {
 		nodeDB.ID = 0
 		query := backRepoNode.db.Create(nodeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoNode.Map_NodeDBID_NodeDB[nodeDB.ID] = nodeDB
 		BackRepoNodeid_atBckpTime_newID[nodeDB_ID_atBackupTime] = nodeDB.ID
@@ -543,7 +570,7 @@ func (backRepoNode *BackRepoNodeStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Node file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Node file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -560,14 +587,14 @@ func (backRepoNode *BackRepoNodeStruct) RestorePhaseOne(dirPath string) {
 		nodeDB.ID = 0
 		query := backRepoNode.db.Create(nodeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoNode.Map_NodeDBID_NodeDB[nodeDB.ID] = nodeDB
 		BackRepoNodeid_atBckpTime_newID[nodeDB_ID_atBackupTime] = nodeDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Node file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Node file", err.Error())
 	}
 }
 
@@ -590,7 +617,7 @@ func (backRepoNode *BackRepoNodeStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoNode.db.Model(nodeDB).Updates(*nodeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

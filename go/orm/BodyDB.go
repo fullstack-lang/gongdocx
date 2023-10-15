@@ -35,16 +35,22 @@ var dummy_Body_sort sort.Float64Slice
 type BodyAPI struct {
 	gorm.Model
 
-	models.Body
+	models.Body_WOP
 
 	// encoding of pointers
-	BodyPointersEnconding
+	BodyPointersEncoding
 }
 
-// BodyPointersEnconding encodes pointers to Struct and
+// BodyPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type BodyPointersEnconding struct {
+type BodyPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
+
+	// field Paragraphs is a slice of pointers to another Struct (optional or 0..1)
+	Paragraphs IntSlice`gorm:"type:TEXT"`
+
+	// field Tables is a slice of pointers to another Struct (optional or 0..1)
+	Tables IntSlice`gorm:"type:TEXT"`
 
 	// field LastParagraph is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
@@ -65,7 +71,7 @@ type BodyDB struct {
 	// Declation for basic field bodyDB.Name
 	Name_Data sql.NullString
 	// encoding of pointers
-	BodyPointersEnconding
+	BodyPointersEncoding
 }
 
 // BodyDBs arrays bodyDBs
@@ -154,7 +160,7 @@ func (backRepoBody *BackRepoBodyStruct) CommitDeleteInstance(id uint) (Error err
 	bodyDB := backRepoBody.Map_BodyDBID_BodyDB[id]
 	query := backRepoBody.db.Unscoped().Delete(&bodyDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -180,7 +186,7 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseOneInstance(body *models.Body
 
 	query := backRepoBody.db.Create(&bodyDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -231,6 +237,16 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// 1. reset
+		bodyDB.BodyPointersEncoding.Paragraphs = make([]int, 0)
+		// 2. encode
+		for _, paragraphAssocEnd := range body.Paragraphs {
+			paragraphAssocEnd_DB :=
+				backRepo.BackRepoParagraph.GetParagraphDBFromParagraphPtr(paragraphAssocEnd)
+			bodyDB.BodyPointersEncoding.Paragraphs =
+				append(bodyDB.BodyPointersEncoding.Paragraphs, int(paragraphAssocEnd_DB.ID))
+		}
+
 		// This loop encodes the slice of pointers body.Tables into the back repo.
 		// Each back repo instance at the end of the association encode the ID of the association start
 		// into a dedicated field for coding the association. The back repo instance is then saved to the db
@@ -250,6 +266,16 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// 1. reset
+		bodyDB.BodyPointersEncoding.Tables = make([]int, 0)
+		// 2. encode
+		for _, tableAssocEnd := range body.Tables {
+			tableAssocEnd_DB :=
+				backRepo.BackRepoTable.GetTableDBFromTablePtr(tableAssocEnd)
+			bodyDB.BodyPointersEncoding.Tables =
+				append(bodyDB.BodyPointersEncoding.Tables, int(tableAssocEnd_DB.ID))
+		}
+
 		// commit pointer value body.LastParagraph translates to updating the body.LastParagraphID
 		bodyDB.LastParagraphID.Valid = true // allow for a 0 value (nil association)
 		if body.LastParagraph != nil {
@@ -264,7 +290,7 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 
 		query := backRepoBody.db.Save(&bodyDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -450,7 +476,7 @@ func (backRepo *BackRepoStruct) CheckoutBody(body *models.Body) {
 			bodyDB.ID = id
 
 			if err := backRepo.BackRepoBody.db.First(&bodyDB, id).Error; err != nil {
-				log.Panicln("CheckoutBody : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutBody : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoBody.CheckoutPhaseOneInstance(&bodyDB)
 			backRepo.BackRepoBody.CheckoutPhaseTwoInstance(backRepo, &bodyDB)
@@ -460,6 +486,14 @@ func (backRepo *BackRepoStruct) CheckoutBody(body *models.Body) {
 
 // CopyBasicFieldsFromBody
 func (bodyDB *BodyDB) CopyBasicFieldsFromBody(body *models.Body) {
+	// insertion point for fields commit
+
+	bodyDB.Name_Data.String = body.Name
+	bodyDB.Name_Data.Valid = true
+}
+
+// CopyBasicFieldsFromBody_WOP
+func (bodyDB *BodyDB) CopyBasicFieldsFromBody_WOP(body *models.Body_WOP) {
 	// insertion point for fields commit
 
 	bodyDB.Name_Data.String = body.Name
@@ -476,6 +510,12 @@ func (bodyDB *BodyDB) CopyBasicFieldsFromBodyWOP(body *BodyWOP) {
 
 // CopyBasicFieldsToBody
 func (bodyDB *BodyDB) CopyBasicFieldsToBody(body *models.Body) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	body.Name = bodyDB.Name_Data.String
+}
+
+// CopyBasicFieldsToBody_WOP
+func (bodyDB *BodyDB) CopyBasicFieldsToBody_WOP(body *models.Body_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	body.Name = bodyDB.Name_Data.String
 }
@@ -506,12 +546,12 @@ func (backRepoBody *BackRepoBodyStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Body ", filename, " ", err.Error())
+		log.Fatal("Cannot json Body ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Body file", err.Error())
+		log.Fatal("Cannot write the json Body file", err.Error())
 	}
 }
 
@@ -531,7 +571,7 @@ func (backRepoBody *BackRepoBodyStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Body")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -556,13 +596,13 @@ func (backRepoBody *BackRepoBodyStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Body"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoBody.rowVisitorBody)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -584,7 +624,7 @@ func (backRepoBody *BackRepoBodyStruct) rowVisitorBody(row *xlsx.Row) error {
 		bodyDB.ID = 0
 		query := backRepoBody.db.Create(bodyDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoBody.Map_BodyDBID_BodyDB[bodyDB.ID] = bodyDB
 		BackRepoBodyid_atBckpTime_newID[bodyDB_ID_atBackupTime] = bodyDB.ID
@@ -604,7 +644,7 @@ func (backRepoBody *BackRepoBodyStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Body file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Body file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -621,14 +661,14 @@ func (backRepoBody *BackRepoBodyStruct) RestorePhaseOne(dirPath string) {
 		bodyDB.ID = 0
 		query := backRepoBody.db.Create(bodyDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoBody.Map_BodyDBID_BodyDB[bodyDB.ID] = bodyDB
 		BackRepoBodyid_atBckpTime_newID[bodyDB_ID_atBackupTime] = bodyDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Body file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Body file", err.Error())
 	}
 }
 
@@ -651,7 +691,7 @@ func (backRepoBody *BackRepoBodyStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoBody.db.Model(bodyDB).Updates(*bodyDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

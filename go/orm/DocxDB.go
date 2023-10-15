@@ -35,16 +35,19 @@ var dummy_Docx_sort sort.Float64Slice
 type DocxAPI struct {
 	gorm.Model
 
-	models.Docx
+	models.Docx_WOP
 
 	// encoding of pointers
-	DocxPointersEnconding
+	DocxPointersEncoding
 }
 
-// DocxPointersEnconding encodes pointers to Struct and
+// DocxPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type DocxPointersEnconding struct {
+type DocxPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
+
+	// field Files is a slice of pointers to another Struct (optional or 0..1)
+	Files IntSlice`gorm:"type:TEXT"`
 
 	// field Document is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
@@ -65,7 +68,7 @@ type DocxDB struct {
 	// Declation for basic field docxDB.Name
 	Name_Data sql.NullString
 	// encoding of pointers
-	DocxPointersEnconding
+	DocxPointersEncoding
 }
 
 // DocxDBs arrays docxDBs
@@ -154,7 +157,7 @@ func (backRepoDocx *BackRepoDocxStruct) CommitDeleteInstance(id uint) (Error err
 	docxDB := backRepoDocx.Map_DocxDBID_DocxDB[id]
 	query := backRepoDocx.db.Unscoped().Delete(&docxDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -180,7 +183,7 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseOneInstance(docx *models.Docx
 
 	query := backRepoDocx.db.Create(&docxDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -231,6 +234,16 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			}
 		}
 
+		// 1. reset
+		docxDB.DocxPointersEncoding.Files = make([]int, 0)
+		// 2. encode
+		for _, fileAssocEnd := range docx.Files {
+			fileAssocEnd_DB :=
+				backRepo.BackRepoFile.GetFileDBFromFilePtr(fileAssocEnd)
+			docxDB.DocxPointersEncoding.Files =
+				append(docxDB.DocxPointersEncoding.Files, int(fileAssocEnd_DB.ID))
+		}
+
 		// commit pointer value docx.Document translates to updating the docx.DocumentID
 		docxDB.DocumentID.Valid = true // allow for a 0 value (nil association)
 		if docx.Document != nil {
@@ -245,7 +258,7 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 
 		query := backRepoDocx.db.Save(&docxDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -404,7 +417,7 @@ func (backRepo *BackRepoStruct) CheckoutDocx(docx *models.Docx) {
 			docxDB.ID = id
 
 			if err := backRepo.BackRepoDocx.db.First(&docxDB, id).Error; err != nil {
-				log.Panicln("CheckoutDocx : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutDocx : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoDocx.CheckoutPhaseOneInstance(&docxDB)
 			backRepo.BackRepoDocx.CheckoutPhaseTwoInstance(backRepo, &docxDB)
@@ -414,6 +427,14 @@ func (backRepo *BackRepoStruct) CheckoutDocx(docx *models.Docx) {
 
 // CopyBasicFieldsFromDocx
 func (docxDB *DocxDB) CopyBasicFieldsFromDocx(docx *models.Docx) {
+	// insertion point for fields commit
+
+	docxDB.Name_Data.String = docx.Name
+	docxDB.Name_Data.Valid = true
+}
+
+// CopyBasicFieldsFromDocx_WOP
+func (docxDB *DocxDB) CopyBasicFieldsFromDocx_WOP(docx *models.Docx_WOP) {
 	// insertion point for fields commit
 
 	docxDB.Name_Data.String = docx.Name
@@ -430,6 +451,12 @@ func (docxDB *DocxDB) CopyBasicFieldsFromDocxWOP(docx *DocxWOP) {
 
 // CopyBasicFieldsToDocx
 func (docxDB *DocxDB) CopyBasicFieldsToDocx(docx *models.Docx) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	docx.Name = docxDB.Name_Data.String
+}
+
+// CopyBasicFieldsToDocx_WOP
+func (docxDB *DocxDB) CopyBasicFieldsToDocx_WOP(docx *models.Docx_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	docx.Name = docxDB.Name_Data.String
 }
@@ -460,12 +487,12 @@ func (backRepoDocx *BackRepoDocxStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Docx ", filename, " ", err.Error())
+		log.Fatal("Cannot json Docx ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Docx file", err.Error())
+		log.Fatal("Cannot write the json Docx file", err.Error())
 	}
 }
 
@@ -485,7 +512,7 @@ func (backRepoDocx *BackRepoDocxStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Docx")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -510,13 +537,13 @@ func (backRepoDocx *BackRepoDocxStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Docx"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoDocx.rowVisitorDocx)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -538,7 +565,7 @@ func (backRepoDocx *BackRepoDocxStruct) rowVisitorDocx(row *xlsx.Row) error {
 		docxDB.ID = 0
 		query := backRepoDocx.db.Create(docxDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoDocx.Map_DocxDBID_DocxDB[docxDB.ID] = docxDB
 		BackRepoDocxid_atBckpTime_newID[docxDB_ID_atBackupTime] = docxDB.ID
@@ -558,7 +585,7 @@ func (backRepoDocx *BackRepoDocxStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Docx file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Docx file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -575,14 +602,14 @@ func (backRepoDocx *BackRepoDocxStruct) RestorePhaseOne(dirPath string) {
 		docxDB.ID = 0
 		query := backRepoDocx.db.Create(docxDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoDocx.Map_DocxDBID_DocxDB[docxDB.ID] = docxDB
 		BackRepoDocxid_atBckpTime_newID[docxDB_ID_atBackupTime] = docxDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Docx file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Docx file", err.Error())
 	}
 }
 
@@ -605,7 +632,7 @@ func (backRepoDocx *BackRepoDocxStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoDocx.db.Model(docxDB).Updates(*docxDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

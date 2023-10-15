@@ -91,8 +91,8 @@ func (controller *Controller) GetTableStyles(c *gin.Context) {
 
 		// insertion point for updating fields
 		tablestyleAPI.ID = tablestyleDB.ID
-		tablestyleDB.CopyBasicFieldsToTableStyle(&tablestyleAPI.TableStyle)
-		tablestyleAPI.TableStylePointersEnconding = tablestyleDB.TableStylePointersEnconding
+		tablestyleDB.CopyBasicFieldsToTableStyle_WOP(&tablestyleAPI.TableStyle_WOP)
+		tablestyleAPI.TableStylePointersEncoding = tablestyleDB.TableStylePointersEncoding
 		tablestyleAPIs = append(tablestyleAPIs, tablestyleAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostTableStyle(c *gin.Context) {
 
 	// Create tablestyle
 	tablestyleDB := orm.TableStyleDB{}
-	tablestyleDB.TableStylePointersEnconding = input.TableStylePointersEnconding
-	tablestyleDB.CopyBasicFieldsFromTableStyle(&input.TableStyle)
+	tablestyleDB.TableStylePointersEncoding = input.TableStylePointersEncoding
+	tablestyleDB.CopyBasicFieldsFromTableStyle_WOP(&input.TableStyle_WOP)
 
 	query := db.Create(&tablestyleDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetTableStyle(c *gin.Context) {
 
 	var tablestyleAPI orm.TableStyleAPI
 	tablestyleAPI.ID = tablestyleDB.ID
-	tablestyleAPI.TableStylePointersEnconding = tablestyleDB.TableStylePointersEnconding
-	tablestyleDB.CopyBasicFieldsToTableStyle(&tablestyleAPI.TableStyle)
+	tablestyleAPI.TableStylePointersEncoding = tablestyleDB.TableStylePointersEncoding
+	tablestyleDB.CopyBasicFieldsToTableStyle_WOP(&tablestyleAPI.TableStyle_WOP)
 
 	c.JSON(http.StatusOK, tablestyleAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 	}
 
 	// update
-	tablestyleDB.CopyBasicFieldsFromTableStyle(&input.TableStyle)
-	tablestyleDB.TableStylePointersEnconding = input.TableStylePointersEnconding
+	tablestyleDB.CopyBasicFieldsFromTableStyle_WOP(&input.TableStyle_WOP)
+	tablestyleDB.TableStylePointersEncoding = input.TableStylePointersEncoding
 
 	query = db.Model(&tablestyleDB).Updates(tablestyleDB)
 	if query.Error != nil {

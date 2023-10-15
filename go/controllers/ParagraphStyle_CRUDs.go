@@ -91,8 +91,8 @@ func (controller *Controller) GetParagraphStyles(c *gin.Context) {
 
 		// insertion point for updating fields
 		paragraphstyleAPI.ID = paragraphstyleDB.ID
-		paragraphstyleDB.CopyBasicFieldsToParagraphStyle(&paragraphstyleAPI.ParagraphStyle)
-		paragraphstyleAPI.ParagraphStylePointersEnconding = paragraphstyleDB.ParagraphStylePointersEnconding
+		paragraphstyleDB.CopyBasicFieldsToParagraphStyle_WOP(&paragraphstyleAPI.ParagraphStyle_WOP)
+		paragraphstyleAPI.ParagraphStylePointersEncoding = paragraphstyleDB.ParagraphStylePointersEncoding
 		paragraphstyleAPIs = append(paragraphstyleAPIs, paragraphstyleAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostParagraphStyle(c *gin.Context) {
 
 	// Create paragraphstyle
 	paragraphstyleDB := orm.ParagraphStyleDB{}
-	paragraphstyleDB.ParagraphStylePointersEnconding = input.ParagraphStylePointersEnconding
-	paragraphstyleDB.CopyBasicFieldsFromParagraphStyle(&input.ParagraphStyle)
+	paragraphstyleDB.ParagraphStylePointersEncoding = input.ParagraphStylePointersEncoding
+	paragraphstyleDB.CopyBasicFieldsFromParagraphStyle_WOP(&input.ParagraphStyle_WOP)
 
 	query := db.Create(&paragraphstyleDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetParagraphStyle(c *gin.Context) {
 
 	var paragraphstyleAPI orm.ParagraphStyleAPI
 	paragraphstyleAPI.ID = paragraphstyleDB.ID
-	paragraphstyleAPI.ParagraphStylePointersEnconding = paragraphstyleDB.ParagraphStylePointersEnconding
-	paragraphstyleDB.CopyBasicFieldsToParagraphStyle(&paragraphstyleAPI.ParagraphStyle)
+	paragraphstyleAPI.ParagraphStylePointersEncoding = paragraphstyleDB.ParagraphStylePointersEncoding
+	paragraphstyleDB.CopyBasicFieldsToParagraphStyle_WOP(&paragraphstyleAPI.ParagraphStyle_WOP)
 
 	c.JSON(http.StatusOK, paragraphstyleAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 	}
 
 	// update
-	paragraphstyleDB.CopyBasicFieldsFromParagraphStyle(&input.ParagraphStyle)
-	paragraphstyleDB.ParagraphStylePointersEnconding = input.ParagraphStylePointersEnconding
+	paragraphstyleDB.CopyBasicFieldsFromParagraphStyle_WOP(&input.ParagraphStyle_WOP)
+	paragraphstyleDB.ParagraphStylePointersEncoding = input.ParagraphStylePointersEncoding
 
 	query = db.Model(&paragraphstyleDB).Updates(paragraphstyleDB)
 	if query.Error != nil {

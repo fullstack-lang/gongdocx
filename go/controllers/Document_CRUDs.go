@@ -91,8 +91,8 @@ func (controller *Controller) GetDocuments(c *gin.Context) {
 
 		// insertion point for updating fields
 		documentAPI.ID = documentDB.ID
-		documentDB.CopyBasicFieldsToDocument(&documentAPI.Document)
-		documentAPI.DocumentPointersEnconding = documentDB.DocumentPointersEnconding
+		documentDB.CopyBasicFieldsToDocument_WOP(&documentAPI.Document_WOP)
+		documentAPI.DocumentPointersEncoding = documentDB.DocumentPointersEncoding
 		documentAPIs = append(documentAPIs, documentAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostDocument(c *gin.Context) {
 
 	// Create document
 	documentDB := orm.DocumentDB{}
-	documentDB.DocumentPointersEnconding = input.DocumentPointersEnconding
-	documentDB.CopyBasicFieldsFromDocument(&input.Document)
+	documentDB.DocumentPointersEncoding = input.DocumentPointersEncoding
+	documentDB.CopyBasicFieldsFromDocument_WOP(&input.Document_WOP)
 
 	query := db.Create(&documentDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetDocument(c *gin.Context) {
 
 	var documentAPI orm.DocumentAPI
 	documentAPI.ID = documentDB.ID
-	documentAPI.DocumentPointersEnconding = documentDB.DocumentPointersEnconding
-	documentDB.CopyBasicFieldsToDocument(&documentAPI.Document)
+	documentAPI.DocumentPointersEncoding = documentDB.DocumentPointersEncoding
+	documentDB.CopyBasicFieldsToDocument_WOP(&documentAPI.Document_WOP)
 
 	c.JSON(http.StatusOK, documentAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateDocument(c *gin.Context) {
 	}
 
 	// update
-	documentDB.CopyBasicFieldsFromDocument(&input.Document)
-	documentDB.DocumentPointersEnconding = input.DocumentPointersEnconding
+	documentDB.CopyBasicFieldsFromDocument_WOP(&input.Document_WOP)
+	documentDB.DocumentPointersEncoding = input.DocumentPointersEncoding
 
 	query = db.Model(&documentDB).Updates(documentDB)
 	if query.Error != nil {

@@ -35,15 +35,15 @@ var dummy_TableProperties_sort sort.Float64Slice
 type TablePropertiesAPI struct {
 	gorm.Model
 
-	models.TableProperties
+	models.TableProperties_WOP
 
 	// encoding of pointers
-	TablePropertiesPointersEnconding
+	TablePropertiesPointersEncoding
 }
 
-// TablePropertiesPointersEnconding encodes pointers to Struct and
+// TablePropertiesPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type TablePropertiesPointersEnconding struct {
+type TablePropertiesPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Node is a pointer to another Struct (optional or 0..1)
@@ -72,7 +72,7 @@ type TablePropertiesDB struct {
 	// Declation for basic field tablepropertiesDB.Content
 	Content_Data sql.NullString
 	// encoding of pointers
-	TablePropertiesPointersEnconding
+	TablePropertiesPointersEncoding
 }
 
 // TablePropertiesDBs arrays tablepropertiesDBs
@@ -164,7 +164,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitDeleteInstan
 	tablepropertiesDB := backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[id]
 	query := backRepoTableProperties.db.Unscoped().Delete(&tablepropertiesDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -190,7 +190,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseOneInst
 
 	query := backRepoTableProperties.db.Create(&tablepropertiesDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -248,7 +248,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseTwoInst
 
 		query := backRepoTableProperties.db.Save(&tablepropertiesDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -385,7 +385,7 @@ func (backRepo *BackRepoStruct) CheckoutTableProperties(tableproperties *models.
 			tablepropertiesDB.ID = id
 
 			if err := backRepo.BackRepoTableProperties.db.First(&tablepropertiesDB, id).Error; err != nil {
-				log.Panicln("CheckoutTableProperties : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutTableProperties : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTableProperties.CheckoutPhaseOneInstance(&tablepropertiesDB)
 			backRepo.BackRepoTableProperties.CheckoutPhaseTwoInstance(backRepo, &tablepropertiesDB)
@@ -395,6 +395,17 @@ func (backRepo *BackRepoStruct) CheckoutTableProperties(tableproperties *models.
 
 // CopyBasicFieldsFromTableProperties
 func (tablepropertiesDB *TablePropertiesDB) CopyBasicFieldsFromTableProperties(tableproperties *models.TableProperties) {
+	// insertion point for fields commit
+
+	tablepropertiesDB.Name_Data.String = tableproperties.Name
+	tablepropertiesDB.Name_Data.Valid = true
+
+	tablepropertiesDB.Content_Data.String = tableproperties.Content
+	tablepropertiesDB.Content_Data.Valid = true
+}
+
+// CopyBasicFieldsFromTableProperties_WOP
+func (tablepropertiesDB *TablePropertiesDB) CopyBasicFieldsFromTableProperties_WOP(tableproperties *models.TableProperties_WOP) {
 	// insertion point for fields commit
 
 	tablepropertiesDB.Name_Data.String = tableproperties.Name
@@ -417,6 +428,13 @@ func (tablepropertiesDB *TablePropertiesDB) CopyBasicFieldsFromTablePropertiesWO
 
 // CopyBasicFieldsToTableProperties
 func (tablepropertiesDB *TablePropertiesDB) CopyBasicFieldsToTableProperties(tableproperties *models.TableProperties) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	tableproperties.Name = tablepropertiesDB.Name_Data.String
+	tableproperties.Content = tablepropertiesDB.Content_Data.String
+}
+
+// CopyBasicFieldsToTableProperties_WOP
+func (tablepropertiesDB *TablePropertiesDB) CopyBasicFieldsToTableProperties_WOP(tableproperties *models.TableProperties_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	tableproperties.Name = tablepropertiesDB.Name_Data.String
 	tableproperties.Content = tablepropertiesDB.Content_Data.String
@@ -449,12 +467,12 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) Backup(dirPath str
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json TableProperties ", filename, " ", err.Error())
+		log.Fatal("Cannot json TableProperties ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json TableProperties file", err.Error())
+		log.Fatal("Cannot write the json TableProperties file", err.Error())
 	}
 }
 
@@ -474,7 +492,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) BackupXL(file *xls
 
 	sh, err := file.AddSheet("TableProperties")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -499,13 +517,13 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) RestoreXLPhaseOne(
 	sh, ok := file.Sheet["TableProperties"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoTableProperties.rowVisitorTableProperties)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -527,7 +545,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) rowVisitorTablePro
 		tablepropertiesDB.ID = 0
 		query := backRepoTableProperties.db.Create(tablepropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[tablepropertiesDB.ID] = tablepropertiesDB
 		BackRepoTablePropertiesid_atBckpTime_newID[tablepropertiesDB_ID_atBackupTime] = tablepropertiesDB.ID
@@ -547,7 +565,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) RestorePhaseOne(di
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json TableProperties file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json TableProperties file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -564,14 +582,14 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) RestorePhaseOne(di
 		tablepropertiesDB.ID = 0
 		query := backRepoTableProperties.db.Create(tablepropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[tablepropertiesDB.ID] = tablepropertiesDB
 		BackRepoTablePropertiesid_atBckpTime_newID[tablepropertiesDB_ID_atBackupTime] = tablepropertiesDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json TableProperties file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json TableProperties file", err.Error())
 	}
 }
 
@@ -600,7 +618,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) RestorePhaseTwo() 
 		// update databse with new index encoding
 		query := backRepoTableProperties.db.Model(tablepropertiesDB).Updates(*tablepropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

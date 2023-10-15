@@ -91,8 +91,8 @@ func (controller *Controller) GetRunePropertiess(c *gin.Context) {
 
 		// insertion point for updating fields
 		runepropertiesAPI.ID = runepropertiesDB.ID
-		runepropertiesDB.CopyBasicFieldsToRuneProperties(&runepropertiesAPI.RuneProperties)
-		runepropertiesAPI.RunePropertiesPointersEnconding = runepropertiesDB.RunePropertiesPointersEnconding
+		runepropertiesDB.CopyBasicFieldsToRuneProperties_WOP(&runepropertiesAPI.RuneProperties_WOP)
+		runepropertiesAPI.RunePropertiesPointersEncoding = runepropertiesDB.RunePropertiesPointersEncoding
 		runepropertiesAPIs = append(runepropertiesAPIs, runepropertiesAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostRuneProperties(c *gin.Context) {
 
 	// Create runeproperties
 	runepropertiesDB := orm.RunePropertiesDB{}
-	runepropertiesDB.RunePropertiesPointersEnconding = input.RunePropertiesPointersEnconding
-	runepropertiesDB.CopyBasicFieldsFromRuneProperties(&input.RuneProperties)
+	runepropertiesDB.RunePropertiesPointersEncoding = input.RunePropertiesPointersEncoding
+	runepropertiesDB.CopyBasicFieldsFromRuneProperties_WOP(&input.RuneProperties_WOP)
 
 	query := db.Create(&runepropertiesDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetRuneProperties(c *gin.Context) {
 
 	var runepropertiesAPI orm.RunePropertiesAPI
 	runepropertiesAPI.ID = runepropertiesDB.ID
-	runepropertiesAPI.RunePropertiesPointersEnconding = runepropertiesDB.RunePropertiesPointersEnconding
-	runepropertiesDB.CopyBasicFieldsToRuneProperties(&runepropertiesAPI.RuneProperties)
+	runepropertiesAPI.RunePropertiesPointersEncoding = runepropertiesDB.RunePropertiesPointersEncoding
+	runepropertiesDB.CopyBasicFieldsToRuneProperties_WOP(&runepropertiesAPI.RuneProperties_WOP)
 
 	c.JSON(http.StatusOK, runepropertiesAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 	}
 
 	// update
-	runepropertiesDB.CopyBasicFieldsFromRuneProperties(&input.RuneProperties)
-	runepropertiesDB.RunePropertiesPointersEnconding = input.RunePropertiesPointersEnconding
+	runepropertiesDB.CopyBasicFieldsFromRuneProperties_WOP(&input.RuneProperties_WOP)
+	runepropertiesDB.RunePropertiesPointersEncoding = input.RunePropertiesPointersEncoding
 
 	query = db.Model(&runepropertiesDB).Updates(runepropertiesDB)
 	if query.Error != nil {

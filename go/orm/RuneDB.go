@@ -35,15 +35,15 @@ var dummy_Rune_sort sort.Float64Slice
 type RuneAPI struct {
 	gorm.Model
 
-	models.Rune
+	models.Rune_WOP
 
 	// encoding of pointers
-	RunePointersEnconding
+	RunePointersEncoding
 }
 
-// RunePointersEnconding encodes pointers to Struct and
+// RunePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type RunePointersEnconding struct {
+type RunePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Node is a pointer to another Struct (optional or 0..1)
@@ -86,7 +86,7 @@ type RuneDB struct {
 	// Declation for basic field runeDB.Content
 	Content_Data sql.NullString
 	// encoding of pointers
-	RunePointersEnconding
+	RunePointersEncoding
 }
 
 // RuneDBs arrays runeDBs
@@ -178,7 +178,7 @@ func (backRepoRune *BackRepoRuneStruct) CommitDeleteInstance(id uint) (Error err
 	runeDB := backRepoRune.Map_RuneDBID_RuneDB[id]
 	query := backRepoRune.db.Unscoped().Delete(&runeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -204,7 +204,7 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseOneInstance(rune *models.Rune
 
 	query := backRepoRune.db.Create(&runeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -286,7 +286,7 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 
 		query := backRepoRune.db.Save(&runeDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -433,7 +433,7 @@ func (backRepo *BackRepoStruct) CheckoutRune(rune *models.Rune) {
 			runeDB.ID = id
 
 			if err := backRepo.BackRepoRune.db.First(&runeDB, id).Error; err != nil {
-				log.Panicln("CheckoutRune : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutRune : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoRune.CheckoutPhaseOneInstance(&runeDB)
 			backRepo.BackRepoRune.CheckoutPhaseTwoInstance(backRepo, &runeDB)
@@ -443,6 +443,17 @@ func (backRepo *BackRepoStruct) CheckoutRune(rune *models.Rune) {
 
 // CopyBasicFieldsFromRune
 func (runeDB *RuneDB) CopyBasicFieldsFromRune(rune *models.Rune) {
+	// insertion point for fields commit
+
+	runeDB.Name_Data.String = rune.Name
+	runeDB.Name_Data.Valid = true
+
+	runeDB.Content_Data.String = rune.Content
+	runeDB.Content_Data.Valid = true
+}
+
+// CopyBasicFieldsFromRune_WOP
+func (runeDB *RuneDB) CopyBasicFieldsFromRune_WOP(rune *models.Rune_WOP) {
 	// insertion point for fields commit
 
 	runeDB.Name_Data.String = rune.Name
@@ -465,6 +476,13 @@ func (runeDB *RuneDB) CopyBasicFieldsFromRuneWOP(rune *RuneWOP) {
 
 // CopyBasicFieldsToRune
 func (runeDB *RuneDB) CopyBasicFieldsToRune(rune *models.Rune) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	rune.Name = runeDB.Name_Data.String
+	rune.Content = runeDB.Content_Data.String
+}
+
+// CopyBasicFieldsToRune_WOP
+func (runeDB *RuneDB) CopyBasicFieldsToRune_WOP(rune *models.Rune_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	rune.Name = runeDB.Name_Data.String
 	rune.Content = runeDB.Content_Data.String
@@ -497,12 +515,12 @@ func (backRepoRune *BackRepoRuneStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Rune ", filename, " ", err.Error())
+		log.Fatal("Cannot json Rune ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Rune file", err.Error())
+		log.Fatal("Cannot write the json Rune file", err.Error())
 	}
 }
 
@@ -522,7 +540,7 @@ func (backRepoRune *BackRepoRuneStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Rune")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -547,13 +565,13 @@ func (backRepoRune *BackRepoRuneStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Rune"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoRune.rowVisitorRune)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -575,7 +593,7 @@ func (backRepoRune *BackRepoRuneStruct) rowVisitorRune(row *xlsx.Row) error {
 		runeDB.ID = 0
 		query := backRepoRune.db.Create(runeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRune.Map_RuneDBID_RuneDB[runeDB.ID] = runeDB
 		BackRepoRuneid_atBckpTime_newID[runeDB_ID_atBackupTime] = runeDB.ID
@@ -595,7 +613,7 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Rune file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Rune file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -612,14 +630,14 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseOne(dirPath string) {
 		runeDB.ID = 0
 		query := backRepoRune.db.Create(runeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRune.Map_RuneDBID_RuneDB[runeDB.ID] = runeDB
 		BackRepoRuneid_atBckpTime_newID[runeDB_ID_atBackupTime] = runeDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Rune file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Rune file", err.Error())
 	}
 }
 
@@ -666,7 +684,7 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoRune.db.Model(runeDB).Updates(*runeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

@@ -35,15 +35,15 @@ var dummy_ParagraphProperties_sort sort.Float64Slice
 type ParagraphPropertiesAPI struct {
 	gorm.Model
 
-	models.ParagraphProperties
+	models.ParagraphProperties_WOP
 
 	// encoding of pointers
-	ParagraphPropertiesPointersEnconding
+	ParagraphPropertiesPointersEncoding
 }
 
-// ParagraphPropertiesPointersEnconding encodes pointers to Struct and
+// ParagraphPropertiesPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type ParagraphPropertiesPointersEnconding struct {
+type ParagraphPropertiesPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field ParagraphStyle is a pointer to another Struct (optional or 0..1)
@@ -72,7 +72,7 @@ type ParagraphPropertiesDB struct {
 	// Declation for basic field paragraphpropertiesDB.Content
 	Content_Data sql.NullString
 	// encoding of pointers
-	ParagraphPropertiesPointersEnconding
+	ParagraphPropertiesPointersEncoding
 }
 
 // ParagraphPropertiesDBs arrays paragraphpropertiesDBs
@@ -164,7 +164,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitDele
 	paragraphpropertiesDB := backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[id]
 	query := backRepoParagraphProperties.db.Unscoped().Delete(&paragraphpropertiesDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -190,7 +190,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 
 	query := backRepoParagraphProperties.db.Create(&paragraphpropertiesDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -248,7 +248,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 
 		query := backRepoParagraphProperties.db.Save(&paragraphpropertiesDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -385,7 +385,7 @@ func (backRepo *BackRepoStruct) CheckoutParagraphProperties(paragraphproperties 
 			paragraphpropertiesDB.ID = id
 
 			if err := backRepo.BackRepoParagraphProperties.db.First(&paragraphpropertiesDB, id).Error; err != nil {
-				log.Panicln("CheckoutParagraphProperties : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutParagraphProperties : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoParagraphProperties.CheckoutPhaseOneInstance(&paragraphpropertiesDB)
 			backRepo.BackRepoParagraphProperties.CheckoutPhaseTwoInstance(backRepo, &paragraphpropertiesDB)
@@ -395,6 +395,17 @@ func (backRepo *BackRepoStruct) CheckoutParagraphProperties(paragraphproperties 
 
 // CopyBasicFieldsFromParagraphProperties
 func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsFromParagraphProperties(paragraphproperties *models.ParagraphProperties) {
+	// insertion point for fields commit
+
+	paragraphpropertiesDB.Name_Data.String = paragraphproperties.Name
+	paragraphpropertiesDB.Name_Data.Valid = true
+
+	paragraphpropertiesDB.Content_Data.String = paragraphproperties.Content
+	paragraphpropertiesDB.Content_Data.Valid = true
+}
+
+// CopyBasicFieldsFromParagraphProperties_WOP
+func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsFromParagraphProperties_WOP(paragraphproperties *models.ParagraphProperties_WOP) {
 	// insertion point for fields commit
 
 	paragraphpropertiesDB.Name_Data.String = paragraphproperties.Name
@@ -417,6 +428,13 @@ func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsFromParagraph
 
 // CopyBasicFieldsToParagraphProperties
 func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsToParagraphProperties(paragraphproperties *models.ParagraphProperties) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	paragraphproperties.Name = paragraphpropertiesDB.Name_Data.String
+	paragraphproperties.Content = paragraphpropertiesDB.Content_Data.String
+}
+
+// CopyBasicFieldsToParagraphProperties_WOP
+func (paragraphpropertiesDB *ParagraphPropertiesDB) CopyBasicFieldsToParagraphProperties_WOP(paragraphproperties *models.ParagraphProperties_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	paragraphproperties.Name = paragraphpropertiesDB.Name_Data.String
 	paragraphproperties.Content = paragraphpropertiesDB.Content_Data.String
@@ -449,12 +467,12 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) Backup(dir
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json ParagraphProperties ", filename, " ", err.Error())
+		log.Fatal("Cannot json ParagraphProperties ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json ParagraphProperties file", err.Error())
+		log.Fatal("Cannot write the json ParagraphProperties file", err.Error())
 	}
 }
 
@@ -474,7 +492,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) BackupXL(f
 
 	sh, err := file.AddSheet("ParagraphProperties")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -499,13 +517,13 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestoreXLP
 	sh, ok := file.Sheet["ParagraphProperties"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoParagraphProperties.rowVisitorParagraphProperties)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -527,7 +545,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) rowVisitor
 		paragraphpropertiesDB.ID = 0
 		query := backRepoParagraphProperties.db.Create(paragraphpropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[paragraphpropertiesDB.ID] = paragraphpropertiesDB
 		BackRepoParagraphPropertiesid_atBckpTime_newID[paragraphpropertiesDB_ID_atBackupTime] = paragraphpropertiesDB.ID
@@ -547,7 +565,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestorePha
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json ParagraphProperties file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json ParagraphProperties file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -564,14 +582,14 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestorePha
 		paragraphpropertiesDB.ID = 0
 		query := backRepoParagraphProperties.db.Create(paragraphpropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[paragraphpropertiesDB.ID] = paragraphpropertiesDB
 		BackRepoParagraphPropertiesid_atBckpTime_newID[paragraphpropertiesDB_ID_atBackupTime] = paragraphpropertiesDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json ParagraphProperties file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json ParagraphProperties file", err.Error())
 	}
 }
 
@@ -600,7 +618,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestorePha
 		// update databse with new index encoding
 		query := backRepoParagraphProperties.db.Model(paragraphpropertiesDB).Updates(*paragraphpropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

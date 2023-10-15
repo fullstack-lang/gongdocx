@@ -91,8 +91,8 @@ func (controller *Controller) GetTablePropertiess(c *gin.Context) {
 
 		// insertion point for updating fields
 		tablepropertiesAPI.ID = tablepropertiesDB.ID
-		tablepropertiesDB.CopyBasicFieldsToTableProperties(&tablepropertiesAPI.TableProperties)
-		tablepropertiesAPI.TablePropertiesPointersEnconding = tablepropertiesDB.TablePropertiesPointersEnconding
+		tablepropertiesDB.CopyBasicFieldsToTableProperties_WOP(&tablepropertiesAPI.TableProperties_WOP)
+		tablepropertiesAPI.TablePropertiesPointersEncoding = tablepropertiesDB.TablePropertiesPointersEncoding
 		tablepropertiesAPIs = append(tablepropertiesAPIs, tablepropertiesAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostTableProperties(c *gin.Context) {
 
 	// Create tableproperties
 	tablepropertiesDB := orm.TablePropertiesDB{}
-	tablepropertiesDB.TablePropertiesPointersEnconding = input.TablePropertiesPointersEnconding
-	tablepropertiesDB.CopyBasicFieldsFromTableProperties(&input.TableProperties)
+	tablepropertiesDB.TablePropertiesPointersEncoding = input.TablePropertiesPointersEncoding
+	tablepropertiesDB.CopyBasicFieldsFromTableProperties_WOP(&input.TableProperties_WOP)
 
 	query := db.Create(&tablepropertiesDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetTableProperties(c *gin.Context) {
 
 	var tablepropertiesAPI orm.TablePropertiesAPI
 	tablepropertiesAPI.ID = tablepropertiesDB.ID
-	tablepropertiesAPI.TablePropertiesPointersEnconding = tablepropertiesDB.TablePropertiesPointersEnconding
-	tablepropertiesDB.CopyBasicFieldsToTableProperties(&tablepropertiesAPI.TableProperties)
+	tablepropertiesAPI.TablePropertiesPointersEncoding = tablepropertiesDB.TablePropertiesPointersEncoding
+	tablepropertiesDB.CopyBasicFieldsToTableProperties_WOP(&tablepropertiesAPI.TableProperties_WOP)
 
 	c.JSON(http.StatusOK, tablepropertiesAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 	}
 
 	// update
-	tablepropertiesDB.CopyBasicFieldsFromTableProperties(&input.TableProperties)
-	tablepropertiesDB.TablePropertiesPointersEnconding = input.TablePropertiesPointersEnconding
+	tablepropertiesDB.CopyBasicFieldsFromTableProperties_WOP(&input.TableProperties_WOP)
+	tablepropertiesDB.TablePropertiesPointersEncoding = input.TablePropertiesPointersEncoding
 
 	query = db.Model(&tablepropertiesDB).Updates(tablepropertiesDB)
 	if query.Error != nil {

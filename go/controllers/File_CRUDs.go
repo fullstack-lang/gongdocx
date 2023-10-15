@@ -91,8 +91,8 @@ func (controller *Controller) GetFiles(c *gin.Context) {
 
 		// insertion point for updating fields
 		fileAPI.ID = fileDB.ID
-		fileDB.CopyBasicFieldsToFile(&fileAPI.File)
-		fileAPI.FilePointersEnconding = fileDB.FilePointersEnconding
+		fileDB.CopyBasicFieldsToFile_WOP(&fileAPI.File_WOP)
+		fileAPI.FilePointersEncoding = fileDB.FilePointersEncoding
 		fileAPIs = append(fileAPIs, fileAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostFile(c *gin.Context) {
 
 	// Create file
 	fileDB := orm.FileDB{}
-	fileDB.FilePointersEnconding = input.FilePointersEnconding
-	fileDB.CopyBasicFieldsFromFile(&input.File)
+	fileDB.FilePointersEncoding = input.FilePointersEncoding
+	fileDB.CopyBasicFieldsFromFile_WOP(&input.File_WOP)
 
 	query := db.Create(&fileDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetFile(c *gin.Context) {
 
 	var fileAPI orm.FileAPI
 	fileAPI.ID = fileDB.ID
-	fileAPI.FilePointersEnconding = fileDB.FilePointersEnconding
-	fileDB.CopyBasicFieldsToFile(&fileAPI.File)
+	fileAPI.FilePointersEncoding = fileDB.FilePointersEncoding
+	fileDB.CopyBasicFieldsToFile_WOP(&fileAPI.File_WOP)
 
 	c.JSON(http.StatusOK, fileAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 	}
 
 	// update
-	fileDB.CopyBasicFieldsFromFile(&input.File)
-	fileDB.FilePointersEnconding = input.FilePointersEnconding
+	fileDB.CopyBasicFieldsFromFile_WOP(&input.File_WOP)
+	fileDB.FilePointersEncoding = input.FilePointersEncoding
 
 	query = db.Model(&fileDB).Updates(fileDB)
 	if query.Error != nil {

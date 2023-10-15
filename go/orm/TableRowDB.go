@@ -35,20 +35,23 @@ var dummy_TableRow_sort sort.Float64Slice
 type TableRowAPI struct {
 	gorm.Model
 
-	models.TableRow
+	models.TableRow_WOP
 
 	// encoding of pointers
-	TableRowPointersEnconding
+	TableRowPointersEncoding
 }
 
-// TableRowPointersEnconding encodes pointers to Struct and
+// TableRowPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type TableRowPointersEnconding struct {
+type TableRowPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Node is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	NodeID sql.NullInt64
+
+	// field TableColumns is a slice of pointers to another Struct (optional or 0..1)
+	TableColumns IntSlice`gorm:"type:TEXT"`
 
 	// Implementation of a reverse ID for field Table{}.TableRows []*TableRow
 	Table_TableRowsDBID sql.NullInt64
@@ -74,7 +77,7 @@ type TableRowDB struct {
 	// Declation for basic field tablerowDB.Content
 	Content_Data sql.NullString
 	// encoding of pointers
-	TableRowPointersEnconding
+	TableRowPointersEncoding
 }
 
 // TableRowDBs arrays tablerowDBs
@@ -166,7 +169,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitDeleteInstance(id uint) (E
 	tablerowDB := backRepoTableRow.Map_TableRowDBID_TableRowDB[id]
 	query := backRepoTableRow.db.Unscoped().Delete(&tablerowDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -192,7 +195,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseOneInstance(tablerow 
 
 	query := backRepoTableRow.db.Create(&tablerowDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -255,9 +258,19 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseTwoInstance(backRepo 
 			}
 		}
 
+		// 1. reset
+		tablerowDB.TableRowPointersEncoding.TableColumns = make([]int, 0)
+		// 2. encode
+		for _, tablecolumnAssocEnd := range tablerow.TableColumns {
+			tablecolumnAssocEnd_DB :=
+				backRepo.BackRepoTableColumn.GetTableColumnDBFromTableColumnPtr(tablecolumnAssocEnd)
+			tablerowDB.TableRowPointersEncoding.TableColumns =
+				append(tablerowDB.TableRowPointersEncoding.TableColumns, int(tablecolumnAssocEnd_DB.ID))
+		}
+
 		query := backRepoTableRow.db.Save(&tablerowDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -416,7 +429,7 @@ func (backRepo *BackRepoStruct) CheckoutTableRow(tablerow *models.TableRow) {
 			tablerowDB.ID = id
 
 			if err := backRepo.BackRepoTableRow.db.First(&tablerowDB, id).Error; err != nil {
-				log.Panicln("CheckoutTableRow : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutTableRow : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTableRow.CheckoutPhaseOneInstance(&tablerowDB)
 			backRepo.BackRepoTableRow.CheckoutPhaseTwoInstance(backRepo, &tablerowDB)
@@ -426,6 +439,17 @@ func (backRepo *BackRepoStruct) CheckoutTableRow(tablerow *models.TableRow) {
 
 // CopyBasicFieldsFromTableRow
 func (tablerowDB *TableRowDB) CopyBasicFieldsFromTableRow(tablerow *models.TableRow) {
+	// insertion point for fields commit
+
+	tablerowDB.Name_Data.String = tablerow.Name
+	tablerowDB.Name_Data.Valid = true
+
+	tablerowDB.Content_Data.String = tablerow.Content
+	tablerowDB.Content_Data.Valid = true
+}
+
+// CopyBasicFieldsFromTableRow_WOP
+func (tablerowDB *TableRowDB) CopyBasicFieldsFromTableRow_WOP(tablerow *models.TableRow_WOP) {
 	// insertion point for fields commit
 
 	tablerowDB.Name_Data.String = tablerow.Name
@@ -448,6 +472,13 @@ func (tablerowDB *TableRowDB) CopyBasicFieldsFromTableRowWOP(tablerow *TableRowW
 
 // CopyBasicFieldsToTableRow
 func (tablerowDB *TableRowDB) CopyBasicFieldsToTableRow(tablerow *models.TableRow) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	tablerow.Name = tablerowDB.Name_Data.String
+	tablerow.Content = tablerowDB.Content_Data.String
+}
+
+// CopyBasicFieldsToTableRow_WOP
+func (tablerowDB *TableRowDB) CopyBasicFieldsToTableRow_WOP(tablerow *models.TableRow_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	tablerow.Name = tablerowDB.Name_Data.String
 	tablerow.Content = tablerowDB.Content_Data.String
@@ -480,12 +511,12 @@ func (backRepoTableRow *BackRepoTableRowStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json TableRow ", filename, " ", err.Error())
+		log.Fatal("Cannot json TableRow ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json TableRow file", err.Error())
+		log.Fatal("Cannot write the json TableRow file", err.Error())
 	}
 }
 
@@ -505,7 +536,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("TableRow")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -530,13 +561,13 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestoreXLPhaseOne(file *xlsx.Fil
 	sh, ok := file.Sheet["TableRow"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoTableRow.rowVisitorTableRow)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -558,7 +589,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) rowVisitorTableRow(row *xlsx.Row
 		tablerowDB.ID = 0
 		query := backRepoTableRow.db.Create(tablerowDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTableRow.Map_TableRowDBID_TableRowDB[tablerowDB.ID] = tablerowDB
 		BackRepoTableRowid_atBckpTime_newID[tablerowDB_ID_atBackupTime] = tablerowDB.ID
@@ -578,7 +609,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestorePhaseOne(dirPath string) 
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json TableRow file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json TableRow file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -595,14 +626,14 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestorePhaseOne(dirPath string) 
 		tablerowDB.ID = 0
 		query := backRepoTableRow.db.Create(tablerowDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTableRow.Map_TableRowDBID_TableRowDB[tablerowDB.ID] = tablerowDB
 		BackRepoTableRowid_atBckpTime_newID[tablerowDB_ID_atBackupTime] = tablerowDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json TableRow file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json TableRow file", err.Error())
 	}
 }
 
@@ -631,7 +662,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoTableRow.db.Model(tablerowDB).Updates(*tablerowDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

@@ -35,20 +35,23 @@ var dummy_TableColumn_sort sort.Float64Slice
 type TableColumnAPI struct {
 	gorm.Model
 
-	models.TableColumn
+	models.TableColumn_WOP
 
 	// encoding of pointers
-	TableColumnPointersEnconding
+	TableColumnPointersEncoding
 }
 
-// TableColumnPointersEnconding encodes pointers to Struct and
+// TableColumnPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type TableColumnPointersEnconding struct {
+type TableColumnPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Node is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	NodeID sql.NullInt64
+
+	// field Paragraphs is a slice of pointers to another Struct (optional or 0..1)
+	Paragraphs IntSlice`gorm:"type:TEXT"`
 
 	// Implementation of a reverse ID for field TableRow{}.TableColumns []*TableColumn
 	TableRow_TableColumnsDBID sql.NullInt64
@@ -74,7 +77,7 @@ type TableColumnDB struct {
 	// Declation for basic field tablecolumnDB.Content
 	Content_Data sql.NullString
 	// encoding of pointers
-	TableColumnPointersEnconding
+	TableColumnPointersEncoding
 }
 
 // TableColumnDBs arrays tablecolumnDBs
@@ -166,7 +169,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CommitDeleteInstance(id ui
 	tablecolumnDB := backRepoTableColumn.Map_TableColumnDBID_TableColumnDB[id]
 	query := backRepoTableColumn.db.Unscoped().Delete(&tablecolumnDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -192,7 +195,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CommitPhaseOneInstance(tab
 
 	query := backRepoTableColumn.db.Create(&tablecolumnDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -255,9 +258,19 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CommitPhaseTwoInstance(bac
 			}
 		}
 
+		// 1. reset
+		tablecolumnDB.TableColumnPointersEncoding.Paragraphs = make([]int, 0)
+		// 2. encode
+		for _, paragraphAssocEnd := range tablecolumn.Paragraphs {
+			paragraphAssocEnd_DB :=
+				backRepo.BackRepoParagraph.GetParagraphDBFromParagraphPtr(paragraphAssocEnd)
+			tablecolumnDB.TableColumnPointersEncoding.Paragraphs =
+				append(tablecolumnDB.TableColumnPointersEncoding.Paragraphs, int(paragraphAssocEnd_DB.ID))
+		}
+
 		query := backRepoTableColumn.db.Save(&tablecolumnDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -416,7 +429,7 @@ func (backRepo *BackRepoStruct) CheckoutTableColumn(tablecolumn *models.TableCol
 			tablecolumnDB.ID = id
 
 			if err := backRepo.BackRepoTableColumn.db.First(&tablecolumnDB, id).Error; err != nil {
-				log.Panicln("CheckoutTableColumn : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutTableColumn : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTableColumn.CheckoutPhaseOneInstance(&tablecolumnDB)
 			backRepo.BackRepoTableColumn.CheckoutPhaseTwoInstance(backRepo, &tablecolumnDB)
@@ -426,6 +439,17 @@ func (backRepo *BackRepoStruct) CheckoutTableColumn(tablecolumn *models.TableCol
 
 // CopyBasicFieldsFromTableColumn
 func (tablecolumnDB *TableColumnDB) CopyBasicFieldsFromTableColumn(tablecolumn *models.TableColumn) {
+	// insertion point for fields commit
+
+	tablecolumnDB.Name_Data.String = tablecolumn.Name
+	tablecolumnDB.Name_Data.Valid = true
+
+	tablecolumnDB.Content_Data.String = tablecolumn.Content
+	tablecolumnDB.Content_Data.Valid = true
+}
+
+// CopyBasicFieldsFromTableColumn_WOP
+func (tablecolumnDB *TableColumnDB) CopyBasicFieldsFromTableColumn_WOP(tablecolumn *models.TableColumn_WOP) {
 	// insertion point for fields commit
 
 	tablecolumnDB.Name_Data.String = tablecolumn.Name
@@ -448,6 +472,13 @@ func (tablecolumnDB *TableColumnDB) CopyBasicFieldsFromTableColumnWOP(tablecolum
 
 // CopyBasicFieldsToTableColumn
 func (tablecolumnDB *TableColumnDB) CopyBasicFieldsToTableColumn(tablecolumn *models.TableColumn) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	tablecolumn.Name = tablecolumnDB.Name_Data.String
+	tablecolumn.Content = tablecolumnDB.Content_Data.String
+}
+
+// CopyBasicFieldsToTableColumn_WOP
+func (tablecolumnDB *TableColumnDB) CopyBasicFieldsToTableColumn_WOP(tablecolumn *models.TableColumn_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	tablecolumn.Name = tablecolumnDB.Name_Data.String
 	tablecolumn.Content = tablecolumnDB.Content_Data.String
@@ -480,12 +511,12 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json TableColumn ", filename, " ", err.Error())
+		log.Fatal("Cannot json TableColumn ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json TableColumn file", err.Error())
+		log.Fatal("Cannot write the json TableColumn file", err.Error())
 	}
 }
 
@@ -505,7 +536,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) BackupXL(file *xlsx.File) 
 
 	sh, err := file.AddSheet("TableColumn")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -530,13 +561,13 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) RestoreXLPhaseOne(file *xl
 	sh, ok := file.Sheet["TableColumn"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoTableColumn.rowVisitorTableColumn)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -558,7 +589,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) rowVisitorTableColumn(row 
 		tablecolumnDB.ID = 0
 		query := backRepoTableColumn.db.Create(tablecolumnDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTableColumn.Map_TableColumnDBID_TableColumnDB[tablecolumnDB.ID] = tablecolumnDB
 		BackRepoTableColumnid_atBckpTime_newID[tablecolumnDB_ID_atBackupTime] = tablecolumnDB.ID
@@ -578,7 +609,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) RestorePhaseOne(dirPath st
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json TableColumn file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json TableColumn file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -595,14 +626,14 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) RestorePhaseOne(dirPath st
 		tablecolumnDB.ID = 0
 		query := backRepoTableColumn.db.Create(tablecolumnDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTableColumn.Map_TableColumnDBID_TableColumnDB[tablecolumnDB.ID] = tablecolumnDB
 		BackRepoTableColumnid_atBckpTime_newID[tablecolumnDB_ID_atBackupTime] = tablecolumnDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json TableColumn file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json TableColumn file", err.Error())
 	}
 }
 
@@ -631,7 +662,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoTableColumn.db.Model(tablecolumnDB).Updates(*tablecolumnDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

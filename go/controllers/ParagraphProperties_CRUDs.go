@@ -91,8 +91,8 @@ func (controller *Controller) GetParagraphPropertiess(c *gin.Context) {
 
 		// insertion point for updating fields
 		paragraphpropertiesAPI.ID = paragraphpropertiesDB.ID
-		paragraphpropertiesDB.CopyBasicFieldsToParagraphProperties(&paragraphpropertiesAPI.ParagraphProperties)
-		paragraphpropertiesAPI.ParagraphPropertiesPointersEnconding = paragraphpropertiesDB.ParagraphPropertiesPointersEnconding
+		paragraphpropertiesDB.CopyBasicFieldsToParagraphProperties_WOP(&paragraphpropertiesAPI.ParagraphProperties_WOP)
+		paragraphpropertiesAPI.ParagraphPropertiesPointersEncoding = paragraphpropertiesDB.ParagraphPropertiesPointersEncoding
 		paragraphpropertiesAPIs = append(paragraphpropertiesAPIs, paragraphpropertiesAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostParagraphProperties(c *gin.Context) {
 
 	// Create paragraphproperties
 	paragraphpropertiesDB := orm.ParagraphPropertiesDB{}
-	paragraphpropertiesDB.ParagraphPropertiesPointersEnconding = input.ParagraphPropertiesPointersEnconding
-	paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties(&input.ParagraphProperties)
+	paragraphpropertiesDB.ParagraphPropertiesPointersEncoding = input.ParagraphPropertiesPointersEncoding
+	paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties_WOP(&input.ParagraphProperties_WOP)
 
 	query := db.Create(&paragraphpropertiesDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetParagraphProperties(c *gin.Context) {
 
 	var paragraphpropertiesAPI orm.ParagraphPropertiesAPI
 	paragraphpropertiesAPI.ID = paragraphpropertiesDB.ID
-	paragraphpropertiesAPI.ParagraphPropertiesPointersEnconding = paragraphpropertiesDB.ParagraphPropertiesPointersEnconding
-	paragraphpropertiesDB.CopyBasicFieldsToParagraphProperties(&paragraphpropertiesAPI.ParagraphProperties)
+	paragraphpropertiesAPI.ParagraphPropertiesPointersEncoding = paragraphpropertiesDB.ParagraphPropertiesPointersEncoding
+	paragraphpropertiesDB.CopyBasicFieldsToParagraphProperties_WOP(&paragraphpropertiesAPI.ParagraphProperties_WOP)
 
 	c.JSON(http.StatusOK, paragraphpropertiesAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateParagraphProperties(c *gin.Context) {
 	}
 
 	// update
-	paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties(&input.ParagraphProperties)
-	paragraphpropertiesDB.ParagraphPropertiesPointersEnconding = input.ParagraphPropertiesPointersEnconding
+	paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties_WOP(&input.ParagraphProperties_WOP)
+	paragraphpropertiesDB.ParagraphPropertiesPointersEncoding = input.ParagraphPropertiesPointersEncoding
 
 	query = db.Model(&paragraphpropertiesDB).Updates(paragraphpropertiesDB)
 	if query.Error != nil {

@@ -35,15 +35,15 @@ var dummy_File_sort sort.Float64Slice
 type FileAPI struct {
 	gorm.Model
 
-	models.File
+	models.File_WOP
 
 	// encoding of pointers
-	FilePointersEnconding
+	FilePointersEncoding
 }
 
-// FilePointersEnconding encodes pointers to Struct and
+// FilePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type FilePointersEnconding struct {
+type FilePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// Implementation of a reverse ID for field Docx{}.Files []*File
@@ -67,7 +67,7 @@ type FileDB struct {
 	// Declation for basic field fileDB.Name
 	Name_Data sql.NullString
 	// encoding of pointers
-	FilePointersEnconding
+	FilePointersEncoding
 }
 
 // FileDBs arrays fileDBs
@@ -156,7 +156,7 @@ func (backRepoFile *BackRepoFileStruct) CommitDeleteInstance(id uint) (Error err
 	fileDB := backRepoFile.Map_FileDBID_FileDB[id]
 	query := backRepoFile.db.Unscoped().Delete(&fileDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -182,7 +182,7 @@ func (backRepoFile *BackRepoFileStruct) CommitPhaseOneInstance(file *models.File
 
 	query := backRepoFile.db.Create(&fileDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -216,7 +216,7 @@ func (backRepoFile *BackRepoFileStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoFile.db.Save(&fileDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -343,7 +343,7 @@ func (backRepo *BackRepoStruct) CheckoutFile(file *models.File) {
 			fileDB.ID = id
 
 			if err := backRepo.BackRepoFile.db.First(&fileDB, id).Error; err != nil {
-				log.Panicln("CheckoutFile : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutFile : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoFile.CheckoutPhaseOneInstance(&fileDB)
 			backRepo.BackRepoFile.CheckoutPhaseTwoInstance(backRepo, &fileDB)
@@ -353,6 +353,14 @@ func (backRepo *BackRepoStruct) CheckoutFile(file *models.File) {
 
 // CopyBasicFieldsFromFile
 func (fileDB *FileDB) CopyBasicFieldsFromFile(file *models.File) {
+	// insertion point for fields commit
+
+	fileDB.Name_Data.String = file.Name
+	fileDB.Name_Data.Valid = true
+}
+
+// CopyBasicFieldsFromFile_WOP
+func (fileDB *FileDB) CopyBasicFieldsFromFile_WOP(file *models.File_WOP) {
 	// insertion point for fields commit
 
 	fileDB.Name_Data.String = file.Name
@@ -369,6 +377,12 @@ func (fileDB *FileDB) CopyBasicFieldsFromFileWOP(file *FileWOP) {
 
 // CopyBasicFieldsToFile
 func (fileDB *FileDB) CopyBasicFieldsToFile(file *models.File) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	file.Name = fileDB.Name_Data.String
+}
+
+// CopyBasicFieldsToFile_WOP
+func (fileDB *FileDB) CopyBasicFieldsToFile_WOP(file *models.File_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	file.Name = fileDB.Name_Data.String
 }
@@ -399,12 +413,12 @@ func (backRepoFile *BackRepoFileStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json File ", filename, " ", err.Error())
+		log.Fatal("Cannot json File ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json File file", err.Error())
+		log.Fatal("Cannot write the json File file", err.Error())
 	}
 }
 
@@ -424,7 +438,7 @@ func (backRepoFile *BackRepoFileStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("File")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -449,13 +463,13 @@ func (backRepoFile *BackRepoFileStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["File"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoFile.rowVisitorFile)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -477,7 +491,7 @@ func (backRepoFile *BackRepoFileStruct) rowVisitorFile(row *xlsx.Row) error {
 		fileDB.ID = 0
 		query := backRepoFile.db.Create(fileDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoFile.Map_FileDBID_FileDB[fileDB.ID] = fileDB
 		BackRepoFileid_atBckpTime_newID[fileDB_ID_atBackupTime] = fileDB.ID
@@ -497,7 +511,7 @@ func (backRepoFile *BackRepoFileStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json File file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json File file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -514,14 +528,14 @@ func (backRepoFile *BackRepoFileStruct) RestorePhaseOne(dirPath string) {
 		fileDB.ID = 0
 		query := backRepoFile.db.Create(fileDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoFile.Map_FileDBID_FileDB[fileDB.ID] = fileDB
 		BackRepoFileid_atBckpTime_newID[fileDB_ID_atBackupTime] = fileDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json File file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json File file", err.Error())
 	}
 }
 
@@ -544,7 +558,7 @@ func (backRepoFile *BackRepoFileStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoFile.db.Model(fileDB).Updates(*fileDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

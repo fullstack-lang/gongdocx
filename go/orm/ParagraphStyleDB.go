@@ -35,15 +35,15 @@ var dummy_ParagraphStyle_sort sort.Float64Slice
 type ParagraphStyleAPI struct {
 	gorm.Model
 
-	models.ParagraphStyle
+	models.ParagraphStyle_WOP
 
 	// encoding of pointers
-	ParagraphStylePointersEnconding
+	ParagraphStylePointersEncoding
 }
 
-// ParagraphStylePointersEnconding encodes pointers to Struct and
+// ParagraphStylePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type ParagraphStylePointersEnconding struct {
+type ParagraphStylePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Node is a pointer to another Struct (optional or 0..1)
@@ -71,7 +71,7 @@ type ParagraphStyleDB struct {
 	// Declation for basic field paragraphstyleDB.ValAttr
 	ValAttr_Data sql.NullString
 	// encoding of pointers
-	ParagraphStylePointersEnconding
+	ParagraphStylePointersEncoding
 }
 
 // ParagraphStyleDBs arrays paragraphstyleDBs
@@ -166,7 +166,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitDeleteInstance
 	paragraphstyleDB := backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[id]
 	query := backRepoParagraphStyle.db.Unscoped().Delete(&paragraphstyleDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -192,7 +192,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitPhaseOneInstan
 
 	query := backRepoParagraphStyle.db.Create(&paragraphstyleDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -238,7 +238,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitPhaseTwoInstan
 
 		query := backRepoParagraphStyle.db.Save(&paragraphstyleDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -370,7 +370,7 @@ func (backRepo *BackRepoStruct) CheckoutParagraphStyle(paragraphstyle *models.Pa
 			paragraphstyleDB.ID = id
 
 			if err := backRepo.BackRepoParagraphStyle.db.First(&paragraphstyleDB, id).Error; err != nil {
-				log.Panicln("CheckoutParagraphStyle : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutParagraphStyle : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoParagraphStyle.CheckoutPhaseOneInstance(&paragraphstyleDB)
 			backRepo.BackRepoParagraphStyle.CheckoutPhaseTwoInstance(backRepo, &paragraphstyleDB)
@@ -380,6 +380,20 @@ func (backRepo *BackRepoStruct) CheckoutParagraphStyle(paragraphstyle *models.Pa
 
 // CopyBasicFieldsFromParagraphStyle
 func (paragraphstyleDB *ParagraphStyleDB) CopyBasicFieldsFromParagraphStyle(paragraphstyle *models.ParagraphStyle) {
+	// insertion point for fields commit
+
+	paragraphstyleDB.Name_Data.String = paragraphstyle.Name
+	paragraphstyleDB.Name_Data.Valid = true
+
+	paragraphstyleDB.Content_Data.String = paragraphstyle.Content
+	paragraphstyleDB.Content_Data.Valid = true
+
+	paragraphstyleDB.ValAttr_Data.String = paragraphstyle.ValAttr
+	paragraphstyleDB.ValAttr_Data.Valid = true
+}
+
+// CopyBasicFieldsFromParagraphStyle_WOP
+func (paragraphstyleDB *ParagraphStyleDB) CopyBasicFieldsFromParagraphStyle_WOP(paragraphstyle *models.ParagraphStyle_WOP) {
 	// insertion point for fields commit
 
 	paragraphstyleDB.Name_Data.String = paragraphstyle.Name
@@ -414,6 +428,14 @@ func (paragraphstyleDB *ParagraphStyleDB) CopyBasicFieldsToParagraphStyle(paragr
 	paragraphstyle.ValAttr = paragraphstyleDB.ValAttr_Data.String
 }
 
+// CopyBasicFieldsToParagraphStyle_WOP
+func (paragraphstyleDB *ParagraphStyleDB) CopyBasicFieldsToParagraphStyle_WOP(paragraphstyle *models.ParagraphStyle_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	paragraphstyle.Name = paragraphstyleDB.Name_Data.String
+	paragraphstyle.Content = paragraphstyleDB.Content_Data.String
+	paragraphstyle.ValAttr = paragraphstyleDB.ValAttr_Data.String
+}
+
 // CopyBasicFieldsToParagraphStyleWOP
 func (paragraphstyleDB *ParagraphStyleDB) CopyBasicFieldsToParagraphStyleWOP(paragraphstyle *ParagraphStyleWOP) {
 	paragraphstyle.ID = int(paragraphstyleDB.ID)
@@ -442,12 +464,12 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) Backup(dirPath strin
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json ParagraphStyle ", filename, " ", err.Error())
+		log.Fatal("Cannot json ParagraphStyle ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json ParagraphStyle file", err.Error())
+		log.Fatal("Cannot write the json ParagraphStyle file", err.Error())
 	}
 }
 
@@ -467,7 +489,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) BackupXL(file *xlsx.
 
 	sh, err := file.AddSheet("ParagraphStyle")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -492,13 +514,13 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) RestoreXLPhaseOne(fi
 	sh, ok := file.Sheet["ParagraphStyle"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoParagraphStyle.rowVisitorParagraphStyle)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -520,7 +542,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) rowVisitorParagraphS
 		paragraphstyleDB.ID = 0
 		query := backRepoParagraphStyle.db.Create(paragraphstyleDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[paragraphstyleDB.ID] = paragraphstyleDB
 		BackRepoParagraphStyleid_atBckpTime_newID[paragraphstyleDB_ID_atBackupTime] = paragraphstyleDB.ID
@@ -540,7 +562,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) RestorePhaseOne(dirP
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json ParagraphStyle file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json ParagraphStyle file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -557,14 +579,14 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) RestorePhaseOne(dirP
 		paragraphstyleDB.ID = 0
 		query := backRepoParagraphStyle.db.Create(paragraphstyleDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[paragraphstyleDB.ID] = paragraphstyleDB
 		BackRepoParagraphStyleid_atBckpTime_newID[paragraphstyleDB_ID_atBackupTime] = paragraphstyleDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json ParagraphStyle file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json ParagraphStyle file", err.Error())
 	}
 }
 
@@ -587,7 +609,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoParagraphStyle.db.Model(paragraphstyleDB).Updates(*paragraphstyleDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

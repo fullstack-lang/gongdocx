@@ -91,8 +91,8 @@ func (controller *Controller) GetTableColumns(c *gin.Context) {
 
 		// insertion point for updating fields
 		tablecolumnAPI.ID = tablecolumnDB.ID
-		tablecolumnDB.CopyBasicFieldsToTableColumn(&tablecolumnAPI.TableColumn)
-		tablecolumnAPI.TableColumnPointersEnconding = tablecolumnDB.TableColumnPointersEnconding
+		tablecolumnDB.CopyBasicFieldsToTableColumn_WOP(&tablecolumnAPI.TableColumn_WOP)
+		tablecolumnAPI.TableColumnPointersEncoding = tablecolumnDB.TableColumnPointersEncoding
 		tablecolumnAPIs = append(tablecolumnAPIs, tablecolumnAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostTableColumn(c *gin.Context) {
 
 	// Create tablecolumn
 	tablecolumnDB := orm.TableColumnDB{}
-	tablecolumnDB.TableColumnPointersEnconding = input.TableColumnPointersEnconding
-	tablecolumnDB.CopyBasicFieldsFromTableColumn(&input.TableColumn)
+	tablecolumnDB.TableColumnPointersEncoding = input.TableColumnPointersEncoding
+	tablecolumnDB.CopyBasicFieldsFromTableColumn_WOP(&input.TableColumn_WOP)
 
 	query := db.Create(&tablecolumnDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetTableColumn(c *gin.Context) {
 
 	var tablecolumnAPI orm.TableColumnAPI
 	tablecolumnAPI.ID = tablecolumnDB.ID
-	tablecolumnAPI.TableColumnPointersEnconding = tablecolumnDB.TableColumnPointersEnconding
-	tablecolumnDB.CopyBasicFieldsToTableColumn(&tablecolumnAPI.TableColumn)
+	tablecolumnAPI.TableColumnPointersEncoding = tablecolumnDB.TableColumnPointersEncoding
+	tablecolumnDB.CopyBasicFieldsToTableColumn_WOP(&tablecolumnAPI.TableColumn_WOP)
 
 	c.JSON(http.StatusOK, tablecolumnAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateTableColumn(c *gin.Context) {
 	}
 
 	// update
-	tablecolumnDB.CopyBasicFieldsFromTableColumn(&input.TableColumn)
-	tablecolumnDB.TableColumnPointersEnconding = input.TableColumnPointersEnconding
+	tablecolumnDB.CopyBasicFieldsFromTableColumn_WOP(&input.TableColumn_WOP)
+	tablecolumnDB.TableColumnPointersEncoding = input.TableColumnPointersEncoding
 
 	query = db.Model(&tablecolumnDB).Updates(tablecolumnDB)
 	if query.Error != nil {

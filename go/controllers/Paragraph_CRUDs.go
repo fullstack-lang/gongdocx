@@ -91,8 +91,8 @@ func (controller *Controller) GetParagraphs(c *gin.Context) {
 
 		// insertion point for updating fields
 		paragraphAPI.ID = paragraphDB.ID
-		paragraphDB.CopyBasicFieldsToParagraph(&paragraphAPI.Paragraph)
-		paragraphAPI.ParagraphPointersEnconding = paragraphDB.ParagraphPointersEnconding
+		paragraphDB.CopyBasicFieldsToParagraph_WOP(&paragraphAPI.Paragraph_WOP)
+		paragraphAPI.ParagraphPointersEncoding = paragraphDB.ParagraphPointersEncoding
 		paragraphAPIs = append(paragraphAPIs, paragraphAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostParagraph(c *gin.Context) {
 
 	// Create paragraph
 	paragraphDB := orm.ParagraphDB{}
-	paragraphDB.ParagraphPointersEnconding = input.ParagraphPointersEnconding
-	paragraphDB.CopyBasicFieldsFromParagraph(&input.Paragraph)
+	paragraphDB.ParagraphPointersEncoding = input.ParagraphPointersEncoding
+	paragraphDB.CopyBasicFieldsFromParagraph_WOP(&input.Paragraph_WOP)
 
 	query := db.Create(&paragraphDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetParagraph(c *gin.Context) {
 
 	var paragraphAPI orm.ParagraphAPI
 	paragraphAPI.ID = paragraphDB.ID
-	paragraphAPI.ParagraphPointersEnconding = paragraphDB.ParagraphPointersEnconding
-	paragraphDB.CopyBasicFieldsToParagraph(&paragraphAPI.Paragraph)
+	paragraphAPI.ParagraphPointersEncoding = paragraphDB.ParagraphPointersEncoding
+	paragraphDB.CopyBasicFieldsToParagraph_WOP(&paragraphAPI.Paragraph_WOP)
 
 	c.JSON(http.StatusOK, paragraphAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateParagraph(c *gin.Context) {
 	}
 
 	// update
-	paragraphDB.CopyBasicFieldsFromParagraph(&input.Paragraph)
-	paragraphDB.ParagraphPointersEnconding = input.ParagraphPointersEnconding
+	paragraphDB.CopyBasicFieldsFromParagraph_WOP(&input.Paragraph_WOP)
+	paragraphDB.ParagraphPointersEncoding = input.ParagraphPointersEncoding
 
 	query = db.Model(&paragraphDB).Updates(paragraphDB)
 	if query.Error != nil {

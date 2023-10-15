@@ -91,8 +91,8 @@ func (controller *Controller) GetTableRows(c *gin.Context) {
 
 		// insertion point for updating fields
 		tablerowAPI.ID = tablerowDB.ID
-		tablerowDB.CopyBasicFieldsToTableRow(&tablerowAPI.TableRow)
-		tablerowAPI.TableRowPointersEnconding = tablerowDB.TableRowPointersEnconding
+		tablerowDB.CopyBasicFieldsToTableRow_WOP(&tablerowAPI.TableRow_WOP)
+		tablerowAPI.TableRowPointersEncoding = tablerowDB.TableRowPointersEncoding
 		tablerowAPIs = append(tablerowAPIs, tablerowAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostTableRow(c *gin.Context) {
 
 	// Create tablerow
 	tablerowDB := orm.TableRowDB{}
-	tablerowDB.TableRowPointersEnconding = input.TableRowPointersEnconding
-	tablerowDB.CopyBasicFieldsFromTableRow(&input.TableRow)
+	tablerowDB.TableRowPointersEncoding = input.TableRowPointersEncoding
+	tablerowDB.CopyBasicFieldsFromTableRow_WOP(&input.TableRow_WOP)
 
 	query := db.Create(&tablerowDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetTableRow(c *gin.Context) {
 
 	var tablerowAPI orm.TableRowAPI
 	tablerowAPI.ID = tablerowDB.ID
-	tablerowAPI.TableRowPointersEnconding = tablerowDB.TableRowPointersEnconding
-	tablerowDB.CopyBasicFieldsToTableRow(&tablerowAPI.TableRow)
+	tablerowAPI.TableRowPointersEncoding = tablerowDB.TableRowPointersEncoding
+	tablerowDB.CopyBasicFieldsToTableRow_WOP(&tablerowAPI.TableRow_WOP)
 
 	c.JSON(http.StatusOK, tablerowAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateTableRow(c *gin.Context) {
 	}
 
 	// update
-	tablerowDB.CopyBasicFieldsFromTableRow(&input.TableRow)
-	tablerowDB.TableRowPointersEnconding = input.TableRowPointersEnconding
+	tablerowDB.CopyBasicFieldsFromTableRow_WOP(&input.TableRow_WOP)
+	tablerowDB.TableRowPointersEncoding = input.TableRowPointersEncoding
 
 	query = db.Model(&tablerowDB).Updates(tablerowDB)
 	if query.Error != nil {

@@ -35,15 +35,15 @@ var dummy_Document_sort sort.Float64Slice
 type DocumentAPI struct {
 	gorm.Model
 
-	models.Document
+	models.Document_WOP
 
 	// encoding of pointers
-	DocumentPointersEnconding
+	DocumentPointersEncoding
 }
 
-// DocumentPointersEnconding encodes pointers to Struct and
+// DocumentPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type DocumentPointersEnconding struct {
+type DocumentPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field File is a pointer to another Struct (optional or 0..1)
@@ -73,7 +73,7 @@ type DocumentDB struct {
 	// Declation for basic field documentDB.Name
 	Name_Data sql.NullString
 	// encoding of pointers
-	DocumentPointersEnconding
+	DocumentPointersEncoding
 }
 
 // DocumentDBs arrays documentDBs
@@ -162,7 +162,7 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitDeleteInstance(id uint) (E
 	documentDB := backRepoDocument.Map_DocumentDBID_DocumentDB[id]
 	query := backRepoDocument.db.Unscoped().Delete(&documentDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -188,7 +188,7 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseOneInstance(document 
 
 	query := backRepoDocument.db.Create(&documentDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -258,7 +258,7 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 
 		query := backRepoDocument.db.Save(&documentDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -400,7 +400,7 @@ func (backRepo *BackRepoStruct) CheckoutDocument(document *models.Document) {
 			documentDB.ID = id
 
 			if err := backRepo.BackRepoDocument.db.First(&documentDB, id).Error; err != nil {
-				log.Panicln("CheckoutDocument : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutDocument : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoDocument.CheckoutPhaseOneInstance(&documentDB)
 			backRepo.BackRepoDocument.CheckoutPhaseTwoInstance(backRepo, &documentDB)
@@ -410,6 +410,14 @@ func (backRepo *BackRepoStruct) CheckoutDocument(document *models.Document) {
 
 // CopyBasicFieldsFromDocument
 func (documentDB *DocumentDB) CopyBasicFieldsFromDocument(document *models.Document) {
+	// insertion point for fields commit
+
+	documentDB.Name_Data.String = document.Name
+	documentDB.Name_Data.Valid = true
+}
+
+// CopyBasicFieldsFromDocument_WOP
+func (documentDB *DocumentDB) CopyBasicFieldsFromDocument_WOP(document *models.Document_WOP) {
 	// insertion point for fields commit
 
 	documentDB.Name_Data.String = document.Name
@@ -426,6 +434,12 @@ func (documentDB *DocumentDB) CopyBasicFieldsFromDocumentWOP(document *DocumentW
 
 // CopyBasicFieldsToDocument
 func (documentDB *DocumentDB) CopyBasicFieldsToDocument(document *models.Document) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	document.Name = documentDB.Name_Data.String
+}
+
+// CopyBasicFieldsToDocument_WOP
+func (documentDB *DocumentDB) CopyBasicFieldsToDocument_WOP(document *models.Document_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	document.Name = documentDB.Name_Data.String
 }
@@ -456,12 +470,12 @@ func (backRepoDocument *BackRepoDocumentStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Document ", filename, " ", err.Error())
+		log.Fatal("Cannot json Document ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Document file", err.Error())
+		log.Fatal("Cannot write the json Document file", err.Error())
 	}
 }
 
@@ -481,7 +495,7 @@ func (backRepoDocument *BackRepoDocumentStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Document")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -506,13 +520,13 @@ func (backRepoDocument *BackRepoDocumentStruct) RestoreXLPhaseOne(file *xlsx.Fil
 	sh, ok := file.Sheet["Document"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoDocument.rowVisitorDocument)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -534,7 +548,7 @@ func (backRepoDocument *BackRepoDocumentStruct) rowVisitorDocument(row *xlsx.Row
 		documentDB.ID = 0
 		query := backRepoDocument.db.Create(documentDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoDocument.Map_DocumentDBID_DocumentDB[documentDB.ID] = documentDB
 		BackRepoDocumentid_atBckpTime_newID[documentDB_ID_atBackupTime] = documentDB.ID
@@ -554,7 +568,7 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseOne(dirPath string) 
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Document file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Document file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -571,14 +585,14 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseOne(dirPath string) 
 		documentDB.ID = 0
 		query := backRepoDocument.db.Create(documentDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoDocument.Map_DocumentDBID_DocumentDB[documentDB.ID] = documentDB
 		BackRepoDocumentid_atBckpTime_newID[documentDB_ID_atBackupTime] = documentDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Document file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Document file", err.Error())
 	}
 }
 
@@ -613,7 +627,7 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoDocument.db.Model(documentDB).Updates(*documentDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

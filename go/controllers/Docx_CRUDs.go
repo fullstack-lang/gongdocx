@@ -91,8 +91,8 @@ func (controller *Controller) GetDocxs(c *gin.Context) {
 
 		// insertion point for updating fields
 		docxAPI.ID = docxDB.ID
-		docxDB.CopyBasicFieldsToDocx(&docxAPI.Docx)
-		docxAPI.DocxPointersEnconding = docxDB.DocxPointersEnconding
+		docxDB.CopyBasicFieldsToDocx_WOP(&docxAPI.Docx_WOP)
+		docxAPI.DocxPointersEncoding = docxDB.DocxPointersEncoding
 		docxAPIs = append(docxAPIs, docxAPI)
 	}
 
@@ -147,8 +147,8 @@ func (controller *Controller) PostDocx(c *gin.Context) {
 
 	// Create docx
 	docxDB := orm.DocxDB{}
-	docxDB.DocxPointersEnconding = input.DocxPointersEnconding
-	docxDB.CopyBasicFieldsFromDocx(&input.Docx)
+	docxDB.DocxPointersEncoding = input.DocxPointersEncoding
+	docxDB.CopyBasicFieldsFromDocx_WOP(&input.Docx_WOP)
 
 	query := db.Create(&docxDB)
 	if query.Error != nil {
@@ -217,8 +217,8 @@ func (controller *Controller) GetDocx(c *gin.Context) {
 
 	var docxAPI orm.DocxAPI
 	docxAPI.ID = docxDB.ID
-	docxAPI.DocxPointersEnconding = docxDB.DocxPointersEnconding
-	docxDB.CopyBasicFieldsToDocx(&docxAPI.Docx)
+	docxAPI.DocxPointersEncoding = docxDB.DocxPointersEncoding
+	docxDB.CopyBasicFieldsToDocx_WOP(&docxAPI.Docx_WOP)
 
 	c.JSON(http.StatusOK, docxAPI)
 }
@@ -276,8 +276,8 @@ func (controller *Controller) UpdateDocx(c *gin.Context) {
 	}
 
 	// update
-	docxDB.CopyBasicFieldsFromDocx(&input.Docx)
-	docxDB.DocxPointersEnconding = input.DocxPointersEnconding
+	docxDB.CopyBasicFieldsFromDocx_WOP(&input.Docx_WOP)
+	docxDB.DocxPointersEncoding = input.DocxPointersEncoding
 
 	query = db.Model(&docxDB).Updates(docxDB)
 	if query.Error != nil {

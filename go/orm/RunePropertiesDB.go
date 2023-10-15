@@ -35,15 +35,15 @@ var dummy_RuneProperties_sort sort.Float64Slice
 type RunePropertiesAPI struct {
 	gorm.Model
 
-	models.RuneProperties
+	models.RuneProperties_WOP
 
 	// encoding of pointers
-	RunePropertiesPointersEnconding
+	RunePropertiesPointersEncoding
 }
 
-// RunePropertiesPointersEnconding encodes pointers to Struct and
+// RunePropertiesPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type RunePropertiesPointersEnconding struct {
+type RunePropertiesPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Node is a pointer to another Struct (optional or 0..1)
@@ -80,7 +80,7 @@ type RunePropertiesDB struct {
 	// Declation for basic field runepropertiesDB.Content
 	Content_Data sql.NullString
 	// encoding of pointers
-	RunePropertiesPointersEnconding
+	RunePropertiesPointersEncoding
 }
 
 // RunePropertiesDBs arrays runepropertiesDBs
@@ -181,7 +181,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitDeleteInstance
 	runepropertiesDB := backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[id]
 	query := backRepoRuneProperties.db.Unscoped().Delete(&runepropertiesDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -207,7 +207,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitPhaseOneInstan
 
 	query := backRepoRuneProperties.db.Create(&runepropertiesDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -253,7 +253,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitPhaseTwoInstan
 
 		query := backRepoRuneProperties.db.Save(&runepropertiesDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -385,7 +385,7 @@ func (backRepo *BackRepoStruct) CheckoutRuneProperties(runeproperties *models.Ru
 			runepropertiesDB.ID = id
 
 			if err := backRepo.BackRepoRuneProperties.db.First(&runepropertiesDB, id).Error; err != nil {
-				log.Panicln("CheckoutRuneProperties : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutRuneProperties : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoRuneProperties.CheckoutPhaseOneInstance(&runepropertiesDB)
 			backRepo.BackRepoRuneProperties.CheckoutPhaseTwoInstance(backRepo, &runepropertiesDB)
@@ -395,6 +395,26 @@ func (backRepo *BackRepoStruct) CheckoutRuneProperties(runeproperties *models.Ru
 
 // CopyBasicFieldsFromRuneProperties
 func (runepropertiesDB *RunePropertiesDB) CopyBasicFieldsFromRuneProperties(runeproperties *models.RuneProperties) {
+	// insertion point for fields commit
+
+	runepropertiesDB.Name_Data.String = runeproperties.Name
+	runepropertiesDB.Name_Data.Valid = true
+
+	runepropertiesDB.IsBold_Data.Bool = runeproperties.IsBold
+	runepropertiesDB.IsBold_Data.Valid = true
+
+	runepropertiesDB.IsStrike_Data.Bool = runeproperties.IsStrike
+	runepropertiesDB.IsStrike_Data.Valid = true
+
+	runepropertiesDB.IsItalic_Data.Bool = runeproperties.IsItalic
+	runepropertiesDB.IsItalic_Data.Valid = true
+
+	runepropertiesDB.Content_Data.String = runeproperties.Content
+	runepropertiesDB.Content_Data.Valid = true
+}
+
+// CopyBasicFieldsFromRuneProperties_WOP
+func (runepropertiesDB *RunePropertiesDB) CopyBasicFieldsFromRuneProperties_WOP(runeproperties *models.RuneProperties_WOP) {
 	// insertion point for fields commit
 
 	runepropertiesDB.Name_Data.String = runeproperties.Name
@@ -443,6 +463,16 @@ func (runepropertiesDB *RunePropertiesDB) CopyBasicFieldsToRuneProperties(runepr
 	runeproperties.Content = runepropertiesDB.Content_Data.String
 }
 
+// CopyBasicFieldsToRuneProperties_WOP
+func (runepropertiesDB *RunePropertiesDB) CopyBasicFieldsToRuneProperties_WOP(runeproperties *models.RuneProperties_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	runeproperties.Name = runepropertiesDB.Name_Data.String
+	runeproperties.IsBold = runepropertiesDB.IsBold_Data.Bool
+	runeproperties.IsStrike = runepropertiesDB.IsStrike_Data.Bool
+	runeproperties.IsItalic = runepropertiesDB.IsItalic_Data.Bool
+	runeproperties.Content = runepropertiesDB.Content_Data.String
+}
+
 // CopyBasicFieldsToRunePropertiesWOP
 func (runepropertiesDB *RunePropertiesDB) CopyBasicFieldsToRunePropertiesWOP(runeproperties *RunePropertiesWOP) {
 	runeproperties.ID = int(runepropertiesDB.ID)
@@ -473,12 +503,12 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) Backup(dirPath strin
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json RuneProperties ", filename, " ", err.Error())
+		log.Fatal("Cannot json RuneProperties ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json RuneProperties file", err.Error())
+		log.Fatal("Cannot write the json RuneProperties file", err.Error())
 	}
 }
 
@@ -498,7 +528,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) BackupXL(file *xlsx.
 
 	sh, err := file.AddSheet("RuneProperties")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -523,13 +553,13 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) RestoreXLPhaseOne(fi
 	sh, ok := file.Sheet["RuneProperties"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoRuneProperties.rowVisitorRuneProperties)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -551,7 +581,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) rowVisitorRuneProper
 		runepropertiesDB.ID = 0
 		query := backRepoRuneProperties.db.Create(runepropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[runepropertiesDB.ID] = runepropertiesDB
 		BackRepoRunePropertiesid_atBckpTime_newID[runepropertiesDB_ID_atBackupTime] = runepropertiesDB.ID
@@ -571,7 +601,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) RestorePhaseOne(dirP
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json RuneProperties file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json RuneProperties file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -588,14 +618,14 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) RestorePhaseOne(dirP
 		runepropertiesDB.ID = 0
 		query := backRepoRuneProperties.db.Create(runepropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[runepropertiesDB.ID] = runepropertiesDB
 		BackRepoRunePropertiesid_atBckpTime_newID[runepropertiesDB_ID_atBackupTime] = runepropertiesDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json RuneProperties file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json RuneProperties file", err.Error())
 	}
 }
 
@@ -618,7 +648,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoRuneProperties.db.Model(runepropertiesDB).Updates(*runepropertiesDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
