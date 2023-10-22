@@ -35,26 +35,20 @@ var dummy_PointerToGongStructField_sort sort.Float64Slice
 type PointerToGongStructFieldAPI struct {
 	gorm.Model
 
-	models.PointerToGongStructField
+	models.PointerToGongStructField_WOP
 
 	// encoding of pointers
-	PointerToGongStructFieldPointersEnconding
+	PointerToGongStructFieldPointersEncoding PointerToGongStructFieldPointersEncoding
 }
 
-// PointerToGongStructFieldPointersEnconding encodes pointers to Struct and
+// PointerToGongStructFieldPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type PointerToGongStructFieldPointersEnconding struct {
+type PointerToGongStructFieldPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field GongStruct is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	GongStructID sql.NullInt64
-
-	// Implementation of a reverse ID for field GongStruct{}.PointerToGongStructFields []*PointerToGongStructField
-	GongStruct_PointerToGongStructFieldsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	GongStruct_PointerToGongStructFieldsDBID_Index sql.NullInt64
 }
 
 // PointerToGongStructFieldDB describes a pointertogongstructfield in the database
@@ -77,7 +71,7 @@ type PointerToGongStructFieldDB struct {
 	// Declation for basic field pointertogongstructfieldDB.CompositeStructName
 	CompositeStructName_Data sql.NullString
 	// encoding of pointers
-	PointerToGongStructFieldPointersEnconding
+	PointerToGongStructFieldPointersEncoding
 }
 
 // PointerToGongStructFieldDBs arrays pointertogongstructfieldDBs
@@ -172,7 +166,7 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 	pointertogongstructfieldDB := backRepoPointerToGongStructField.Map_PointerToGongStructFieldDBID_PointerToGongStructFieldDB[id]
 	query := backRepoPointerToGongStructField.db.Unscoped().Delete(&pointertogongstructfieldDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -198,7 +192,7 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 
 	query := backRepoPointerToGongStructField.db.Create(&pointertogongstructfieldDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -244,7 +238,7 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 
 		query := backRepoPointerToGongStructField.db.Save(&pointertogongstructfieldDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -376,7 +370,7 @@ func (backRepo *BackRepoStruct) CheckoutPointerToGongStructField(pointertogongst
 			pointertogongstructfieldDB.ID = id
 
 			if err := backRepo.BackRepoPointerToGongStructField.db.First(&pointertogongstructfieldDB, id).Error; err != nil {
-				log.Panicln("CheckoutPointerToGongStructField : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutPointerToGongStructField : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoPointerToGongStructField.CheckoutPhaseOneInstance(&pointertogongstructfieldDB)
 			backRepo.BackRepoPointerToGongStructField.CheckoutPhaseTwoInstance(backRepo, &pointertogongstructfieldDB)
@@ -386,6 +380,20 @@ func (backRepo *BackRepoStruct) CheckoutPointerToGongStructField(pointertogongst
 
 // CopyBasicFieldsFromPointerToGongStructField
 func (pointertogongstructfieldDB *PointerToGongStructFieldDB) CopyBasicFieldsFromPointerToGongStructField(pointertogongstructfield *models.PointerToGongStructField) {
+	// insertion point for fields commit
+
+	pointertogongstructfieldDB.Name_Data.String = pointertogongstructfield.Name
+	pointertogongstructfieldDB.Name_Data.Valid = true
+
+	pointertogongstructfieldDB.Index_Data.Int64 = int64(pointertogongstructfield.Index)
+	pointertogongstructfieldDB.Index_Data.Valid = true
+
+	pointertogongstructfieldDB.CompositeStructName_Data.String = pointertogongstructfield.CompositeStructName
+	pointertogongstructfieldDB.CompositeStructName_Data.Valid = true
+}
+
+// CopyBasicFieldsFromPointerToGongStructField_WOP
+func (pointertogongstructfieldDB *PointerToGongStructFieldDB) CopyBasicFieldsFromPointerToGongStructField_WOP(pointertogongstructfield *models.PointerToGongStructField_WOP) {
 	// insertion point for fields commit
 
 	pointertogongstructfieldDB.Name_Data.String = pointertogongstructfield.Name
@@ -420,6 +428,14 @@ func (pointertogongstructfieldDB *PointerToGongStructFieldDB) CopyBasicFieldsToP
 	pointertogongstructfield.CompositeStructName = pointertogongstructfieldDB.CompositeStructName_Data.String
 }
 
+// CopyBasicFieldsToPointerToGongStructField_WOP
+func (pointertogongstructfieldDB *PointerToGongStructFieldDB) CopyBasicFieldsToPointerToGongStructField_WOP(pointertogongstructfield *models.PointerToGongStructField_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	pointertogongstructfield.Name = pointertogongstructfieldDB.Name_Data.String
+	pointertogongstructfield.Index = int(pointertogongstructfieldDB.Index_Data.Int64)
+	pointertogongstructfield.CompositeStructName = pointertogongstructfieldDB.CompositeStructName_Data.String
+}
+
 // CopyBasicFieldsToPointerToGongStructFieldWOP
 func (pointertogongstructfieldDB *PointerToGongStructFieldDB) CopyBasicFieldsToPointerToGongStructFieldWOP(pointertogongstructfield *PointerToGongStructFieldWOP) {
 	pointertogongstructfield.ID = int(pointertogongstructfieldDB.ID)
@@ -448,12 +464,12 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json PointerToGongStructField ", filename, " ", err.Error())
+		log.Fatal("Cannot json PointerToGongStructField ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json PointerToGongStructField file", err.Error())
+		log.Fatal("Cannot write the json PointerToGongStructField file", err.Error())
 	}
 }
 
@@ -473,7 +489,7 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 
 	sh, err := file.AddSheet("PointerToGongStructField")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -498,13 +514,13 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 	sh, ok := file.Sheet["PointerToGongStructField"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoPointerToGongStructField.rowVisitorPointerToGongStructField)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -526,7 +542,7 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 		pointertogongstructfieldDB.ID = 0
 		query := backRepoPointerToGongStructField.db.Create(pointertogongstructfieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoPointerToGongStructField.Map_PointerToGongStructFieldDBID_PointerToGongStructFieldDB[pointertogongstructfieldDB.ID] = pointertogongstructfieldDB
 		BackRepoPointerToGongStructFieldid_atBckpTime_newID[pointertogongstructfieldDB_ID_atBackupTime] = pointertogongstructfieldDB.ID
@@ -546,7 +562,7 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json PointerToGongStructField file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json PointerToGongStructField file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -563,14 +579,14 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 		pointertogongstructfieldDB.ID = 0
 		query := backRepoPointerToGongStructField.db.Create(pointertogongstructfieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoPointerToGongStructField.Map_PointerToGongStructFieldDBID_PointerToGongStructFieldDB[pointertogongstructfieldDB.ID] = pointertogongstructfieldDB
 		BackRepoPointerToGongStructFieldid_atBckpTime_newID[pointertogongstructfieldDB_ID_atBackupTime] = pointertogongstructfieldDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json PointerToGongStructField file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json PointerToGongStructField file", err.Error())
 	}
 }
 
@@ -590,16 +606,10 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 			pointertogongstructfieldDB.GongStructID.Valid = true
 		}
 
-		// This reindex pointertogongstructfield.PointerToGongStructFields
-		if pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64 != 0 {
-			pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64 =
-				int64(BackRepoGongStructid_atBckpTime_newID[uint(pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoPointerToGongStructField.db.Model(pointertogongstructfieldDB).Updates(*pointertogongstructfieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -623,15 +633,6 @@ func (backRepoPointerToGongStructField *BackRepoPointerToGongStructFieldStruct) 
 		_ = pointertogongstructfieldDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64 != 0 {
-			pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Int64 = 0
-			pointertogongstructfieldDB.GongStruct_PointerToGongStructFieldsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoPointerToGongStructField.db.Save(pointertogongstructfieldDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

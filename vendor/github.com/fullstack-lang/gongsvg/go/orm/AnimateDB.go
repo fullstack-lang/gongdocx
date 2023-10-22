@@ -35,76 +35,16 @@ var dummy_Animate_sort sort.Float64Slice
 type AnimateAPI struct {
 	gorm.Model
 
-	models.Animate
+	models.Animate_WOP
 
 	// encoding of pointers
-	AnimatePointersEnconding
+	AnimatePointersEncoding AnimatePointersEncoding
 }
 
-// AnimatePointersEnconding encodes pointers to Struct and
+// AnimatePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type AnimatePointersEnconding struct {
+type AnimatePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
-
-	// Implementation of a reverse ID for field Circle{}.Animations []*Animate
-	Circle_AnimationsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Circle_AnimationsDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field Ellipse{}.Animates []*Animate
-	Ellipse_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Ellipse_AnimatesDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field Line{}.Animates []*Animate
-	Line_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Line_AnimatesDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field LinkAnchoredText{}.Animates []*Animate
-	LinkAnchoredText_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	LinkAnchoredText_AnimatesDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field Path{}.Animates []*Animate
-	Path_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Path_AnimatesDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field Polygone{}.Animates []*Animate
-	Polygone_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Polygone_AnimatesDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field Polyline{}.Animates []*Animate
-	Polyline_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Polyline_AnimatesDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field Rect{}.Animations []*Animate
-	Rect_AnimationsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Rect_AnimationsDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field RectAnchoredText{}.Animates []*Animate
-	RectAnchoredText_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	RectAnchoredText_AnimatesDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field Text{}.Animates []*Animate
-	Text_AnimatesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Text_AnimatesDBID_Index sql.NullInt64
 }
 
 // AnimateDB describes a animate in the database
@@ -133,7 +73,7 @@ type AnimateDB struct {
 	// Declation for basic field animateDB.RepeatCount
 	RepeatCount_Data sql.NullString
 	// encoding of pointers
-	AnimatePointersEnconding
+	AnimatePointersEncoding
 }
 
 // AnimateDBs arrays animateDBs
@@ -234,7 +174,7 @@ func (backRepoAnimate *BackRepoAnimateStruct) CommitDeleteInstance(id uint) (Err
 	animateDB := backRepoAnimate.Map_AnimateDBID_AnimateDB[id]
 	query := backRepoAnimate.db.Unscoped().Delete(&animateDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -260,7 +200,7 @@ func (backRepoAnimate *BackRepoAnimateStruct) CommitPhaseOneInstance(animate *mo
 
 	query := backRepoAnimate.db.Create(&animateDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -294,7 +234,7 @@ func (backRepoAnimate *BackRepoAnimateStruct) CommitPhaseTwoInstance(backRepo *B
 		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoAnimate.db.Save(&animateDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -421,7 +361,7 @@ func (backRepo *BackRepoStruct) CheckoutAnimate(animate *models.Animate) {
 			animateDB.ID = id
 
 			if err := backRepo.BackRepoAnimate.db.First(&animateDB, id).Error; err != nil {
-				log.Panicln("CheckoutAnimate : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutAnimate : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoAnimate.CheckoutPhaseOneInstance(&animateDB)
 			backRepo.BackRepoAnimate.CheckoutPhaseTwoInstance(backRepo, &animateDB)
@@ -431,6 +371,26 @@ func (backRepo *BackRepoStruct) CheckoutAnimate(animate *models.Animate) {
 
 // CopyBasicFieldsFromAnimate
 func (animateDB *AnimateDB) CopyBasicFieldsFromAnimate(animate *models.Animate) {
+	// insertion point for fields commit
+
+	animateDB.Name_Data.String = animate.Name
+	animateDB.Name_Data.Valid = true
+
+	animateDB.AttributeName_Data.String = animate.AttributeName
+	animateDB.AttributeName_Data.Valid = true
+
+	animateDB.Values_Data.String = animate.Values
+	animateDB.Values_Data.Valid = true
+
+	animateDB.Dur_Data.String = animate.Dur
+	animateDB.Dur_Data.Valid = true
+
+	animateDB.RepeatCount_Data.String = animate.RepeatCount
+	animateDB.RepeatCount_Data.Valid = true
+}
+
+// CopyBasicFieldsFromAnimate_WOP
+func (animateDB *AnimateDB) CopyBasicFieldsFromAnimate_WOP(animate *models.Animate_WOP) {
 	// insertion point for fields commit
 
 	animateDB.Name_Data.String = animate.Name
@@ -479,6 +439,16 @@ func (animateDB *AnimateDB) CopyBasicFieldsToAnimate(animate *models.Animate) {
 	animate.RepeatCount = animateDB.RepeatCount_Data.String
 }
 
+// CopyBasicFieldsToAnimate_WOP
+func (animateDB *AnimateDB) CopyBasicFieldsToAnimate_WOP(animate *models.Animate_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	animate.Name = animateDB.Name_Data.String
+	animate.AttributeName = animateDB.AttributeName_Data.String
+	animate.Values = animateDB.Values_Data.String
+	animate.Dur = animateDB.Dur_Data.String
+	animate.RepeatCount = animateDB.RepeatCount_Data.String
+}
+
 // CopyBasicFieldsToAnimateWOP
 func (animateDB *AnimateDB) CopyBasicFieldsToAnimateWOP(animate *AnimateWOP) {
 	animate.ID = int(animateDB.ID)
@@ -509,12 +479,12 @@ func (backRepoAnimate *BackRepoAnimateStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Animate ", filename, " ", err.Error())
+		log.Fatal("Cannot json Animate ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Animate file", err.Error())
+		log.Fatal("Cannot write the json Animate file", err.Error())
 	}
 }
 
@@ -534,7 +504,7 @@ func (backRepoAnimate *BackRepoAnimateStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Animate")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -559,13 +529,13 @@ func (backRepoAnimate *BackRepoAnimateStruct) RestoreXLPhaseOne(file *xlsx.File)
 	sh, ok := file.Sheet["Animate"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoAnimate.rowVisitorAnimate)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -587,7 +557,7 @@ func (backRepoAnimate *BackRepoAnimateStruct) rowVisitorAnimate(row *xlsx.Row) e
 		animateDB.ID = 0
 		query := backRepoAnimate.db.Create(animateDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB.ID] = animateDB
 		BackRepoAnimateid_atBckpTime_newID[animateDB_ID_atBackupTime] = animateDB.ID
@@ -607,7 +577,7 @@ func (backRepoAnimate *BackRepoAnimateStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Animate file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Animate file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -624,14 +594,14 @@ func (backRepoAnimate *BackRepoAnimateStruct) RestorePhaseOne(dirPath string) {
 		animateDB.ID = 0
 		query := backRepoAnimate.db.Create(animateDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB.ID] = animateDB
 		BackRepoAnimateid_atBckpTime_newID[animateDB_ID_atBackupTime] = animateDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Animate file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Animate file", err.Error())
 	}
 }
 
@@ -645,70 +615,10 @@ func (backRepoAnimate *BackRepoAnimateStruct) RestorePhaseTwo() {
 		_ = animateDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex animate.Animations
-		if animateDB.Circle_AnimationsDBID.Int64 != 0 {
-			animateDB.Circle_AnimationsDBID.Int64 =
-				int64(BackRepoCircleid_atBckpTime_newID[uint(animateDB.Circle_AnimationsDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.Ellipse_AnimatesDBID.Int64 != 0 {
-			animateDB.Ellipse_AnimatesDBID.Int64 =
-				int64(BackRepoEllipseid_atBckpTime_newID[uint(animateDB.Ellipse_AnimatesDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.Line_AnimatesDBID.Int64 != 0 {
-			animateDB.Line_AnimatesDBID.Int64 =
-				int64(BackRepoLineid_atBckpTime_newID[uint(animateDB.Line_AnimatesDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.LinkAnchoredText_AnimatesDBID.Int64 != 0 {
-			animateDB.LinkAnchoredText_AnimatesDBID.Int64 =
-				int64(BackRepoLinkAnchoredTextid_atBckpTime_newID[uint(animateDB.LinkAnchoredText_AnimatesDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.Path_AnimatesDBID.Int64 != 0 {
-			animateDB.Path_AnimatesDBID.Int64 =
-				int64(BackRepoPathid_atBckpTime_newID[uint(animateDB.Path_AnimatesDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.Polygone_AnimatesDBID.Int64 != 0 {
-			animateDB.Polygone_AnimatesDBID.Int64 =
-				int64(BackRepoPolygoneid_atBckpTime_newID[uint(animateDB.Polygone_AnimatesDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.Polyline_AnimatesDBID.Int64 != 0 {
-			animateDB.Polyline_AnimatesDBID.Int64 =
-				int64(BackRepoPolylineid_atBckpTime_newID[uint(animateDB.Polyline_AnimatesDBID.Int64)])
-		}
-
-		// This reindex animate.Animations
-		if animateDB.Rect_AnimationsDBID.Int64 != 0 {
-			animateDB.Rect_AnimationsDBID.Int64 =
-				int64(BackRepoRectid_atBckpTime_newID[uint(animateDB.Rect_AnimationsDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.RectAnchoredText_AnimatesDBID.Int64 != 0 {
-			animateDB.RectAnchoredText_AnimatesDBID.Int64 =
-				int64(BackRepoRectAnchoredTextid_atBckpTime_newID[uint(animateDB.RectAnchoredText_AnimatesDBID.Int64)])
-		}
-
-		// This reindex animate.Animates
-		if animateDB.Text_AnimatesDBID.Int64 != 0 {
-			animateDB.Text_AnimatesDBID.Int64 =
-				int64(BackRepoTextid_atBckpTime_newID[uint(animateDB.Text_AnimatesDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoAnimate.db.Model(animateDB).Updates(*animateDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -732,96 +642,6 @@ func (backRepoAnimate *BackRepoAnimateStruct) ResetReversePointersInstance(backR
 		_ = animateDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if animateDB.Circle_AnimationsDBID.Int64 != 0 {
-			animateDB.Circle_AnimationsDBID.Int64 = 0
-			animateDB.Circle_AnimationsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.Ellipse_AnimatesDBID.Int64 != 0 {
-			animateDB.Ellipse_AnimatesDBID.Int64 = 0
-			animateDB.Ellipse_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.Line_AnimatesDBID.Int64 != 0 {
-			animateDB.Line_AnimatesDBID.Int64 = 0
-			animateDB.Line_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.LinkAnchoredText_AnimatesDBID.Int64 != 0 {
-			animateDB.LinkAnchoredText_AnimatesDBID.Int64 = 0
-			animateDB.LinkAnchoredText_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.Path_AnimatesDBID.Int64 != 0 {
-			animateDB.Path_AnimatesDBID.Int64 = 0
-			animateDB.Path_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.Polygone_AnimatesDBID.Int64 != 0 {
-			animateDB.Polygone_AnimatesDBID.Int64 = 0
-			animateDB.Polygone_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.Polyline_AnimatesDBID.Int64 != 0 {
-			animateDB.Polyline_AnimatesDBID.Int64 = 0
-			animateDB.Polyline_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.Rect_AnimationsDBID.Int64 != 0 {
-			animateDB.Rect_AnimationsDBID.Int64 = 0
-			animateDB.Rect_AnimationsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.RectAnchoredText_AnimatesDBID.Int64 != 0 {
-			animateDB.RectAnchoredText_AnimatesDBID.Int64 = 0
-			animateDB.RectAnchoredText_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if animateDB.Text_AnimatesDBID.Int64 != 0 {
-			animateDB.Text_AnimatesDBID.Int64 = 0
-			animateDB.Text_AnimatesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoAnimate.db.Save(animateDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

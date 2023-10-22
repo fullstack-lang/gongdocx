@@ -35,22 +35,19 @@ var dummy_RectAnchoredText_sort sort.Float64Slice
 type RectAnchoredTextAPI struct {
 	gorm.Model
 
-	models.RectAnchoredText
+	models.RectAnchoredText_WOP
 
 	// encoding of pointers
-	RectAnchoredTextPointersEnconding
+	RectAnchoredTextPointersEncoding RectAnchoredTextPointersEncoding
 }
 
-// RectAnchoredTextPointersEnconding encodes pointers to Struct and
+// RectAnchoredTextPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type RectAnchoredTextPointersEnconding struct {
+type RectAnchoredTextPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
-	// Implementation of a reverse ID for field Rect{}.RectAnchoredTexts []*RectAnchoredText
-	Rect_RectAnchoredTextsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Rect_RectAnchoredTextsDBID_Index sql.NullInt64
+	// field Animates is a slice of pointers to another Struct (optional or 0..1)
+	Animates IntSlice `gorm:"type:TEXT"`
 }
 
 // RectAnchoredTextDB describes a rectanchoredtext in the database
@@ -109,7 +106,7 @@ type RectAnchoredTextDB struct {
 	// Declation for basic field rectanchoredtextDB.Transform
 	Transform_Data sql.NullString
 	// encoding of pointers
-	RectAnchoredTextPointersEnconding
+	RectAnchoredTextPointersEncoding
 }
 
 // RectAnchoredTextDBs arrays rectanchoredtextDBs
@@ -240,7 +237,7 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) CommitDeleteInst
 	rectanchoredtextDB := backRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextDB[id]
 	query := backRepoRectAnchoredText.db.Unscoped().Delete(&rectanchoredtextDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -266,7 +263,7 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) CommitPhaseOneIn
 
 	query := backRepoRectAnchoredText.db.Create(&rectanchoredtextDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -298,28 +295,19 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) CommitPhaseTwoIn
 		rectanchoredtextDB.CopyBasicFieldsFromRectAnchoredText(rectanchoredtext)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers rectanchoredtext.Animates into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, animateAssocEnd := range rectanchoredtext.Animates {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		rectanchoredtextDB.RectAnchoredTextPointersEncoding.Animates = make([]int, 0)
+		// 2. encode
+		for _, animateAssocEnd := range rectanchoredtext.Animates {
 			animateAssocEnd_DB :=
 				backRepo.BackRepoAnimate.GetAnimateDBFromAnimatePtr(animateAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			animateAssocEnd_DB.RectAnchoredText_AnimatesDBID.Int64 = int64(rectanchoredtextDB.ID)
-			animateAssocEnd_DB.RectAnchoredText_AnimatesDBID.Valid = true
-			animateAssocEnd_DB.RectAnchoredText_AnimatesDBID_Index.Int64 = int64(idx)
-			animateAssocEnd_DB.RectAnchoredText_AnimatesDBID_Index.Valid = true
-			if q := backRepoRectAnchoredText.db.Save(animateAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			rectanchoredtextDB.RectAnchoredTextPointersEncoding.Animates =
+				append(rectanchoredtextDB.RectAnchoredTextPointersEncoding.Animates, int(animateAssocEnd_DB.ID))
 		}
 
 		query := backRepoRectAnchoredText.db.Save(&rectanchoredtextDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -429,27 +417,9 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) CheckoutPhaseTwo
 	// it appends the stage instance
 	// 1. reset the slice
 	rectanchoredtext.Animates = rectanchoredtext.Animates[:0]
-	// 2. loop all instances in the type in the association end
-	for _, animateDB_AssocEnd := range backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if animateDB_AssocEnd.RectAnchoredText_AnimatesDBID.Int64 == int64(rectanchoredtextDB.ID) {
-			// 4. fetch the associated instance in the stage
-			animate_AssocEnd := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[animateDB_AssocEnd.ID]
-			// 5. append it the association slice
-			rectanchoredtext.Animates = append(rectanchoredtext.Animates, animate_AssocEnd)
-		}
+	for _, _Animateid := range rectanchoredtextDB.RectAnchoredTextPointersEncoding.Animates {
+		rectanchoredtext.Animates = append(rectanchoredtext.Animates, backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[uint(_Animateid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(rectanchoredtext.Animates, func(i, j int) bool {
-		animateDB_i_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[rectanchoredtext.Animates[i]]
-		animateDB_j_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[rectanchoredtext.Animates[j]]
-
-		animateDB_i := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_i_ID]
-		animateDB_j := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_j_ID]
-
-		return animateDB_i.RectAnchoredText_AnimatesDBID_Index.Int64 < animateDB_j.RectAnchoredText_AnimatesDBID_Index.Int64
-	})
 
 	return
 }
@@ -473,7 +443,7 @@ func (backRepo *BackRepoStruct) CheckoutRectAnchoredText(rectanchoredtext *model
 			rectanchoredtextDB.ID = id
 
 			if err := backRepo.BackRepoRectAnchoredText.db.First(&rectanchoredtextDB, id).Error; err != nil {
-				log.Panicln("CheckoutRectAnchoredText : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutRectAnchoredText : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoRectAnchoredText.CheckoutPhaseOneInstance(&rectanchoredtextDB)
 			backRepo.BackRepoRectAnchoredText.CheckoutPhaseTwoInstance(backRepo, &rectanchoredtextDB)
@@ -483,6 +453,56 @@ func (backRepo *BackRepoStruct) CheckoutRectAnchoredText(rectanchoredtext *model
 
 // CopyBasicFieldsFromRectAnchoredText
 func (rectanchoredtextDB *RectAnchoredTextDB) CopyBasicFieldsFromRectAnchoredText(rectanchoredtext *models.RectAnchoredText) {
+	// insertion point for fields commit
+
+	rectanchoredtextDB.Name_Data.String = rectanchoredtext.Name
+	rectanchoredtextDB.Name_Data.Valid = true
+
+	rectanchoredtextDB.Content_Data.String = rectanchoredtext.Content
+	rectanchoredtextDB.Content_Data.Valid = true
+
+	rectanchoredtextDB.FontWeight_Data.String = rectanchoredtext.FontWeight
+	rectanchoredtextDB.FontWeight_Data.Valid = true
+
+	rectanchoredtextDB.FontSize_Data.Int64 = int64(rectanchoredtext.FontSize)
+	rectanchoredtextDB.FontSize_Data.Valid = true
+
+	rectanchoredtextDB.X_Offset_Data.Float64 = rectanchoredtext.X_Offset
+	rectanchoredtextDB.X_Offset_Data.Valid = true
+
+	rectanchoredtextDB.Y_Offset_Data.Float64 = rectanchoredtext.Y_Offset
+	rectanchoredtextDB.Y_Offset_Data.Valid = true
+
+	rectanchoredtextDB.RectAnchorType_Data.String = rectanchoredtext.RectAnchorType.ToString()
+	rectanchoredtextDB.RectAnchorType_Data.Valid = true
+
+	rectanchoredtextDB.TextAnchorType_Data.String = rectanchoredtext.TextAnchorType.ToString()
+	rectanchoredtextDB.TextAnchorType_Data.Valid = true
+
+	rectanchoredtextDB.Color_Data.String = rectanchoredtext.Color
+	rectanchoredtextDB.Color_Data.Valid = true
+
+	rectanchoredtextDB.FillOpacity_Data.Float64 = rectanchoredtext.FillOpacity
+	rectanchoredtextDB.FillOpacity_Data.Valid = true
+
+	rectanchoredtextDB.Stroke_Data.String = rectanchoredtext.Stroke
+	rectanchoredtextDB.Stroke_Data.Valid = true
+
+	rectanchoredtextDB.StrokeWidth_Data.Float64 = rectanchoredtext.StrokeWidth
+	rectanchoredtextDB.StrokeWidth_Data.Valid = true
+
+	rectanchoredtextDB.StrokeDashArray_Data.String = rectanchoredtext.StrokeDashArray
+	rectanchoredtextDB.StrokeDashArray_Data.Valid = true
+
+	rectanchoredtextDB.StrokeDashArrayWhenSelected_Data.String = rectanchoredtext.StrokeDashArrayWhenSelected
+	rectanchoredtextDB.StrokeDashArrayWhenSelected_Data.Valid = true
+
+	rectanchoredtextDB.Transform_Data.String = rectanchoredtext.Transform
+	rectanchoredtextDB.Transform_Data.Valid = true
+}
+
+// CopyBasicFieldsFromRectAnchoredText_WOP
+func (rectanchoredtextDB *RectAnchoredTextDB) CopyBasicFieldsFromRectAnchoredText_WOP(rectanchoredtext *models.RectAnchoredText_WOP) {
 	// insertion point for fields commit
 
 	rectanchoredtextDB.Name_Data.String = rectanchoredtext.Name
@@ -601,6 +621,26 @@ func (rectanchoredtextDB *RectAnchoredTextDB) CopyBasicFieldsToRectAnchoredText(
 	rectanchoredtext.Transform = rectanchoredtextDB.Transform_Data.String
 }
 
+// CopyBasicFieldsToRectAnchoredText_WOP
+func (rectanchoredtextDB *RectAnchoredTextDB) CopyBasicFieldsToRectAnchoredText_WOP(rectanchoredtext *models.RectAnchoredText_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	rectanchoredtext.Name = rectanchoredtextDB.Name_Data.String
+	rectanchoredtext.Content = rectanchoredtextDB.Content_Data.String
+	rectanchoredtext.FontWeight = rectanchoredtextDB.FontWeight_Data.String
+	rectanchoredtext.FontSize = int(rectanchoredtextDB.FontSize_Data.Int64)
+	rectanchoredtext.X_Offset = rectanchoredtextDB.X_Offset_Data.Float64
+	rectanchoredtext.Y_Offset = rectanchoredtextDB.Y_Offset_Data.Float64
+	rectanchoredtext.RectAnchorType.FromString(rectanchoredtextDB.RectAnchorType_Data.String)
+	rectanchoredtext.TextAnchorType.FromString(rectanchoredtextDB.TextAnchorType_Data.String)
+	rectanchoredtext.Color = rectanchoredtextDB.Color_Data.String
+	rectanchoredtext.FillOpacity = rectanchoredtextDB.FillOpacity_Data.Float64
+	rectanchoredtext.Stroke = rectanchoredtextDB.Stroke_Data.String
+	rectanchoredtext.StrokeWidth = rectanchoredtextDB.StrokeWidth_Data.Float64
+	rectanchoredtext.StrokeDashArray = rectanchoredtextDB.StrokeDashArray_Data.String
+	rectanchoredtext.StrokeDashArrayWhenSelected = rectanchoredtextDB.StrokeDashArrayWhenSelected_Data.String
+	rectanchoredtext.Transform = rectanchoredtextDB.Transform_Data.String
+}
+
 // CopyBasicFieldsToRectAnchoredTextWOP
 func (rectanchoredtextDB *RectAnchoredTextDB) CopyBasicFieldsToRectAnchoredTextWOP(rectanchoredtext *RectAnchoredTextWOP) {
 	rectanchoredtext.ID = int(rectanchoredtextDB.ID)
@@ -641,12 +681,12 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) Backup(dirPath s
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json RectAnchoredText ", filename, " ", err.Error())
+		log.Fatal("Cannot json RectAnchoredText ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json RectAnchoredText file", err.Error())
+		log.Fatal("Cannot write the json RectAnchoredText file", err.Error())
 	}
 }
 
@@ -666,7 +706,7 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) BackupXL(file *x
 
 	sh, err := file.AddSheet("RectAnchoredText")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -691,13 +731,13 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) RestoreXLPhaseOn
 	sh, ok := file.Sheet["RectAnchoredText"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoRectAnchoredText.rowVisitorRectAnchoredText)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -719,7 +759,7 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) rowVisitorRectAn
 		rectanchoredtextDB.ID = 0
 		query := backRepoRectAnchoredText.db.Create(rectanchoredtextDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextDB[rectanchoredtextDB.ID] = rectanchoredtextDB
 		BackRepoRectAnchoredTextid_atBckpTime_newID[rectanchoredtextDB_ID_atBackupTime] = rectanchoredtextDB.ID
@@ -739,7 +779,7 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) RestorePhaseOne(
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json RectAnchoredText file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json RectAnchoredText file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -756,14 +796,14 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) RestorePhaseOne(
 		rectanchoredtextDB.ID = 0
 		query := backRepoRectAnchoredText.db.Create(rectanchoredtextDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextDB[rectanchoredtextDB.ID] = rectanchoredtextDB
 		BackRepoRectAnchoredTextid_atBckpTime_newID[rectanchoredtextDB_ID_atBackupTime] = rectanchoredtextDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json RectAnchoredText file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json RectAnchoredText file", err.Error())
 	}
 }
 
@@ -777,16 +817,10 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) RestorePhaseTwo(
 		_ = rectanchoredtextDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex rectanchoredtext.RectAnchoredTexts
-		if rectanchoredtextDB.Rect_RectAnchoredTextsDBID.Int64 != 0 {
-			rectanchoredtextDB.Rect_RectAnchoredTextsDBID.Int64 =
-				int64(BackRepoRectid_atBckpTime_newID[uint(rectanchoredtextDB.Rect_RectAnchoredTextsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoRectAnchoredText.db.Model(rectanchoredtextDB).Updates(*rectanchoredtextDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -810,15 +844,6 @@ func (backRepoRectAnchoredText *BackRepoRectAnchoredTextStruct) ResetReversePoin
 		_ = rectanchoredtextDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if rectanchoredtextDB.Rect_RectAnchoredTextsDBID.Int64 != 0 {
-			rectanchoredtextDB.Rect_RectAnchoredTextsDBID.Int64 = 0
-			rectanchoredtextDB.Rect_RectAnchoredTextsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoRectAnchoredText.db.Save(rectanchoredtextDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

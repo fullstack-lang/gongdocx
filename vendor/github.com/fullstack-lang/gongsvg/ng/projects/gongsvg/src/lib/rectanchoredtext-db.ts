@@ -1,6 +1,5 @@
 // insertion point for imports
 import { AnimateDB } from './animate-db'
-import { RectDB } from './rect-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -30,10 +29,13 @@ export class RectAnchoredTextDB {
 	StrokeDashArrayWhenSelected: string = ""
 	Transform: string = ""
 
-	// insertion point for other declarations
-	Animates?: Array<AnimateDB>
-	Rect_RectAnchoredTextsDBID: NullInt64 = new NullInt64
-	Rect_RectAnchoredTextsDBID_Index: NullInt64  = new NullInt64 // store the index of the rectanchoredtext instance in Rect.RectAnchoredTexts
-	Rect_RectAnchoredTexts_reverse?: RectDB 
+	// insertion point for pointers and slices of pointers declarations
+	Animates: Array<AnimateDB> = []
 
+	RectAnchoredTextPointersEncoding: RectAnchoredTextPointersEncoding = new RectAnchoredTextPointersEncoding
+}
+
+export class RectAnchoredTextPointersEncoding {
+	// insertion point for pointers and slices of pointers encoding fields
+	Animates: number[] = []
 }

@@ -35,22 +35,19 @@ var dummy_Polyline_sort sort.Float64Slice
 type PolylineAPI struct {
 	gorm.Model
 
-	models.Polyline
+	models.Polyline_WOP
 
 	// encoding of pointers
-	PolylinePointersEnconding
+	PolylinePointersEncoding PolylinePointersEncoding
 }
 
-// PolylinePointersEnconding encodes pointers to Struct and
+// PolylinePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type PolylinePointersEnconding struct {
+type PolylinePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
-	// Implementation of a reverse ID for field Layer{}.Polylines []*Polyline
-	Layer_PolylinesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Layer_PolylinesDBID_Index sql.NullInt64
+	// field Animates is a slice of pointers to another Struct (optional or 0..1)
+	Animates IntSlice `gorm:"type:TEXT"`
 }
 
 // PolylineDB describes a polyline in the database
@@ -91,7 +88,7 @@ type PolylineDB struct {
 	// Declation for basic field polylineDB.Transform
 	Transform_Data sql.NullString
 	// encoding of pointers
-	PolylinePointersEnconding
+	PolylinePointersEncoding
 }
 
 // PolylineDBs arrays polylineDBs
@@ -204,7 +201,7 @@ func (backRepoPolyline *BackRepoPolylineStruct) CommitDeleteInstance(id uint) (E
 	polylineDB := backRepoPolyline.Map_PolylineDBID_PolylineDB[id]
 	query := backRepoPolyline.db.Unscoped().Delete(&polylineDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -230,7 +227,7 @@ func (backRepoPolyline *BackRepoPolylineStruct) CommitPhaseOneInstance(polyline 
 
 	query := backRepoPolyline.db.Create(&polylineDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -262,28 +259,19 @@ func (backRepoPolyline *BackRepoPolylineStruct) CommitPhaseTwoInstance(backRepo 
 		polylineDB.CopyBasicFieldsFromPolyline(polyline)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers polyline.Animates into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, animateAssocEnd := range polyline.Animates {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		polylineDB.PolylinePointersEncoding.Animates = make([]int, 0)
+		// 2. encode
+		for _, animateAssocEnd := range polyline.Animates {
 			animateAssocEnd_DB :=
 				backRepo.BackRepoAnimate.GetAnimateDBFromAnimatePtr(animateAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			animateAssocEnd_DB.Polyline_AnimatesDBID.Int64 = int64(polylineDB.ID)
-			animateAssocEnd_DB.Polyline_AnimatesDBID.Valid = true
-			animateAssocEnd_DB.Polyline_AnimatesDBID_Index.Int64 = int64(idx)
-			animateAssocEnd_DB.Polyline_AnimatesDBID_Index.Valid = true
-			if q := backRepoPolyline.db.Save(animateAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			polylineDB.PolylinePointersEncoding.Animates =
+				append(polylineDB.PolylinePointersEncoding.Animates, int(animateAssocEnd_DB.ID))
 		}
 
 		query := backRepoPolyline.db.Save(&polylineDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -393,27 +381,9 @@ func (backRepoPolyline *BackRepoPolylineStruct) CheckoutPhaseTwoInstance(backRep
 	// it appends the stage instance
 	// 1. reset the slice
 	polyline.Animates = polyline.Animates[:0]
-	// 2. loop all instances in the type in the association end
-	for _, animateDB_AssocEnd := range backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if animateDB_AssocEnd.Polyline_AnimatesDBID.Int64 == int64(polylineDB.ID) {
-			// 4. fetch the associated instance in the stage
-			animate_AssocEnd := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[animateDB_AssocEnd.ID]
-			// 5. append it the association slice
-			polyline.Animates = append(polyline.Animates, animate_AssocEnd)
-		}
+	for _, _Animateid := range polylineDB.PolylinePointersEncoding.Animates {
+		polyline.Animates = append(polyline.Animates, backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[uint(_Animateid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(polyline.Animates, func(i, j int) bool {
-		animateDB_i_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[polyline.Animates[i]]
-		animateDB_j_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[polyline.Animates[j]]
-
-		animateDB_i := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_i_ID]
-		animateDB_j := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_j_ID]
-
-		return animateDB_i.Polyline_AnimatesDBID_Index.Int64 < animateDB_j.Polyline_AnimatesDBID_Index.Int64
-	})
 
 	return
 }
@@ -437,7 +407,7 @@ func (backRepo *BackRepoStruct) CheckoutPolyline(polyline *models.Polyline) {
 			polylineDB.ID = id
 
 			if err := backRepo.BackRepoPolyline.db.First(&polylineDB, id).Error; err != nil {
-				log.Panicln("CheckoutPolyline : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutPolyline : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoPolyline.CheckoutPhaseOneInstance(&polylineDB)
 			backRepo.BackRepoPolyline.CheckoutPhaseTwoInstance(backRepo, &polylineDB)
@@ -447,6 +417,38 @@ func (backRepo *BackRepoStruct) CheckoutPolyline(polyline *models.Polyline) {
 
 // CopyBasicFieldsFromPolyline
 func (polylineDB *PolylineDB) CopyBasicFieldsFromPolyline(polyline *models.Polyline) {
+	// insertion point for fields commit
+
+	polylineDB.Name_Data.String = polyline.Name
+	polylineDB.Name_Data.Valid = true
+
+	polylineDB.Points_Data.String = polyline.Points
+	polylineDB.Points_Data.Valid = true
+
+	polylineDB.Color_Data.String = polyline.Color
+	polylineDB.Color_Data.Valid = true
+
+	polylineDB.FillOpacity_Data.Float64 = polyline.FillOpacity
+	polylineDB.FillOpacity_Data.Valid = true
+
+	polylineDB.Stroke_Data.String = polyline.Stroke
+	polylineDB.Stroke_Data.Valid = true
+
+	polylineDB.StrokeWidth_Data.Float64 = polyline.StrokeWidth
+	polylineDB.StrokeWidth_Data.Valid = true
+
+	polylineDB.StrokeDashArray_Data.String = polyline.StrokeDashArray
+	polylineDB.StrokeDashArray_Data.Valid = true
+
+	polylineDB.StrokeDashArrayWhenSelected_Data.String = polyline.StrokeDashArrayWhenSelected
+	polylineDB.StrokeDashArrayWhenSelected_Data.Valid = true
+
+	polylineDB.Transform_Data.String = polyline.Transform
+	polylineDB.Transform_Data.Valid = true
+}
+
+// CopyBasicFieldsFromPolyline_WOP
+func (polylineDB *PolylineDB) CopyBasicFieldsFromPolyline_WOP(polyline *models.Polyline_WOP) {
 	// insertion point for fields commit
 
 	polylineDB.Name_Data.String = polyline.Name
@@ -523,6 +525,20 @@ func (polylineDB *PolylineDB) CopyBasicFieldsToPolyline(polyline *models.Polylin
 	polyline.Transform = polylineDB.Transform_Data.String
 }
 
+// CopyBasicFieldsToPolyline_WOP
+func (polylineDB *PolylineDB) CopyBasicFieldsToPolyline_WOP(polyline *models.Polyline_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	polyline.Name = polylineDB.Name_Data.String
+	polyline.Points = polylineDB.Points_Data.String
+	polyline.Color = polylineDB.Color_Data.String
+	polyline.FillOpacity = polylineDB.FillOpacity_Data.Float64
+	polyline.Stroke = polylineDB.Stroke_Data.String
+	polyline.StrokeWidth = polylineDB.StrokeWidth_Data.Float64
+	polyline.StrokeDashArray = polylineDB.StrokeDashArray_Data.String
+	polyline.StrokeDashArrayWhenSelected = polylineDB.StrokeDashArrayWhenSelected_Data.String
+	polyline.Transform = polylineDB.Transform_Data.String
+}
+
 // CopyBasicFieldsToPolylineWOP
 func (polylineDB *PolylineDB) CopyBasicFieldsToPolylineWOP(polyline *PolylineWOP) {
 	polyline.ID = int(polylineDB.ID)
@@ -557,12 +573,12 @@ func (backRepoPolyline *BackRepoPolylineStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Polyline ", filename, " ", err.Error())
+		log.Fatal("Cannot json Polyline ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Polyline file", err.Error())
+		log.Fatal("Cannot write the json Polyline file", err.Error())
 	}
 }
 
@@ -582,7 +598,7 @@ func (backRepoPolyline *BackRepoPolylineStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Polyline")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -607,13 +623,13 @@ func (backRepoPolyline *BackRepoPolylineStruct) RestoreXLPhaseOne(file *xlsx.Fil
 	sh, ok := file.Sheet["Polyline"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoPolyline.rowVisitorPolyline)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -635,7 +651,7 @@ func (backRepoPolyline *BackRepoPolylineStruct) rowVisitorPolyline(row *xlsx.Row
 		polylineDB.ID = 0
 		query := backRepoPolyline.db.Create(polylineDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoPolyline.Map_PolylineDBID_PolylineDB[polylineDB.ID] = polylineDB
 		BackRepoPolylineid_atBckpTime_newID[polylineDB_ID_atBackupTime] = polylineDB.ID
@@ -655,7 +671,7 @@ func (backRepoPolyline *BackRepoPolylineStruct) RestorePhaseOne(dirPath string) 
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Polyline file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Polyline file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -672,14 +688,14 @@ func (backRepoPolyline *BackRepoPolylineStruct) RestorePhaseOne(dirPath string) 
 		polylineDB.ID = 0
 		query := backRepoPolyline.db.Create(polylineDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoPolyline.Map_PolylineDBID_PolylineDB[polylineDB.ID] = polylineDB
 		BackRepoPolylineid_atBckpTime_newID[polylineDB_ID_atBackupTime] = polylineDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Polyline file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Polyline file", err.Error())
 	}
 }
 
@@ -693,16 +709,10 @@ func (backRepoPolyline *BackRepoPolylineStruct) RestorePhaseTwo() {
 		_ = polylineDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex polyline.Polylines
-		if polylineDB.Layer_PolylinesDBID.Int64 != 0 {
-			polylineDB.Layer_PolylinesDBID.Int64 =
-				int64(BackRepoLayerid_atBckpTime_newID[uint(polylineDB.Layer_PolylinesDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoPolyline.db.Model(polylineDB).Updates(*polylineDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -726,15 +736,6 @@ func (backRepoPolyline *BackRepoPolylineStruct) ResetReversePointersInstance(bac
 		_ = polylineDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if polylineDB.Layer_PolylinesDBID.Int64 != 0 {
-			polylineDB.Layer_PolylinesDBID.Int64 = 0
-			polylineDB.Layer_PolylinesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoPolyline.db.Save(polylineDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

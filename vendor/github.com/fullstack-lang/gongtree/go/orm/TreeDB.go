@@ -35,16 +35,19 @@ var dummy_Tree_sort sort.Float64Slice
 type TreeAPI struct {
 	gorm.Model
 
-	models.Tree
+	models.Tree_WOP
 
 	// encoding of pointers
-	TreePointersEnconding
+	TreePointersEncoding TreePointersEncoding
 }
 
-// TreePointersEnconding encodes pointers to Struct and
+// TreePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type TreePointersEnconding struct {
+type TreePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
+
+	// field RootNodes is a slice of pointers to another Struct (optional or 0..1)
+	RootNodes IntSlice `gorm:"type:TEXT"`
 }
 
 // TreeDB describes a tree in the database
@@ -61,7 +64,7 @@ type TreeDB struct {
 	// Declation for basic field treeDB.Name
 	Name_Data sql.NullString
 	// encoding of pointers
-	TreePointersEnconding
+	TreePointersEncoding
 }
 
 // TreeDBs arrays treeDBs
@@ -150,7 +153,7 @@ func (backRepoTree *BackRepoTreeStruct) CommitDeleteInstance(id uint) (Error err
 	treeDB := backRepoTree.Map_TreeDBID_TreeDB[id]
 	query := backRepoTree.db.Unscoped().Delete(&treeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -176,7 +179,7 @@ func (backRepoTree *BackRepoTreeStruct) CommitPhaseOneInstance(tree *models.Tree
 
 	query := backRepoTree.db.Create(&treeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -208,28 +211,19 @@ func (backRepoTree *BackRepoTreeStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		treeDB.CopyBasicFieldsFromTree(tree)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers tree.RootNodes into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, nodeAssocEnd := range tree.RootNodes {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		treeDB.TreePointersEncoding.RootNodes = make([]int, 0)
+		// 2. encode
+		for _, nodeAssocEnd := range tree.RootNodes {
 			nodeAssocEnd_DB :=
 				backRepo.BackRepoNode.GetNodeDBFromNodePtr(nodeAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			nodeAssocEnd_DB.Tree_RootNodesDBID.Int64 = int64(treeDB.ID)
-			nodeAssocEnd_DB.Tree_RootNodesDBID.Valid = true
-			nodeAssocEnd_DB.Tree_RootNodesDBID_Index.Int64 = int64(idx)
-			nodeAssocEnd_DB.Tree_RootNodesDBID_Index.Valid = true
-			if q := backRepoTree.db.Save(nodeAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			treeDB.TreePointersEncoding.RootNodes =
+				append(treeDB.TreePointersEncoding.RootNodes, int(nodeAssocEnd_DB.ID))
 		}
 
 		query := backRepoTree.db.Save(&treeDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -339,27 +333,9 @@ func (backRepoTree *BackRepoTreeStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// it appends the stage instance
 	// 1. reset the slice
 	tree.RootNodes = tree.RootNodes[:0]
-	// 2. loop all instances in the type in the association end
-	for _, nodeDB_AssocEnd := range backRepo.BackRepoNode.Map_NodeDBID_NodeDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if nodeDB_AssocEnd.Tree_RootNodesDBID.Int64 == int64(treeDB.ID) {
-			// 4. fetch the associated instance in the stage
-			node_AssocEnd := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[nodeDB_AssocEnd.ID]
-			// 5. append it the association slice
-			tree.RootNodes = append(tree.RootNodes, node_AssocEnd)
-		}
+	for _, _Nodeid := range treeDB.TreePointersEncoding.RootNodes {
+		tree.RootNodes = append(tree.RootNodes, backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(_Nodeid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(tree.RootNodes, func(i, j int) bool {
-		nodeDB_i_ID := backRepo.BackRepoNode.Map_NodePtr_NodeDBID[tree.RootNodes[i]]
-		nodeDB_j_ID := backRepo.BackRepoNode.Map_NodePtr_NodeDBID[tree.RootNodes[j]]
-
-		nodeDB_i := backRepo.BackRepoNode.Map_NodeDBID_NodeDB[nodeDB_i_ID]
-		nodeDB_j := backRepo.BackRepoNode.Map_NodeDBID_NodeDB[nodeDB_j_ID]
-
-		return nodeDB_i.Tree_RootNodesDBID_Index.Int64 < nodeDB_j.Tree_RootNodesDBID_Index.Int64
-	})
 
 	return
 }
@@ -383,7 +359,7 @@ func (backRepo *BackRepoStruct) CheckoutTree(tree *models.Tree) {
 			treeDB.ID = id
 
 			if err := backRepo.BackRepoTree.db.First(&treeDB, id).Error; err != nil {
-				log.Panicln("CheckoutTree : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutTree : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTree.CheckoutPhaseOneInstance(&treeDB)
 			backRepo.BackRepoTree.CheckoutPhaseTwoInstance(backRepo, &treeDB)
@@ -393,6 +369,14 @@ func (backRepo *BackRepoStruct) CheckoutTree(tree *models.Tree) {
 
 // CopyBasicFieldsFromTree
 func (treeDB *TreeDB) CopyBasicFieldsFromTree(tree *models.Tree) {
+	// insertion point for fields commit
+
+	treeDB.Name_Data.String = tree.Name
+	treeDB.Name_Data.Valid = true
+}
+
+// CopyBasicFieldsFromTree_WOP
+func (treeDB *TreeDB) CopyBasicFieldsFromTree_WOP(tree *models.Tree_WOP) {
 	// insertion point for fields commit
 
 	treeDB.Name_Data.String = tree.Name
@@ -409,6 +393,12 @@ func (treeDB *TreeDB) CopyBasicFieldsFromTreeWOP(tree *TreeWOP) {
 
 // CopyBasicFieldsToTree
 func (treeDB *TreeDB) CopyBasicFieldsToTree(tree *models.Tree) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	tree.Name = treeDB.Name_Data.String
+}
+
+// CopyBasicFieldsToTree_WOP
+func (treeDB *TreeDB) CopyBasicFieldsToTree_WOP(tree *models.Tree_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	tree.Name = treeDB.Name_Data.String
 }
@@ -439,12 +429,12 @@ func (backRepoTree *BackRepoTreeStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Tree ", filename, " ", err.Error())
+		log.Fatal("Cannot json Tree ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Tree file", err.Error())
+		log.Fatal("Cannot write the json Tree file", err.Error())
 	}
 }
 
@@ -464,7 +454,7 @@ func (backRepoTree *BackRepoTreeStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Tree")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -489,13 +479,13 @@ func (backRepoTree *BackRepoTreeStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Tree"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoTree.rowVisitorTree)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -517,7 +507,7 @@ func (backRepoTree *BackRepoTreeStruct) rowVisitorTree(row *xlsx.Row) error {
 		treeDB.ID = 0
 		query := backRepoTree.db.Create(treeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTree.Map_TreeDBID_TreeDB[treeDB.ID] = treeDB
 		BackRepoTreeid_atBckpTime_newID[treeDB_ID_atBackupTime] = treeDB.ID
@@ -537,7 +527,7 @@ func (backRepoTree *BackRepoTreeStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Tree file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Tree file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -554,14 +544,14 @@ func (backRepoTree *BackRepoTreeStruct) RestorePhaseOne(dirPath string) {
 		treeDB.ID = 0
 		query := backRepoTree.db.Create(treeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoTree.Map_TreeDBID_TreeDB[treeDB.ID] = treeDB
 		BackRepoTreeid_atBckpTime_newID[treeDB_ID_atBackupTime] = treeDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Tree file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Tree file", err.Error())
 	}
 }
 
@@ -578,7 +568,7 @@ func (backRepoTree *BackRepoTreeStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoTree.db.Model(treeDB).Updates(*treeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

@@ -35,15 +35,15 @@ var dummy_Link_sort sort.Float64Slice
 type LinkAPI struct {
 	gorm.Model
 
-	models.Link
+	models.Link_WOP
 
 	// encoding of pointers
-	LinkPointersEnconding
+	LinkPointersEncoding LinkPointersEncoding
 }
 
-// LinkPointersEnconding encodes pointers to Struct and
+// LinkPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type LinkPointersEnconding struct {
+type LinkPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Start is a pointer to another Struct (optional or 0..1)
@@ -54,11 +54,14 @@ type LinkPointersEnconding struct {
 	// This field is generated into another field to enable AS ONE association
 	EndID sql.NullInt64
 
-	// Implementation of a reverse ID for field Layer{}.Links []*Link
-	Layer_LinksDBID sql.NullInt64
+	// field TextAtArrowEnd is a slice of pointers to another Struct (optional or 0..1)
+	TextAtArrowEnd IntSlice `gorm:"type:TEXT"`
 
-	// implementation of the index of the withing the slice
-	Layer_LinksDBID_Index sql.NullInt64
+	// field TextAtArrowStart is a slice of pointers to another Struct (optional or 0..1)
+	TextAtArrowStart IntSlice `gorm:"type:TEXT"`
+
+	// field ControlPoints is a slice of pointers to another Struct (optional or 0..1)
+	ControlPoints IntSlice `gorm:"type:TEXT"`
 }
 
 // LinkDB describes a link in the database
@@ -130,7 +133,7 @@ type LinkDB struct {
 	// Declation for basic field linkDB.Transform
 	Transform_Data sql.NullString
 	// encoding of pointers
-	LinkPointersEnconding
+	LinkPointersEncoding
 }
 
 // LinkDBs arrays linkDBs
@@ -273,7 +276,7 @@ func (backRepoLink *BackRepoLinkStruct) CommitDeleteInstance(id uint) (Error err
 	linkDB := backRepoLink.Map_LinkDBID_LinkDB[id]
 	query := backRepoLink.db.Unscoped().Delete(&linkDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -299,7 +302,7 @@ func (backRepoLink *BackRepoLinkStruct) CommitPhaseOneInstance(link *models.Link
 
 	query := backRepoLink.db.Create(&linkDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -355,66 +358,39 @@ func (backRepoLink *BackRepoLinkStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			linkDB.EndID.Valid = true
 		}
 
-		// This loop encodes the slice of pointers link.TextAtArrowEnd into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, linkanchoredtextAssocEnd := range link.TextAtArrowEnd {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		linkDB.LinkPointersEncoding.TextAtArrowEnd = make([]int, 0)
+		// 2. encode
+		for _, linkanchoredtextAssocEnd := range link.TextAtArrowEnd {
 			linkanchoredtextAssocEnd_DB :=
 				backRepo.BackRepoLinkAnchoredText.GetLinkAnchoredTextDBFromLinkAnchoredTextPtr(linkanchoredtextAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowEndDBID.Int64 = int64(linkDB.ID)
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowEndDBID.Valid = true
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowEndDBID_Index.Int64 = int64(idx)
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowEndDBID_Index.Valid = true
-			if q := backRepoLink.db.Save(linkanchoredtextAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			linkDB.LinkPointersEncoding.TextAtArrowEnd =
+				append(linkDB.LinkPointersEncoding.TextAtArrowEnd, int(linkanchoredtextAssocEnd_DB.ID))
 		}
 
-		// This loop encodes the slice of pointers link.TextAtArrowStart into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, linkanchoredtextAssocEnd := range link.TextAtArrowStart {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		linkDB.LinkPointersEncoding.TextAtArrowStart = make([]int, 0)
+		// 2. encode
+		for _, linkanchoredtextAssocEnd := range link.TextAtArrowStart {
 			linkanchoredtextAssocEnd_DB :=
 				backRepo.BackRepoLinkAnchoredText.GetLinkAnchoredTextDBFromLinkAnchoredTextPtr(linkanchoredtextAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowStartDBID.Int64 = int64(linkDB.ID)
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowStartDBID.Valid = true
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowStartDBID_Index.Int64 = int64(idx)
-			linkanchoredtextAssocEnd_DB.Link_TextAtArrowStartDBID_Index.Valid = true
-			if q := backRepoLink.db.Save(linkanchoredtextAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			linkDB.LinkPointersEncoding.TextAtArrowStart =
+				append(linkDB.LinkPointersEncoding.TextAtArrowStart, int(linkanchoredtextAssocEnd_DB.ID))
 		}
 
-		// This loop encodes the slice of pointers link.ControlPoints into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, pointAssocEnd := range link.ControlPoints {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		linkDB.LinkPointersEncoding.ControlPoints = make([]int, 0)
+		// 2. encode
+		for _, pointAssocEnd := range link.ControlPoints {
 			pointAssocEnd_DB :=
 				backRepo.BackRepoPoint.GetPointDBFromPointPtr(pointAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			pointAssocEnd_DB.Link_ControlPointsDBID.Int64 = int64(linkDB.ID)
-			pointAssocEnd_DB.Link_ControlPointsDBID.Valid = true
-			pointAssocEnd_DB.Link_ControlPointsDBID_Index.Int64 = int64(idx)
-			pointAssocEnd_DB.Link_ControlPointsDBID_Index.Valid = true
-			if q := backRepoLink.db.Save(pointAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			linkDB.LinkPointersEncoding.ControlPoints =
+				append(linkDB.LinkPointersEncoding.ControlPoints, int(pointAssocEnd_DB.ID))
 		}
 
 		query := backRepoLink.db.Save(&linkDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -534,81 +510,27 @@ func (backRepoLink *BackRepoLinkStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// it appends the stage instance
 	// 1. reset the slice
 	link.TextAtArrowEnd = link.TextAtArrowEnd[:0]
-	// 2. loop all instances in the type in the association end
-	for _, linkanchoredtextDB_AssocEnd := range backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if linkanchoredtextDB_AssocEnd.Link_TextAtArrowEndDBID.Int64 == int64(linkDB.ID) {
-			// 4. fetch the associated instance in the stage
-			linkanchoredtext_AssocEnd := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextPtr[linkanchoredtextDB_AssocEnd.ID]
-			// 5. append it the association slice
-			link.TextAtArrowEnd = append(link.TextAtArrowEnd, linkanchoredtext_AssocEnd)
-		}
+	for _, _LinkAnchoredTextid := range linkDB.LinkPointersEncoding.TextAtArrowEnd {
+		link.TextAtArrowEnd = append(link.TextAtArrowEnd, backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextPtr[uint(_LinkAnchoredTextid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(link.TextAtArrowEnd, func(i, j int) bool {
-		linkanchoredtextDB_i_ID := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextPtr_LinkAnchoredTextDBID[link.TextAtArrowEnd[i]]
-		linkanchoredtextDB_j_ID := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextPtr_LinkAnchoredTextDBID[link.TextAtArrowEnd[j]]
-
-		linkanchoredtextDB_i := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextDB[linkanchoredtextDB_i_ID]
-		linkanchoredtextDB_j := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextDB[linkanchoredtextDB_j_ID]
-
-		return linkanchoredtextDB_i.Link_TextAtArrowEndDBID_Index.Int64 < linkanchoredtextDB_j.Link_TextAtArrowEndDBID_Index.Int64
-	})
 
 	// This loop redeem link.TextAtArrowStart in the stage from the encode in the back repo
 	// It parses all LinkAnchoredTextDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance
 	// 1. reset the slice
 	link.TextAtArrowStart = link.TextAtArrowStart[:0]
-	// 2. loop all instances in the type in the association end
-	for _, linkanchoredtextDB_AssocEnd := range backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if linkanchoredtextDB_AssocEnd.Link_TextAtArrowStartDBID.Int64 == int64(linkDB.ID) {
-			// 4. fetch the associated instance in the stage
-			linkanchoredtext_AssocEnd := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextPtr[linkanchoredtextDB_AssocEnd.ID]
-			// 5. append it the association slice
-			link.TextAtArrowStart = append(link.TextAtArrowStart, linkanchoredtext_AssocEnd)
-		}
+	for _, _LinkAnchoredTextid := range linkDB.LinkPointersEncoding.TextAtArrowStart {
+		link.TextAtArrowStart = append(link.TextAtArrowStart, backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextPtr[uint(_LinkAnchoredTextid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(link.TextAtArrowStart, func(i, j int) bool {
-		linkanchoredtextDB_i_ID := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextPtr_LinkAnchoredTextDBID[link.TextAtArrowStart[i]]
-		linkanchoredtextDB_j_ID := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextPtr_LinkAnchoredTextDBID[link.TextAtArrowStart[j]]
-
-		linkanchoredtextDB_i := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextDB[linkanchoredtextDB_i_ID]
-		linkanchoredtextDB_j := backRepo.BackRepoLinkAnchoredText.Map_LinkAnchoredTextDBID_LinkAnchoredTextDB[linkanchoredtextDB_j_ID]
-
-		return linkanchoredtextDB_i.Link_TextAtArrowStartDBID_Index.Int64 < linkanchoredtextDB_j.Link_TextAtArrowStartDBID_Index.Int64
-	})
 
 	// This loop redeem link.ControlPoints in the stage from the encode in the back repo
 	// It parses all PointDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance
 	// 1. reset the slice
 	link.ControlPoints = link.ControlPoints[:0]
-	// 2. loop all instances in the type in the association end
-	for _, pointDB_AssocEnd := range backRepo.BackRepoPoint.Map_PointDBID_PointDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if pointDB_AssocEnd.Link_ControlPointsDBID.Int64 == int64(linkDB.ID) {
-			// 4. fetch the associated instance in the stage
-			point_AssocEnd := backRepo.BackRepoPoint.Map_PointDBID_PointPtr[pointDB_AssocEnd.ID]
-			// 5. append it the association slice
-			link.ControlPoints = append(link.ControlPoints, point_AssocEnd)
-		}
+	for _, _Pointid := range linkDB.LinkPointersEncoding.ControlPoints {
+		link.ControlPoints = append(link.ControlPoints, backRepo.BackRepoPoint.Map_PointDBID_PointPtr[uint(_Pointid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(link.ControlPoints, func(i, j int) bool {
-		pointDB_i_ID := backRepo.BackRepoPoint.Map_PointPtr_PointDBID[link.ControlPoints[i]]
-		pointDB_j_ID := backRepo.BackRepoPoint.Map_PointPtr_PointDBID[link.ControlPoints[j]]
-
-		pointDB_i := backRepo.BackRepoPoint.Map_PointDBID_PointDB[pointDB_i_ID]
-		pointDB_j := backRepo.BackRepoPoint.Map_PointDBID_PointDB[pointDB_j_ID]
-
-		return pointDB_i.Link_ControlPointsDBID_Index.Int64 < pointDB_j.Link_ControlPointsDBID_Index.Int64
-	})
 
 	return
 }
@@ -632,7 +554,7 @@ func (backRepo *BackRepoStruct) CheckoutLink(link *models.Link) {
 			linkDB.ID = id
 
 			if err := backRepo.BackRepoLink.db.First(&linkDB, id).Error; err != nil {
-				log.Panicln("CheckoutLink : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutLink : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoLink.CheckoutPhaseOneInstance(&linkDB)
 			backRepo.BackRepoLink.CheckoutPhaseTwoInstance(backRepo, &linkDB)
@@ -642,6 +564,68 @@ func (backRepo *BackRepoStruct) CheckoutLink(link *models.Link) {
 
 // CopyBasicFieldsFromLink
 func (linkDB *LinkDB) CopyBasicFieldsFromLink(link *models.Link) {
+	// insertion point for fields commit
+
+	linkDB.Name_Data.String = link.Name
+	linkDB.Name_Data.Valid = true
+
+	linkDB.Type_Data.String = link.Type.ToString()
+	linkDB.Type_Data.Valid = true
+
+	linkDB.StartAnchorType_Data.String = link.StartAnchorType.ToString()
+	linkDB.StartAnchorType_Data.Valid = true
+
+	linkDB.EndAnchorType_Data.String = link.EndAnchorType.ToString()
+	linkDB.EndAnchorType_Data.Valid = true
+
+	linkDB.StartOrientation_Data.String = link.StartOrientation.ToString()
+	linkDB.StartOrientation_Data.Valid = true
+
+	linkDB.StartRatio_Data.Float64 = link.StartRatio
+	linkDB.StartRatio_Data.Valid = true
+
+	linkDB.EndOrientation_Data.String = link.EndOrientation.ToString()
+	linkDB.EndOrientation_Data.Valid = true
+
+	linkDB.EndRatio_Data.Float64 = link.EndRatio
+	linkDB.EndRatio_Data.Valid = true
+
+	linkDB.CornerOffsetRatio_Data.Float64 = link.CornerOffsetRatio
+	linkDB.CornerOffsetRatio_Data.Valid = true
+
+	linkDB.CornerRadius_Data.Float64 = link.CornerRadius
+	linkDB.CornerRadius_Data.Valid = true
+
+	linkDB.HasEndArrow_Data.Bool = link.HasEndArrow
+	linkDB.HasEndArrow_Data.Valid = true
+
+	linkDB.EndArrowSize_Data.Float64 = link.EndArrowSize
+	linkDB.EndArrowSize_Data.Valid = true
+
+	linkDB.Color_Data.String = link.Color
+	linkDB.Color_Data.Valid = true
+
+	linkDB.FillOpacity_Data.Float64 = link.FillOpacity
+	linkDB.FillOpacity_Data.Valid = true
+
+	linkDB.Stroke_Data.String = link.Stroke
+	linkDB.Stroke_Data.Valid = true
+
+	linkDB.StrokeWidth_Data.Float64 = link.StrokeWidth
+	linkDB.StrokeWidth_Data.Valid = true
+
+	linkDB.StrokeDashArray_Data.String = link.StrokeDashArray
+	linkDB.StrokeDashArray_Data.Valid = true
+
+	linkDB.StrokeDashArrayWhenSelected_Data.String = link.StrokeDashArrayWhenSelected
+	linkDB.StrokeDashArrayWhenSelected_Data.Valid = true
+
+	linkDB.Transform_Data.String = link.Transform
+	linkDB.Transform_Data.Valid = true
+}
+
+// CopyBasicFieldsFromLink_WOP
+func (linkDB *LinkDB) CopyBasicFieldsFromLink_WOP(link *models.Link_WOP) {
 	// insertion point for fields commit
 
 	linkDB.Name_Data.String = link.Name
@@ -788,6 +772,30 @@ func (linkDB *LinkDB) CopyBasicFieldsToLink(link *models.Link) {
 	link.Transform = linkDB.Transform_Data.String
 }
 
+// CopyBasicFieldsToLink_WOP
+func (linkDB *LinkDB) CopyBasicFieldsToLink_WOP(link *models.Link_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	link.Name = linkDB.Name_Data.String
+	link.Type.FromString(linkDB.Type_Data.String)
+	link.StartAnchorType.FromString(linkDB.StartAnchorType_Data.String)
+	link.EndAnchorType.FromString(linkDB.EndAnchorType_Data.String)
+	link.StartOrientation.FromString(linkDB.StartOrientation_Data.String)
+	link.StartRatio = linkDB.StartRatio_Data.Float64
+	link.EndOrientation.FromString(linkDB.EndOrientation_Data.String)
+	link.EndRatio = linkDB.EndRatio_Data.Float64
+	link.CornerOffsetRatio = linkDB.CornerOffsetRatio_Data.Float64
+	link.CornerRadius = linkDB.CornerRadius_Data.Float64
+	link.HasEndArrow = linkDB.HasEndArrow_Data.Bool
+	link.EndArrowSize = linkDB.EndArrowSize_Data.Float64
+	link.Color = linkDB.Color_Data.String
+	link.FillOpacity = linkDB.FillOpacity_Data.Float64
+	link.Stroke = linkDB.Stroke_Data.String
+	link.StrokeWidth = linkDB.StrokeWidth_Data.Float64
+	link.StrokeDashArray = linkDB.StrokeDashArray_Data.String
+	link.StrokeDashArrayWhenSelected = linkDB.StrokeDashArrayWhenSelected_Data.String
+	link.Transform = linkDB.Transform_Data.String
+}
+
 // CopyBasicFieldsToLinkWOP
 func (linkDB *LinkDB) CopyBasicFieldsToLinkWOP(link *LinkWOP) {
 	link.ID = int(linkDB.ID)
@@ -832,12 +840,12 @@ func (backRepoLink *BackRepoLinkStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Link ", filename, " ", err.Error())
+		log.Fatal("Cannot json Link ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Link file", err.Error())
+		log.Fatal("Cannot write the json Link file", err.Error())
 	}
 }
 
@@ -857,7 +865,7 @@ func (backRepoLink *BackRepoLinkStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Link")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -882,13 +890,13 @@ func (backRepoLink *BackRepoLinkStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Link"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoLink.rowVisitorLink)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -910,7 +918,7 @@ func (backRepoLink *BackRepoLinkStruct) rowVisitorLink(row *xlsx.Row) error {
 		linkDB.ID = 0
 		query := backRepoLink.db.Create(linkDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoLink.Map_LinkDBID_LinkDB[linkDB.ID] = linkDB
 		BackRepoLinkid_atBckpTime_newID[linkDB_ID_atBackupTime] = linkDB.ID
@@ -930,7 +938,7 @@ func (backRepoLink *BackRepoLinkStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Link file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Link file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -947,14 +955,14 @@ func (backRepoLink *BackRepoLinkStruct) RestorePhaseOne(dirPath string) {
 		linkDB.ID = 0
 		query := backRepoLink.db.Create(linkDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoLink.Map_LinkDBID_LinkDB[linkDB.ID] = linkDB
 		BackRepoLinkid_atBckpTime_newID[linkDB_ID_atBackupTime] = linkDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Link file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Link file", err.Error())
 	}
 }
 
@@ -980,16 +988,10 @@ func (backRepoLink *BackRepoLinkStruct) RestorePhaseTwo() {
 			linkDB.EndID.Valid = true
 		}
 
-		// This reindex link.Links
-		if linkDB.Layer_LinksDBID.Int64 != 0 {
-			linkDB.Layer_LinksDBID.Int64 =
-				int64(BackRepoLayerid_atBckpTime_newID[uint(linkDB.Layer_LinksDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoLink.db.Model(linkDB).Updates(*linkDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -1013,15 +1015,6 @@ func (backRepoLink *BackRepoLinkStruct) ResetReversePointersInstance(backRepo *B
 		_ = linkDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if linkDB.Layer_LinksDBID.Int64 != 0 {
-			linkDB.Layer_LinksDBID.Int64 = 0
-			linkDB.Layer_LinksDBID.Valid = true
-
-			// save the reset
-			if q := backRepoLink.db.Save(linkDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

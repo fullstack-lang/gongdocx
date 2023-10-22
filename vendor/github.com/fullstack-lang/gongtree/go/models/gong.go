@@ -4,15 +4,25 @@ package models
 import (
 	"errors"
 	"fmt"
-	"sync"
+	"math"
 	"time"
 )
+
+func __Gong__Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
 
 // errUnkownEnum is returns when a value cannot match enum values
 var errUnkownEnum = errors.New("unkown enum")
 
 // needed to avoid when fmt package is not needed by generated code
 var __dummy__fmt_variable fmt.Scanner
+
+// idem for math package when not need by generated code
+var __dummy_math_variable = math.E
 
 // swagger:ignore
 type __void any
@@ -38,6 +48,8 @@ type StageStruct struct {
 	Buttons           map[*Button]any
 	Buttons_mapString map[string]*Button
 
+	// insertion point for slice of pointers maps
+
 	OnAfterButtonCreateCallback OnAfterCreateInterface[Button]
 	OnAfterButtonUpdateCallback OnAfterUpdateInterface[Button]
 	OnAfterButtonDeleteCallback OnAfterDeleteInterface[Button]
@@ -46,6 +58,10 @@ type StageStruct struct {
 	Nodes           map[*Node]any
 	Nodes_mapString map[string]*Node
 
+	// insertion point for slice of pointers maps
+	Node_Children_reverseMap map[*Node]*Node
+	Node_Buttons_reverseMap map[*Button]*Node
+
 	OnAfterNodeCreateCallback OnAfterCreateInterface[Node]
 	OnAfterNodeUpdateCallback OnAfterUpdateInterface[Node]
 	OnAfterNodeDeleteCallback OnAfterDeleteInterface[Node]
@@ -53,6 +69,9 @@ type StageStruct struct {
 
 	Trees           map[*Tree]any
 	Trees_mapString map[string]*Tree
+
+	// insertion point for slice of pointers maps
+	Tree_RootNodes_reverseMap map[*Node]*Tree
 
 	OnAfterTreeCreateCallback OnAfterCreateInterface[Tree]
 	OnAfterTreeUpdateCallback OnAfterUpdateInterface[Tree]
@@ -133,17 +152,6 @@ type BackRepoInterface interface {
 	GetLastPushFromFrontNb() uint
 }
 
-var _stage *StageStruct
-
-var once sync.Once
-
-func GetDefaultStage() *StageStruct {
-	once.Do(func() {
-		_stage = NewStage("")
-	})
-	return _stage
-}
-
 func NewStage(path string) (stage *StageStruct) {
 
 	stage = &StageStruct{ // insertion point for array initiatialisation
@@ -182,6 +190,8 @@ func (stage *StageStruct) CommitWithSuspendedCallbacks() {
 }
 
 func (stage *StageStruct) Commit() {
+	stage.ComputeReverseMaps()
+
 	if stage.BackRepo != nil {
 		stage.BackRepo.Commit(stage)
 	}
@@ -198,6 +208,7 @@ func (stage *StageStruct) Checkout() {
 		stage.BackRepo.Checkout(stage)
 	}
 
+	stage.ComputeReverseMaps()
 	// insertion point for computing the map of number of instances per gongstruct
 	stage.Map_GongStructName_InstancesNb["Button"] = len(stage.Buttons)
 	stage.Map_GongStructName_InstancesNb["Node"] = len(stage.Nodes)

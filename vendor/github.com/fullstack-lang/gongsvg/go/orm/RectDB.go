@@ -35,22 +35,25 @@ var dummy_Rect_sort sort.Float64Slice
 type RectAPI struct {
 	gorm.Model
 
-	models.Rect
+	models.Rect_WOP
 
 	// encoding of pointers
-	RectPointersEnconding
+	RectPointersEncoding RectPointersEncoding
 }
 
-// RectPointersEnconding encodes pointers to Struct and
+// RectPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type RectPointersEnconding struct {
+type RectPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
-	// Implementation of a reverse ID for field Layer{}.Rects []*Rect
-	Layer_RectsDBID sql.NullInt64
+	// field Animations is a slice of pointers to another Struct (optional or 0..1)
+	Animations IntSlice `gorm:"type:TEXT"`
 
-	// implementation of the index of the withing the slice
-	Layer_RectsDBID_Index sql.NullInt64
+	// field RectAnchoredTexts is a slice of pointers to another Struct (optional or 0..1)
+	RectAnchoredTexts IntSlice `gorm:"type:TEXT"`
+
+	// field RectAnchoredRects is a slice of pointers to another Struct (optional or 0..1)
+	RectAnchoredRects IntSlice `gorm:"type:TEXT"`
 }
 
 // RectDB describes a rect in the database
@@ -151,7 +154,7 @@ type RectDB struct {
 	// provide the sql storage for the boolan
 	CanMoveVerticaly_Data sql.NullBool
 	// encoding of pointers
-	RectPointersEnconding
+	RectPointersEncoding
 }
 
 // RectDBs arrays rectDBs
@@ -312,7 +315,7 @@ func (backRepoRect *BackRepoRectStruct) CommitDeleteInstance(id uint) (Error err
 	rectDB := backRepoRect.Map_RectDBID_RectDB[id]
 	query := backRepoRect.db.Unscoped().Delete(&rectDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -338,7 +341,7 @@ func (backRepoRect *BackRepoRectStruct) CommitPhaseOneInstance(rect *models.Rect
 
 	query := backRepoRect.db.Create(&rectDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -370,66 +373,39 @@ func (backRepoRect *BackRepoRectStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		rectDB.CopyBasicFieldsFromRect(rect)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers rect.Animations into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, animateAssocEnd := range rect.Animations {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		rectDB.RectPointersEncoding.Animations = make([]int, 0)
+		// 2. encode
+		for _, animateAssocEnd := range rect.Animations {
 			animateAssocEnd_DB :=
 				backRepo.BackRepoAnimate.GetAnimateDBFromAnimatePtr(animateAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			animateAssocEnd_DB.Rect_AnimationsDBID.Int64 = int64(rectDB.ID)
-			animateAssocEnd_DB.Rect_AnimationsDBID.Valid = true
-			animateAssocEnd_DB.Rect_AnimationsDBID_Index.Int64 = int64(idx)
-			animateAssocEnd_DB.Rect_AnimationsDBID_Index.Valid = true
-			if q := backRepoRect.db.Save(animateAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			rectDB.RectPointersEncoding.Animations =
+				append(rectDB.RectPointersEncoding.Animations, int(animateAssocEnd_DB.ID))
 		}
 
-		// This loop encodes the slice of pointers rect.RectAnchoredTexts into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, rectanchoredtextAssocEnd := range rect.RectAnchoredTexts {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		rectDB.RectPointersEncoding.RectAnchoredTexts = make([]int, 0)
+		// 2. encode
+		for _, rectanchoredtextAssocEnd := range rect.RectAnchoredTexts {
 			rectanchoredtextAssocEnd_DB :=
 				backRepo.BackRepoRectAnchoredText.GetRectAnchoredTextDBFromRectAnchoredTextPtr(rectanchoredtextAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			rectanchoredtextAssocEnd_DB.Rect_RectAnchoredTextsDBID.Int64 = int64(rectDB.ID)
-			rectanchoredtextAssocEnd_DB.Rect_RectAnchoredTextsDBID.Valid = true
-			rectanchoredtextAssocEnd_DB.Rect_RectAnchoredTextsDBID_Index.Int64 = int64(idx)
-			rectanchoredtextAssocEnd_DB.Rect_RectAnchoredTextsDBID_Index.Valid = true
-			if q := backRepoRect.db.Save(rectanchoredtextAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			rectDB.RectPointersEncoding.RectAnchoredTexts =
+				append(rectDB.RectPointersEncoding.RectAnchoredTexts, int(rectanchoredtextAssocEnd_DB.ID))
 		}
 
-		// This loop encodes the slice of pointers rect.RectAnchoredRects into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, rectanchoredrectAssocEnd := range rect.RectAnchoredRects {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		rectDB.RectPointersEncoding.RectAnchoredRects = make([]int, 0)
+		// 2. encode
+		for _, rectanchoredrectAssocEnd := range rect.RectAnchoredRects {
 			rectanchoredrectAssocEnd_DB :=
 				backRepo.BackRepoRectAnchoredRect.GetRectAnchoredRectDBFromRectAnchoredRectPtr(rectanchoredrectAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			rectanchoredrectAssocEnd_DB.Rect_RectAnchoredRectsDBID.Int64 = int64(rectDB.ID)
-			rectanchoredrectAssocEnd_DB.Rect_RectAnchoredRectsDBID.Valid = true
-			rectanchoredrectAssocEnd_DB.Rect_RectAnchoredRectsDBID_Index.Int64 = int64(idx)
-			rectanchoredrectAssocEnd_DB.Rect_RectAnchoredRectsDBID_Index.Valid = true
-			if q := backRepoRect.db.Save(rectanchoredrectAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			rectDB.RectPointersEncoding.RectAnchoredRects =
+				append(rectDB.RectPointersEncoding.RectAnchoredRects, int(rectanchoredrectAssocEnd_DB.ID))
 		}
 
 		query := backRepoRect.db.Save(&rectDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -539,81 +515,27 @@ func (backRepoRect *BackRepoRectStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// it appends the stage instance
 	// 1. reset the slice
 	rect.Animations = rect.Animations[:0]
-	// 2. loop all instances in the type in the association end
-	for _, animateDB_AssocEnd := range backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if animateDB_AssocEnd.Rect_AnimationsDBID.Int64 == int64(rectDB.ID) {
-			// 4. fetch the associated instance in the stage
-			animate_AssocEnd := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[animateDB_AssocEnd.ID]
-			// 5. append it the association slice
-			rect.Animations = append(rect.Animations, animate_AssocEnd)
-		}
+	for _, _Animateid := range rectDB.RectPointersEncoding.Animations {
+		rect.Animations = append(rect.Animations, backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[uint(_Animateid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(rect.Animations, func(i, j int) bool {
-		animateDB_i_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[rect.Animations[i]]
-		animateDB_j_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[rect.Animations[j]]
-
-		animateDB_i := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_i_ID]
-		animateDB_j := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_j_ID]
-
-		return animateDB_i.Rect_AnimationsDBID_Index.Int64 < animateDB_j.Rect_AnimationsDBID_Index.Int64
-	})
 
 	// This loop redeem rect.RectAnchoredTexts in the stage from the encode in the back repo
 	// It parses all RectAnchoredTextDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance
 	// 1. reset the slice
 	rect.RectAnchoredTexts = rect.RectAnchoredTexts[:0]
-	// 2. loop all instances in the type in the association end
-	for _, rectanchoredtextDB_AssocEnd := range backRepo.BackRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if rectanchoredtextDB_AssocEnd.Rect_RectAnchoredTextsDBID.Int64 == int64(rectDB.ID) {
-			// 4. fetch the associated instance in the stage
-			rectanchoredtext_AssocEnd := backRepo.BackRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextPtr[rectanchoredtextDB_AssocEnd.ID]
-			// 5. append it the association slice
-			rect.RectAnchoredTexts = append(rect.RectAnchoredTexts, rectanchoredtext_AssocEnd)
-		}
+	for _, _RectAnchoredTextid := range rectDB.RectPointersEncoding.RectAnchoredTexts {
+		rect.RectAnchoredTexts = append(rect.RectAnchoredTexts, backRepo.BackRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextPtr[uint(_RectAnchoredTextid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(rect.RectAnchoredTexts, func(i, j int) bool {
-		rectanchoredtextDB_i_ID := backRepo.BackRepoRectAnchoredText.Map_RectAnchoredTextPtr_RectAnchoredTextDBID[rect.RectAnchoredTexts[i]]
-		rectanchoredtextDB_j_ID := backRepo.BackRepoRectAnchoredText.Map_RectAnchoredTextPtr_RectAnchoredTextDBID[rect.RectAnchoredTexts[j]]
-
-		rectanchoredtextDB_i := backRepo.BackRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextDB[rectanchoredtextDB_i_ID]
-		rectanchoredtextDB_j := backRepo.BackRepoRectAnchoredText.Map_RectAnchoredTextDBID_RectAnchoredTextDB[rectanchoredtextDB_j_ID]
-
-		return rectanchoredtextDB_i.Rect_RectAnchoredTextsDBID_Index.Int64 < rectanchoredtextDB_j.Rect_RectAnchoredTextsDBID_Index.Int64
-	})
 
 	// This loop redeem rect.RectAnchoredRects in the stage from the encode in the back repo
 	// It parses all RectAnchoredRectDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance
 	// 1. reset the slice
 	rect.RectAnchoredRects = rect.RectAnchoredRects[:0]
-	// 2. loop all instances in the type in the association end
-	for _, rectanchoredrectDB_AssocEnd := range backRepo.BackRepoRectAnchoredRect.Map_RectAnchoredRectDBID_RectAnchoredRectDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if rectanchoredrectDB_AssocEnd.Rect_RectAnchoredRectsDBID.Int64 == int64(rectDB.ID) {
-			// 4. fetch the associated instance in the stage
-			rectanchoredrect_AssocEnd := backRepo.BackRepoRectAnchoredRect.Map_RectAnchoredRectDBID_RectAnchoredRectPtr[rectanchoredrectDB_AssocEnd.ID]
-			// 5. append it the association slice
-			rect.RectAnchoredRects = append(rect.RectAnchoredRects, rectanchoredrect_AssocEnd)
-		}
+	for _, _RectAnchoredRectid := range rectDB.RectPointersEncoding.RectAnchoredRects {
+		rect.RectAnchoredRects = append(rect.RectAnchoredRects, backRepo.BackRepoRectAnchoredRect.Map_RectAnchoredRectDBID_RectAnchoredRectPtr[uint(_RectAnchoredRectid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(rect.RectAnchoredRects, func(i, j int) bool {
-		rectanchoredrectDB_i_ID := backRepo.BackRepoRectAnchoredRect.Map_RectAnchoredRectPtr_RectAnchoredRectDBID[rect.RectAnchoredRects[i]]
-		rectanchoredrectDB_j_ID := backRepo.BackRepoRectAnchoredRect.Map_RectAnchoredRectPtr_RectAnchoredRectDBID[rect.RectAnchoredRects[j]]
-
-		rectanchoredrectDB_i := backRepo.BackRepoRectAnchoredRect.Map_RectAnchoredRectDBID_RectAnchoredRectDB[rectanchoredrectDB_i_ID]
-		rectanchoredrectDB_j := backRepo.BackRepoRectAnchoredRect.Map_RectAnchoredRectDBID_RectAnchoredRectDB[rectanchoredrectDB_j_ID]
-
-		return rectanchoredrectDB_i.Rect_RectAnchoredRectsDBID_Index.Int64 < rectanchoredrectDB_j.Rect_RectAnchoredRectsDBID_Index.Int64
-	})
 
 	return
 }
@@ -637,7 +559,7 @@ func (backRepo *BackRepoStruct) CheckoutRect(rect *models.Rect) {
 			rectDB.ID = id
 
 			if err := backRepo.BackRepoRect.db.First(&rectDB, id).Error; err != nil {
-				log.Panicln("CheckoutRect : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutRect : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoRect.CheckoutPhaseOneInstance(&rectDB)
 			backRepo.BackRepoRect.CheckoutPhaseTwoInstance(backRepo, &rectDB)
@@ -647,6 +569,86 @@ func (backRepo *BackRepoStruct) CheckoutRect(rect *models.Rect) {
 
 // CopyBasicFieldsFromRect
 func (rectDB *RectDB) CopyBasicFieldsFromRect(rect *models.Rect) {
+	// insertion point for fields commit
+
+	rectDB.Name_Data.String = rect.Name
+	rectDB.Name_Data.Valid = true
+
+	rectDB.X_Data.Float64 = rect.X
+	rectDB.X_Data.Valid = true
+
+	rectDB.Y_Data.Float64 = rect.Y
+	rectDB.Y_Data.Valid = true
+
+	rectDB.Width_Data.Float64 = rect.Width
+	rectDB.Width_Data.Valid = true
+
+	rectDB.Height_Data.Float64 = rect.Height
+	rectDB.Height_Data.Valid = true
+
+	rectDB.RX_Data.Float64 = rect.RX
+	rectDB.RX_Data.Valid = true
+
+	rectDB.Color_Data.String = rect.Color
+	rectDB.Color_Data.Valid = true
+
+	rectDB.FillOpacity_Data.Float64 = rect.FillOpacity
+	rectDB.FillOpacity_Data.Valid = true
+
+	rectDB.Stroke_Data.String = rect.Stroke
+	rectDB.Stroke_Data.Valid = true
+
+	rectDB.StrokeWidth_Data.Float64 = rect.StrokeWidth
+	rectDB.StrokeWidth_Data.Valid = true
+
+	rectDB.StrokeDashArray_Data.String = rect.StrokeDashArray
+	rectDB.StrokeDashArray_Data.Valid = true
+
+	rectDB.StrokeDashArrayWhenSelected_Data.String = rect.StrokeDashArrayWhenSelected
+	rectDB.StrokeDashArrayWhenSelected_Data.Valid = true
+
+	rectDB.Transform_Data.String = rect.Transform
+	rectDB.Transform_Data.Valid = true
+
+	rectDB.IsSelectable_Data.Bool = rect.IsSelectable
+	rectDB.IsSelectable_Data.Valid = true
+
+	rectDB.IsSelected_Data.Bool = rect.IsSelected
+	rectDB.IsSelected_Data.Valid = true
+
+	rectDB.CanHaveLeftHandle_Data.Bool = rect.CanHaveLeftHandle
+	rectDB.CanHaveLeftHandle_Data.Valid = true
+
+	rectDB.HasLeftHandle_Data.Bool = rect.HasLeftHandle
+	rectDB.HasLeftHandle_Data.Valid = true
+
+	rectDB.CanHaveRightHandle_Data.Bool = rect.CanHaveRightHandle
+	rectDB.CanHaveRightHandle_Data.Valid = true
+
+	rectDB.HasRightHandle_Data.Bool = rect.HasRightHandle
+	rectDB.HasRightHandle_Data.Valid = true
+
+	rectDB.CanHaveTopHandle_Data.Bool = rect.CanHaveTopHandle
+	rectDB.CanHaveTopHandle_Data.Valid = true
+
+	rectDB.HasTopHandle_Data.Bool = rect.HasTopHandle
+	rectDB.HasTopHandle_Data.Valid = true
+
+	rectDB.CanHaveBottomHandle_Data.Bool = rect.CanHaveBottomHandle
+	rectDB.CanHaveBottomHandle_Data.Valid = true
+
+	rectDB.HasBottomHandle_Data.Bool = rect.HasBottomHandle
+	rectDB.HasBottomHandle_Data.Valid = true
+
+	rectDB.CanMoveHorizontaly_Data.Bool = rect.CanMoveHorizontaly
+	rectDB.CanMoveHorizontaly_Data.Valid = true
+
+	rectDB.CanMoveVerticaly_Data.Bool = rect.CanMoveVerticaly
+	rectDB.CanMoveVerticaly_Data.Valid = true
+}
+
+// CopyBasicFieldsFromRect_WOP
+func (rectDB *RectDB) CopyBasicFieldsFromRect_WOP(rect *models.Rect_WOP) {
 	// insertion point for fields commit
 
 	rectDB.Name_Data.String = rect.Name
@@ -835,6 +837,36 @@ func (rectDB *RectDB) CopyBasicFieldsToRect(rect *models.Rect) {
 	rect.CanMoveVerticaly = rectDB.CanMoveVerticaly_Data.Bool
 }
 
+// CopyBasicFieldsToRect_WOP
+func (rectDB *RectDB) CopyBasicFieldsToRect_WOP(rect *models.Rect_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	rect.Name = rectDB.Name_Data.String
+	rect.X = rectDB.X_Data.Float64
+	rect.Y = rectDB.Y_Data.Float64
+	rect.Width = rectDB.Width_Data.Float64
+	rect.Height = rectDB.Height_Data.Float64
+	rect.RX = rectDB.RX_Data.Float64
+	rect.Color = rectDB.Color_Data.String
+	rect.FillOpacity = rectDB.FillOpacity_Data.Float64
+	rect.Stroke = rectDB.Stroke_Data.String
+	rect.StrokeWidth = rectDB.StrokeWidth_Data.Float64
+	rect.StrokeDashArray = rectDB.StrokeDashArray_Data.String
+	rect.StrokeDashArrayWhenSelected = rectDB.StrokeDashArrayWhenSelected_Data.String
+	rect.Transform = rectDB.Transform_Data.String
+	rect.IsSelectable = rectDB.IsSelectable_Data.Bool
+	rect.IsSelected = rectDB.IsSelected_Data.Bool
+	rect.CanHaveLeftHandle = rectDB.CanHaveLeftHandle_Data.Bool
+	rect.HasLeftHandle = rectDB.HasLeftHandle_Data.Bool
+	rect.CanHaveRightHandle = rectDB.CanHaveRightHandle_Data.Bool
+	rect.HasRightHandle = rectDB.HasRightHandle_Data.Bool
+	rect.CanHaveTopHandle = rectDB.CanHaveTopHandle_Data.Bool
+	rect.HasTopHandle = rectDB.HasTopHandle_Data.Bool
+	rect.CanHaveBottomHandle = rectDB.CanHaveBottomHandle_Data.Bool
+	rect.HasBottomHandle = rectDB.HasBottomHandle_Data.Bool
+	rect.CanMoveHorizontaly = rectDB.CanMoveHorizontaly_Data.Bool
+	rect.CanMoveVerticaly = rectDB.CanMoveVerticaly_Data.Bool
+}
+
 // CopyBasicFieldsToRectWOP
 func (rectDB *RectDB) CopyBasicFieldsToRectWOP(rect *RectWOP) {
 	rect.ID = int(rectDB.ID)
@@ -885,12 +917,12 @@ func (backRepoRect *BackRepoRectStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Rect ", filename, " ", err.Error())
+		log.Fatal("Cannot json Rect ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Rect file", err.Error())
+		log.Fatal("Cannot write the json Rect file", err.Error())
 	}
 }
 
@@ -910,7 +942,7 @@ func (backRepoRect *BackRepoRectStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Rect")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -935,13 +967,13 @@ func (backRepoRect *BackRepoRectStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Rect"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoRect.rowVisitorRect)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -963,7 +995,7 @@ func (backRepoRect *BackRepoRectStruct) rowVisitorRect(row *xlsx.Row) error {
 		rectDB.ID = 0
 		query := backRepoRect.db.Create(rectDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRect.Map_RectDBID_RectDB[rectDB.ID] = rectDB
 		BackRepoRectid_atBckpTime_newID[rectDB_ID_atBackupTime] = rectDB.ID
@@ -983,7 +1015,7 @@ func (backRepoRect *BackRepoRectStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Rect file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Rect file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -1000,14 +1032,14 @@ func (backRepoRect *BackRepoRectStruct) RestorePhaseOne(dirPath string) {
 		rectDB.ID = 0
 		query := backRepoRect.db.Create(rectDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRect.Map_RectDBID_RectDB[rectDB.ID] = rectDB
 		BackRepoRectid_atBckpTime_newID[rectDB_ID_atBackupTime] = rectDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Rect file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Rect file", err.Error())
 	}
 }
 
@@ -1021,16 +1053,10 @@ func (backRepoRect *BackRepoRectStruct) RestorePhaseTwo() {
 		_ = rectDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex rect.Rects
-		if rectDB.Layer_RectsDBID.Int64 != 0 {
-			rectDB.Layer_RectsDBID.Int64 =
-				int64(BackRepoLayerid_atBckpTime_newID[uint(rectDB.Layer_RectsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoRect.db.Model(rectDB).Updates(*rectDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -1054,15 +1080,6 @@ func (backRepoRect *BackRepoRectStruct) ResetReversePointersInstance(backRepo *B
 		_ = rectDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if rectDB.Layer_RectsDBID.Int64 != 0 {
-			rectDB.Layer_RectsDBID.Int64 = 0
-			rectDB.Layer_RectsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoRect.db.Save(rectDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

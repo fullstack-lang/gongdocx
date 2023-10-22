@@ -35,20 +35,23 @@ var dummy_FormFieldSelect_sort sort.Float64Slice
 type FormFieldSelectAPI struct {
 	gorm.Model
 
-	models.FormFieldSelect
+	models.FormFieldSelect_WOP
 
 	// encoding of pointers
-	FormFieldSelectPointersEnconding
+	FormFieldSelectPointersEncoding FormFieldSelectPointersEncoding
 }
 
-// FormFieldSelectPointersEnconding encodes pointers to Struct and
+// FormFieldSelectPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type FormFieldSelectPointersEnconding struct {
+type FormFieldSelectPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Value is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	ValueID sql.NullInt64
+
+	// field Options is a slice of pointers to another Struct (optional or 0..1)
+	Options IntSlice `gorm:"type:TEXT"`
 }
 
 // FormFieldSelectDB describes a formfieldselect in the database
@@ -69,7 +72,7 @@ type FormFieldSelectDB struct {
 	// provide the sql storage for the boolan
 	CanBeEmpty_Data sql.NullBool
 	// encoding of pointers
-	FormFieldSelectPointersEnconding
+	FormFieldSelectPointersEncoding
 }
 
 // FormFieldSelectDBs arrays formfieldselectDBs
@@ -161,7 +164,7 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) CommitDeleteInstan
 	formfieldselectDB := backRepoFormFieldSelect.Map_FormFieldSelectDBID_FormFieldSelectDB[id]
 	query := backRepoFormFieldSelect.db.Unscoped().Delete(&formfieldselectDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -187,7 +190,7 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) CommitPhaseOneInst
 
 	query := backRepoFormFieldSelect.db.Create(&formfieldselectDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -231,28 +234,19 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) CommitPhaseTwoInst
 			formfieldselectDB.ValueID.Valid = true
 		}
 
-		// This loop encodes the slice of pointers formfieldselect.Options into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, optionAssocEnd := range formfieldselect.Options {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		formfieldselectDB.FormFieldSelectPointersEncoding.Options = make([]int, 0)
+		// 2. encode
+		for _, optionAssocEnd := range formfieldselect.Options {
 			optionAssocEnd_DB :=
 				backRepo.BackRepoOption.GetOptionDBFromOptionPtr(optionAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			optionAssocEnd_DB.FormFieldSelect_OptionsDBID.Int64 = int64(formfieldselectDB.ID)
-			optionAssocEnd_DB.FormFieldSelect_OptionsDBID.Valid = true
-			optionAssocEnd_DB.FormFieldSelect_OptionsDBID_Index.Int64 = int64(idx)
-			optionAssocEnd_DB.FormFieldSelect_OptionsDBID_Index.Valid = true
-			if q := backRepoFormFieldSelect.db.Save(optionAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			formfieldselectDB.FormFieldSelectPointersEncoding.Options =
+				append(formfieldselectDB.FormFieldSelectPointersEncoding.Options, int(optionAssocEnd_DB.ID))
 		}
 
 		query := backRepoFormFieldSelect.db.Save(&formfieldselectDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -367,27 +361,9 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) CheckoutPhaseTwoIn
 	// it appends the stage instance
 	// 1. reset the slice
 	formfieldselect.Options = formfieldselect.Options[:0]
-	// 2. loop all instances in the type in the association end
-	for _, optionDB_AssocEnd := range backRepo.BackRepoOption.Map_OptionDBID_OptionDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if optionDB_AssocEnd.FormFieldSelect_OptionsDBID.Int64 == int64(formfieldselectDB.ID) {
-			// 4. fetch the associated instance in the stage
-			option_AssocEnd := backRepo.BackRepoOption.Map_OptionDBID_OptionPtr[optionDB_AssocEnd.ID]
-			// 5. append it the association slice
-			formfieldselect.Options = append(formfieldselect.Options, option_AssocEnd)
-		}
+	for _, _Optionid := range formfieldselectDB.FormFieldSelectPointersEncoding.Options {
+		formfieldselect.Options = append(formfieldselect.Options, backRepo.BackRepoOption.Map_OptionDBID_OptionPtr[uint(_Optionid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(formfieldselect.Options, func(i, j int) bool {
-		optionDB_i_ID := backRepo.BackRepoOption.Map_OptionPtr_OptionDBID[formfieldselect.Options[i]]
-		optionDB_j_ID := backRepo.BackRepoOption.Map_OptionPtr_OptionDBID[formfieldselect.Options[j]]
-
-		optionDB_i := backRepo.BackRepoOption.Map_OptionDBID_OptionDB[optionDB_i_ID]
-		optionDB_j := backRepo.BackRepoOption.Map_OptionDBID_OptionDB[optionDB_j_ID]
-
-		return optionDB_i.FormFieldSelect_OptionsDBID_Index.Int64 < optionDB_j.FormFieldSelect_OptionsDBID_Index.Int64
-	})
 
 	return
 }
@@ -411,7 +387,7 @@ func (backRepo *BackRepoStruct) CheckoutFormFieldSelect(formfieldselect *models.
 			formfieldselectDB.ID = id
 
 			if err := backRepo.BackRepoFormFieldSelect.db.First(&formfieldselectDB, id).Error; err != nil {
-				log.Panicln("CheckoutFormFieldSelect : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutFormFieldSelect : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoFormFieldSelect.CheckoutPhaseOneInstance(&formfieldselectDB)
 			backRepo.BackRepoFormFieldSelect.CheckoutPhaseTwoInstance(backRepo, &formfieldselectDB)
@@ -421,6 +397,17 @@ func (backRepo *BackRepoStruct) CheckoutFormFieldSelect(formfieldselect *models.
 
 // CopyBasicFieldsFromFormFieldSelect
 func (formfieldselectDB *FormFieldSelectDB) CopyBasicFieldsFromFormFieldSelect(formfieldselect *models.FormFieldSelect) {
+	// insertion point for fields commit
+
+	formfieldselectDB.Name_Data.String = formfieldselect.Name
+	formfieldselectDB.Name_Data.Valid = true
+
+	formfieldselectDB.CanBeEmpty_Data.Bool = formfieldselect.CanBeEmpty
+	formfieldselectDB.CanBeEmpty_Data.Valid = true
+}
+
+// CopyBasicFieldsFromFormFieldSelect_WOP
+func (formfieldselectDB *FormFieldSelectDB) CopyBasicFieldsFromFormFieldSelect_WOP(formfieldselect *models.FormFieldSelect_WOP) {
 	// insertion point for fields commit
 
 	formfieldselectDB.Name_Data.String = formfieldselect.Name
@@ -443,6 +430,13 @@ func (formfieldselectDB *FormFieldSelectDB) CopyBasicFieldsFromFormFieldSelectWO
 
 // CopyBasicFieldsToFormFieldSelect
 func (formfieldselectDB *FormFieldSelectDB) CopyBasicFieldsToFormFieldSelect(formfieldselect *models.FormFieldSelect) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	formfieldselect.Name = formfieldselectDB.Name_Data.String
+	formfieldselect.CanBeEmpty = formfieldselectDB.CanBeEmpty_Data.Bool
+}
+
+// CopyBasicFieldsToFormFieldSelect_WOP
+func (formfieldselectDB *FormFieldSelectDB) CopyBasicFieldsToFormFieldSelect_WOP(formfieldselect *models.FormFieldSelect_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	formfieldselect.Name = formfieldselectDB.Name_Data.String
 	formfieldselect.CanBeEmpty = formfieldselectDB.CanBeEmpty_Data.Bool
@@ -475,12 +469,12 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) Backup(dirPath str
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json FormFieldSelect ", filename, " ", err.Error())
+		log.Fatal("Cannot json FormFieldSelect ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json FormFieldSelect file", err.Error())
+		log.Fatal("Cannot write the json FormFieldSelect file", err.Error())
 	}
 }
 
@@ -500,7 +494,7 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) BackupXL(file *xls
 
 	sh, err := file.AddSheet("FormFieldSelect")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -525,13 +519,13 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) RestoreXLPhaseOne(
 	sh, ok := file.Sheet["FormFieldSelect"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoFormFieldSelect.rowVisitorFormFieldSelect)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -553,7 +547,7 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) rowVisitorFormFiel
 		formfieldselectDB.ID = 0
 		query := backRepoFormFieldSelect.db.Create(formfieldselectDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoFormFieldSelect.Map_FormFieldSelectDBID_FormFieldSelectDB[formfieldselectDB.ID] = formfieldselectDB
 		BackRepoFormFieldSelectid_atBckpTime_newID[formfieldselectDB_ID_atBackupTime] = formfieldselectDB.ID
@@ -573,7 +567,7 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) RestorePhaseOne(di
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json FormFieldSelect file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json FormFieldSelect file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -590,14 +584,14 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) RestorePhaseOne(di
 		formfieldselectDB.ID = 0
 		query := backRepoFormFieldSelect.db.Create(formfieldselectDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoFormFieldSelect.Map_FormFieldSelectDBID_FormFieldSelectDB[formfieldselectDB.ID] = formfieldselectDB
 		BackRepoFormFieldSelectid_atBckpTime_newID[formfieldselectDB_ID_atBackupTime] = formfieldselectDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json FormFieldSelect file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json FormFieldSelect file", err.Error())
 	}
 }
 
@@ -620,7 +614,7 @@ func (backRepoFormFieldSelect *BackRepoFormFieldSelectStruct) RestorePhaseTwo() 
 		// update databse with new index encoding
 		query := backRepoFormFieldSelect.db.Model(formfieldselectDB).Updates(*formfieldselectDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

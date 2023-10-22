@@ -35,22 +35,16 @@ var dummy_GongTimeField_sort sort.Float64Slice
 type GongTimeFieldAPI struct {
 	gorm.Model
 
-	models.GongTimeField
+	models.GongTimeField_WOP
 
 	// encoding of pointers
-	GongTimeFieldPointersEnconding
+	GongTimeFieldPointersEncoding GongTimeFieldPointersEncoding
 }
 
-// GongTimeFieldPointersEnconding encodes pointers to Struct and
+// GongTimeFieldPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type GongTimeFieldPointersEnconding struct {
+type GongTimeFieldPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
-
-	// Implementation of a reverse ID for field GongStruct{}.GongTimeFields []*GongTimeField
-	GongStruct_GongTimeFieldsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	GongStruct_GongTimeFieldsDBID_Index sql.NullInt64
 }
 
 // GongTimeFieldDB describes a gongtimefield in the database
@@ -73,7 +67,7 @@ type GongTimeFieldDB struct {
 	// Declation for basic field gongtimefieldDB.CompositeStructName
 	CompositeStructName_Data sql.NullString
 	// encoding of pointers
-	GongTimeFieldPointersEnconding
+	GongTimeFieldPointersEncoding
 }
 
 // GongTimeFieldDBs arrays gongtimefieldDBs
@@ -168,7 +162,7 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) CommitDeleteInstance(i
 	gongtimefieldDB := backRepoGongTimeField.Map_GongTimeFieldDBID_GongTimeFieldDB[id]
 	query := backRepoGongTimeField.db.Unscoped().Delete(&gongtimefieldDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -194,7 +188,7 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) CommitPhaseOneInstance
 
 	query := backRepoGongTimeField.db.Create(&gongtimefieldDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -228,7 +222,7 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) CommitPhaseTwoInstance
 		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoGongTimeField.db.Save(&gongtimefieldDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -355,7 +349,7 @@ func (backRepo *BackRepoStruct) CheckoutGongTimeField(gongtimefield *models.Gong
 			gongtimefieldDB.ID = id
 
 			if err := backRepo.BackRepoGongTimeField.db.First(&gongtimefieldDB, id).Error; err != nil {
-				log.Panicln("CheckoutGongTimeField : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutGongTimeField : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoGongTimeField.CheckoutPhaseOneInstance(&gongtimefieldDB)
 			backRepo.BackRepoGongTimeField.CheckoutPhaseTwoInstance(backRepo, &gongtimefieldDB)
@@ -365,6 +359,20 @@ func (backRepo *BackRepoStruct) CheckoutGongTimeField(gongtimefield *models.Gong
 
 // CopyBasicFieldsFromGongTimeField
 func (gongtimefieldDB *GongTimeFieldDB) CopyBasicFieldsFromGongTimeField(gongtimefield *models.GongTimeField) {
+	// insertion point for fields commit
+
+	gongtimefieldDB.Name_Data.String = gongtimefield.Name
+	gongtimefieldDB.Name_Data.Valid = true
+
+	gongtimefieldDB.Index_Data.Int64 = int64(gongtimefield.Index)
+	gongtimefieldDB.Index_Data.Valid = true
+
+	gongtimefieldDB.CompositeStructName_Data.String = gongtimefield.CompositeStructName
+	gongtimefieldDB.CompositeStructName_Data.Valid = true
+}
+
+// CopyBasicFieldsFromGongTimeField_WOP
+func (gongtimefieldDB *GongTimeFieldDB) CopyBasicFieldsFromGongTimeField_WOP(gongtimefield *models.GongTimeField_WOP) {
 	// insertion point for fields commit
 
 	gongtimefieldDB.Name_Data.String = gongtimefield.Name
@@ -399,6 +407,14 @@ func (gongtimefieldDB *GongTimeFieldDB) CopyBasicFieldsToGongTimeField(gongtimef
 	gongtimefield.CompositeStructName = gongtimefieldDB.CompositeStructName_Data.String
 }
 
+// CopyBasicFieldsToGongTimeField_WOP
+func (gongtimefieldDB *GongTimeFieldDB) CopyBasicFieldsToGongTimeField_WOP(gongtimefield *models.GongTimeField_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	gongtimefield.Name = gongtimefieldDB.Name_Data.String
+	gongtimefield.Index = int(gongtimefieldDB.Index_Data.Int64)
+	gongtimefield.CompositeStructName = gongtimefieldDB.CompositeStructName_Data.String
+}
+
 // CopyBasicFieldsToGongTimeFieldWOP
 func (gongtimefieldDB *GongTimeFieldDB) CopyBasicFieldsToGongTimeFieldWOP(gongtimefield *GongTimeFieldWOP) {
 	gongtimefield.ID = int(gongtimefieldDB.ID)
@@ -427,12 +443,12 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) Backup(dirPath string)
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json GongTimeField ", filename, " ", err.Error())
+		log.Fatal("Cannot json GongTimeField ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json GongTimeField file", err.Error())
+		log.Fatal("Cannot write the json GongTimeField file", err.Error())
 	}
 }
 
@@ -452,7 +468,7 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) BackupXL(file *xlsx.Fi
 
 	sh, err := file.AddSheet("GongTimeField")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -477,13 +493,13 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) RestoreXLPhaseOne(file
 	sh, ok := file.Sheet["GongTimeField"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoGongTimeField.rowVisitorGongTimeField)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -505,7 +521,7 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) rowVisitorGongTimeFiel
 		gongtimefieldDB.ID = 0
 		query := backRepoGongTimeField.db.Create(gongtimefieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoGongTimeField.Map_GongTimeFieldDBID_GongTimeFieldDB[gongtimefieldDB.ID] = gongtimefieldDB
 		BackRepoGongTimeFieldid_atBckpTime_newID[gongtimefieldDB_ID_atBackupTime] = gongtimefieldDB.ID
@@ -525,7 +541,7 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) RestorePhaseOne(dirPat
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json GongTimeField file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json GongTimeField file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -542,14 +558,14 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) RestorePhaseOne(dirPat
 		gongtimefieldDB.ID = 0
 		query := backRepoGongTimeField.db.Create(gongtimefieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoGongTimeField.Map_GongTimeFieldDBID_GongTimeFieldDB[gongtimefieldDB.ID] = gongtimefieldDB
 		BackRepoGongTimeFieldid_atBckpTime_newID[gongtimefieldDB_ID_atBackupTime] = gongtimefieldDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json GongTimeField file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json GongTimeField file", err.Error())
 	}
 }
 
@@ -563,16 +579,10 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) RestorePhaseTwo() {
 		_ = gongtimefieldDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex gongtimefield.GongTimeFields
-		if gongtimefieldDB.GongStruct_GongTimeFieldsDBID.Int64 != 0 {
-			gongtimefieldDB.GongStruct_GongTimeFieldsDBID.Int64 =
-				int64(BackRepoGongStructid_atBckpTime_newID[uint(gongtimefieldDB.GongStruct_GongTimeFieldsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoGongTimeField.db.Model(gongtimefieldDB).Updates(*gongtimefieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -596,15 +606,6 @@ func (backRepoGongTimeField *BackRepoGongTimeFieldStruct) ResetReversePointersIn
 		_ = gongtimefieldDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if gongtimefieldDB.GongStruct_GongTimeFieldsDBID.Int64 != 0 {
-			gongtimefieldDB.GongStruct_GongTimeFieldsDBID.Int64 = 0
-			gongtimefieldDB.GongStruct_GongTimeFieldsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoGongTimeField.db.Save(gongtimefieldDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

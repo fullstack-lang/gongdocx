@@ -35,16 +35,19 @@ var dummy_FormGroup_sort sort.Float64Slice
 type FormGroupAPI struct {
 	gorm.Model
 
-	models.FormGroup
+	models.FormGroup_WOP
 
 	// encoding of pointers
-	FormGroupPointersEnconding
+	FormGroupPointersEncoding FormGroupPointersEncoding
 }
 
-// FormGroupPointersEnconding encodes pointers to Struct and
+// FormGroupPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type FormGroupPointersEnconding struct {
+type FormGroupPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
+
+	// field FormDivs is a slice of pointers to another Struct (optional or 0..1)
+	FormDivs IntSlice `gorm:"type:TEXT"`
 }
 
 // FormGroupDB describes a formgroup in the database
@@ -64,7 +67,7 @@ type FormGroupDB struct {
 	// Declation for basic field formgroupDB.Label
 	Label_Data sql.NullString
 	// encoding of pointers
-	FormGroupPointersEnconding
+	FormGroupPointersEncoding
 }
 
 // FormGroupDBs arrays formgroupDBs
@@ -156,7 +159,7 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) CommitDeleteInstance(id uint) 
 	formgroupDB := backRepoFormGroup.Map_FormGroupDBID_FormGroupDB[id]
 	query := backRepoFormGroup.db.Unscoped().Delete(&formgroupDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -182,7 +185,7 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) CommitPhaseOneInstance(formgro
 
 	query := backRepoFormGroup.db.Create(&formgroupDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -214,28 +217,19 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) CommitPhaseTwoInstance(backRep
 		formgroupDB.CopyBasicFieldsFromFormGroup(formgroup)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers formgroup.FormDivs into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, formdivAssocEnd := range formgroup.FormDivs {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		formgroupDB.FormGroupPointersEncoding.FormDivs = make([]int, 0)
+		// 2. encode
+		for _, formdivAssocEnd := range formgroup.FormDivs {
 			formdivAssocEnd_DB :=
 				backRepo.BackRepoFormDiv.GetFormDivDBFromFormDivPtr(formdivAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			formdivAssocEnd_DB.FormGroup_FormDivsDBID.Int64 = int64(formgroupDB.ID)
-			formdivAssocEnd_DB.FormGroup_FormDivsDBID.Valid = true
-			formdivAssocEnd_DB.FormGroup_FormDivsDBID_Index.Int64 = int64(idx)
-			formdivAssocEnd_DB.FormGroup_FormDivsDBID_Index.Valid = true
-			if q := backRepoFormGroup.db.Save(formdivAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			formgroupDB.FormGroupPointersEncoding.FormDivs =
+				append(formgroupDB.FormGroupPointersEncoding.FormDivs, int(formdivAssocEnd_DB.ID))
 		}
 
 		query := backRepoFormGroup.db.Save(&formgroupDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -345,27 +339,9 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) CheckoutPhaseTwoInstance(backR
 	// it appends the stage instance
 	// 1. reset the slice
 	formgroup.FormDivs = formgroup.FormDivs[:0]
-	// 2. loop all instances in the type in the association end
-	for _, formdivDB_AssocEnd := range backRepo.BackRepoFormDiv.Map_FormDivDBID_FormDivDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if formdivDB_AssocEnd.FormGroup_FormDivsDBID.Int64 == int64(formgroupDB.ID) {
-			// 4. fetch the associated instance in the stage
-			formdiv_AssocEnd := backRepo.BackRepoFormDiv.Map_FormDivDBID_FormDivPtr[formdivDB_AssocEnd.ID]
-			// 5. append it the association slice
-			formgroup.FormDivs = append(formgroup.FormDivs, formdiv_AssocEnd)
-		}
+	for _, _FormDivid := range formgroupDB.FormGroupPointersEncoding.FormDivs {
+		formgroup.FormDivs = append(formgroup.FormDivs, backRepo.BackRepoFormDiv.Map_FormDivDBID_FormDivPtr[uint(_FormDivid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(formgroup.FormDivs, func(i, j int) bool {
-		formdivDB_i_ID := backRepo.BackRepoFormDiv.Map_FormDivPtr_FormDivDBID[formgroup.FormDivs[i]]
-		formdivDB_j_ID := backRepo.BackRepoFormDiv.Map_FormDivPtr_FormDivDBID[formgroup.FormDivs[j]]
-
-		formdivDB_i := backRepo.BackRepoFormDiv.Map_FormDivDBID_FormDivDB[formdivDB_i_ID]
-		formdivDB_j := backRepo.BackRepoFormDiv.Map_FormDivDBID_FormDivDB[formdivDB_j_ID]
-
-		return formdivDB_i.FormGroup_FormDivsDBID_Index.Int64 < formdivDB_j.FormGroup_FormDivsDBID_Index.Int64
-	})
 
 	return
 }
@@ -389,7 +365,7 @@ func (backRepo *BackRepoStruct) CheckoutFormGroup(formgroup *models.FormGroup) {
 			formgroupDB.ID = id
 
 			if err := backRepo.BackRepoFormGroup.db.First(&formgroupDB, id).Error; err != nil {
-				log.Panicln("CheckoutFormGroup : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutFormGroup : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoFormGroup.CheckoutPhaseOneInstance(&formgroupDB)
 			backRepo.BackRepoFormGroup.CheckoutPhaseTwoInstance(backRepo, &formgroupDB)
@@ -399,6 +375,17 @@ func (backRepo *BackRepoStruct) CheckoutFormGroup(formgroup *models.FormGroup) {
 
 // CopyBasicFieldsFromFormGroup
 func (formgroupDB *FormGroupDB) CopyBasicFieldsFromFormGroup(formgroup *models.FormGroup) {
+	// insertion point for fields commit
+
+	formgroupDB.Name_Data.String = formgroup.Name
+	formgroupDB.Name_Data.Valid = true
+
+	formgroupDB.Label_Data.String = formgroup.Label
+	formgroupDB.Label_Data.Valid = true
+}
+
+// CopyBasicFieldsFromFormGroup_WOP
+func (formgroupDB *FormGroupDB) CopyBasicFieldsFromFormGroup_WOP(formgroup *models.FormGroup_WOP) {
 	// insertion point for fields commit
 
 	formgroupDB.Name_Data.String = formgroup.Name
@@ -421,6 +408,13 @@ func (formgroupDB *FormGroupDB) CopyBasicFieldsFromFormGroupWOP(formgroup *FormG
 
 // CopyBasicFieldsToFormGroup
 func (formgroupDB *FormGroupDB) CopyBasicFieldsToFormGroup(formgroup *models.FormGroup) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	formgroup.Name = formgroupDB.Name_Data.String
+	formgroup.Label = formgroupDB.Label_Data.String
+}
+
+// CopyBasicFieldsToFormGroup_WOP
+func (formgroupDB *FormGroupDB) CopyBasicFieldsToFormGroup_WOP(formgroup *models.FormGroup_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	formgroup.Name = formgroupDB.Name_Data.String
 	formgroup.Label = formgroupDB.Label_Data.String
@@ -453,12 +447,12 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json FormGroup ", filename, " ", err.Error())
+		log.Fatal("Cannot json FormGroup ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json FormGroup file", err.Error())
+		log.Fatal("Cannot write the json FormGroup file", err.Error())
 	}
 }
 
@@ -478,7 +472,7 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("FormGroup")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -503,13 +497,13 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) RestoreXLPhaseOne(file *xlsx.F
 	sh, ok := file.Sheet["FormGroup"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoFormGroup.rowVisitorFormGroup)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -531,7 +525,7 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) rowVisitorFormGroup(row *xlsx.
 		formgroupDB.ID = 0
 		query := backRepoFormGroup.db.Create(formgroupDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoFormGroup.Map_FormGroupDBID_FormGroupDB[formgroupDB.ID] = formgroupDB
 		BackRepoFormGroupid_atBckpTime_newID[formgroupDB_ID_atBackupTime] = formgroupDB.ID
@@ -551,7 +545,7 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) RestorePhaseOne(dirPath string
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json FormGroup file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json FormGroup file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -568,14 +562,14 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) RestorePhaseOne(dirPath string
 		formgroupDB.ID = 0
 		query := backRepoFormGroup.db.Create(formgroupDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoFormGroup.Map_FormGroupDBID_FormGroupDB[formgroupDB.ID] = formgroupDB
 		BackRepoFormGroupid_atBckpTime_newID[formgroupDB_ID_atBackupTime] = formgroupDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json FormGroup file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json FormGroup file", err.Error())
 	}
 }
 
@@ -592,7 +586,7 @@ func (backRepoFormGroup *BackRepoFormGroupStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoFormGroup.db.Model(formgroupDB).Updates(*formgroupDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

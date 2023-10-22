@@ -35,22 +35,19 @@ var dummy_Text_sort sort.Float64Slice
 type TextAPI struct {
 	gorm.Model
 
-	models.Text
+	models.Text_WOP
 
 	// encoding of pointers
-	TextPointersEnconding
+	TextPointersEncoding TextPointersEncoding
 }
 
-// TextPointersEnconding encodes pointers to Struct and
+// TextPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type TextPointersEnconding struct {
+type TextPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
-	// Implementation of a reverse ID for field Layer{}.Texts []*Text
-	Layer_TextsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Layer_TextsDBID_Index sql.NullInt64
+	// field Animates is a slice of pointers to another Struct (optional or 0..1)
+	Animates IntSlice `gorm:"type:TEXT"`
 }
 
 // TextDB describes a text in the database
@@ -97,7 +94,7 @@ type TextDB struct {
 	// Declation for basic field textDB.Transform
 	Transform_Data sql.NullString
 	// encoding of pointers
-	TextPointersEnconding
+	TextPointersEncoding
 }
 
 // TextDBs arrays textDBs
@@ -216,7 +213,7 @@ func (backRepoText *BackRepoTextStruct) CommitDeleteInstance(id uint) (Error err
 	textDB := backRepoText.Map_TextDBID_TextDB[id]
 	query := backRepoText.db.Unscoped().Delete(&textDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -242,7 +239,7 @@ func (backRepoText *BackRepoTextStruct) CommitPhaseOneInstance(text *models.Text
 
 	query := backRepoText.db.Create(&textDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -274,28 +271,19 @@ func (backRepoText *BackRepoTextStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		textDB.CopyBasicFieldsFromText(text)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers text.Animates into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, animateAssocEnd := range text.Animates {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		textDB.TextPointersEncoding.Animates = make([]int, 0)
+		// 2. encode
+		for _, animateAssocEnd := range text.Animates {
 			animateAssocEnd_DB :=
 				backRepo.BackRepoAnimate.GetAnimateDBFromAnimatePtr(animateAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			animateAssocEnd_DB.Text_AnimatesDBID.Int64 = int64(textDB.ID)
-			animateAssocEnd_DB.Text_AnimatesDBID.Valid = true
-			animateAssocEnd_DB.Text_AnimatesDBID_Index.Int64 = int64(idx)
-			animateAssocEnd_DB.Text_AnimatesDBID_Index.Valid = true
-			if q := backRepoText.db.Save(animateAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			textDB.TextPointersEncoding.Animates =
+				append(textDB.TextPointersEncoding.Animates, int(animateAssocEnd_DB.ID))
 		}
 
 		query := backRepoText.db.Save(&textDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -405,27 +393,9 @@ func (backRepoText *BackRepoTextStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// it appends the stage instance
 	// 1. reset the slice
 	text.Animates = text.Animates[:0]
-	// 2. loop all instances in the type in the association end
-	for _, animateDB_AssocEnd := range backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if animateDB_AssocEnd.Text_AnimatesDBID.Int64 == int64(textDB.ID) {
-			// 4. fetch the associated instance in the stage
-			animate_AssocEnd := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[animateDB_AssocEnd.ID]
-			// 5. append it the association slice
-			text.Animates = append(text.Animates, animate_AssocEnd)
-		}
+	for _, _Animateid := range textDB.TextPointersEncoding.Animates {
+		text.Animates = append(text.Animates, backRepo.BackRepoAnimate.Map_AnimateDBID_AnimatePtr[uint(_Animateid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(text.Animates, func(i, j int) bool {
-		animateDB_i_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[text.Animates[i]]
-		animateDB_j_ID := backRepo.BackRepoAnimate.Map_AnimatePtr_AnimateDBID[text.Animates[j]]
-
-		animateDB_i := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_i_ID]
-		animateDB_j := backRepo.BackRepoAnimate.Map_AnimateDBID_AnimateDB[animateDB_j_ID]
-
-		return animateDB_i.Text_AnimatesDBID_Index.Int64 < animateDB_j.Text_AnimatesDBID_Index.Int64
-	})
 
 	return
 }
@@ -449,7 +419,7 @@ func (backRepo *BackRepoStruct) CheckoutText(text *models.Text) {
 			textDB.ID = id
 
 			if err := backRepo.BackRepoText.db.First(&textDB, id).Error; err != nil {
-				log.Panicln("CheckoutText : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutText : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoText.CheckoutPhaseOneInstance(&textDB)
 			backRepo.BackRepoText.CheckoutPhaseTwoInstance(backRepo, &textDB)
@@ -459,6 +429,44 @@ func (backRepo *BackRepoStruct) CheckoutText(text *models.Text) {
 
 // CopyBasicFieldsFromText
 func (textDB *TextDB) CopyBasicFieldsFromText(text *models.Text) {
+	// insertion point for fields commit
+
+	textDB.Name_Data.String = text.Name
+	textDB.Name_Data.Valid = true
+
+	textDB.X_Data.Float64 = text.X
+	textDB.X_Data.Valid = true
+
+	textDB.Y_Data.Float64 = text.Y
+	textDB.Y_Data.Valid = true
+
+	textDB.Content_Data.String = text.Content
+	textDB.Content_Data.Valid = true
+
+	textDB.Color_Data.String = text.Color
+	textDB.Color_Data.Valid = true
+
+	textDB.FillOpacity_Data.Float64 = text.FillOpacity
+	textDB.FillOpacity_Data.Valid = true
+
+	textDB.Stroke_Data.String = text.Stroke
+	textDB.Stroke_Data.Valid = true
+
+	textDB.StrokeWidth_Data.Float64 = text.StrokeWidth
+	textDB.StrokeWidth_Data.Valid = true
+
+	textDB.StrokeDashArray_Data.String = text.StrokeDashArray
+	textDB.StrokeDashArray_Data.Valid = true
+
+	textDB.StrokeDashArrayWhenSelected_Data.String = text.StrokeDashArrayWhenSelected
+	textDB.StrokeDashArrayWhenSelected_Data.Valid = true
+
+	textDB.Transform_Data.String = text.Transform
+	textDB.Transform_Data.Valid = true
+}
+
+// CopyBasicFieldsFromText_WOP
+func (textDB *TextDB) CopyBasicFieldsFromText_WOP(text *models.Text_WOP) {
 	// insertion point for fields commit
 
 	textDB.Name_Data.String = text.Name
@@ -549,6 +557,22 @@ func (textDB *TextDB) CopyBasicFieldsToText(text *models.Text) {
 	text.Transform = textDB.Transform_Data.String
 }
 
+// CopyBasicFieldsToText_WOP
+func (textDB *TextDB) CopyBasicFieldsToText_WOP(text *models.Text_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	text.Name = textDB.Name_Data.String
+	text.X = textDB.X_Data.Float64
+	text.Y = textDB.Y_Data.Float64
+	text.Content = textDB.Content_Data.String
+	text.Color = textDB.Color_Data.String
+	text.FillOpacity = textDB.FillOpacity_Data.Float64
+	text.Stroke = textDB.Stroke_Data.String
+	text.StrokeWidth = textDB.StrokeWidth_Data.Float64
+	text.StrokeDashArray = textDB.StrokeDashArray_Data.String
+	text.StrokeDashArrayWhenSelected = textDB.StrokeDashArrayWhenSelected_Data.String
+	text.Transform = textDB.Transform_Data.String
+}
+
 // CopyBasicFieldsToTextWOP
 func (textDB *TextDB) CopyBasicFieldsToTextWOP(text *TextWOP) {
 	text.ID = int(textDB.ID)
@@ -585,12 +609,12 @@ func (backRepoText *BackRepoTextStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Text ", filename, " ", err.Error())
+		log.Fatal("Cannot json Text ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Text file", err.Error())
+		log.Fatal("Cannot write the json Text file", err.Error())
 	}
 }
 
@@ -610,7 +634,7 @@ func (backRepoText *BackRepoTextStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Text")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -635,13 +659,13 @@ func (backRepoText *BackRepoTextStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Text"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoText.rowVisitorText)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -663,7 +687,7 @@ func (backRepoText *BackRepoTextStruct) rowVisitorText(row *xlsx.Row) error {
 		textDB.ID = 0
 		query := backRepoText.db.Create(textDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoText.Map_TextDBID_TextDB[textDB.ID] = textDB
 		BackRepoTextid_atBckpTime_newID[textDB_ID_atBackupTime] = textDB.ID
@@ -683,7 +707,7 @@ func (backRepoText *BackRepoTextStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Text file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Text file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -700,14 +724,14 @@ func (backRepoText *BackRepoTextStruct) RestorePhaseOne(dirPath string) {
 		textDB.ID = 0
 		query := backRepoText.db.Create(textDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoText.Map_TextDBID_TextDB[textDB.ID] = textDB
 		BackRepoTextid_atBckpTime_newID[textDB_ID_atBackupTime] = textDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Text file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Text file", err.Error())
 	}
 }
 
@@ -721,16 +745,10 @@ func (backRepoText *BackRepoTextStruct) RestorePhaseTwo() {
 		_ = textDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex text.Texts
-		if textDB.Layer_TextsDBID.Int64 != 0 {
-			textDB.Layer_TextsDBID.Int64 =
-				int64(BackRepoLayerid_atBckpTime_newID[uint(textDB.Layer_TextsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoText.db.Model(textDB).Updates(*textDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -754,15 +772,6 @@ func (backRepoText *BackRepoTextStruct) ResetReversePointersInstance(backRepo *B
 		_ = textDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if textDB.Layer_TextsDBID.Int64 != 0 {
-			textDB.Layer_TextsDBID.Int64 = 0
-			textDB.Layer_TextsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoText.db.Save(textDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

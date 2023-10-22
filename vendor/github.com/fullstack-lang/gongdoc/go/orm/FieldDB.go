@@ -35,22 +35,16 @@ var dummy_Field_sort sort.Float64Slice
 type FieldAPI struct {
 	gorm.Model
 
-	models.Field
+	models.Field_WOP
 
 	// encoding of pointers
-	FieldPointersEnconding
+	FieldPointersEncoding FieldPointersEncoding
 }
 
-// FieldPointersEnconding encodes pointers to Struct and
+// FieldPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type FieldPointersEnconding struct {
+type FieldPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
-
-	// Implementation of a reverse ID for field GongStructShape{}.Fields []*Field
-	GongStructShape_FieldsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	GongStructShape_FieldsDBID_Index sql.NullInt64
 }
 
 // FieldDB describes a field in the database
@@ -79,7 +73,7 @@ type FieldDB struct {
 	// Declation for basic field fieldDB.Fieldtypename
 	Fieldtypename_Data sql.NullString
 	// encoding of pointers
-	FieldPointersEnconding
+	FieldPointersEncoding
 }
 
 // FieldDBs arrays fieldDBs
@@ -180,7 +174,7 @@ func (backRepoField *BackRepoFieldStruct) CommitDeleteInstance(id uint) (Error e
 	fieldDB := backRepoField.Map_FieldDBID_FieldDB[id]
 	query := backRepoField.db.Unscoped().Delete(&fieldDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -206,7 +200,7 @@ func (backRepoField *BackRepoFieldStruct) CommitPhaseOneInstance(field *models.F
 
 	query := backRepoField.db.Create(&fieldDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -240,7 +234,7 @@ func (backRepoField *BackRepoFieldStruct) CommitPhaseTwoInstance(backRepo *BackR
 		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoField.db.Save(&fieldDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -367,7 +361,7 @@ func (backRepo *BackRepoStruct) CheckoutField(field *models.Field) {
 			fieldDB.ID = id
 
 			if err := backRepo.BackRepoField.db.First(&fieldDB, id).Error; err != nil {
-				log.Panicln("CheckoutField : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutField : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoField.CheckoutPhaseOneInstance(&fieldDB)
 			backRepo.BackRepoField.CheckoutPhaseTwoInstance(backRepo, &fieldDB)
@@ -377,6 +371,26 @@ func (backRepo *BackRepoStruct) CheckoutField(field *models.Field) {
 
 // CopyBasicFieldsFromField
 func (fieldDB *FieldDB) CopyBasicFieldsFromField(field *models.Field) {
+	// insertion point for fields commit
+
+	fieldDB.Name_Data.String = field.Name
+	fieldDB.Name_Data.Valid = true
+
+	fieldDB.Identifier_Data.String = field.Identifier
+	fieldDB.Identifier_Data.Valid = true
+
+	fieldDB.FieldTypeAsString_Data.String = field.FieldTypeAsString
+	fieldDB.FieldTypeAsString_Data.Valid = true
+
+	fieldDB.Structname_Data.String = field.Structname
+	fieldDB.Structname_Data.Valid = true
+
+	fieldDB.Fieldtypename_Data.String = field.Fieldtypename
+	fieldDB.Fieldtypename_Data.Valid = true
+}
+
+// CopyBasicFieldsFromField_WOP
+func (fieldDB *FieldDB) CopyBasicFieldsFromField_WOP(field *models.Field_WOP) {
 	// insertion point for fields commit
 
 	fieldDB.Name_Data.String = field.Name
@@ -425,6 +439,16 @@ func (fieldDB *FieldDB) CopyBasicFieldsToField(field *models.Field) {
 	field.Fieldtypename = fieldDB.Fieldtypename_Data.String
 }
 
+// CopyBasicFieldsToField_WOP
+func (fieldDB *FieldDB) CopyBasicFieldsToField_WOP(field *models.Field_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	field.Name = fieldDB.Name_Data.String
+	field.Identifier = fieldDB.Identifier_Data.String
+	field.FieldTypeAsString = fieldDB.FieldTypeAsString_Data.String
+	field.Structname = fieldDB.Structname_Data.String
+	field.Fieldtypename = fieldDB.Fieldtypename_Data.String
+}
+
 // CopyBasicFieldsToFieldWOP
 func (fieldDB *FieldDB) CopyBasicFieldsToFieldWOP(field *FieldWOP) {
 	field.ID = int(fieldDB.ID)
@@ -455,12 +479,12 @@ func (backRepoField *BackRepoFieldStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Field ", filename, " ", err.Error())
+		log.Fatal("Cannot json Field ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Field file", err.Error())
+		log.Fatal("Cannot write the json Field file", err.Error())
 	}
 }
 
@@ -480,7 +504,7 @@ func (backRepoField *BackRepoFieldStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Field")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -505,13 +529,13 @@ func (backRepoField *BackRepoFieldStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Field"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoField.rowVisitorField)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -533,7 +557,7 @@ func (backRepoField *BackRepoFieldStruct) rowVisitorField(row *xlsx.Row) error {
 		fieldDB.ID = 0
 		query := backRepoField.db.Create(fieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoField.Map_FieldDBID_FieldDB[fieldDB.ID] = fieldDB
 		BackRepoFieldid_atBckpTime_newID[fieldDB_ID_atBackupTime] = fieldDB.ID
@@ -553,7 +577,7 @@ func (backRepoField *BackRepoFieldStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Field file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Field file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -570,14 +594,14 @@ func (backRepoField *BackRepoFieldStruct) RestorePhaseOne(dirPath string) {
 		fieldDB.ID = 0
 		query := backRepoField.db.Create(fieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoField.Map_FieldDBID_FieldDB[fieldDB.ID] = fieldDB
 		BackRepoFieldid_atBckpTime_newID[fieldDB_ID_atBackupTime] = fieldDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Field file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Field file", err.Error())
 	}
 }
 
@@ -591,16 +615,10 @@ func (backRepoField *BackRepoFieldStruct) RestorePhaseTwo() {
 		_ = fieldDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex field.Fields
-		if fieldDB.GongStructShape_FieldsDBID.Int64 != 0 {
-			fieldDB.GongStructShape_FieldsDBID.Int64 =
-				int64(BackRepoGongStructShapeid_atBckpTime_newID[uint(fieldDB.GongStructShape_FieldsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoField.db.Model(fieldDB).Updates(*fieldDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -624,15 +642,6 @@ func (backRepoField *BackRepoFieldStruct) ResetReversePointersInstance(backRepo 
 		_ = fieldDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if fieldDB.GongStructShape_FieldsDBID.Int64 != 0 {
-			fieldDB.GongStructShape_FieldsDBID.Int64 = 0
-			fieldDB.GongStructShape_FieldsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoField.db.Save(fieldDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

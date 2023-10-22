@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
 
-import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs';
+import { Observable, combineLatest, BehaviorSubject, of } from 'rxjs'
 
-// insertion point sub template for services imports 
+// insertion point sub template for services imports
 import { ButtonDB } from './button-db'
 import { ButtonService } from './button.service'
 
@@ -15,16 +15,51 @@ import { TreeService } from './tree.service'
 
 
 // FrontRepo stores all instances in a front repository (design pattern repository)
-export class FrontRepo { // insertion point sub template 
-  Buttons_array = new Array<ButtonDB>(); // array of repo instances
-  Buttons = new Map<number, ButtonDB>(); // map of repo instances
-  Buttons_batch = new Map<number, ButtonDB>(); // same but only in last GET (for finding repo instances to delete)
-  Nodes_array = new Array<NodeDB>(); // array of repo instances
-  Nodes = new Map<number, NodeDB>(); // map of repo instances
-  Nodes_batch = new Map<number, NodeDB>(); // same but only in last GET (for finding repo instances to delete)
-  Trees_array = new Array<TreeDB>(); // array of repo instances
-  Trees = new Map<number, TreeDB>(); // map of repo instances
-  Trees_batch = new Map<number, TreeDB>(); // same but only in last GET (for finding repo instances to delete)
+export class FrontRepo { // insertion point sub template
+  Buttons_array = new Array<ButtonDB>() // array of repo instances
+  Buttons = new Map<number, ButtonDB>() // map of repo instances
+  Buttons_batch = new Map<number, ButtonDB>() // same but only in last GET (for finding repo instances to delete)
+
+  Nodes_array = new Array<NodeDB>() // array of repo instances
+  Nodes = new Map<number, NodeDB>() // map of repo instances
+  Nodes_batch = new Map<number, NodeDB>() // same but only in last GET (for finding repo instances to delete)
+
+  Trees_array = new Array<TreeDB>() // array of repo instances
+  Trees = new Map<number, TreeDB>() // map of repo instances
+  Trees_batch = new Map<number, TreeDB>() // same but only in last GET (for finding repo instances to delete)
+
+
+  // getArray allows for a get function that is robust to refactoring of the named struct name
+  // for instance frontRepo.getArray<Astruct>( Astruct.GONGSTRUCT_NAME), is robust to a refactoring of Astruct identifier
+  // contrary to frontRepo.Astructs_array which is not refactored when Astruct identifier is modified
+  getArray<Type>(gongStructName: string): Array<Type> {
+    switch (gongStructName) {
+      // insertion point
+      case 'Button':
+        return this.Buttons_array as unknown as Array<Type>
+      case 'Node':
+        return this.Nodes_array as unknown as Array<Type>
+      case 'Tree':
+        return this.Trees_array as unknown as Array<Type>
+      default:
+        throw new Error("Type not recognized");
+    }
+  }
+
+  // getMap allows for a get function that is robust to refactoring of the named struct name
+  getMap<Type>(gongStructName: string): Map<number, Type> {
+    switch (gongStructName) {
+      // insertion point
+      case 'Button':
+        return this.Buttons_array as unknown as Map<number, Type>
+      case 'Node':
+        return this.Nodes_array as unknown as Map<number, Type>
+      case 'Tree':
+        return this.Trees_array as unknown as Map<number, Type>
+      default:
+        throw new Error("Type not recognized");
+    }
+  }
 }
 
 // the table component is called in different ways
@@ -119,25 +154,25 @@ export class FrontRepoService {
   }
 
   // typing of observable can be messy in typescript. Therefore, one force the type
-  observableFrontRepo: [ 
+  observableFrontRepo: [
     Observable<null>, // see below for the of(null) observable
     // insertion point sub template 
     Observable<ButtonDB[]>,
     Observable<NodeDB[]>,
     Observable<TreeDB[]>,
-  ] = [ 
-    // Using "combineLatest" with a placeholder observable.
-    //
-    // This allows the typescript compiler to pass when no GongStruct is present in the front API
-    //
-    // The "of(null)" is a "meaningless" observable that emits a single value (null) and completes.
-    // This is used as a workaround to satisfy TypeScript requirements and the "combineLatest" 
-    // expectation for a non-empty array of observables.
-    of(null), // 
-    // insertion point sub template
-      this.buttonService.getButtons(this.GONG__StackPath),
-      this.nodeService.getNodes(this.GONG__StackPath),
-      this.treeService.getTrees(this.GONG__StackPath),
+  ] = [
+      // Using "combineLatest" with a placeholder observable.
+      //
+      // This allows the typescript compiler to pass when no GongStruct is present in the front API
+      //
+      // The "of(null)" is a "meaningless" observable that emits a single value (null) and completes.
+      // This is used as a workaround to satisfy TypeScript requirements and the "combineLatest" 
+      // expectation for a non-empty array of observables.
+      of(null), // 
+      // insertion point sub template
+      this.buttonService.getButtons(this.GONG__StackPath, this.frontRepo),
+      this.nodeService.getNodes(this.GONG__StackPath, this.frontRepo),
+      this.treeService.getTrees(this.GONG__StackPath, this.frontRepo),
     ];
 
   //
@@ -150,12 +185,12 @@ export class FrontRepoService {
 
     this.GONG__StackPath = GONG__StackPath
 
-    this.observableFrontRepo = [ 
+    this.observableFrontRepo = [
       of(null), // see above for justification
       // insertion point sub template
-      this.buttonService.getButtons(this.GONG__StackPath),
-      this.nodeService.getNodes(this.GONG__StackPath),
-      this.treeService.getTrees(this.GONG__StackPath),
+      this.buttonService.getButtons(this.GONG__StackPath, this.frontRepo),
+      this.nodeService.getNodes(this.GONG__StackPath, this.frontRepo),
+      this.treeService.getTrees(this.GONG__StackPath, this.frontRepo),
     ]
 
     return new Observable<FrontRepo>(
@@ -163,7 +198,7 @@ export class FrontRepoService {
         combineLatest(
           this.observableFrontRepo
         ).subscribe(
-          ([ 
+          ([
             ___of_null, // see above for the explanation about of
             // insertion point sub template for declarations 
             buttons_,
@@ -283,57 +318,30 @@ export class FrontRepoService {
 
 
             // 
-            // Second Step: redeem pointers between instances (thanks to maps in the First Step)
+            // Second Step: reddeem slice of pointers fields
             // insertion point sub template for redeem 
             buttons.forEach(
               button => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
-                // insertion point for slice of pointer field Node.Buttons redeeming
-                {
-                  let _node = this.frontRepo.Nodes.get(button.Node_ButtonsDBID.Int64)
-                  if (_node) {
-                    if (_node.Buttons == undefined) {
-                      _node.Buttons = new Array<ButtonDB>()
-                    }
-                    _node.Buttons.push(button)
-                    if (button.Node_Buttons_reverse == undefined) {
-                      button.Node_Buttons_reverse = _node
-                    }
-                  }
-                }
+                // insertion point for pointers decoding
               }
             )
             nodes.forEach(
               node => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
-                // insertion point for slice of pointer field Node.Children redeeming
-                {
-                  let _node = this.frontRepo.Nodes.get(node.Node_ChildrenDBID.Int64)
-                  if (_node) {
-                    if (_node.Children == undefined) {
-                      _node.Children = new Array<NodeDB>()
-                    }
-                    _node.Children.push(node)
-                    if (node.Node_Children_reverse == undefined) {
-                      node.Node_Children_reverse = _node
-                    }
+                // insertion point for pointers decoding
+                node.Children = new Array<NodeDB>()
+                for (let _id of node.NodePointersEncoding.Children) {
+                  let _node = this.frontRepo.Nodes.get(_id)
+                  if (_node != undefined) {
+                    node.Children.push(_node!)
                   }
                 }
-                // insertion point for slice of pointer field Tree.RootNodes redeeming
-                {
-                  let _tree = this.frontRepo.Trees.get(node.Tree_RootNodesDBID.Int64)
-                  if (_tree) {
-                    if (_tree.RootNodes == undefined) {
-                      _tree.RootNodes = new Array<NodeDB>()
-                    }
-                    _tree.RootNodes.push(node)
-                    if (node.Tree_RootNodes_reverse == undefined) {
-                      node.Tree_RootNodes_reverse = _tree
-                    }
+                node.Buttons = new Array<ButtonDB>()
+                for (let _id of node.NodePointersEncoding.Buttons) {
+                  let _button = this.frontRepo.Buttons.get(_id)
+                  if (_button != undefined) {
+                    node.Buttons.push(_button!)
                   }
                 }
               }
@@ -341,57 +349,14 @@ export class FrontRepoService {
             trees.forEach(
               tree => {
                 // insertion point sub sub template for ONE-/ZERO-ONE associations pointers redeeming
-
-                // insertion point for redeeming ONE-MANY associations
-              }
-            )
-
-            // 
-            // Third Step: sort arrays (slices in go) according to their index
-            // insertion point sub template for redeem 
-            buttons.forEach(
-              button => {
-                // insertion point for sorting
-              }
-            )
-            nodes.forEach(
-              node => {
-                // insertion point for sorting
-                node.Children?.sort((t1, t2) => {
-                  if (t1.Node_ChildrenDBID_Index.Int64 > t2.Node_ChildrenDBID_Index.Int64) {
-                    return 1;
+                // insertion point for pointers decoding
+                tree.RootNodes = new Array<NodeDB>()
+                for (let _id of tree.TreePointersEncoding.RootNodes) {
+                  let _node = this.frontRepo.Nodes.get(_id)
+                  if (_node != undefined) {
+                    tree.RootNodes.push(_node!)
                   }
-                  if (t1.Node_ChildrenDBID_Index.Int64 < t2.Node_ChildrenDBID_Index.Int64) {
-                    return -1;
-                  }
-                  return 0;
-                })
-
-                node.Buttons?.sort((t1, t2) => {
-                  if (t1.Node_ButtonsDBID_Index.Int64 > t2.Node_ButtonsDBID_Index.Int64) {
-                    return 1;
-                  }
-                  if (t1.Node_ButtonsDBID_Index.Int64 < t2.Node_ButtonsDBID_Index.Int64) {
-                    return -1;
-                  }
-                  return 0;
-                })
-
-              }
-            )
-            trees.forEach(
-              tree => {
-                // insertion point for sorting
-                tree.RootNodes?.sort((t1, t2) => {
-                  if (t1.Tree_RootNodesDBID_Index.Int64 > t2.Tree_RootNodesDBID_Index.Int64) {
-                    return 1;
-                  }
-                  if (t1.Tree_RootNodesDBID_Index.Int64 < t2.Tree_RootNodesDBID_Index.Int64) {
-                    return -1;
-                  }
-                  return 0;
-                })
-
+                }
               }
             )
 
@@ -410,7 +375,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.buttonService.getButtons(this.GONG__StackPath)
+          this.buttonService.getButtons(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             buttons,
@@ -430,21 +395,6 @@ export class FrontRepoService {
                 this.frontRepo.Buttons_batch.set(button.ID, button)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
-                // insertion point for slice of pointer field Node.Buttons redeeming
-                {
-                  let _node = this.frontRepo.Nodes.get(button.Node_ButtonsDBID.Int64)
-                  if (_node) {
-                    if (_node.Buttons == undefined) {
-                      _node.Buttons = new Array<ButtonDB>()
-                    }
-                    _node.Buttons.push(button)
-                    if (button.Node_Buttons_reverse == undefined) {
-                      button.Node_Buttons_reverse = _node
-                    }
-                  }
-                }
               }
             )
 
@@ -474,7 +424,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.nodeService.getNodes(this.GONG__StackPath)
+          this.nodeService.getNodes(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             nodes,
@@ -494,34 +444,6 @@ export class FrontRepoService {
                 this.frontRepo.Nodes_batch.set(node.ID, node)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
-                // insertion point for slice of pointer field Node.Children redeeming
-                {
-                  let _node = this.frontRepo.Nodes.get(node.Node_ChildrenDBID.Int64)
-                  if (_node) {
-                    if (_node.Children == undefined) {
-                      _node.Children = new Array<NodeDB>()
-                    }
-                    _node.Children.push(node)
-                    if (node.Node_Children_reverse == undefined) {
-                      node.Node_Children_reverse = _node
-                    }
-                  }
-                }
-                // insertion point for slice of pointer field Tree.RootNodes redeeming
-                {
-                  let _tree = this.frontRepo.Trees.get(node.Tree_RootNodesDBID.Int64)
-                  if (_tree) {
-                    if (_tree.RootNodes == undefined) {
-                      _tree.RootNodes = new Array<NodeDB>()
-                    }
-                    _tree.RootNodes.push(node)
-                    if (node.Tree_RootNodes_reverse == undefined) {
-                      node.Tree_RootNodes_reverse = _tree
-                    }
-                  }
-                }
               }
             )
 
@@ -551,7 +473,7 @@ export class FrontRepoService {
     return new Observable<FrontRepo>(
       (observer) => {
         combineLatest([
-          this.treeService.getTrees(this.GONG__StackPath)
+          this.treeService.getTrees(this.GONG__StackPath, this.frontRepo)
         ]).subscribe(
           ([ // insertion point sub template 
             trees,
@@ -571,8 +493,6 @@ export class FrontRepoService {
                 this.frontRepo.Trees_batch.set(tree.ID, tree)
 
                 // insertion point for redeeming ONE/ZERO-ONE associations
-
-                // insertion point for redeeming ONE-MANY associations
               }
             )
 

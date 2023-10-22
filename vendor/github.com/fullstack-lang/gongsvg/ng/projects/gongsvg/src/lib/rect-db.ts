@@ -2,7 +2,6 @@
 import { AnimateDB } from './animate-db'
 import { RectAnchoredTextDB } from './rectanchoredtext-db'
 import { RectAnchoredRectDB } from './rectanchoredrect-db'
-import { LayerDB } from './layer-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -42,12 +41,17 @@ export class RectDB {
 	CanMoveHorizontaly: boolean = false
 	CanMoveVerticaly: boolean = false
 
-	// insertion point for other declarations
-	Animations?: Array<AnimateDB>
-	RectAnchoredTexts?: Array<RectAnchoredTextDB>
-	RectAnchoredRects?: Array<RectAnchoredRectDB>
-	Layer_RectsDBID: NullInt64 = new NullInt64
-	Layer_RectsDBID_Index: NullInt64  = new NullInt64 // store the index of the rect instance in Layer.Rects
-	Layer_Rects_reverse?: LayerDB 
+	// insertion point for pointers and slices of pointers declarations
+	Animations: Array<AnimateDB> = []
+	RectAnchoredTexts: Array<RectAnchoredTextDB> = []
+	RectAnchoredRects: Array<RectAnchoredRectDB> = []
 
+	RectPointersEncoding: RectPointersEncoding = new RectPointersEncoding
+}
+
+export class RectPointersEncoding {
+	// insertion point for pointers and slices of pointers encoding fields
+	Animations: number[] = []
+	RectAnchoredTexts: number[] = []
+	RectAnchoredRects: number[] = []
 }

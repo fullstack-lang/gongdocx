@@ -9,7 +9,6 @@ import { PolygoneDB } from './polygone-db'
 import { PathDB } from './path-db'
 import { LinkDB } from './link-db'
 import { RectLinkLinkDB } from './rectlinklink-db'
-import { SVGDB } from './svg-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -26,19 +25,31 @@ export class LayerDB {
 	Display: boolean = false
 	Name: string = ""
 
-	// insertion point for other declarations
-	Rects?: Array<RectDB>
-	Texts?: Array<TextDB>
-	Circles?: Array<CircleDB>
-	Lines?: Array<LineDB>
-	Ellipses?: Array<EllipseDB>
-	Polylines?: Array<PolylineDB>
-	Polygones?: Array<PolygoneDB>
-	Paths?: Array<PathDB>
-	Links?: Array<LinkDB>
-	RectLinkLinks?: Array<RectLinkLinkDB>
-	SVG_LayersDBID: NullInt64 = new NullInt64
-	SVG_LayersDBID_Index: NullInt64  = new NullInt64 // store the index of the layer instance in SVG.Layers
-	SVG_Layers_reverse?: SVGDB 
+	// insertion point for pointers and slices of pointers declarations
+	Rects: Array<RectDB> = []
+	Texts: Array<TextDB> = []
+	Circles: Array<CircleDB> = []
+	Lines: Array<LineDB> = []
+	Ellipses: Array<EllipseDB> = []
+	Polylines: Array<PolylineDB> = []
+	Polygones: Array<PolygoneDB> = []
+	Paths: Array<PathDB> = []
+	Links: Array<LinkDB> = []
+	RectLinkLinks: Array<RectLinkLinkDB> = []
 
+	LayerPointersEncoding: LayerPointersEncoding = new LayerPointersEncoding
+}
+
+export class LayerPointersEncoding {
+	// insertion point for pointers and slices of pointers encoding fields
+	Rects: number[] = []
+	Texts: number[] = []
+	Circles: number[] = []
+	Lines: number[] = []
+	Ellipses: number[] = []
+	Polylines: number[] = []
+	Polygones: number[] = []
+	Paths: number[] = []
+	Links: number[] = []
+	RectLinkLinks: number[] = []
 }

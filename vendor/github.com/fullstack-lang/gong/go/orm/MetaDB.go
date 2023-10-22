@@ -35,16 +35,19 @@ var dummy_Meta_sort sort.Float64Slice
 type MetaAPI struct {
 	gorm.Model
 
-	models.Meta
+	models.Meta_WOP
 
 	// encoding of pointers
-	MetaPointersEnconding
+	MetaPointersEncoding MetaPointersEncoding
 }
 
-// MetaPointersEnconding encodes pointers to Struct and
+// MetaPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type MetaPointersEnconding struct {
+type MetaPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
+
+	// field MetaReferences is a slice of pointers to another Struct (optional or 0..1)
+	MetaReferences IntSlice `gorm:"type:TEXT"`
 }
 
 // MetaDB describes a meta in the database
@@ -64,7 +67,7 @@ type MetaDB struct {
 	// Declation for basic field metaDB.Text
 	Text_Data sql.NullString
 	// encoding of pointers
-	MetaPointersEnconding
+	MetaPointersEncoding
 }
 
 // MetaDBs arrays metaDBs
@@ -156,7 +159,7 @@ func (backRepoMeta *BackRepoMetaStruct) CommitDeleteInstance(id uint) (Error err
 	metaDB := backRepoMeta.Map_MetaDBID_MetaDB[id]
 	query := backRepoMeta.db.Unscoped().Delete(&metaDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -182,7 +185,7 @@ func (backRepoMeta *BackRepoMetaStruct) CommitPhaseOneInstance(meta *models.Meta
 
 	query := backRepoMeta.db.Create(&metaDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -214,28 +217,19 @@ func (backRepoMeta *BackRepoMetaStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		metaDB.CopyBasicFieldsFromMeta(meta)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers meta.MetaReferences into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, metareferenceAssocEnd := range meta.MetaReferences {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		metaDB.MetaPointersEncoding.MetaReferences = make([]int, 0)
+		// 2. encode
+		for _, metareferenceAssocEnd := range meta.MetaReferences {
 			metareferenceAssocEnd_DB :=
 				backRepo.BackRepoMetaReference.GetMetaReferenceDBFromMetaReferencePtr(metareferenceAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			metareferenceAssocEnd_DB.Meta_MetaReferencesDBID.Int64 = int64(metaDB.ID)
-			metareferenceAssocEnd_DB.Meta_MetaReferencesDBID.Valid = true
-			metareferenceAssocEnd_DB.Meta_MetaReferencesDBID_Index.Int64 = int64(idx)
-			metareferenceAssocEnd_DB.Meta_MetaReferencesDBID_Index.Valid = true
-			if q := backRepoMeta.db.Save(metareferenceAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			metaDB.MetaPointersEncoding.MetaReferences =
+				append(metaDB.MetaPointersEncoding.MetaReferences, int(metareferenceAssocEnd_DB.ID))
 		}
 
 		query := backRepoMeta.db.Save(&metaDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -345,27 +339,9 @@ func (backRepoMeta *BackRepoMetaStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// it appends the stage instance
 	// 1. reset the slice
 	meta.MetaReferences = meta.MetaReferences[:0]
-	// 2. loop all instances in the type in the association end
-	for _, metareferenceDB_AssocEnd := range backRepo.BackRepoMetaReference.Map_MetaReferenceDBID_MetaReferenceDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if metareferenceDB_AssocEnd.Meta_MetaReferencesDBID.Int64 == int64(metaDB.ID) {
-			// 4. fetch the associated instance in the stage
-			metareference_AssocEnd := backRepo.BackRepoMetaReference.Map_MetaReferenceDBID_MetaReferencePtr[metareferenceDB_AssocEnd.ID]
-			// 5. append it the association slice
-			meta.MetaReferences = append(meta.MetaReferences, metareference_AssocEnd)
-		}
+	for _, _MetaReferenceid := range metaDB.MetaPointersEncoding.MetaReferences {
+		meta.MetaReferences = append(meta.MetaReferences, backRepo.BackRepoMetaReference.Map_MetaReferenceDBID_MetaReferencePtr[uint(_MetaReferenceid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(meta.MetaReferences, func(i, j int) bool {
-		metareferenceDB_i_ID := backRepo.BackRepoMetaReference.Map_MetaReferencePtr_MetaReferenceDBID[meta.MetaReferences[i]]
-		metareferenceDB_j_ID := backRepo.BackRepoMetaReference.Map_MetaReferencePtr_MetaReferenceDBID[meta.MetaReferences[j]]
-
-		metareferenceDB_i := backRepo.BackRepoMetaReference.Map_MetaReferenceDBID_MetaReferenceDB[metareferenceDB_i_ID]
-		metareferenceDB_j := backRepo.BackRepoMetaReference.Map_MetaReferenceDBID_MetaReferenceDB[metareferenceDB_j_ID]
-
-		return metareferenceDB_i.Meta_MetaReferencesDBID_Index.Int64 < metareferenceDB_j.Meta_MetaReferencesDBID_Index.Int64
-	})
 
 	return
 }
@@ -389,7 +365,7 @@ func (backRepo *BackRepoStruct) CheckoutMeta(meta *models.Meta) {
 			metaDB.ID = id
 
 			if err := backRepo.BackRepoMeta.db.First(&metaDB, id).Error; err != nil {
-				log.Panicln("CheckoutMeta : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutMeta : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoMeta.CheckoutPhaseOneInstance(&metaDB)
 			backRepo.BackRepoMeta.CheckoutPhaseTwoInstance(backRepo, &metaDB)
@@ -399,6 +375,17 @@ func (backRepo *BackRepoStruct) CheckoutMeta(meta *models.Meta) {
 
 // CopyBasicFieldsFromMeta
 func (metaDB *MetaDB) CopyBasicFieldsFromMeta(meta *models.Meta) {
+	// insertion point for fields commit
+
+	metaDB.Name_Data.String = meta.Name
+	metaDB.Name_Data.Valid = true
+
+	metaDB.Text_Data.String = meta.Text
+	metaDB.Text_Data.Valid = true
+}
+
+// CopyBasicFieldsFromMeta_WOP
+func (metaDB *MetaDB) CopyBasicFieldsFromMeta_WOP(meta *models.Meta_WOP) {
 	// insertion point for fields commit
 
 	metaDB.Name_Data.String = meta.Name
@@ -421,6 +408,13 @@ func (metaDB *MetaDB) CopyBasicFieldsFromMetaWOP(meta *MetaWOP) {
 
 // CopyBasicFieldsToMeta
 func (metaDB *MetaDB) CopyBasicFieldsToMeta(meta *models.Meta) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	meta.Name = metaDB.Name_Data.String
+	meta.Text = metaDB.Text_Data.String
+}
+
+// CopyBasicFieldsToMeta_WOP
+func (metaDB *MetaDB) CopyBasicFieldsToMeta_WOP(meta *models.Meta_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	meta.Name = metaDB.Name_Data.String
 	meta.Text = metaDB.Text_Data.String
@@ -453,12 +447,12 @@ func (backRepoMeta *BackRepoMetaStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Meta ", filename, " ", err.Error())
+		log.Fatal("Cannot json Meta ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Meta file", err.Error())
+		log.Fatal("Cannot write the json Meta file", err.Error())
 	}
 }
 
@@ -478,7 +472,7 @@ func (backRepoMeta *BackRepoMetaStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Meta")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -503,13 +497,13 @@ func (backRepoMeta *BackRepoMetaStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Meta"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoMeta.rowVisitorMeta)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -531,7 +525,7 @@ func (backRepoMeta *BackRepoMetaStruct) rowVisitorMeta(row *xlsx.Row) error {
 		metaDB.ID = 0
 		query := backRepoMeta.db.Create(metaDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoMeta.Map_MetaDBID_MetaDB[metaDB.ID] = metaDB
 		BackRepoMetaid_atBckpTime_newID[metaDB_ID_atBackupTime] = metaDB.ID
@@ -551,7 +545,7 @@ func (backRepoMeta *BackRepoMetaStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Meta file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Meta file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -568,14 +562,14 @@ func (backRepoMeta *BackRepoMetaStruct) RestorePhaseOne(dirPath string) {
 		metaDB.ID = 0
 		query := backRepoMeta.db.Create(metaDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoMeta.Map_MetaDBID_MetaDB[metaDB.ID] = metaDB
 		BackRepoMetaid_atBckpTime_newID[metaDB_ID_atBackupTime] = metaDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Meta file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Meta file", err.Error())
 	}
 }
 
@@ -592,7 +586,7 @@ func (backRepoMeta *BackRepoMetaStruct) RestorePhaseTwo() {
 		// update databse with new index encoding
 		query := backRepoMeta.db.Model(metaDB).Updates(*metaDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 

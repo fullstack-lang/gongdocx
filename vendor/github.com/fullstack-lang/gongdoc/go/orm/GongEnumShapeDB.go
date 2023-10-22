@@ -35,26 +35,23 @@ var dummy_GongEnumShape_sort sort.Float64Slice
 type GongEnumShapeAPI struct {
 	gorm.Model
 
-	models.GongEnumShape
+	models.GongEnumShape_WOP
 
 	// encoding of pointers
-	GongEnumShapePointersEnconding
+	GongEnumShapePointersEncoding GongEnumShapePointersEncoding
 }
 
-// GongEnumShapePointersEnconding encodes pointers to Struct and
+// GongEnumShapePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type GongEnumShapePointersEnconding struct {
+type GongEnumShapePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Position is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	PositionID sql.NullInt64
 
-	// Implementation of a reverse ID for field Classdiagram{}.GongEnumShapes []*GongEnumShape
-	Classdiagram_GongEnumShapesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Classdiagram_GongEnumShapesDBID_Index sql.NullInt64
+	// field GongEnumValueEntrys is a slice of pointers to another Struct (optional or 0..1)
+	GongEnumValueEntrys IntSlice `gorm:"type:TEXT"`
 }
 
 // GongEnumShapeDB describes a gongenumshape in the database
@@ -80,7 +77,7 @@ type GongEnumShapeDB struct {
 	// Declation for basic field gongenumshapeDB.Heigth
 	Heigth_Data sql.NullFloat64
 	// encoding of pointers
-	GongEnumShapePointersEnconding
+	GongEnumShapePointersEncoding
 }
 
 // GongEnumShapeDBs arrays gongenumshapeDBs
@@ -178,7 +175,7 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) CommitDeleteInstance(i
 	gongenumshapeDB := backRepoGongEnumShape.Map_GongEnumShapeDBID_GongEnumShapeDB[id]
 	query := backRepoGongEnumShape.db.Unscoped().Delete(&gongenumshapeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -204,7 +201,7 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) CommitPhaseOneInstance
 
 	query := backRepoGongEnumShape.db.Create(&gongenumshapeDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -248,28 +245,19 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) CommitPhaseTwoInstance
 			gongenumshapeDB.PositionID.Valid = true
 		}
 
-		// This loop encodes the slice of pointers gongenumshape.GongEnumValueEntrys into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, gongenumvalueentryAssocEnd := range gongenumshape.GongEnumValueEntrys {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		gongenumshapeDB.GongEnumShapePointersEncoding.GongEnumValueEntrys = make([]int, 0)
+		// 2. encode
+		for _, gongenumvalueentryAssocEnd := range gongenumshape.GongEnumValueEntrys {
 			gongenumvalueentryAssocEnd_DB :=
 				backRepo.BackRepoGongEnumValueEntry.GetGongEnumValueEntryDBFromGongEnumValueEntryPtr(gongenumvalueentryAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			gongenumvalueentryAssocEnd_DB.GongEnumShape_GongEnumValueEntrysDBID.Int64 = int64(gongenumshapeDB.ID)
-			gongenumvalueentryAssocEnd_DB.GongEnumShape_GongEnumValueEntrysDBID.Valid = true
-			gongenumvalueentryAssocEnd_DB.GongEnumShape_GongEnumValueEntrysDBID_Index.Int64 = int64(idx)
-			gongenumvalueentryAssocEnd_DB.GongEnumShape_GongEnumValueEntrysDBID_Index.Valid = true
-			if q := backRepoGongEnumShape.db.Save(gongenumvalueentryAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			gongenumshapeDB.GongEnumShapePointersEncoding.GongEnumValueEntrys =
+				append(gongenumshapeDB.GongEnumShapePointersEncoding.GongEnumValueEntrys, int(gongenumvalueentryAssocEnd_DB.ID))
 		}
 
 		query := backRepoGongEnumShape.db.Save(&gongenumshapeDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -384,27 +372,9 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) CheckoutPhaseTwoInstan
 	// it appends the stage instance
 	// 1. reset the slice
 	gongenumshape.GongEnumValueEntrys = gongenumshape.GongEnumValueEntrys[:0]
-	// 2. loop all instances in the type in the association end
-	for _, gongenumvalueentryDB_AssocEnd := range backRepo.BackRepoGongEnumValueEntry.Map_GongEnumValueEntryDBID_GongEnumValueEntryDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if gongenumvalueentryDB_AssocEnd.GongEnumShape_GongEnumValueEntrysDBID.Int64 == int64(gongenumshapeDB.ID) {
-			// 4. fetch the associated instance in the stage
-			gongenumvalueentry_AssocEnd := backRepo.BackRepoGongEnumValueEntry.Map_GongEnumValueEntryDBID_GongEnumValueEntryPtr[gongenumvalueentryDB_AssocEnd.ID]
-			// 5. append it the association slice
-			gongenumshape.GongEnumValueEntrys = append(gongenumshape.GongEnumValueEntrys, gongenumvalueentry_AssocEnd)
-		}
+	for _, _GongEnumValueEntryid := range gongenumshapeDB.GongEnumShapePointersEncoding.GongEnumValueEntrys {
+		gongenumshape.GongEnumValueEntrys = append(gongenumshape.GongEnumValueEntrys, backRepo.BackRepoGongEnumValueEntry.Map_GongEnumValueEntryDBID_GongEnumValueEntryPtr[uint(_GongEnumValueEntryid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(gongenumshape.GongEnumValueEntrys, func(i, j int) bool {
-		gongenumvalueentryDB_i_ID := backRepo.BackRepoGongEnumValueEntry.Map_GongEnumValueEntryPtr_GongEnumValueEntryDBID[gongenumshape.GongEnumValueEntrys[i]]
-		gongenumvalueentryDB_j_ID := backRepo.BackRepoGongEnumValueEntry.Map_GongEnumValueEntryPtr_GongEnumValueEntryDBID[gongenumshape.GongEnumValueEntrys[j]]
-
-		gongenumvalueentryDB_i := backRepo.BackRepoGongEnumValueEntry.Map_GongEnumValueEntryDBID_GongEnumValueEntryDB[gongenumvalueentryDB_i_ID]
-		gongenumvalueentryDB_j := backRepo.BackRepoGongEnumValueEntry.Map_GongEnumValueEntryDBID_GongEnumValueEntryDB[gongenumvalueentryDB_j_ID]
-
-		return gongenumvalueentryDB_i.GongEnumShape_GongEnumValueEntrysDBID_Index.Int64 < gongenumvalueentryDB_j.GongEnumShape_GongEnumValueEntrysDBID_Index.Int64
-	})
 
 	return
 }
@@ -428,7 +398,7 @@ func (backRepo *BackRepoStruct) CheckoutGongEnumShape(gongenumshape *models.Gong
 			gongenumshapeDB.ID = id
 
 			if err := backRepo.BackRepoGongEnumShape.db.First(&gongenumshapeDB, id).Error; err != nil {
-				log.Panicln("CheckoutGongEnumShape : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutGongEnumShape : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoGongEnumShape.CheckoutPhaseOneInstance(&gongenumshapeDB)
 			backRepo.BackRepoGongEnumShape.CheckoutPhaseTwoInstance(backRepo, &gongenumshapeDB)
@@ -438,6 +408,23 @@ func (backRepo *BackRepoStruct) CheckoutGongEnumShape(gongenumshape *models.Gong
 
 // CopyBasicFieldsFromGongEnumShape
 func (gongenumshapeDB *GongEnumShapeDB) CopyBasicFieldsFromGongEnumShape(gongenumshape *models.GongEnumShape) {
+	// insertion point for fields commit
+
+	gongenumshapeDB.Name_Data.String = gongenumshape.Name
+	gongenumshapeDB.Name_Data.Valid = true
+
+	gongenumshapeDB.Identifier_Data.String = gongenumshape.Identifier
+	gongenumshapeDB.Identifier_Data.Valid = true
+
+	gongenumshapeDB.Width_Data.Float64 = gongenumshape.Width
+	gongenumshapeDB.Width_Data.Valid = true
+
+	gongenumshapeDB.Heigth_Data.Float64 = gongenumshape.Heigth
+	gongenumshapeDB.Heigth_Data.Valid = true
+}
+
+// CopyBasicFieldsFromGongEnumShape_WOP
+func (gongenumshapeDB *GongEnumShapeDB) CopyBasicFieldsFromGongEnumShape_WOP(gongenumshape *models.GongEnumShape_WOP) {
 	// insertion point for fields commit
 
 	gongenumshapeDB.Name_Data.String = gongenumshape.Name
@@ -479,6 +466,15 @@ func (gongenumshapeDB *GongEnumShapeDB) CopyBasicFieldsToGongEnumShape(gongenums
 	gongenumshape.Heigth = gongenumshapeDB.Heigth_Data.Float64
 }
 
+// CopyBasicFieldsToGongEnumShape_WOP
+func (gongenumshapeDB *GongEnumShapeDB) CopyBasicFieldsToGongEnumShape_WOP(gongenumshape *models.GongEnumShape_WOP) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	gongenumshape.Name = gongenumshapeDB.Name_Data.String
+	gongenumshape.Identifier = gongenumshapeDB.Identifier_Data.String
+	gongenumshape.Width = gongenumshapeDB.Width_Data.Float64
+	gongenumshape.Heigth = gongenumshapeDB.Heigth_Data.Float64
+}
+
 // CopyBasicFieldsToGongEnumShapeWOP
 func (gongenumshapeDB *GongEnumShapeDB) CopyBasicFieldsToGongEnumShapeWOP(gongenumshape *GongEnumShapeWOP) {
 	gongenumshape.ID = int(gongenumshapeDB.ID)
@@ -508,12 +504,12 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) Backup(dirPath string)
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json GongEnumShape ", filename, " ", err.Error())
+		log.Fatal("Cannot json GongEnumShape ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json GongEnumShape file", err.Error())
+		log.Fatal("Cannot write the json GongEnumShape file", err.Error())
 	}
 }
 
@@ -533,7 +529,7 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) BackupXL(file *xlsx.Fi
 
 	sh, err := file.AddSheet("GongEnumShape")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -558,13 +554,13 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) RestoreXLPhaseOne(file
 	sh, ok := file.Sheet["GongEnumShape"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoGongEnumShape.rowVisitorGongEnumShape)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -586,7 +582,7 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) rowVisitorGongEnumShap
 		gongenumshapeDB.ID = 0
 		query := backRepoGongEnumShape.db.Create(gongenumshapeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoGongEnumShape.Map_GongEnumShapeDBID_GongEnumShapeDB[gongenumshapeDB.ID] = gongenumshapeDB
 		BackRepoGongEnumShapeid_atBckpTime_newID[gongenumshapeDB_ID_atBackupTime] = gongenumshapeDB.ID
@@ -606,7 +602,7 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) RestorePhaseOne(dirPat
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json GongEnumShape file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json GongEnumShape file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -623,14 +619,14 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) RestorePhaseOne(dirPat
 		gongenumshapeDB.ID = 0
 		query := backRepoGongEnumShape.db.Create(gongenumshapeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoGongEnumShape.Map_GongEnumShapeDBID_GongEnumShapeDB[gongenumshapeDB.ID] = gongenumshapeDB
 		BackRepoGongEnumShapeid_atBckpTime_newID[gongenumshapeDB_ID_atBackupTime] = gongenumshapeDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json GongEnumShape file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json GongEnumShape file", err.Error())
 	}
 }
 
@@ -650,16 +646,10 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) RestorePhaseTwo() {
 			gongenumshapeDB.PositionID.Valid = true
 		}
 
-		// This reindex gongenumshape.GongEnumShapes
-		if gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Int64 != 0 {
-			gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Int64 =
-				int64(BackRepoClassdiagramid_atBckpTime_newID[uint(gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoGongEnumShape.db.Model(gongenumshapeDB).Updates(*gongenumshapeDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -683,15 +673,6 @@ func (backRepoGongEnumShape *BackRepoGongEnumShapeStruct) ResetReversePointersIn
 		_ = gongenumshapeDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Int64 != 0 {
-			gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Int64 = 0
-			gongenumshapeDB.Classdiagram_GongEnumShapesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoGongEnumShape.db.Save(gongenumshapeDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

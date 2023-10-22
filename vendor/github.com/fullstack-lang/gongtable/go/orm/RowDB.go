@@ -35,22 +35,19 @@ var dummy_Row_sort sort.Float64Slice
 type RowAPI struct {
 	gorm.Model
 
-	models.Row
+	models.Row_WOP
 
 	// encoding of pointers
-	RowPointersEnconding
+	RowPointersEncoding RowPointersEncoding
 }
 
-// RowPointersEnconding encodes pointers to Struct and
+// RowPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type RowPointersEnconding struct {
+type RowPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
-	// Implementation of a reverse ID for field Table{}.Rows []*Row
-	Table_RowsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Table_RowsDBID_Index sql.NullInt64
+	// field Cells is a slice of pointers to another Struct (optional or 0..1)
+	Cells IntSlice `gorm:"type:TEXT"`
 }
 
 // RowDB describes a row in the database
@@ -71,7 +68,7 @@ type RowDB struct {
 	// provide the sql storage for the boolan
 	IsChecked_Data sql.NullBool
 	// encoding of pointers
-	RowPointersEnconding
+	RowPointersEncoding
 }
 
 // RowDBs arrays rowDBs
@@ -163,7 +160,7 @@ func (backRepoRow *BackRepoRowStruct) CommitDeleteInstance(id uint) (Error error
 	rowDB := backRepoRow.Map_RowDBID_RowDB[id]
 	query := backRepoRow.db.Unscoped().Delete(&rowDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -189,7 +186,7 @@ func (backRepoRow *BackRepoRowStruct) CommitPhaseOneInstance(row *models.Row) (E
 
 	query := backRepoRow.db.Create(&rowDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -221,28 +218,19 @@ func (backRepoRow *BackRepoRowStruct) CommitPhaseTwoInstance(backRepo *BackRepoS
 		rowDB.CopyBasicFieldsFromRow(row)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers row.Cells into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, cellAssocEnd := range row.Cells {
-
-			// get the back repo instance at the association end
+		// 1. reset
+		rowDB.RowPointersEncoding.Cells = make([]int, 0)
+		// 2. encode
+		for _, cellAssocEnd := range row.Cells {
 			cellAssocEnd_DB :=
 				backRepo.BackRepoCell.GetCellDBFromCellPtr(cellAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			cellAssocEnd_DB.Row_CellsDBID.Int64 = int64(rowDB.ID)
-			cellAssocEnd_DB.Row_CellsDBID.Valid = true
-			cellAssocEnd_DB.Row_CellsDBID_Index.Int64 = int64(idx)
-			cellAssocEnd_DB.Row_CellsDBID_Index.Valid = true
-			if q := backRepoRow.db.Save(cellAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
+			rowDB.RowPointersEncoding.Cells =
+				append(rowDB.RowPointersEncoding.Cells, int(cellAssocEnd_DB.ID))
 		}
 
 		query := backRepoRow.db.Save(&rowDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -352,27 +340,9 @@ func (backRepoRow *BackRepoRowStruct) CheckoutPhaseTwoInstance(backRepo *BackRep
 	// it appends the stage instance
 	// 1. reset the slice
 	row.Cells = row.Cells[:0]
-	// 2. loop all instances in the type in the association end
-	for _, cellDB_AssocEnd := range backRepo.BackRepoCell.Map_CellDBID_CellDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if cellDB_AssocEnd.Row_CellsDBID.Int64 == int64(rowDB.ID) {
-			// 4. fetch the associated instance in the stage
-			cell_AssocEnd := backRepo.BackRepoCell.Map_CellDBID_CellPtr[cellDB_AssocEnd.ID]
-			// 5. append it the association slice
-			row.Cells = append(row.Cells, cell_AssocEnd)
-		}
+	for _, _Cellid := range rowDB.RowPointersEncoding.Cells {
+		row.Cells = append(row.Cells, backRepo.BackRepoCell.Map_CellDBID_CellPtr[uint(_Cellid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(row.Cells, func(i, j int) bool {
-		cellDB_i_ID := backRepo.BackRepoCell.Map_CellPtr_CellDBID[row.Cells[i]]
-		cellDB_j_ID := backRepo.BackRepoCell.Map_CellPtr_CellDBID[row.Cells[j]]
-
-		cellDB_i := backRepo.BackRepoCell.Map_CellDBID_CellDB[cellDB_i_ID]
-		cellDB_j := backRepo.BackRepoCell.Map_CellDBID_CellDB[cellDB_j_ID]
-
-		return cellDB_i.Row_CellsDBID_Index.Int64 < cellDB_j.Row_CellsDBID_Index.Int64
-	})
 
 	return
 }
@@ -396,7 +366,7 @@ func (backRepo *BackRepoStruct) CheckoutRow(row *models.Row) {
 			rowDB.ID = id
 
 			if err := backRepo.BackRepoRow.db.First(&rowDB, id).Error; err != nil {
-				log.Panicln("CheckoutRow : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutRow : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoRow.CheckoutPhaseOneInstance(&rowDB)
 			backRepo.BackRepoRow.CheckoutPhaseTwoInstance(backRepo, &rowDB)
@@ -406,6 +376,17 @@ func (backRepo *BackRepoStruct) CheckoutRow(row *models.Row) {
 
 // CopyBasicFieldsFromRow
 func (rowDB *RowDB) CopyBasicFieldsFromRow(row *models.Row) {
+	// insertion point for fields commit
+
+	rowDB.Name_Data.String = row.Name
+	rowDB.Name_Data.Valid = true
+
+	rowDB.IsChecked_Data.Bool = row.IsChecked
+	rowDB.IsChecked_Data.Valid = true
+}
+
+// CopyBasicFieldsFromRow_WOP
+func (rowDB *RowDB) CopyBasicFieldsFromRow_WOP(row *models.Row_WOP) {
 	// insertion point for fields commit
 
 	rowDB.Name_Data.String = row.Name
@@ -428,6 +409,13 @@ func (rowDB *RowDB) CopyBasicFieldsFromRowWOP(row *RowWOP) {
 
 // CopyBasicFieldsToRow
 func (rowDB *RowDB) CopyBasicFieldsToRow(row *models.Row) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	row.Name = rowDB.Name_Data.String
+	row.IsChecked = rowDB.IsChecked_Data.Bool
+}
+
+// CopyBasicFieldsToRow_WOP
+func (rowDB *RowDB) CopyBasicFieldsToRow_WOP(row *models.Row_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	row.Name = rowDB.Name_Data.String
 	row.IsChecked = rowDB.IsChecked_Data.Bool
@@ -460,12 +448,12 @@ func (backRepoRow *BackRepoRowStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Row ", filename, " ", err.Error())
+		log.Fatal("Cannot json Row ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Row file", err.Error())
+		log.Fatal("Cannot write the json Row file", err.Error())
 	}
 }
 
@@ -485,7 +473,7 @@ func (backRepoRow *BackRepoRowStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Row")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -510,13 +498,13 @@ func (backRepoRow *BackRepoRowStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Row"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoRow.rowVisitorRow)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -538,7 +526,7 @@ func (backRepoRow *BackRepoRowStruct) rowVisitorRow(row *xlsx.Row) error {
 		rowDB.ID = 0
 		query := backRepoRow.db.Create(rowDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRow.Map_RowDBID_RowDB[rowDB.ID] = rowDB
 		BackRepoRowid_atBckpTime_newID[rowDB_ID_atBackupTime] = rowDB.ID
@@ -558,7 +546,7 @@ func (backRepoRow *BackRepoRowStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Row file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Row file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -575,14 +563,14 @@ func (backRepoRow *BackRepoRowStruct) RestorePhaseOne(dirPath string) {
 		rowDB.ID = 0
 		query := backRepoRow.db.Create(rowDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoRow.Map_RowDBID_RowDB[rowDB.ID] = rowDB
 		BackRepoRowid_atBckpTime_newID[rowDB_ID_atBackupTime] = rowDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Row file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Row file", err.Error())
 	}
 }
 
@@ -596,16 +584,10 @@ func (backRepoRow *BackRepoRowStruct) RestorePhaseTwo() {
 		_ = rowDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex row.Rows
-		if rowDB.Table_RowsDBID.Int64 != 0 {
-			rowDB.Table_RowsDBID.Int64 =
-				int64(BackRepoTableid_atBckpTime_newID[uint(rowDB.Table_RowsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoRow.db.Model(rowDB).Updates(*rowDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -629,15 +611,6 @@ func (backRepoRow *BackRepoRowStruct) ResetReversePointersInstance(backRepo *Bac
 		_ = rowDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if rowDB.Table_RowsDBID.Int64 != 0 {
-			rowDB.Table_RowsDBID.Int64 = 0
-			rowDB.Table_RowsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoRow.db.Save(rowDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

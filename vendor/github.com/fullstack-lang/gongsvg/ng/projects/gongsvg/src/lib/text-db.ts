@@ -1,6 +1,5 @@
 // insertion point for imports
 import { AnimateDB } from './animate-db'
-import { LayerDB } from './layer-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -26,10 +25,13 @@ export class TextDB {
 	StrokeDashArrayWhenSelected: string = ""
 	Transform: string = ""
 
-	// insertion point for other declarations
-	Animates?: Array<AnimateDB>
-	Layer_TextsDBID: NullInt64 = new NullInt64
-	Layer_TextsDBID_Index: NullInt64  = new NullInt64 // store the index of the text instance in Layer.Texts
-	Layer_Texts_reverse?: LayerDB 
+	// insertion point for pointers and slices of pointers declarations
+	Animates: Array<AnimateDB> = []
 
+	TextPointersEncoding: TextPointersEncoding = new TextPointersEncoding
+}
+
+export class TextPointersEncoding {
+	// insertion point for pointers and slices of pointers encoding fields
+	Animates: number[] = []
 }

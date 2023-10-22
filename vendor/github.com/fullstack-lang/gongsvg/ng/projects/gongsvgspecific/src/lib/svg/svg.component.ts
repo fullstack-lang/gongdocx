@@ -76,7 +76,8 @@ export class SvgComponent implements OnInit, OnDestroy {
           // console.log('SvgComponent, Mouse down event occurred on rectangle ', rectangleID, " at ", coordinate)
           this.linkStartRectangleID = shapeMouseEvent.ShapeID
 
-          let rect = this.gongsvgFrontRepo?.Rects.get(shapeMouseEvent.ShapeID)
+          // refactorable of Rect name
+          let rect = this.gongsvgFrontRepo?.getMap<gongsvg.RectDB>(gongsvg.RectDB.GONGSTRUCT_NAME).get(shapeMouseEvent.ShapeID)
 
           if (rect == undefined) {
             return
@@ -189,8 +190,8 @@ export class SvgComponent implements OnInit, OnDestroy {
       gongsvgsFrontRepo => {
         this.gongsvgFrontRepo = gongsvgsFrontRepo
 
-        if (this.gongsvgFrontRepo.SVGs_array.length == 1) {
-          this.svg = this.gongsvgFrontRepo.SVGs_array[0]
+        if (this.gongsvgFrontRepo.getArray(gongsvg.SVGDB.GONGSTRUCT_NAME).length == 1) {
+          this.svg = this.gongsvgFrontRepo.getArray<gongsvg.SVGDB>(gongsvg.SVGDB.GONGSTRUCT_NAME)[0]
 
           // set the isEditable
           this.isEditableService.setIsEditable(this.svg!.IsEditable)
@@ -201,21 +202,6 @@ export class SvgComponent implements OnInit, OnDestroy {
         if (this.svg.Layers == undefined) {
           return
         }
-
-        this.svg.Layers.sort((t1, t2) => {
-          let t1_revPointerID_Index = t1.SVG_LayersDBID_Index
-          let t2_revPointerID_Index = t2.SVG_LayersDBID_Index
-
-          if (t1_revPointerID_Index && t2_revPointerID_Index) {
-            if (t1_revPointerID_Index.Int64 > t2_revPointerID_Index.Int64) {
-              return 1;
-            }
-            if (t1_revPointerID_Index.Int64 < t2_revPointerID_Index.Int64) {
-              return -1;
-            }
-          }
-          return 0;
-        });
       }
 
     )
@@ -227,7 +213,7 @@ export class SvgComponent implements OnInit, OnDestroy {
 
   onEndOfLinkDrawing(startRectangleID: number, endRectangleID: number) {
 
-    let svgArray = this.gongsvgFrontRepo?.SVGs_array
+    let svgArray = this.gongsvgFrontRepo?.getArray<gongsvg.SVGDB>(gongsvg.SVGDB.GONGSTRUCT_NAME)
     // update the svg
     if (svgArray?.length == 1) {
       this.svg = svgArray[0]
@@ -245,17 +231,17 @@ export class SvgComponent implements OnInit, OnDestroy {
 
     this.svg.DrawingState = gongsvg.DrawingState.DRAWING_LINE
 
-    this.svg.StartRectID.Valid = true
-    this.svg.StartRectID.Int64 = startRectangleID
+    this.svg.SVGPointersEncoding.StartRectID.Valid = true
+    this.svg.SVGPointersEncoding.StartRectID.Int64 = startRectangleID
 
-    this.svg.EndRectID.Valid = true
-    this.svg.EndRectID.Int64 = endRectangleID
+    this.svg.SVGPointersEncoding.EndRectID.Valid = true
+    this.svg.SVGPointersEncoding.EndRectID.Int64 = endRectangleID
 
-    this.svgService.updateSVG(this.svg, this.GONG__StackPath).subscribe(
+    this.svgService.updateSVG(this.svg, this.GONG__StackPath, this.gongsvgFrontRepoService.frontRepo).subscribe(
       () => {
         // back to normal state
         this.svg.DrawingState = gongsvg.DrawingState.NOT_DRAWING_LINE
-        this.svgService.updateSVG(this.svg, this.GONG__StackPath).subscribe()
+        this.svgService.updateSVG(this.svg, this.GONG__StackPath, this.gongsvgFrontRepoService.frontRepo).subscribe()
       }
     )
   }

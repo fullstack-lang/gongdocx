@@ -1,6 +1,5 @@
 // insertion point for imports
 import { AnimateDB } from './animate-db'
-import { LayerDB } from './layer-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -27,10 +26,13 @@ export class EllipseDB {
 	StrokeDashArrayWhenSelected: string = ""
 	Transform: string = ""
 
-	// insertion point for other declarations
-	Animates?: Array<AnimateDB>
-	Layer_EllipsesDBID: NullInt64 = new NullInt64
-	Layer_EllipsesDBID_Index: NullInt64  = new NullInt64 // store the index of the ellipse instance in Layer.Ellipses
-	Layer_Ellipses_reverse?: LayerDB 
+	// insertion point for pointers and slices of pointers declarations
+	Animates: Array<AnimateDB> = []
 
+	EllipsePointersEncoding: EllipsePointersEncoding = new EllipsePointersEncoding
+}
+
+export class EllipsePointersEncoding {
+	// insertion point for pointers and slices of pointers encoding fields
+	Animates: number[] = []
 }

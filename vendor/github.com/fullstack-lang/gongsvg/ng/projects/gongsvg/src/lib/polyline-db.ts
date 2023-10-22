@@ -1,6 +1,5 @@
 // insertion point for imports
 import { AnimateDB } from './animate-db'
-import { LayerDB } from './layer-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -24,10 +23,13 @@ export class PolylineDB {
 	StrokeDashArrayWhenSelected: string = ""
 	Transform: string = ""
 
-	// insertion point for other declarations
-	Animates?: Array<AnimateDB>
-	Layer_PolylinesDBID: NullInt64 = new NullInt64
-	Layer_PolylinesDBID_Index: NullInt64  = new NullInt64 // store the index of the polyline instance in Layer.Polylines
-	Layer_Polylines_reverse?: LayerDB 
+	// insertion point for pointers and slices of pointers declarations
+	Animates: Array<AnimateDB> = []
 
+	PolylinePointersEncoding: PolylinePointersEncoding = new PolylinePointersEncoding
+}
+
+export class PolylinePointersEncoding {
+	// insertion point for pointers and slices of pointers encoding fields
+	Animates: number[] = []
 }

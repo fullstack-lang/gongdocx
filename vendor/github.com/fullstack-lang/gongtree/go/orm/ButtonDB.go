@@ -35,22 +35,16 @@ var dummy_Button_sort sort.Float64Slice
 type ButtonAPI struct {
 	gorm.Model
 
-	models.Button
+	models.Button_WOP
 
 	// encoding of pointers
-	ButtonPointersEnconding
+	ButtonPointersEncoding ButtonPointersEncoding
 }
 
-// ButtonPointersEnconding encodes pointers to Struct and
+// ButtonPointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
-type ButtonPointersEnconding struct {
+type ButtonPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
-
-	// Implementation of a reverse ID for field Node{}.Buttons []*Button
-	Node_ButtonsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Node_ButtonsDBID_Index sql.NullInt64
 }
 
 // ButtonDB describes a button in the database
@@ -70,7 +64,7 @@ type ButtonDB struct {
 	// Declation for basic field buttonDB.Icon
 	Icon_Data sql.NullString
 	// encoding of pointers
-	ButtonPointersEnconding
+	ButtonPointersEncoding
 }
 
 // ButtonDBs arrays buttonDBs
@@ -162,7 +156,7 @@ func (backRepoButton *BackRepoButtonStruct) CommitDeleteInstance(id uint) (Error
 	buttonDB := backRepoButton.Map_ButtonDBID_ButtonDB[id]
 	query := backRepoButton.db.Unscoped().Delete(&buttonDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -188,7 +182,7 @@ func (backRepoButton *BackRepoButtonStruct) CommitPhaseOneInstance(button *model
 
 	query := backRepoButton.db.Create(&buttonDB)
 	if query.Error != nil {
-		return query.Error
+		log.Fatal(query.Error)
 	}
 
 	// update stores
@@ -222,7 +216,7 @@ func (backRepoButton *BackRepoButtonStruct) CommitPhaseTwoInstance(backRepo *Bac
 		// insertion point for translating pointers encodings into actual pointers
 		query := backRepoButton.db.Save(&buttonDB)
 		if query.Error != nil {
-			return query.Error
+			log.Fatalln(query.Error)
 		}
 
 	} else {
@@ -349,7 +343,7 @@ func (backRepo *BackRepoStruct) CheckoutButton(button *models.Button) {
 			buttonDB.ID = id
 
 			if err := backRepo.BackRepoButton.db.First(&buttonDB, id).Error; err != nil {
-				log.Panicln("CheckoutButton : Problem with getting object with id:", id)
+				log.Fatalln("CheckoutButton : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoButton.CheckoutPhaseOneInstance(&buttonDB)
 			backRepo.BackRepoButton.CheckoutPhaseTwoInstance(backRepo, &buttonDB)
@@ -359,6 +353,17 @@ func (backRepo *BackRepoStruct) CheckoutButton(button *models.Button) {
 
 // CopyBasicFieldsFromButton
 func (buttonDB *ButtonDB) CopyBasicFieldsFromButton(button *models.Button) {
+	// insertion point for fields commit
+
+	buttonDB.Name_Data.String = button.Name
+	buttonDB.Name_Data.Valid = true
+
+	buttonDB.Icon_Data.String = button.Icon
+	buttonDB.Icon_Data.Valid = true
+}
+
+// CopyBasicFieldsFromButton_WOP
+func (buttonDB *ButtonDB) CopyBasicFieldsFromButton_WOP(button *models.Button_WOP) {
 	// insertion point for fields commit
 
 	buttonDB.Name_Data.String = button.Name
@@ -381,6 +386,13 @@ func (buttonDB *ButtonDB) CopyBasicFieldsFromButtonWOP(button *ButtonWOP) {
 
 // CopyBasicFieldsToButton
 func (buttonDB *ButtonDB) CopyBasicFieldsToButton(button *models.Button) {
+	// insertion point for checkout of basic fields (back repo to stage)
+	button.Name = buttonDB.Name_Data.String
+	button.Icon = buttonDB.Icon_Data.String
+}
+
+// CopyBasicFieldsToButton_WOP
+func (buttonDB *ButtonDB) CopyBasicFieldsToButton_WOP(button *models.Button_WOP) {
 	// insertion point for checkout of basic fields (back repo to stage)
 	button.Name = buttonDB.Name_Data.String
 	button.Icon = buttonDB.Icon_Data.String
@@ -413,12 +425,12 @@ func (backRepoButton *BackRepoButtonStruct) Backup(dirPath string) {
 	file, err := json.MarshalIndent(forBackup, "", " ")
 
 	if err != nil {
-		log.Panic("Cannot json Button ", filename, " ", err.Error())
+		log.Fatal("Cannot json Button ", filename, " ", err.Error())
 	}
 
 	err = ioutil.WriteFile(filename, file, 0644)
 	if err != nil {
-		log.Panic("Cannot write the json Button file", err.Error())
+		log.Fatal("Cannot write the json Button file", err.Error())
 	}
 }
 
@@ -438,7 +450,7 @@ func (backRepoButton *BackRepoButtonStruct) BackupXL(file *xlsx.File) {
 
 	sh, err := file.AddSheet("Button")
 	if err != nil {
-		log.Panic("Cannot add XL file", err.Error())
+		log.Fatal("Cannot add XL file", err.Error())
 	}
 	_ = sh
 
@@ -463,13 +475,13 @@ func (backRepoButton *BackRepoButtonStruct) RestoreXLPhaseOne(file *xlsx.File) {
 	sh, ok := file.Sheet["Button"]
 	_ = sh
 	if !ok {
-		log.Panic(errors.New("sheet not found"))
+		log.Fatal(errors.New("sheet not found"))
 	}
 
 	// log.Println("Max row is", sh.MaxRow)
 	err := sh.ForEachRow(backRepoButton.rowVisitorButton)
 	if err != nil {
-		log.Panic("Err=", err)
+		log.Fatal("Err=", err)
 	}
 }
 
@@ -491,7 +503,7 @@ func (backRepoButton *BackRepoButtonStruct) rowVisitorButton(row *xlsx.Row) erro
 		buttonDB.ID = 0
 		query := backRepoButton.db.Create(buttonDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoButton.Map_ButtonDBID_ButtonDB[buttonDB.ID] = buttonDB
 		BackRepoButtonid_atBckpTime_newID[buttonDB_ID_atBackupTime] = buttonDB.ID
@@ -511,7 +523,7 @@ func (backRepoButton *BackRepoButtonStruct) RestorePhaseOne(dirPath string) {
 	jsonFile, err := os.Open(filename)
 	// if we os.Open returns an error then handle it
 	if err != nil {
-		log.Panic("Cannot restore/open the json Button file", filename, " ", err.Error())
+		log.Fatal("Cannot restore/open the json Button file", filename, " ", err.Error())
 	}
 
 	// read our opened jsonFile as a byte array.
@@ -528,14 +540,14 @@ func (backRepoButton *BackRepoButtonStruct) RestorePhaseOne(dirPath string) {
 		buttonDB.ID = 0
 		query := backRepoButton.db.Create(buttonDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 		backRepoButton.Map_ButtonDBID_ButtonDB[buttonDB.ID] = buttonDB
 		BackRepoButtonid_atBckpTime_newID[buttonDB_ID_atBackupTime] = buttonDB.ID
 	}
 
 	if err != nil {
-		log.Panic("Cannot restore/unmarshall json Button file", err.Error())
+		log.Fatal("Cannot restore/unmarshall json Button file", err.Error())
 	}
 }
 
@@ -549,16 +561,10 @@ func (backRepoButton *BackRepoButtonStruct) RestorePhaseTwo() {
 		_ = buttonDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex button.Buttons
-		if buttonDB.Node_ButtonsDBID.Int64 != 0 {
-			buttonDB.Node_ButtonsDBID.Int64 =
-				int64(BackRepoNodeid_atBckpTime_newID[uint(buttonDB.Node_ButtonsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoButton.db.Model(buttonDB).Updates(*buttonDB)
 		if query.Error != nil {
-			log.Panic(query.Error)
+			log.Fatal(query.Error)
 		}
 	}
 
@@ -582,15 +588,6 @@ func (backRepoButton *BackRepoButtonStruct) ResetReversePointersInstance(backRep
 		_ = buttonDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if buttonDB.Node_ButtonsDBID.Int64 != 0 {
-			buttonDB.Node_ButtonsDBID.Int64 = 0
-			buttonDB.Node_ButtonsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoButton.db.Save(buttonDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 
