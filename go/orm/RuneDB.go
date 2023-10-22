@@ -38,7 +38,7 @@ type RuneAPI struct {
 	models.Rune_WOP
 
 	// encoding of pointers
-	RunePointersEncoding
+	RunePointersEncoding RunePointersEncoding
 }
 
 // RunePointersEncoding encodes pointers to Struct and
@@ -61,12 +61,6 @@ type RunePointersEncoding struct {
 	// field EnclosingParagraph is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	EnclosingParagraphID sql.NullInt64
-
-	// Implementation of a reverse ID for field Paragraph{}.Runes []*Rune
-	Paragraph_RunesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Paragraph_RunesDBID_Index sql.NullInt64
 }
 
 // RuneDB describes a rune in the database
@@ -675,12 +669,6 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 			runeDB.EnclosingParagraphID.Valid = true
 		}
 
-		// This reindex rune.Runes
-		if runeDB.Paragraph_RunesDBID.Int64 != 0 {
-			runeDB.Paragraph_RunesDBID.Int64 =
-				int64(BackRepoParagraphid_atBckpTime_newID[uint(runeDB.Paragraph_RunesDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoRune.db.Model(runeDB).Updates(*runeDB)
 		if query.Error != nil {
@@ -708,15 +696,6 @@ func (backRepoRune *BackRepoRuneStruct) ResetReversePointersInstance(backRepo *B
 		_ = runeDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if runeDB.Paragraph_RunesDBID.Int64 != 0 {
-			runeDB.Paragraph_RunesDBID.Int64 = 0
-			runeDB.Paragraph_RunesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoRune.db.Save(runeDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

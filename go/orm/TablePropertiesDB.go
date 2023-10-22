@@ -38,7 +38,7 @@ type TablePropertiesAPI struct {
 	models.TableProperties_WOP
 
 	// encoding of pointers
-	TablePropertiesPointersEncoding
+	TablePropertiesPointersEncoding TablePropertiesPointersEncoding
 }
 
 // TablePropertiesPointersEncoding encodes pointers to Struct and

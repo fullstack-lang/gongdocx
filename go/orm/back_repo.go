@@ -305,24 +305,6 @@ func (backRepo *BackRepoStruct) Commit(stage *models.StageStruct) {
 	backRepo.BackRepoTableStyle.CommitPhaseOne(stage)
 	backRepo.BackRepoText.CommitPhaseOne(stage)
 
-	// insertion point for per struct back repo for reseting the reverse pointers
-	backRepo.BackRepoBody.ResetReversePointers(backRepo)
-	backRepo.BackRepoDocument.ResetReversePointers(backRepo)
-	backRepo.BackRepoDocx.ResetReversePointers(backRepo)
-	backRepo.BackRepoFile.ResetReversePointers(backRepo)
-	backRepo.BackRepoNode.ResetReversePointers(backRepo)
-	backRepo.BackRepoParagraph.ResetReversePointers(backRepo)
-	backRepo.BackRepoParagraphProperties.ResetReversePointers(backRepo)
-	backRepo.BackRepoParagraphStyle.ResetReversePointers(backRepo)
-	backRepo.BackRepoRune.ResetReversePointers(backRepo)
-	backRepo.BackRepoRuneProperties.ResetReversePointers(backRepo)
-	backRepo.BackRepoTable.ResetReversePointers(backRepo)
-	backRepo.BackRepoTableColumn.ResetReversePointers(backRepo)
-	backRepo.BackRepoTableProperties.ResetReversePointers(backRepo)
-	backRepo.BackRepoTableRow.ResetReversePointers(backRepo)
-	backRepo.BackRepoTableStyle.ResetReversePointers(backRepo)
-	backRepo.BackRepoText.ResetReversePointers(backRepo)
-
 	// insertion point for per struct back repo phase two commit
 	backRepo.BackRepoBody.CommitPhaseTwo(backRepo)
 	backRepo.BackRepoDocument.CommitPhaseTwo(backRepo)

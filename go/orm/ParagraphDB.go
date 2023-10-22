@@ -38,7 +38,7 @@ type ParagraphAPI struct {
 	models.Paragraph_WOP
 
 	// encoding of pointers
-	ParagraphPointersEncoding
+	ParagraphPointersEncoding ParagraphPointersEncoding
 }
 
 // ParagraphPointersEncoding encodes pointers to Struct and
@@ -55,7 +55,7 @@ type ParagraphPointersEncoding struct {
 	ParagraphPropertiesID sql.NullInt64
 
 	// field Runes is a slice of pointers to another Struct (optional or 0..1)
-	Runes IntSlice`gorm:"type:TEXT"`
+	Runes IntSlice `gorm:"type:TEXT"`
 
 	// field Next is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
@@ -72,18 +72,6 @@ type ParagraphPointersEncoding struct {
 	// field EnclosingTableColumn is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
 	EnclosingTableColumnID sql.NullInt64
-
-	// Implementation of a reverse ID for field Body{}.Paragraphs []*Paragraph
-	Body_ParagraphsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Body_ParagraphsDBID_Index sql.NullInt64
-
-	// Implementation of a reverse ID for field TableColumn{}.Paragraphs []*Paragraph
-	TableColumn_ParagraphsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	TableColumn_ParagraphsDBID_Index sql.NullInt64
 }
 
 // ParagraphDB describes a paragraph in the database
@@ -283,25 +271,6 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 			paragraphDB.ParagraphPropertiesID.Valid = true
 		}
 
-		// This loop encodes the slice of pointers paragraph.Runes into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, runeAssocEnd := range paragraph.Runes {
-
-			// get the back repo instance at the association end
-			runeAssocEnd_DB :=
-				backRepo.BackRepoRune.GetRuneDBFromRunePtr(runeAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			runeAssocEnd_DB.Paragraph_RunesDBID.Int64 = int64(paragraphDB.ID)
-			runeAssocEnd_DB.Paragraph_RunesDBID.Valid = true
-			runeAssocEnd_DB.Paragraph_RunesDBID_Index.Int64 = int64(idx)
-			runeAssocEnd_DB.Paragraph_RunesDBID_Index.Valid = true
-			if q := backRepoParagraph.db.Save(runeAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
-		}
-
 		// 1. reset
 		paragraphDB.ParagraphPointersEncoding.Runes = make([]int, 0)
 		// 2. encode
@@ -482,27 +451,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 	// it appends the stage instance
 	// 1. reset the slice
 	paragraph.Runes = paragraph.Runes[:0]
-	// 2. loop all instances in the type in the association end
-	for _, runeDB_AssocEnd := range backRepo.BackRepoRune.Map_RuneDBID_RuneDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if runeDB_AssocEnd.Paragraph_RunesDBID.Int64 == int64(paragraphDB.ID) {
-			// 4. fetch the associated instance in the stage
-			rune_AssocEnd := backRepo.BackRepoRune.Map_RuneDBID_RunePtr[runeDB_AssocEnd.ID]
-			// 5. append it the association slice
-			paragraph.Runes = append(paragraph.Runes, rune_AssocEnd)
-		}
+	for _, _Runeid := range paragraphDB.ParagraphPointersEncoding.Runes {
+		paragraph.Runes = append(paragraph.Runes, backRepo.BackRepoRune.Map_RuneDBID_RunePtr[uint(_Runeid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(paragraph.Runes, func(i, j int) bool {
-		runeDB_i_ID := backRepo.BackRepoRune.Map_RunePtr_RuneDBID[paragraph.Runes[i]]
-		runeDB_j_ID := backRepo.BackRepoRune.Map_RunePtr_RuneDBID[paragraph.Runes[j]]
-
-		runeDB_i := backRepo.BackRepoRune.Map_RuneDBID_RuneDB[runeDB_i_ID]
-		runeDB_j := backRepo.BackRepoRune.Map_RuneDBID_RuneDB[runeDB_j_ID]
-
-		return runeDB_i.Paragraph_RunesDBID_Index.Int64 < runeDB_j.Paragraph_RunesDBID_Index.Int64
-	})
 
 	// Next field
 	paragraph.Next = nil
@@ -812,18 +763,6 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseTwo() {
 			paragraphDB.EnclosingTableColumnID.Valid = true
 		}
 
-		// This reindex paragraph.Paragraphs
-		if paragraphDB.Body_ParagraphsDBID.Int64 != 0 {
-			paragraphDB.Body_ParagraphsDBID.Int64 =
-				int64(BackRepoBodyid_atBckpTime_newID[uint(paragraphDB.Body_ParagraphsDBID.Int64)])
-		}
-
-		// This reindex paragraph.Paragraphs
-		if paragraphDB.TableColumn_ParagraphsDBID.Int64 != 0 {
-			paragraphDB.TableColumn_ParagraphsDBID.Int64 =
-				int64(BackRepoTableColumnid_atBckpTime_newID[uint(paragraphDB.TableColumn_ParagraphsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoParagraph.db.Model(paragraphDB).Updates(*paragraphDB)
 		if query.Error != nil {
@@ -851,24 +790,6 @@ func (backRepoParagraph *BackRepoParagraphStruct) ResetReversePointersInstance(b
 		_ = paragraphDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if paragraphDB.Body_ParagraphsDBID.Int64 != 0 {
-			paragraphDB.Body_ParagraphsDBID.Int64 = 0
-			paragraphDB.Body_ParagraphsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoParagraph.db.Save(paragraphDB); q.Error != nil {
-				return q.Error
-			}
-		}
-		if paragraphDB.TableColumn_ParagraphsDBID.Int64 != 0 {
-			paragraphDB.TableColumn_ParagraphsDBID.Int64 = 0
-			paragraphDB.TableColumn_ParagraphsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoParagraph.db.Save(paragraphDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

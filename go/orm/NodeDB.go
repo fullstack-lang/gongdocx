@@ -38,7 +38,7 @@ type NodeAPI struct {
 	models.Node_WOP
 
 	// encoding of pointers
-	NodePointersEncoding
+	NodePointersEncoding NodePointersEncoding
 }
 
 // NodePointersEncoding encodes pointers to Struct and
@@ -47,13 +47,7 @@ type NodePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Nodes is a slice of pointers to another Struct (optional or 0..1)
-	Nodes IntSlice`gorm:"type:TEXT"`
-
-	// Implementation of a reverse ID for field Node{}.Nodes []*Node
-	Node_NodesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Node_NodesDBID_Index sql.NullInt64
+	Nodes IntSlice `gorm:"type:TEXT"`
 }
 
 // NodeDB describes a node in the database
@@ -217,25 +211,6 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		nodeDB.CopyBasicFieldsFromNode(node)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers node.Nodes into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, nodeAssocEnd := range node.Nodes {
-
-			// get the back repo instance at the association end
-			nodeAssocEnd_DB :=
-				backRepo.BackRepoNode.GetNodeDBFromNodePtr(nodeAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			nodeAssocEnd_DB.Node_NodesDBID.Int64 = int64(nodeDB.ID)
-			nodeAssocEnd_DB.Node_NodesDBID.Valid = true
-			nodeAssocEnd_DB.Node_NodesDBID_Index.Int64 = int64(idx)
-			nodeAssocEnd_DB.Node_NodesDBID_Index.Valid = true
-			if q := backRepoNode.db.Save(nodeAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
-		}
-
 		// 1. reset
 		nodeDB.NodePointersEncoding.Nodes = make([]int, 0)
 		// 2. encode
@@ -358,27 +333,9 @@ func (backRepoNode *BackRepoNodeStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// it appends the stage instance
 	// 1. reset the slice
 	node.Nodes = node.Nodes[:0]
-	// 2. loop all instances in the type in the association end
-	for _, nodeDB_AssocEnd := range backRepo.BackRepoNode.Map_NodeDBID_NodeDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if nodeDB_AssocEnd.Node_NodesDBID.Int64 == int64(nodeDB.ID) {
-			// 4. fetch the associated instance in the stage
-			node_AssocEnd := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[nodeDB_AssocEnd.ID]
-			// 5. append it the association slice
-			node.Nodes = append(node.Nodes, node_AssocEnd)
-		}
+	for _, _Nodeid := range nodeDB.NodePointersEncoding.Nodes {
+		node.Nodes = append(node.Nodes, backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(_Nodeid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(node.Nodes, func(i, j int) bool {
-		nodeDB_i_ID := backRepo.BackRepoNode.Map_NodePtr_NodeDBID[node.Nodes[i]]
-		nodeDB_j_ID := backRepo.BackRepoNode.Map_NodePtr_NodeDBID[node.Nodes[j]]
-
-		nodeDB_i := backRepo.BackRepoNode.Map_NodeDBID_NodeDB[nodeDB_i_ID]
-		nodeDB_j := backRepo.BackRepoNode.Map_NodeDBID_NodeDB[nodeDB_j_ID]
-
-		return nodeDB_i.Node_NodesDBID_Index.Int64 < nodeDB_j.Node_NodesDBID_Index.Int64
-	})
 
 	return
 }
@@ -608,12 +565,6 @@ func (backRepoNode *BackRepoNodeStruct) RestorePhaseTwo() {
 		_ = nodeDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex node.Nodes
-		if nodeDB.Node_NodesDBID.Int64 != 0 {
-			nodeDB.Node_NodesDBID.Int64 =
-				int64(BackRepoNodeid_atBckpTime_newID[uint(nodeDB.Node_NodesDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoNode.db.Model(nodeDB).Updates(*nodeDB)
 		if query.Error != nil {
@@ -641,15 +592,6 @@ func (backRepoNode *BackRepoNodeStruct) ResetReversePointersInstance(backRepo *B
 		_ = nodeDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if nodeDB.Node_NodesDBID.Int64 != 0 {
-			nodeDB.Node_NodesDBID.Int64 = 0
-			nodeDB.Node_NodesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoNode.db.Save(nodeDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

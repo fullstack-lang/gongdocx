@@ -38,7 +38,7 @@ type TextAPI struct {
 	models.Text_WOP
 
 	// encoding of pointers
-	TextPointersEncoding
+	TextPointersEncoding TextPointersEncoding
 }
 
 // TextPointersEncoding encodes pointers to Struct and

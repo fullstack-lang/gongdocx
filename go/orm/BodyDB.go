@@ -38,7 +38,7 @@ type BodyAPI struct {
 	models.Body_WOP
 
 	// encoding of pointers
-	BodyPointersEncoding
+	BodyPointersEncoding BodyPointersEncoding
 }
 
 // BodyPointersEncoding encodes pointers to Struct and
@@ -47,10 +47,10 @@ type BodyPointersEncoding struct {
 	// insertion for pointer fields encoding declaration
 
 	// field Paragraphs is a slice of pointers to another Struct (optional or 0..1)
-	Paragraphs IntSlice`gorm:"type:TEXT"`
+	Paragraphs IntSlice `gorm:"type:TEXT"`
 
 	// field Tables is a slice of pointers to another Struct (optional or 0..1)
-	Tables IntSlice`gorm:"type:TEXT"`
+	Tables IntSlice `gorm:"type:TEXT"`
 
 	// field LastParagraph is a pointer to another Struct (optional or 0..1)
 	// This field is generated into another field to enable AS ONE association
@@ -218,25 +218,6 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		bodyDB.CopyBasicFieldsFromBody(body)
 
 		// insertion point for translating pointers encodings into actual pointers
-		// This loop encodes the slice of pointers body.Paragraphs into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, paragraphAssocEnd := range body.Paragraphs {
-
-			// get the back repo instance at the association end
-			paragraphAssocEnd_DB :=
-				backRepo.BackRepoParagraph.GetParagraphDBFromParagraphPtr(paragraphAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			paragraphAssocEnd_DB.Body_ParagraphsDBID.Int64 = int64(bodyDB.ID)
-			paragraphAssocEnd_DB.Body_ParagraphsDBID.Valid = true
-			paragraphAssocEnd_DB.Body_ParagraphsDBID_Index.Int64 = int64(idx)
-			paragraphAssocEnd_DB.Body_ParagraphsDBID_Index.Valid = true
-			if q := backRepoBody.db.Save(paragraphAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
-		}
-
 		// 1. reset
 		bodyDB.BodyPointersEncoding.Paragraphs = make([]int, 0)
 		// 2. encode
@@ -245,25 +226,6 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				backRepo.BackRepoParagraph.GetParagraphDBFromParagraphPtr(paragraphAssocEnd)
 			bodyDB.BodyPointersEncoding.Paragraphs =
 				append(bodyDB.BodyPointersEncoding.Paragraphs, int(paragraphAssocEnd_DB.ID))
-		}
-
-		// This loop encodes the slice of pointers body.Tables into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, tableAssocEnd := range body.Tables {
-
-			// get the back repo instance at the association end
-			tableAssocEnd_DB :=
-				backRepo.BackRepoTable.GetTableDBFromTablePtr(tableAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			tableAssocEnd_DB.Body_TablesDBID.Int64 = int64(bodyDB.ID)
-			tableAssocEnd_DB.Body_TablesDBID.Valid = true
-			tableAssocEnd_DB.Body_TablesDBID_Index.Int64 = int64(idx)
-			tableAssocEnd_DB.Body_TablesDBID_Index.Valid = true
-			if q := backRepoBody.db.Save(tableAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
 		}
 
 		// 1. reset
@@ -400,54 +362,18 @@ func (backRepoBody *BackRepoBodyStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 	// it appends the stage instance
 	// 1. reset the slice
 	body.Paragraphs = body.Paragraphs[:0]
-	// 2. loop all instances in the type in the association end
-	for _, paragraphDB_AssocEnd := range backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if paragraphDB_AssocEnd.Body_ParagraphsDBID.Int64 == int64(bodyDB.ID) {
-			// 4. fetch the associated instance in the stage
-			paragraph_AssocEnd := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[paragraphDB_AssocEnd.ID]
-			// 5. append it the association slice
-			body.Paragraphs = append(body.Paragraphs, paragraph_AssocEnd)
-		}
+	for _, _Paragraphid := range bodyDB.BodyPointersEncoding.Paragraphs {
+		body.Paragraphs = append(body.Paragraphs, backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(_Paragraphid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(body.Paragraphs, func(i, j int) bool {
-		paragraphDB_i_ID := backRepo.BackRepoParagraph.Map_ParagraphPtr_ParagraphDBID[body.Paragraphs[i]]
-		paragraphDB_j_ID := backRepo.BackRepoParagraph.Map_ParagraphPtr_ParagraphDBID[body.Paragraphs[j]]
-
-		paragraphDB_i := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphDB[paragraphDB_i_ID]
-		paragraphDB_j := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphDB[paragraphDB_j_ID]
-
-		return paragraphDB_i.Body_ParagraphsDBID_Index.Int64 < paragraphDB_j.Body_ParagraphsDBID_Index.Int64
-	})
 
 	// This loop redeem body.Tables in the stage from the encode in the back repo
 	// It parses all TableDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance
 	// 1. reset the slice
 	body.Tables = body.Tables[:0]
-	// 2. loop all instances in the type in the association end
-	for _, tableDB_AssocEnd := range backRepo.BackRepoTable.Map_TableDBID_TableDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if tableDB_AssocEnd.Body_TablesDBID.Int64 == int64(bodyDB.ID) {
-			// 4. fetch the associated instance in the stage
-			table_AssocEnd := backRepo.BackRepoTable.Map_TableDBID_TablePtr[tableDB_AssocEnd.ID]
-			// 5. append it the association slice
-			body.Tables = append(body.Tables, table_AssocEnd)
-		}
+	for _, _Tableid := range bodyDB.BodyPointersEncoding.Tables {
+		body.Tables = append(body.Tables, backRepo.BackRepoTable.Map_TableDBID_TablePtr[uint(_Tableid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(body.Tables, func(i, j int) bool {
-		tableDB_i_ID := backRepo.BackRepoTable.Map_TablePtr_TableDBID[body.Tables[i]]
-		tableDB_j_ID := backRepo.BackRepoTable.Map_TablePtr_TableDBID[body.Tables[j]]
-
-		tableDB_i := backRepo.BackRepoTable.Map_TableDBID_TableDB[tableDB_i_ID]
-		tableDB_j := backRepo.BackRepoTable.Map_TableDBID_TableDB[tableDB_j_ID]
-
-		return tableDB_i.Body_TablesDBID_Index.Int64 < tableDB_j.Body_TablesDBID_Index.Int64
-	})
 
 	// LastParagraph field
 	body.LastParagraph = nil

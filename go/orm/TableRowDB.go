@@ -38,7 +38,7 @@ type TableRowAPI struct {
 	models.TableRow_WOP
 
 	// encoding of pointers
-	TableRowPointersEncoding
+	TableRowPointersEncoding TableRowPointersEncoding
 }
 
 // TableRowPointersEncoding encodes pointers to Struct and
@@ -51,13 +51,7 @@ type TableRowPointersEncoding struct {
 	NodeID sql.NullInt64
 
 	// field TableColumns is a slice of pointers to another Struct (optional or 0..1)
-	TableColumns IntSlice`gorm:"type:TEXT"`
-
-	// Implementation of a reverse ID for field Table{}.TableRows []*TableRow
-	Table_TableRowsDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Table_TableRowsDBID_Index sql.NullInt64
+	TableColumns IntSlice `gorm:"type:TEXT"`
 }
 
 // TableRowDB describes a tablerow in the database
@@ -239,25 +233,6 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseTwoInstance(backRepo 
 			tablerowDB.NodeID.Valid = true
 		}
 
-		// This loop encodes the slice of pointers tablerow.TableColumns into the back repo.
-		// Each back repo instance at the end of the association encode the ID of the association start
-		// into a dedicated field for coding the association. The back repo instance is then saved to the db
-		for idx, tablecolumnAssocEnd := range tablerow.TableColumns {
-
-			// get the back repo instance at the association end
-			tablecolumnAssocEnd_DB :=
-				backRepo.BackRepoTableColumn.GetTableColumnDBFromTableColumnPtr(tablecolumnAssocEnd)
-
-			// encode reverse pointer in the association end back repo instance
-			tablecolumnAssocEnd_DB.TableRow_TableColumnsDBID.Int64 = int64(tablerowDB.ID)
-			tablecolumnAssocEnd_DB.TableRow_TableColumnsDBID.Valid = true
-			tablecolumnAssocEnd_DB.TableRow_TableColumnsDBID_Index.Int64 = int64(idx)
-			tablecolumnAssocEnd_DB.TableRow_TableColumnsDBID_Index.Valid = true
-			if q := backRepoTableRow.db.Save(tablecolumnAssocEnd_DB); q.Error != nil {
-				return q.Error
-			}
-		}
-
 		// 1. reset
 		tablerowDB.TableRowPointersEncoding.TableColumns = make([]int, 0)
 		// 2. encode
@@ -385,27 +360,9 @@ func (backRepoTableRow *BackRepoTableRowStruct) CheckoutPhaseTwoInstance(backRep
 	// it appends the stage instance
 	// 1. reset the slice
 	tablerow.TableColumns = tablerow.TableColumns[:0]
-	// 2. loop all instances in the type in the association end
-	for _, tablecolumnDB_AssocEnd := range backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnDB {
-		// 3. Does the ID encoding at the end and the ID at the start matches ?
-		if tablecolumnDB_AssocEnd.TableRow_TableColumnsDBID.Int64 == int64(tablerowDB.ID) {
-			// 4. fetch the associated instance in the stage
-			tablecolumn_AssocEnd := backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnPtr[tablecolumnDB_AssocEnd.ID]
-			// 5. append it the association slice
-			tablerow.TableColumns = append(tablerow.TableColumns, tablecolumn_AssocEnd)
-		}
+	for _, _TableColumnid := range tablerowDB.TableRowPointersEncoding.TableColumns {
+		tablerow.TableColumns = append(tablerow.TableColumns, backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnPtr[uint(_TableColumnid)])
 	}
-
-	// sort the array according to the order
-	sort.Slice(tablerow.TableColumns, func(i, j int) bool {
-		tablecolumnDB_i_ID := backRepo.BackRepoTableColumn.Map_TableColumnPtr_TableColumnDBID[tablerow.TableColumns[i]]
-		tablecolumnDB_j_ID := backRepo.BackRepoTableColumn.Map_TableColumnPtr_TableColumnDBID[tablerow.TableColumns[j]]
-
-		tablecolumnDB_i := backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnDB[tablecolumnDB_i_ID]
-		tablecolumnDB_j := backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnDB[tablecolumnDB_j_ID]
-
-		return tablecolumnDB_i.TableRow_TableColumnsDBID_Index.Int64 < tablecolumnDB_j.TableRow_TableColumnsDBID_Index.Int64
-	})
 
 	return
 }
@@ -653,12 +610,6 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestorePhaseTwo() {
 			tablerowDB.NodeID.Valid = true
 		}
 
-		// This reindex tablerow.TableRows
-		if tablerowDB.Table_TableRowsDBID.Int64 != 0 {
-			tablerowDB.Table_TableRowsDBID.Int64 =
-				int64(BackRepoTableid_atBckpTime_newID[uint(tablerowDB.Table_TableRowsDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoTableRow.db.Model(tablerowDB).Updates(*tablerowDB)
 		if query.Error != nil {
@@ -686,15 +637,6 @@ func (backRepoTableRow *BackRepoTableRowStruct) ResetReversePointersInstance(bac
 		_ = tablerowDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if tablerowDB.Table_TableRowsDBID.Int64 != 0 {
-			tablerowDB.Table_TableRowsDBID.Int64 = 0
-			tablerowDB.Table_TableRowsDBID.Valid = true
-
-			// save the reset
-			if q := backRepoTableRow.db.Save(tablerowDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 

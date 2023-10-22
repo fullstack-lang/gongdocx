@@ -38,7 +38,7 @@ type ParagraphPropertiesAPI struct {
 	models.ParagraphProperties_WOP
 
 	// encoding of pointers
-	ParagraphPropertiesPointersEncoding
+	ParagraphPropertiesPointersEncoding ParagraphPropertiesPointersEncoding
 }
 
 // ParagraphPropertiesPointersEncoding encodes pointers to Struct and

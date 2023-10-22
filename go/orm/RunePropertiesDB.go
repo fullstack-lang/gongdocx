@@ -38,7 +38,7 @@ type RunePropertiesAPI struct {
 	models.RuneProperties_WOP
 
 	// encoding of pointers
-	RunePropertiesPointersEncoding
+	RunePropertiesPointersEncoding RunePropertiesPointersEncoding
 }
 
 // RunePropertiesPointersEncoding encodes pointers to Struct and

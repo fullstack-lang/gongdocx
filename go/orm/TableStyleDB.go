@@ -38,7 +38,7 @@ type TableStyleAPI struct {
 	models.TableStyle_WOP
 
 	// encoding of pointers
-	TableStylePointersEncoding
+	TableStylePointersEncoding TableStylePointersEncoding
 }
 
 // TableStylePointersEncoding encodes pointers to Struct and

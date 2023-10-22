@@ -48,6 +48,10 @@ type StageStruct struct {
 	Bodys           map[*Body]any
 	Bodys_mapString map[string]*Body
 
+	// insertion point for slice of pointers maps
+	Body_Paragraphs_reverseMap map[*Paragraph]*Body
+	Body_Tables_reverseMap map[*Table]*Body
+
 	OnAfterBodyCreateCallback OnAfterCreateInterface[Body]
 	OnAfterBodyUpdateCallback OnAfterUpdateInterface[Body]
 	OnAfterBodyDeleteCallback OnAfterDeleteInterface[Body]
@@ -55,6 +59,8 @@ type StageStruct struct {
 
 	Documents           map[*Document]any
 	Documents_mapString map[string]*Document
+
+	// insertion point for slice of pointers maps
 
 	OnAfterDocumentCreateCallback OnAfterCreateInterface[Document]
 	OnAfterDocumentUpdateCallback OnAfterUpdateInterface[Document]
@@ -64,6 +70,9 @@ type StageStruct struct {
 	Docxs           map[*Docx]any
 	Docxs_mapString map[string]*Docx
 
+	// insertion point for slice of pointers maps
+	Docx_Files_reverseMap map[*File]*Docx
+
 	OnAfterDocxCreateCallback OnAfterCreateInterface[Docx]
 	OnAfterDocxUpdateCallback OnAfterUpdateInterface[Docx]
 	OnAfterDocxDeleteCallback OnAfterDeleteInterface[Docx]
@@ -71,6 +80,8 @@ type StageStruct struct {
 
 	Files           map[*File]any
 	Files_mapString map[string]*File
+
+	// insertion point for slice of pointers maps
 
 	OnAfterFileCreateCallback OnAfterCreateInterface[File]
 	OnAfterFileUpdateCallback OnAfterUpdateInterface[File]
@@ -80,6 +91,9 @@ type StageStruct struct {
 	Nodes           map[*Node]any
 	Nodes_mapString map[string]*Node
 
+	// insertion point for slice of pointers maps
+	Node_Nodes_reverseMap map[*Node]*Node
+
 	OnAfterNodeCreateCallback OnAfterCreateInterface[Node]
 	OnAfterNodeUpdateCallback OnAfterUpdateInterface[Node]
 	OnAfterNodeDeleteCallback OnAfterDeleteInterface[Node]
@@ -87,6 +101,9 @@ type StageStruct struct {
 
 	Paragraphs           map[*Paragraph]any
 	Paragraphs_mapString map[string]*Paragraph
+
+	// insertion point for slice of pointers maps
+	Paragraph_Runes_reverseMap map[*Rune]*Paragraph
 
 	OnAfterParagraphCreateCallback OnAfterCreateInterface[Paragraph]
 	OnAfterParagraphUpdateCallback OnAfterUpdateInterface[Paragraph]
@@ -96,6 +113,8 @@ type StageStruct struct {
 	ParagraphPropertiess           map[*ParagraphProperties]any
 	ParagraphPropertiess_mapString map[string]*ParagraphProperties
 
+	// insertion point for slice of pointers maps
+
 	OnAfterParagraphPropertiesCreateCallback OnAfterCreateInterface[ParagraphProperties]
 	OnAfterParagraphPropertiesUpdateCallback OnAfterUpdateInterface[ParagraphProperties]
 	OnAfterParagraphPropertiesDeleteCallback OnAfterDeleteInterface[ParagraphProperties]
@@ -103,6 +122,8 @@ type StageStruct struct {
 
 	ParagraphStyles           map[*ParagraphStyle]any
 	ParagraphStyles_mapString map[string]*ParagraphStyle
+
+	// insertion point for slice of pointers maps
 
 	OnAfterParagraphStyleCreateCallback OnAfterCreateInterface[ParagraphStyle]
 	OnAfterParagraphStyleUpdateCallback OnAfterUpdateInterface[ParagraphStyle]
@@ -112,6 +133,8 @@ type StageStruct struct {
 	Runes           map[*Rune]any
 	Runes_mapString map[string]*Rune
 
+	// insertion point for slice of pointers maps
+
 	OnAfterRuneCreateCallback OnAfterCreateInterface[Rune]
 	OnAfterRuneUpdateCallback OnAfterUpdateInterface[Rune]
 	OnAfterRuneDeleteCallback OnAfterDeleteInterface[Rune]
@@ -119,6 +142,8 @@ type StageStruct struct {
 
 	RunePropertiess           map[*RuneProperties]any
 	RunePropertiess_mapString map[string]*RuneProperties
+
+	// insertion point for slice of pointers maps
 
 	OnAfterRunePropertiesCreateCallback OnAfterCreateInterface[RuneProperties]
 	OnAfterRunePropertiesUpdateCallback OnAfterUpdateInterface[RuneProperties]
@@ -128,6 +153,9 @@ type StageStruct struct {
 	Tables           map[*Table]any
 	Tables_mapString map[string]*Table
 
+	// insertion point for slice of pointers maps
+	Table_TableRows_reverseMap map[*TableRow]*Table
+
 	OnAfterTableCreateCallback OnAfterCreateInterface[Table]
 	OnAfterTableUpdateCallback OnAfterUpdateInterface[Table]
 	OnAfterTableDeleteCallback OnAfterDeleteInterface[Table]
@@ -135,6 +163,9 @@ type StageStruct struct {
 
 	TableColumns           map[*TableColumn]any
 	TableColumns_mapString map[string]*TableColumn
+
+	// insertion point for slice of pointers maps
+	TableColumn_Paragraphs_reverseMap map[*Paragraph]*TableColumn
 
 	OnAfterTableColumnCreateCallback OnAfterCreateInterface[TableColumn]
 	OnAfterTableColumnUpdateCallback OnAfterUpdateInterface[TableColumn]
@@ -144,6 +175,8 @@ type StageStruct struct {
 	TablePropertiess           map[*TableProperties]any
 	TablePropertiess_mapString map[string]*TableProperties
 
+	// insertion point for slice of pointers maps
+
 	OnAfterTablePropertiesCreateCallback OnAfterCreateInterface[TableProperties]
 	OnAfterTablePropertiesUpdateCallback OnAfterUpdateInterface[TableProperties]
 	OnAfterTablePropertiesDeleteCallback OnAfterDeleteInterface[TableProperties]
@@ -151,6 +184,9 @@ type StageStruct struct {
 
 	TableRows           map[*TableRow]any
 	TableRows_mapString map[string]*TableRow
+
+	// insertion point for slice of pointers maps
+	TableRow_TableColumns_reverseMap map[*TableColumn]*TableRow
 
 	OnAfterTableRowCreateCallback OnAfterCreateInterface[TableRow]
 	OnAfterTableRowUpdateCallback OnAfterUpdateInterface[TableRow]
@@ -160,6 +196,8 @@ type StageStruct struct {
 	TableStyles           map[*TableStyle]any
 	TableStyles_mapString map[string]*TableStyle
 
+	// insertion point for slice of pointers maps
+
 	OnAfterTableStyleCreateCallback OnAfterCreateInterface[TableStyle]
 	OnAfterTableStyleUpdateCallback OnAfterUpdateInterface[TableStyle]
 	OnAfterTableStyleDeleteCallback OnAfterDeleteInterface[TableStyle]
@@ -167,6 +205,8 @@ type StageStruct struct {
 
 	Texts           map[*Text]any
 	Texts_mapString map[string]*Text
+
+	// insertion point for slice of pointers maps
 
 	OnAfterTextCreateCallback OnAfterCreateInterface[Text]
 	OnAfterTextUpdateCallback OnAfterUpdateInterface[Text]
@@ -350,6 +390,8 @@ func (stage *StageStruct) CommitWithSuspendedCallbacks() {
 }
 
 func (stage *StageStruct) Commit() {
+	stage.ComputeReverseMaps()
+
 	if stage.BackRepo != nil {
 		stage.BackRepo.Commit(stage)
 	}
@@ -379,6 +421,7 @@ func (stage *StageStruct) Checkout() {
 		stage.BackRepo.Checkout(stage)
 	}
 
+	stage.ComputeReverseMaps()
 	// insertion point for computing the map of number of instances per gongstruct
 	stage.Map_GongStructName_InstancesNb["Body"] = len(stage.Bodys)
 	stage.Map_GongStructName_InstancesNb["Document"] = len(stage.Documents)

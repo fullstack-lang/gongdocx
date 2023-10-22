@@ -38,7 +38,7 @@ type DocumentAPI struct {
 	models.Document_WOP
 
 	// encoding of pointers
-	DocumentPointersEncoding
+	DocumentPointersEncoding DocumentPointersEncoding
 }
 
 // DocumentPointersEncoding encodes pointers to Struct and

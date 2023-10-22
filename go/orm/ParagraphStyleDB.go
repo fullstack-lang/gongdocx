@@ -38,7 +38,7 @@ type ParagraphStyleAPI struct {
 	models.ParagraphStyle_WOP
 
 	// encoding of pointers
-	ParagraphStylePointersEncoding
+	ParagraphStylePointersEncoding ParagraphStylePointersEncoding
 }
 
 // ParagraphStylePointersEncoding encodes pointers to Struct and

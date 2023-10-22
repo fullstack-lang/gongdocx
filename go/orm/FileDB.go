@@ -38,19 +38,13 @@ type FileAPI struct {
 	models.File_WOP
 
 	// encoding of pointers
-	FilePointersEncoding
+	FilePointersEncoding FilePointersEncoding
 }
 
 // FilePointersEncoding encodes pointers to Struct and
 // reverse pointers of slice of poitners to Struct
 type FilePointersEncoding struct {
 	// insertion for pointer fields encoding declaration
-
-	// Implementation of a reverse ID for field Docx{}.Files []*File
-	Docx_FilesDBID sql.NullInt64
-
-	// implementation of the index of the withing the slice
-	Docx_FilesDBID_Index sql.NullInt64
 }
 
 // FileDB describes a file in the database
@@ -549,12 +543,6 @@ func (backRepoFile *BackRepoFileStruct) RestorePhaseTwo() {
 		_ = fileDB
 
 		// insertion point for reindexing pointers encoding
-		// This reindex file.Files
-		if fileDB.Docx_FilesDBID.Int64 != 0 {
-			fileDB.Docx_FilesDBID.Int64 =
-				int64(BackRepoDocxid_atBckpTime_newID[uint(fileDB.Docx_FilesDBID.Int64)])
-		}
-
 		// update databse with new index encoding
 		query := backRepoFile.db.Model(fileDB).Updates(*fileDB)
 		if query.Error != nil {
@@ -582,15 +570,6 @@ func (backRepoFile *BackRepoFileStruct) ResetReversePointersInstance(backRepo *B
 		_ = fileDB // to avoid unused variable error if there are no reverse to reset
 
 		// insertion point for reverse pointers reset
-		if fileDB.Docx_FilesDBID.Int64 != 0 {
-			fileDB.Docx_FilesDBID.Int64 = 0
-			fileDB.Docx_FilesDBID.Valid = true
-
-			// save the reset
-			if q := backRepoFile.db.Save(fileDB); q.Error != nil {
-				return q.Error
-			}
-		}
 		// end of insertion point for reverse pointers reset
 	}
 
