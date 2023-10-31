@@ -34,14 +34,14 @@ github.com/dustin/go-humanize
 # github.com/frankban/quicktest v1.14.6
 ## explicit; go 1.13
 github.com/frankban/quicktest
-# github.com/fullstack-lang/gong v0.0.0-20231023031805-6f3b29995761
+# github.com/fullstack-lang/gong v0.0.0-20231031143927-871d19ce3949
 ## explicit; go 1.21.0
 github.com/fullstack-lang/gong/go/controllers
 github.com/fullstack-lang/gong/go/fullstack
 github.com/fullstack-lang/gong/go/models
 github.com/fullstack-lang/gong/go/orm
 github.com/fullstack-lang/gong/ng/projects
-# github.com/fullstack-lang/gongdoc v0.0.0-20231023032144-1c3b92fe2275
+# github.com/fullstack-lang/gongdoc v0.0.0-20231031124425-1f25da0fef61
 ## explicit; go 1.21.0
 github.com/fullstack-lang/gongdoc/go/controllers
 github.com/fullstack-lang/gongdoc/go/doc2svg
@@ -51,21 +51,21 @@ github.com/fullstack-lang/gongdoc/go/models
 github.com/fullstack-lang/gongdoc/go/node2gongdoc
 github.com/fullstack-lang/gongdoc/go/orm
 github.com/fullstack-lang/gongdoc/ng/projects
-# github.com/fullstack-lang/gongsvg v0.0.0-20231023031806-925b6e7ea7fe
+# github.com/fullstack-lang/gongsvg v0.0.0-20231023033444-85a4afa297e7
 ## explicit; go 1.21.0
 github.com/fullstack-lang/gongsvg/go/controllers
 github.com/fullstack-lang/gongsvg/go/fullstack
 github.com/fullstack-lang/gongsvg/go/models
 github.com/fullstack-lang/gongsvg/go/orm
 github.com/fullstack-lang/gongsvg/ng/projects
-# github.com/fullstack-lang/gongtable v0.0.0-20231023031806-c2ced54560fc
+# github.com/fullstack-lang/gongtable v0.0.0-20231023033444-ebb9ca5f0e39
 ## explicit; go 1.21.0
 github.com/fullstack-lang/gongtable/go/controllers
 github.com/fullstack-lang/gongtable/go/fullstack
 github.com/fullstack-lang/gongtable/go/models
 github.com/fullstack-lang/gongtable/go/orm
 github.com/fullstack-lang/gongtable/ng/projects
-# github.com/fullstack-lang/gongtree v0.0.0-20231023031806-2beaec84ed97
+# github.com/fullstack-lang/gongtree v0.0.0-20231023033444-0a79ad5dd896
 ## explicit; go 1.21.0
 github.com/fullstack-lang/gongtree/go/buttons
 github.com/fullstack-lang/gongtree/go/controllers
@@ -101,7 +101,7 @@ github.com/gin-gonic/gin/render
 # github.com/glebarez/go-sqlite v1.21.2
 ## explicit; go 1.17
 github.com/glebarez/go-sqlite
-# github.com/glebarez/sqlite v1.9.0
+# github.com/glebarez/sqlite v1.10.0
 ## explicit; go 1.18
 github.com/glebarez/sqlite
 # github.com/go-playground/locales v0.14.1
@@ -136,7 +136,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/uuid v1.3.1
+# github.com/google/uuid v1.4.0
 ## explicit
 github.com/google/uuid
 # github.com/jinzhu/inflection v1.0.0
@@ -209,7 +209,7 @@ github.com/sabhiram/go-gitignore
 # github.com/shabbyrobe/xmlwriter v0.0.0-20230525083848-85336ec334fa
 ## explicit; go 1.13
 github.com/shabbyrobe/xmlwriter
-# github.com/tealeg/xlsx/v3 v3.3.2
+# github.com/tealeg/xlsx/v3 v3.3.4
 ## explicit; go 1.18
 github.com/tealeg/xlsx/v3
 # github.com/twitchyliquid64/golang-asm v0.15.1
@@ -234,7 +234,7 @@ github.com/twitchyliquid64/golang-asm/unsafeheader
 # github.com/ugorji/go/codec v1.2.11
 ## explicit; go 1.11
 github.com/ugorji/go/codec
-# github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca
+# github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53
 ## explicit; go 1.11
 github.com/xuri/efp
 # github.com/xuri/excelize/v2 v2.8.0
@@ -328,7 +328,7 @@ gorm.io/gorm/logger
 gorm.io/gorm/migrator
 gorm.io/gorm/schema
 gorm.io/gorm/utils
-# modernc.org/libc v1.28.0
+# modernc.org/libc v1.29.0
 ## explicit; go 1.20
 modernc.org/libc
 modernc.org/libc/errno

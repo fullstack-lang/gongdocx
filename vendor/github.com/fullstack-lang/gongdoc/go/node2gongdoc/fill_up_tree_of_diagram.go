@@ -1,6 +1,8 @@
 package node2gongdoc
 
 import (
+	"slices"
+
 	gongdoc_models "github.com/fullstack-lang/gongdoc/go/models"
 	gongtree_models "github.com/fullstack-lang/gongtree/go/models"
 )
@@ -34,14 +36,16 @@ func FillUpTreeOfDiagramNodes(
 
 	// add one node for each diagram
 	for classdiagram := range *gongdoc_models.GetGongstructInstancesSet[gongdoc_models.Classdiagram](gongdocStage) {
-		classdiagramNode := NewClassdiagramNode(
+		NewClassdiagramNode(
 			gongtreeStage,
 			classdiagram,
 			diagramPackage,
 			rootOfClassdiagramsNode,
 			treeOfGongObjects)
-		rootOfClassdiagramsNode.Children = append(rootOfClassdiagramsNode.Children, classdiagramNode)
 	}
+
+	// have the nodes display order done according the alphabetical order
+	slices.SortFunc(rootOfClassdiagramsNode.Children, CompareNodeNames)
 
 	return
 }
