@@ -14,12 +14,12 @@ import (
 )
 
 func fillUpTree(
-	playground *Playground,
+	probe *Probe,
 ) {
 	// keep in memory which nodes have been unfolded / folded
 	expandedNodesSet := make(map[string]any, 0)
 	var _sidebar *tree.Tree
-	for __sidebar := range playground.treeStage.Trees {
+	for __sidebar := range probe.treeStage.Trees {
 		_sidebar = __sidebar
 	}
 	if _sidebar != nil {
@@ -30,13 +30,13 @@ func fillUpTree(
 		}
 	}
 
-	playground.treeStage.Reset()
+	probe.treeStage.Reset()
 
 	// create tree
-	sidebar := (&tree.Tree{Name: "gong"}).Stage(playground.treeStage)
+	sidebar := (&tree.Tree{Name: "gong"}).Stage(probe.treeStage)
 
 	// collect all gong struct to construe the true
-	setOfGongStructs := *gong_models.GetGongstructInstancesSet[gong_models.GongStruct](playground.gongStage)
+	setOfGongStructs := *gong_models.GetGongstructInstancesSet[gong_models.GongStruct](probe.gongStage)
 
 	sliceOfGongStructsSorted := make([]*gong_models.GongStruct, len(setOfGongStructs))
 	i := 0
@@ -51,9 +51,9 @@ func fillUpTree(
 	for _, gongStruct := range sliceOfGongStructsSorted {
 
 		name := gongStruct.Name + " (" +
-			fmt.Sprintf("%d", playground.stageOfInterest.Map_GongStructName_InstancesNb[gongStruct.Name]) + ")"
+			fmt.Sprintf("%d", probe.stageOfInterest.Map_GongStructName_InstancesNb[gongStruct.Name]) + ")"
 
-		nodeGongstruct := (&tree.Node{Name: name}).Stage(playground.treeStage)
+		nodeGongstruct := (&tree.Node{Name: name}).Stage(probe.treeStage)
 
 
 		nodeGongstruct.IsExpanded = false
@@ -65,200 +65,200 @@ func fillUpTree(
 		// insertion point
 		case "Body":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Body](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Body](probe.stageOfInterest)
 			for _body := range set {
-				nodeInstance := (&tree.Node{Name: _body.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _body.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_body, "Body", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_body, "Body", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "Document":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Document](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Document](probe.stageOfInterest)
 			for _document := range set {
-				nodeInstance := (&tree.Node{Name: _document.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _document.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_document, "Document", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_document, "Document", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "Docx":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Docx](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Docx](probe.stageOfInterest)
 			for _docx := range set {
-				nodeInstance := (&tree.Node{Name: _docx.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _docx.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_docx, "Docx", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_docx, "Docx", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "File":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.File](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.File](probe.stageOfInterest)
 			for _file := range set {
-				nodeInstance := (&tree.Node{Name: _file.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _file.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_file, "File", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_file, "File", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "Node":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Node](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Node](probe.stageOfInterest)
 			for _node := range set {
-				nodeInstance := (&tree.Node{Name: _node.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _node.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_node, "Node", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_node, "Node", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "Paragraph":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Paragraph](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Paragraph](probe.stageOfInterest)
 			for _paragraph := range set {
-				nodeInstance := (&tree.Node{Name: _paragraph.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _paragraph.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_paragraph, "Paragraph", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_paragraph, "Paragraph", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "ParagraphProperties":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.ParagraphProperties](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.ParagraphProperties](probe.stageOfInterest)
 			for _paragraphproperties := range set {
-				nodeInstance := (&tree.Node{Name: _paragraphproperties.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _paragraphproperties.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_paragraphproperties, "ParagraphProperties", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_paragraphproperties, "ParagraphProperties", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "ParagraphStyle":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.ParagraphStyle](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.ParagraphStyle](probe.stageOfInterest)
 			for _paragraphstyle := range set {
-				nodeInstance := (&tree.Node{Name: _paragraphstyle.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _paragraphstyle.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_paragraphstyle, "ParagraphStyle", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_paragraphstyle, "ParagraphStyle", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "Rune":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Rune](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Rune](probe.stageOfInterest)
 			for _rune := range set {
-				nodeInstance := (&tree.Node{Name: _rune.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _rune.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_rune, "Rune", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_rune, "Rune", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "RuneProperties":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.RuneProperties](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.RuneProperties](probe.stageOfInterest)
 			for _runeproperties := range set {
-				nodeInstance := (&tree.Node{Name: _runeproperties.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _runeproperties.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_runeproperties, "RuneProperties", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_runeproperties, "RuneProperties", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "Table":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Table](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Table](probe.stageOfInterest)
 			for _table := range set {
-				nodeInstance := (&tree.Node{Name: _table.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _table.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_table, "Table", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_table, "Table", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "TableColumn":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.TableColumn](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.TableColumn](probe.stageOfInterest)
 			for _tablecolumn := range set {
-				nodeInstance := (&tree.Node{Name: _tablecolumn.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _tablecolumn.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_tablecolumn, "TableColumn", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_tablecolumn, "TableColumn", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "TableProperties":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.TableProperties](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.TableProperties](probe.stageOfInterest)
 			for _tableproperties := range set {
-				nodeInstance := (&tree.Node{Name: _tableproperties.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _tableproperties.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_tableproperties, "TableProperties", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_tableproperties, "TableProperties", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "TableRow":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.TableRow](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.TableRow](probe.stageOfInterest)
 			for _tablerow := range set {
-				nodeInstance := (&tree.Node{Name: _tablerow.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _tablerow.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_tablerow, "TableRow", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_tablerow, "TableRow", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "TableStyle":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.TableStyle](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.TableStyle](probe.stageOfInterest)
 			for _tablestyle := range set {
-				nodeInstance := (&tree.Node{Name: _tablestyle.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _tablestyle.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_tablestyle, "TableStyle", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_tablestyle, "TableStyle", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}
 		case "Text":
 			nodeGongstruct.Name = name
-			set := *models.GetGongstructInstancesSet[models.Text](playground.stageOfInterest)
+			set := *models.GetGongstructInstancesSet[models.Text](probe.stageOfInterest)
 			for _text := range set {
-				nodeInstance := (&tree.Node{Name: _text.GetName()}).Stage(playground.treeStage)
+				nodeInstance := (&tree.Node{Name: _text.GetName()}).Stage(probe.treeStage)
 				nodeInstance.IsNodeClickable = true
-				nodeInstance.Impl = NewInstanceNodeCallback(_text, "Text", playground)
+				nodeInstance.Impl = NewInstanceNodeCallback(_text, "Text", probe)
 
 				nodeGongstruct.Children = append(nodeGongstruct.Children, nodeInstance)
 			}	
 		}
 
 		nodeGongstruct.IsNodeClickable = true
-		nodeGongstruct.Impl = NewTreeNodeImplGongstruct(gongStruct, playground)
+		nodeGongstruct.Impl = NewTreeNodeImplGongstruct(gongStruct, probe)
 
 		// add add button
 		addButton := (&tree.Button{
 			Name: gongStruct.Name + " " + string(gongtree_buttons.BUTTON_add),
-			Icon: string(gongtree_buttons.BUTTON_add)}).Stage(playground.treeStage)
+			Icon: string(gongtree_buttons.BUTTON_add)}).Stage(probe.treeStage)
 		nodeGongstruct.Buttons = append(nodeGongstruct.Buttons, addButton)
 		addButton.Impl = NewButtonImplGongstruct(
 			gongStruct,
 			gongtree_buttons.BUTTON_add,
-			playground,
+			probe,
 		)
 
 		sidebar.RootNodes = append(sidebar.RootNodes, nodeGongstruct)
 	}
-	playground.treeStage.Commit()
+	probe.treeStage.Commit()
 }
 
 type InstanceNodeCallback[T models.Gongstruct] struct {
 	Instance       *T
 	gongstructName string
-	playground     *Playground
+	probe     *Probe
 }
 
 func NewInstanceNodeCallback[T models.Gongstruct](
 	instance *T,
 	gongstructName string,
-	playground *Playground) (
+	probe *Probe) (
 	instanceNodeCallback *InstanceNodeCallback[T],
 ) {
 	instanceNodeCallback = new(InstanceNodeCallback[T])
 
-	instanceNodeCallback.playground = playground
+	instanceNodeCallback.probe = probe
 	instanceNodeCallback.gongstructName = gongstructName
 	instanceNodeCallback.Instance = instance
 
@@ -271,6 +271,6 @@ func (instanceNodeCallback *InstanceNodeCallback[T]) OnAfterUpdate(
 
 	FillUpFormFromGongstruct(
 		instanceNodeCallback.Instance,
-		instanceNodeCallback.playground,
+		instanceNodeCallback.probe,
 	)
 }

@@ -12,17 +12,17 @@ import (
 
 type TreeNodeImplGongstruct struct {
 	gongStruct *gong_models.GongStruct
-	playground *Playground
+	probe *Probe
 }
 
 func NewTreeNodeImplGongstruct(
 	gongStruct *gong_models.GongStruct,
-	playground *Playground,
+	probe *Probe,
 ) (nodeImplGongstruct *TreeNodeImplGongstruct) {
 
 	nodeImplGongstruct = new(TreeNodeImplGongstruct)
 	nodeImplGongstruct.gongStruct = gongStruct
-	nodeImplGongstruct.playground = playground
+	nodeImplGongstruct.probe = probe
 	return
 }
 
@@ -53,52 +53,52 @@ func (nodeImplGongstruct *TreeNodeImplGongstruct) OnAfterUpdate(
 
 	// insertion point
 	if nodeImplGongstruct.gongStruct.GetName() == "Body" {
-		fillUpTable[models.Body](nodeImplGongstruct.playground)
+		fillUpTable[models.Body](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "Document" {
-		fillUpTable[models.Document](nodeImplGongstruct.playground)
+		fillUpTable[models.Document](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "Docx" {
-		fillUpTable[models.Docx](nodeImplGongstruct.playground)
+		fillUpTable[models.Docx](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "File" {
-		fillUpTable[models.File](nodeImplGongstruct.playground)
+		fillUpTable[models.File](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "Node" {
-		fillUpTable[models.Node](nodeImplGongstruct.playground)
+		fillUpTable[models.Node](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "Paragraph" {
-		fillUpTable[models.Paragraph](nodeImplGongstruct.playground)
+		fillUpTable[models.Paragraph](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "ParagraphProperties" {
-		fillUpTable[models.ParagraphProperties](nodeImplGongstruct.playground)
+		fillUpTable[models.ParagraphProperties](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "ParagraphStyle" {
-		fillUpTable[models.ParagraphStyle](nodeImplGongstruct.playground)
+		fillUpTable[models.ParagraphStyle](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "Rune" {
-		fillUpTable[models.Rune](nodeImplGongstruct.playground)
+		fillUpTable[models.Rune](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "RuneProperties" {
-		fillUpTable[models.RuneProperties](nodeImplGongstruct.playground)
+		fillUpTable[models.RuneProperties](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "Table" {
-		fillUpTable[models.Table](nodeImplGongstruct.playground)
+		fillUpTable[models.Table](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "TableColumn" {
-		fillUpTable[models.TableColumn](nodeImplGongstruct.playground)
+		fillUpTable[models.TableColumn](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "TableProperties" {
-		fillUpTable[models.TableProperties](nodeImplGongstruct.playground)
+		fillUpTable[models.TableProperties](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "TableRow" {
-		fillUpTable[models.TableRow](nodeImplGongstruct.playground)
+		fillUpTable[models.TableRow](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "TableStyle" {
-		fillUpTable[models.TableStyle](nodeImplGongstruct.playground)
+		fillUpTable[models.TableStyle](nodeImplGongstruct.probe)
 	}
 	if nodeImplGongstruct.gongStruct.GetName() == "Text" {
-		fillUpTable[models.Text](nodeImplGongstruct.playground)
+		fillUpTable[models.Text](nodeImplGongstruct.probe)
 	}
 
 	// set color for node and reset all other nodes color
@@ -108,5 +108,5 @@ func (nodeImplGongstruct *TreeNodeImplGongstruct) OnAfterUpdate(
 	stagedNode.BackgroundColor = "lightgrey"
 	gongtreeStage.Commit()
 
-	nodeImplGongstruct.playground.tableStage.Commit()
+	nodeImplGongstruct.probe.tableStage.Commit()
 }

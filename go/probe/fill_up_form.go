@@ -13,116 +13,116 @@ var __dummy_orm_fillup_form = orm.BackRepoStruct{}
 func FillUpForm[T models.Gongstruct](
 	instance *T,
 	formGroup *form.FormGroup,
-	playground *Playground,
+	probe *Probe,
 ) {
 
 	switch instanceWithInferedType := any(instance).(type) {
 	// insertion point
 	case *models.Body:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationSliceToForm("Paragraphs", instanceWithInferedType, &instanceWithInferedType.Paragraphs, formGroup, playground)
-		AssociationSliceToForm("Tables", instanceWithInferedType, &instanceWithInferedType.Tables, formGroup, playground)
-		AssociationFieldToForm("LastParagraph", instanceWithInferedType.LastParagraph, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationSliceToForm("Paragraphs", instanceWithInferedType, &instanceWithInferedType.Paragraphs, formGroup, probe)
+		AssociationSliceToForm("Tables", instanceWithInferedType, &instanceWithInferedType.Tables, formGroup, probe)
+		AssociationFieldToForm("LastParagraph", instanceWithInferedType.LastParagraph, formGroup, probe)
 
 	case *models.Document:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("File", instanceWithInferedType.File, formGroup, playground)
-		AssociationFieldToForm("Root", instanceWithInferedType.Root, formGroup, playground)
-		AssociationFieldToForm("Body", instanceWithInferedType.Body, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("File", instanceWithInferedType.File, formGroup, probe)
+		AssociationFieldToForm("Root", instanceWithInferedType.Root, formGroup, probe)
+		AssociationFieldToForm("Body", instanceWithInferedType.Body, formGroup, probe)
 
 	case *models.Docx:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationSliceToForm("Files", instanceWithInferedType, &instanceWithInferedType.Files, formGroup, playground)
-		AssociationFieldToForm("Document", instanceWithInferedType.Document, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationSliceToForm("Files", instanceWithInferedType, &instanceWithInferedType.Files, formGroup, probe)
+		AssociationFieldToForm("Document", instanceWithInferedType.Document, formGroup, probe)
 
 	case *models.File:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
 		{
 			var rf models.ReverseField
 			_ = rf
 			rf.GongstructName = "Docx"
 			rf.Fieldname = "Files"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.Docx),
 					"Files",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.Docx, *models.File](
 					nil,
 					"Files",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 
 	case *models.Node:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationSliceToForm("Nodes", instanceWithInferedType, &instanceWithInferedType.Nodes, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationSliceToForm("Nodes", instanceWithInferedType, &instanceWithInferedType.Nodes, formGroup, probe)
 		{
 			var rf models.ReverseField
 			_ = rf
 			rf.GongstructName = "Node"
 			rf.Fieldname = "Nodes"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.Node),
 					"Nodes",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.Node, *models.Node](
 					nil,
 					"Nodes",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 
 	case *models.Paragraph:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		AssociationFieldToForm("ParagraphProperties", instanceWithInferedType.ParagraphProperties, formGroup, playground)
-		AssociationSliceToForm("Runes", instanceWithInferedType, &instanceWithInferedType.Runes, formGroup, playground)
-		BasicFieldtoForm("Text", instanceWithInferedType.Text, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Next", instanceWithInferedType.Next, formGroup, playground)
-		AssociationFieldToForm("Previous", instanceWithInferedType.Previous, formGroup, playground)
-		AssociationFieldToForm("EnclosingBody", instanceWithInferedType.EnclosingBody, formGroup, playground)
-		AssociationFieldToForm("EnclosingTableColumn", instanceWithInferedType.EnclosingTableColumn, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		AssociationFieldToForm("ParagraphProperties", instanceWithInferedType.ParagraphProperties, formGroup, probe)
+		AssociationSliceToForm("Runes", instanceWithInferedType, &instanceWithInferedType.Runes, formGroup, probe)
+		BasicFieldtoForm("Text", instanceWithInferedType.Text, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Next", instanceWithInferedType.Next, formGroup, probe)
+		AssociationFieldToForm("Previous", instanceWithInferedType.Previous, formGroup, probe)
+		AssociationFieldToForm("EnclosingBody", instanceWithInferedType.EnclosingBody, formGroup, probe)
+		AssociationFieldToForm("EnclosingTableColumn", instanceWithInferedType.EnclosingTableColumn, formGroup, probe)
 		{
 			var rf models.ReverseField
 			_ = rf
 			rf.GongstructName = "Body"
 			rf.Fieldname = "Paragraphs"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.Body),
 					"Paragraphs",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.Body, *models.Paragraph](
 					nil,
 					"Paragraphs",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 		{
@@ -130,187 +130,187 @@ func FillUpForm[T models.Gongstruct](
 			_ = rf
 			rf.GongstructName = "TableColumn"
 			rf.Fieldname = "Paragraphs"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.TableColumn),
 					"Paragraphs",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.TableColumn, *models.Paragraph](
 					nil,
 					"Paragraphs",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 
 	case *models.ParagraphProperties:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("ParagraphStyle", instanceWithInferedType.ParagraphStyle, formGroup, playground)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("ParagraphStyle", instanceWithInferedType.ParagraphStyle, formGroup, probe)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
 
 	case *models.ParagraphStyle:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("ValAttr", instanceWithInferedType.ValAttr, instanceWithInferedType, playground.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("ValAttr", instanceWithInferedType.ValAttr, instanceWithInferedType, probe.formStage, formGroup, false)
 
 	case *models.Rune:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		AssociationFieldToForm("Text", instanceWithInferedType.Text, formGroup, playground)
-		AssociationFieldToForm("RuneProperties", instanceWithInferedType.RuneProperties, formGroup, playground)
-		AssociationFieldToForm("EnclosingParagraph", instanceWithInferedType.EnclosingParagraph, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		AssociationFieldToForm("Text", instanceWithInferedType.Text, formGroup, probe)
+		AssociationFieldToForm("RuneProperties", instanceWithInferedType.RuneProperties, formGroup, probe)
+		AssociationFieldToForm("EnclosingParagraph", instanceWithInferedType.EnclosingParagraph, formGroup, probe)
 		{
 			var rf models.ReverseField
 			_ = rf
 			rf.GongstructName = "Paragraph"
 			rf.Fieldname = "Runes"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.Paragraph),
 					"Runes",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.Paragraph, *models.Rune](
 					nil,
 					"Runes",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 
 	case *models.RuneProperties:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		BasicFieldtoForm("IsBold", instanceWithInferedType.IsBold, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("IsStrike", instanceWithInferedType.IsStrike, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("IsItalic", instanceWithInferedType.IsItalic, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		BasicFieldtoForm("IsBold", instanceWithInferedType.IsBold, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("IsStrike", instanceWithInferedType.IsStrike, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("IsItalic", instanceWithInferedType.IsItalic, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
 
 	case *models.Table:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("TableProperties", instanceWithInferedType.TableProperties, formGroup, playground)
-		AssociationSliceToForm("TableRows", instanceWithInferedType, &instanceWithInferedType.TableRows, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("TableProperties", instanceWithInferedType.TableProperties, formGroup, probe)
+		AssociationSliceToForm("TableRows", instanceWithInferedType, &instanceWithInferedType.TableRows, formGroup, probe)
 		{
 			var rf models.ReverseField
 			_ = rf
 			rf.GongstructName = "Body"
 			rf.Fieldname = "Tables"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.Body),
 					"Tables",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.Body, *models.Table](
 					nil,
 					"Tables",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 
 	case *models.TableColumn:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		AssociationSliceToForm("Paragraphs", instanceWithInferedType, &instanceWithInferedType.Paragraphs, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		AssociationSliceToForm("Paragraphs", instanceWithInferedType, &instanceWithInferedType.Paragraphs, formGroup, probe)
 		{
 			var rf models.ReverseField
 			_ = rf
 			rf.GongstructName = "TableRow"
 			rf.Fieldname = "TableColumns"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.TableRow),
 					"TableColumns",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.TableRow, *models.TableColumn](
 					nil,
 					"TableColumns",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 
 	case *models.TableProperties:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("TableStyle", instanceWithInferedType.TableStyle, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("TableStyle", instanceWithInferedType.TableStyle, formGroup, probe)
 
 	case *models.TableRow:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		AssociationSliceToForm("TableColumns", instanceWithInferedType, &instanceWithInferedType.TableColumns, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		AssociationSliceToForm("TableColumns", instanceWithInferedType, &instanceWithInferedType.TableColumns, formGroup, probe)
 		{
 			var rf models.ReverseField
 			_ = rf
 			rf.GongstructName = "Table"
 			rf.Fieldname = "TableRows"
-			reverseFieldOwner := orm.GetReverseFieldOwner(playground.stageOfInterest, playground.backRepoOfInterest, instanceWithInferedType, &rf)
+			reverseFieldOwner := orm.GetReverseFieldOwner(probe.stageOfInterest, probe.backRepoOfInterest, instanceWithInferedType, &rf)
 			if reverseFieldOwner != nil {
 				AssociationReverseFieldToForm(
 					reverseFieldOwner.(*models.Table),
 					"TableRows",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			} else {
 				AssociationReverseFieldToForm[*models.Table, *models.TableRow](
 					nil,
 					"TableRows",
 					instanceWithInferedType,
 					formGroup,
-					playground)
+					probe)
 			}	
 		}
 
 	case *models.TableStyle:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Val", instanceWithInferedType.Val, instanceWithInferedType, playground.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Val", instanceWithInferedType.Val, instanceWithInferedType, probe.formStage, formGroup, false)
 
 	case *models.Text:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, playground.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, playground)
-		BasicFieldtoForm("PreserveWhiteSpace", instanceWithInferedType.PreserveWhiteSpace, instanceWithInferedType, playground.formStage, formGroup, false)
-		AssociationFieldToForm("EnclosingRune", instanceWithInferedType.EnclosingRune, formGroup, playground)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
+		BasicFieldtoForm("PreserveWhiteSpace", instanceWithInferedType.PreserveWhiteSpace, instanceWithInferedType, probe.formStage, formGroup, false)
+		AssociationFieldToForm("EnclosingRune", instanceWithInferedType.EnclosingRune, formGroup, probe)
 
 	default:
 		_ = instanceWithInferedType
