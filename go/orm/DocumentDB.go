@@ -360,7 +360,13 @@ func (backRepoDocument *BackRepoDocumentStruct) CheckoutPhaseTwo(backRepo *BackR
 func (backRepoDocument *BackRepoDocumentStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, documentDB *DocumentDB) (Error error) {
 
 	document := backRepoDocument.Map_DocumentDBID_DocumentPtr[documentDB.ID]
-	_ = document // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	documentDB.DecodePointers(backRepo, document)
+
+	return
+}
+
+func (documentDB *DocumentDB) DecodePointers(backRepo *BackRepoStruct, document *models.Document) {
 
 	// insertion point for checkout of pointer encoding
 	// File field
@@ -644,7 +650,7 @@ func (backRepoDocument *BackRepoDocumentStruct) ResetReversePointers(backRepo *B
 	return
 }
 
-func (backRepoDocument *BackRepoDocumentStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Document) (Error error) {
+func (backRepoDocument *BackRepoDocumentStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, document *models.Document) (Error error) {
 
 	// fetch matching documentDB
 	if documentDB, ok := backRepoDocument.Map_DocumentDBID_DocumentDB[idx]; ok {

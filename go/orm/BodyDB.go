@@ -354,7 +354,13 @@ func (backRepoBody *BackRepoBodyStruct) CheckoutPhaseTwo(backRepo *BackRepoStruc
 func (backRepoBody *BackRepoBodyStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, bodyDB *BodyDB) (Error error) {
 
 	body := backRepoBody.Map_BodyDBID_BodyPtr[bodyDB.ID]
-	_ = body // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	bodyDB.DecodePointers(backRepo, body)
+
+	return
+}
+
+func (bodyDB *BodyDB) DecodePointers(backRepo *BackRepoStruct, body *models.Body) {
 
 	// insertion point for checkout of pointer encoding
 	// This loop redeem body.Paragraphs in the stage from the encode in the back repo
@@ -634,7 +640,7 @@ func (backRepoBody *BackRepoBodyStruct) ResetReversePointers(backRepo *BackRepoS
 	return
 }
 
-func (backRepoBody *BackRepoBodyStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Body) (Error error) {
+func (backRepoBody *BackRepoBodyStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, body *models.Body) (Error error) {
 
 	// fetch matching bodyDB
 	if bodyDB, ok := backRepoBody.Map_BodyDBID_BodyDB[idx]; ok {

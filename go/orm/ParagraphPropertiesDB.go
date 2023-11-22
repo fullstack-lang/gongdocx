@@ -350,7 +350,13 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CheckoutPh
 func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, paragraphpropertiesDB *ParagraphPropertiesDB) (Error error) {
 
 	paragraphproperties := backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr[paragraphpropertiesDB.ID]
-	_ = paragraphproperties // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	paragraphpropertiesDB.DecodePointers(backRepo, paragraphproperties)
+
+	return
+}
+
+func (paragraphpropertiesDB *ParagraphPropertiesDB) DecodePointers(backRepo *BackRepoStruct, paragraphproperties *models.ParagraphProperties) {
 
 	// insertion point for checkout of pointer encoding
 	// ParagraphStyle field
@@ -635,7 +641,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) ResetRever
 	return
 }
 
-func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.ParagraphProperties) (Error error) {
+func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, paragraphproperties *models.ParagraphProperties) (Error error) {
 
 	// fetch matching paragraphpropertiesDB
 	if paragraphpropertiesDB, ok := backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[idx]; ok {

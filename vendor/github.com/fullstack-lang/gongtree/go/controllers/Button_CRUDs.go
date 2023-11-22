@@ -293,6 +293,9 @@ func (controller *Controller) UpdateButton(c *gin.Context) {
 	buttonNew := new(models.Button)
 	buttonDB.CopyBasicFieldsToButton(buttonNew)
 
+	// redeem pointers
+	buttonDB.DecodePointers(backRepo, buttonNew)
+
 	// get stage instance from DB instance, and call callback function
 	buttonOld := backRepo.BackRepoButton.Map_ButtonDBID_ButtonPtr[buttonDB.ID]
 	if buttonOld != nil {

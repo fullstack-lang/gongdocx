@@ -433,7 +433,13 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwo(backRepo *Bac
 func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, paragraphDB *ParagraphDB) (Error error) {
 
 	paragraph := backRepoParagraph.Map_ParagraphDBID_ParagraphPtr[paragraphDB.ID]
-	_ = paragraph // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	paragraphDB.DecodePointers(backRepo, paragraph)
+
+	return
+}
+
+func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragraph *models.Paragraph) {
 
 	// insertion point for checkout of pointer encoding
 	// Node field
@@ -783,7 +789,7 @@ func (backRepoParagraph *BackRepoParagraphStruct) ResetReversePointers(backRepo 
 	return
 }
 
-func (backRepoParagraph *BackRepoParagraphStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Paragraph) (Error error) {
+func (backRepoParagraph *BackRepoParagraphStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, paragraph *models.Paragraph) (Error error) {
 
 	// fetch matching paragraphDB
 	if paragraphDB, ok := backRepoParagraph.Map_ParagraphDBID_ParagraphDB[idx]; ok {

@@ -340,7 +340,13 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CheckoutPhaseTwo(bac
 func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, paragraphstyleDB *ParagraphStyleDB) (Error error) {
 
 	paragraphstyle := backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStylePtr[paragraphstyleDB.ID]
-	_ = paragraphstyle // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	paragraphstyleDB.DecodePointers(backRepo, paragraphstyle)
+
+	return
+}
+
+func (paragraphstyleDB *ParagraphStyleDB) DecodePointers(backRepo *BackRepoStruct, paragraphstyle *models.ParagraphStyle) {
 
 	// insertion point for checkout of pointer encoding
 	// Node field
@@ -626,7 +632,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) ResetReversePointers
 	return
 }
 
-func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.ParagraphStyle) (Error error) {
+func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, paragraphstyle *models.ParagraphStyle) (Error error) {
 
 	// fetch matching paragraphstyleDB
 	if paragraphstyleDB, ok := backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[idx]; ok {

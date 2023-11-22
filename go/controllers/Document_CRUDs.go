@@ -293,6 +293,9 @@ func (controller *Controller) UpdateDocument(c *gin.Context) {
 	documentNew := new(models.Document)
 	documentDB.CopyBasicFieldsToDocument(documentNew)
 
+	// redeem pointers
+	documentDB.DecodePointers(backRepo, documentNew)
+
 	// get stage instance from DB instance, and call callback function
 	documentOld := backRepo.BackRepoDocument.Map_DocumentDBID_DocumentPtr[documentDB.ID]
 	if documentOld != nil {

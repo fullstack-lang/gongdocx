@@ -293,6 +293,9 @@ func (controller *Controller) UpdateDocx(c *gin.Context) {
 	docxNew := new(models.Docx)
 	docxDB.CopyBasicFieldsToDocx(docxNew)
 
+	// redeem pointers
+	docxDB.DecodePointers(backRepo, docxNew)
+
 	// get stage instance from DB instance, and call callback function
 	docxOld := backRepo.BackRepoDocx.Map_DocxDBID_DocxPtr[docxDB.ID]
 	if docxOld != nil {

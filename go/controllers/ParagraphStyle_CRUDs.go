@@ -293,6 +293,9 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 	paragraphstyleNew := new(models.ParagraphStyle)
 	paragraphstyleDB.CopyBasicFieldsToParagraphStyle(paragraphstyleNew)
 
+	// redeem pointers
+	paragraphstyleDB.DecodePointers(backRepo, paragraphstyleNew)
+
 	// get stage instance from DB instance, and call callback function
 	paragraphstyleOld := backRepo.BackRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStylePtr[paragraphstyleDB.ID]
 	if paragraphstyleOld != nil {

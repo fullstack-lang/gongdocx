@@ -355,7 +355,13 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CheckoutPhaseTwo(bac
 func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, runepropertiesDB *RunePropertiesDB) (Error error) {
 
 	runeproperties := backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[runepropertiesDB.ID]
-	_ = runeproperties // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	runepropertiesDB.DecodePointers(backRepo, runeproperties)
+
+	return
+}
+
+func (runepropertiesDB *RunePropertiesDB) DecodePointers(backRepo *BackRepoStruct, runeproperties *models.RuneProperties) {
 
 	// insertion point for checkout of pointer encoding
 	// Node field
@@ -665,7 +671,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) ResetReversePointers
 	return
 }
 
-func (backRepoRuneProperties *BackRepoRunePropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.RuneProperties) (Error error) {
+func (backRepoRuneProperties *BackRepoRunePropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, runeproperties *models.RuneProperties) (Error error) {
 
 	// fetch matching runepropertiesDB
 	if runepropertiesDB, ok := backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[idx]; ok {

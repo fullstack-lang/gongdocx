@@ -293,6 +293,9 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 	tablestyleNew := new(models.TableStyle)
 	tablestyleDB.CopyBasicFieldsToTableStyle(tablestyleNew)
 
+	// redeem pointers
+	tablestyleDB.DecodePointers(backRepo, tablestyleNew)
+
 	// get stage instance from DB instance, and call callback function
 	tablestyleOld := backRepo.BackRepoTableStyle.Map_TableStyleDBID_TableStylePtr[tablestyleDB.ID]
 	if tablestyleOld != nil {

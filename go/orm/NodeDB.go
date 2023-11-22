@@ -325,7 +325,13 @@ func (backRepoNode *BackRepoNodeStruct) CheckoutPhaseTwo(backRepo *BackRepoStruc
 func (backRepoNode *BackRepoNodeStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, nodeDB *NodeDB) (Error error) {
 
 	node := backRepoNode.Map_NodeDBID_NodePtr[nodeDB.ID]
-	_ = node // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	nodeDB.DecodePointers(backRepo, node)
+
+	return
+}
+
+func (nodeDB *NodeDB) DecodePointers(backRepo *BackRepoStruct, node *models.Node) {
 
 	// insertion point for checkout of pointer encoding
 	// This loop redeem node.Nodes in the stage from the encode in the back repo
@@ -585,7 +591,7 @@ func (backRepoNode *BackRepoNodeStruct) ResetReversePointers(backRepo *BackRepoS
 	return
 }
 
-func (backRepoNode *BackRepoNodeStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Node) (Error error) {
+func (backRepoNode *BackRepoNodeStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, node *models.Node) (Error error) {
 
 	// fetch matching nodeDB
 	if nodeDB, ok := backRepoNode.Map_NodeDBID_NodeDB[idx]; ok {

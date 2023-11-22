@@ -293,6 +293,9 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 	tablepropertiesNew := new(models.TableProperties)
 	tablepropertiesDB.CopyBasicFieldsToTableProperties(tablepropertiesNew)
 
+	// redeem pointers
+	tablepropertiesDB.DecodePointers(backRepo, tablepropertiesNew)
+
 	// get stage instance from DB instance, and call callback function
 	tablepropertiesOld := backRepo.BackRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesPtr[tablepropertiesDB.ID]
 	if tablepropertiesOld != nil {

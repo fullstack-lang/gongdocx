@@ -357,7 +357,13 @@ func (backRepoText *BackRepoTextStruct) CheckoutPhaseTwo(backRepo *BackRepoStruc
 func (backRepoText *BackRepoTextStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, textDB *TextDB) (Error error) {
 
 	text := backRepoText.Map_TextDBID_TextPtr[textDB.ID]
-	_ = text // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	textDB.DecodePointers(backRepo, text)
+
+	return
+}
+
+func (textDB *TextDB) DecodePointers(backRepo *BackRepoStruct, text *models.Text) {
 
 	// insertion point for checkout of pointer encoding
 	// Node field
@@ -654,7 +660,7 @@ func (backRepoText *BackRepoTextStruct) ResetReversePointers(backRepo *BackRepoS
 	return
 }
 
-func (backRepoText *BackRepoTextStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Text) (Error error) {
+func (backRepoText *BackRepoTextStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, text *models.Text) (Error error) {
 
 	// fetch matching textDB
 	if textDB, ok := backRepoText.Map_TextDBID_TextDB[idx]; ok {

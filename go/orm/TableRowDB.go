@@ -347,7 +347,13 @@ func (backRepoTableRow *BackRepoTableRowStruct) CheckoutPhaseTwo(backRepo *BackR
 func (backRepoTableRow *BackRepoTableRowStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, tablerowDB *TableRowDB) (Error error) {
 
 	tablerow := backRepoTableRow.Map_TableRowDBID_TableRowPtr[tablerowDB.ID]
-	_ = tablerow // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	tablerowDB.DecodePointers(backRepo, tablerow)
+
+	return
+}
+
+func (tablerowDB *TableRowDB) DecodePointers(backRepo *BackRepoStruct, tablerow *models.TableRow) {
 
 	// insertion point for checkout of pointer encoding
 	// Node field
@@ -630,7 +636,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) ResetReversePointers(backRepo *B
 	return
 }
 
-func (backRepoTableRow *BackRepoTableRowStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.TableRow) (Error error) {
+func (backRepoTableRow *BackRepoTableRowStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, tablerow *models.TableRow) (Error error) {
 
 	// fetch matching tablerowDB
 	if tablerowDB, ok := backRepoTableRow.Map_TableRowDBID_TableRowDB[idx]; ok {

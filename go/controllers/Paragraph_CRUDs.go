@@ -293,6 +293,9 @@ func (controller *Controller) UpdateParagraph(c *gin.Context) {
 	paragraphNew := new(models.Paragraph)
 	paragraphDB.CopyBasicFieldsToParagraph(paragraphNew)
 
+	// redeem pointers
+	paragraphDB.DecodePointers(backRepo, paragraphNew)
+
 	// get stage instance from DB instance, and call callback function
 	paragraphOld := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[paragraphDB.ID]
 	if paragraphOld != nil {

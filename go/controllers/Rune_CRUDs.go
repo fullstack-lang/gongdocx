@@ -293,6 +293,9 @@ func (controller *Controller) UpdateRune(c *gin.Context) {
 	runeNew := new(models.Rune)
 	runeDB.CopyBasicFieldsToRune(runeNew)
 
+	// redeem pointers
+	runeDB.DecodePointers(backRepo, runeNew)
+
 	// get stage instance from DB instance, and call callback function
 	runeOld := backRepo.BackRepoRune.Map_RuneDBID_RunePtr[runeDB.ID]
 	if runeOld != nil {

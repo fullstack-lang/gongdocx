@@ -312,7 +312,13 @@ func (backRepoFile *BackRepoFileStruct) CheckoutPhaseTwo(backRepo *BackRepoStruc
 func (backRepoFile *BackRepoFileStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, fileDB *FileDB) (Error error) {
 
 	file := backRepoFile.Map_FileDBID_FilePtr[fileDB.ID]
-	_ = file // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	fileDB.DecodePointers(backRepo, file)
+
+	return
+}
+
+func (fileDB *FileDB) DecodePointers(backRepo *BackRepoStruct, file *models.File) {
 
 	// insertion point for checkout of pointer encoding
 	return
@@ -563,7 +569,7 @@ func (backRepoFile *BackRepoFileStruct) ResetReversePointers(backRepo *BackRepoS
 	return
 }
 
-func (backRepoFile *BackRepoFileStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.File) (Error error) {
+func (backRepoFile *BackRepoFileStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, file *models.File) (Error error) {
 
 	// fetch matching fileDB
 	if fileDB, ok := backRepoFile.Map_FileDBID_FileDB[idx]; ok {

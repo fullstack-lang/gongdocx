@@ -341,7 +341,13 @@ func (backRepoDocx *BackRepoDocxStruct) CheckoutPhaseTwo(backRepo *BackRepoStruc
 func (backRepoDocx *BackRepoDocxStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, docxDB *DocxDB) (Error error) {
 
 	docx := backRepoDocx.Map_DocxDBID_DocxPtr[docxDB.ID]
-	_ = docx // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	docxDB.DecodePointers(backRepo, docx)
+
+	return
+}
+
+func (docxDB *DocxDB) DecodePointers(backRepo *BackRepoStruct, docx *models.Docx) {
 
 	// insertion point for checkout of pointer encoding
 	// This loop redeem docx.Files in the stage from the encode in the back repo
@@ -612,7 +618,7 @@ func (backRepoDocx *BackRepoDocxStruct) ResetReversePointers(backRepo *BackRepoS
 	return
 }
 
-func (backRepoDocx *BackRepoDocxStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.Docx) (Error error) {
+func (backRepoDocx *BackRepoDocxStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, docx *models.Docx) (Error error) {
 
 	// fetch matching docxDB
 	if docxDB, ok := backRepoDocx.Map_DocxDBID_DocxDB[idx]; ok {

@@ -350,7 +350,13 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CheckoutPhaseTwo(b
 func (backRepoTableProperties *BackRepoTablePropertiesStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, tablepropertiesDB *TablePropertiesDB) (Error error) {
 
 	tableproperties := backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesPtr[tablepropertiesDB.ID]
-	_ = tableproperties // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	tablepropertiesDB.DecodePointers(backRepo, tableproperties)
+
+	return
+}
+
+func (tablepropertiesDB *TablePropertiesDB) DecodePointers(backRepo *BackRepoStruct, tableproperties *models.TableProperties) {
 
 	// insertion point for checkout of pointer encoding
 	// Node field
@@ -635,7 +641,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) ResetReversePointe
 	return
 }
 
-func (backRepoTableProperties *BackRepoTablePropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.TableProperties) (Error error) {
+func (backRepoTableProperties *BackRepoTablePropertiesStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, tableproperties *models.TableProperties) (Error error) {
 
 	// fetch matching tablepropertiesDB
 	if tablepropertiesDB, ok := backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[idx]; ok {

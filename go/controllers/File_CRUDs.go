@@ -293,6 +293,9 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 	fileNew := new(models.File)
 	fileDB.CopyBasicFieldsToFile(fileNew)
 
+	// redeem pointers
+	fileDB.DecodePointers(backRepo, fileNew)
+
 	// get stage instance from DB instance, and call callback function
 	fileOld := backRepo.BackRepoFile.Map_FileDBID_FilePtr[fileDB.ID]
 	if fileOld != nil {

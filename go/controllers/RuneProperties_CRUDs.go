@@ -293,6 +293,9 @@ func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 	runepropertiesNew := new(models.RuneProperties)
 	runepropertiesDB.CopyBasicFieldsToRuneProperties(runepropertiesNew)
 
+	// redeem pointers
+	runepropertiesDB.DecodePointers(backRepo, runepropertiesNew)
+
 	// get stage instance from DB instance, and call callback function
 	runepropertiesOld := backRepo.BackRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[runepropertiesDB.ID]
 	if runepropertiesOld != nil {

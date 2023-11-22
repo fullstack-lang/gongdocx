@@ -340,7 +340,13 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CheckoutPhaseTwo(backRepo *B
 func (backRepoTableStyle *BackRepoTableStyleStruct) CheckoutPhaseTwoInstance(backRepo *BackRepoStruct, tablestyleDB *TableStyleDB) (Error error) {
 
 	tablestyle := backRepoTableStyle.Map_TableStyleDBID_TableStylePtr[tablestyleDB.ID]
-	_ = tablestyle // sometimes, there is no code generated. This lines voids the "unused variable" compilation error
+
+	tablestyleDB.DecodePointers(backRepo, tablestyle)
+
+	return
+}
+
+func (tablestyleDB *TableStyleDB) DecodePointers(backRepo *BackRepoStruct, tablestyle *models.TableStyle) {
 
 	// insertion point for checkout of pointer encoding
 	// Node field
@@ -626,7 +632,7 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) ResetReversePointers(backRep
 	return
 }
 
-func (backRepoTableStyle *BackRepoTableStyleStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, astruct *models.TableStyle) (Error error) {
+func (backRepoTableStyle *BackRepoTableStyleStruct) ResetReversePointersInstance(backRepo *BackRepoStruct, idx uint, tablestyle *models.TableStyle) (Error error) {
 
 	// fetch matching tablestyleDB
 	if tablestyleDB, ok := backRepoTableStyle.Map_TableStyleDBID_TableStyleDB[idx]; ok {

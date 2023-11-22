@@ -293,6 +293,9 @@ func (controller *Controller) UpdateBody(c *gin.Context) {
 	bodyNew := new(models.Body)
 	bodyDB.CopyBasicFieldsToBody(bodyNew)
 
+	// redeem pointers
+	bodyDB.DecodePointers(backRepo, bodyNew)
+
 	// get stage instance from DB instance, and call callback function
 	bodyOld := backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[bodyDB.ID]
 	if bodyOld != nil {
