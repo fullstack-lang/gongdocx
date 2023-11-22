@@ -253,7 +253,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000000_NewDiagram_Document.ShowNbInstances = true
 	__GongStructShape__000000_NewDiagram_Document.NbInstances = 1
 	__GongStructShape__000000_NewDiagram_Document.Width = 240.000000
-	__GongStructShape__000000_NewDiagram_Document.Heigth = 78.000000
+	__GongStructShape__000000_NewDiagram_Document.Height = 78.000000
 	__GongStructShape__000000_NewDiagram_Document.IsSelected = false
 
 	// GongStructShape values setup
@@ -266,7 +266,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000001_NewDiagram_Docx.ShowNbInstances = true
 	__GongStructShape__000001_NewDiagram_Docx.NbInstances = 1
 	__GongStructShape__000001_NewDiagram_Docx.Width = 240.000000
-	__GongStructShape__000001_NewDiagram_Docx.Heigth = 78.000000
+	__GongStructShape__000001_NewDiagram_Docx.Height = 78.000000
 	__GongStructShape__000001_NewDiagram_Docx.IsSelected = false
 
 	// GongStructShape values setup
@@ -279,7 +279,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000002_NewDiagram_File.ShowNbInstances = true
 	__GongStructShape__000002_NewDiagram_File.NbInstances = 11
 	__GongStructShape__000002_NewDiagram_File.Width = 244.000000
-	__GongStructShape__000002_NewDiagram_File.Heigth = 78.000000
+	__GongStructShape__000002_NewDiagram_File.Height = 78.000000
 	__GongStructShape__000002_NewDiagram_File.IsSelected = false
 
 	// GongStructShape values setup
@@ -292,7 +292,7 @@ func NewDiagramInjection(stage *models.StageStruct) {
 	__GongStructShape__000003_NewDiagram_Node.ShowNbInstances = true
 	__GongStructShape__000003_NewDiagram_Node.NbInstances = 110
 	__GongStructShape__000003_NewDiagram_Node.Width = 240.000000
-	__GongStructShape__000003_NewDiagram_Node.Heigth = 131.000000
+	__GongStructShape__000003_NewDiagram_Node.Height = 131.000000
 	__GongStructShape__000003_NewDiagram_Node.IsSelected = false
 
 	// Link values setup

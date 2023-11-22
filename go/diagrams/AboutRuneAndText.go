@@ -287,7 +287,7 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 	__GongStructShape__000000_AboutRuneAndText_Rune.ShowNbInstances = true
 	__GongStructShape__000000_AboutRuneAndText_Rune.NbInstances = 25
 	__GongStructShape__000000_AboutRuneAndText_Rune.Width = 240.000000
-	__GongStructShape__000000_AboutRuneAndText_Rune.Heigth = 93.000000
+	__GongStructShape__000000_AboutRuneAndText_Rune.Height = 93.000000
 	__GongStructShape__000000_AboutRuneAndText_Rune.IsSelected = false
 
 	// GongStructShape values setup
@@ -300,7 +300,7 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.ShowNbInstances = true
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.NbInstances = 25
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Width = 240.000000
-	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Heigth = 138.000000
+	__GongStructShape__000001_AboutRuneAndText_RuneProperties.Height = 138.000000
 	__GongStructShape__000001_AboutRuneAndText_RuneProperties.IsSelected = false
 
 	// GongStructShape values setup
@@ -313,7 +313,7 @@ func AboutRuneAndTextInjection(stage *models.StageStruct) {
 	__GongStructShape__000002_AboutRuneAndText_Text.ShowNbInstances = true
 	__GongStructShape__000002_AboutRuneAndText_Text.NbInstances = 25
 	__GongStructShape__000002_AboutRuneAndText_Text.Width = 240.000000
-	__GongStructShape__000002_AboutRuneAndText_Text.Heigth = 63.000000
+	__GongStructShape__000002_AboutRuneAndText_Text.Height = 63.000000
 	__GongStructShape__000002_AboutRuneAndText_Text.IsSelected = false
 
 	// Link values setup
@@ -411,7 +411,7 @@ this &quot;w:rPr&quot; node.
 	__NoteShape__000000_NoteOnRunProperties.X = 766.000000
 	__NoteShape__000000_NoteOnRunProperties.Y = 347.000000
 	__NoteShape__000000_NoteOnRunProperties.Width = 595.000000
-	__NoteShape__000000_NoteOnRunProperties.Heigth = 300.000000
+	__NoteShape__000000_NoteOnRunProperties.Height = 300.000000
 	__NoteShape__000000_NoteOnRunProperties.Matched = false
 
 	// NoteShape values setup
@@ -463,7 +463,7 @@ the &quot;w:t&quot; nodes.
 	__NoteShape__000001_NoteOnRune.X = 44.000000
 	__NoteShape__000001_NoteOnRune.Y = 324.000000
 	__NoteShape__000001_NoteOnRune.Width = 631.000000
-	__NoteShape__000001_NoteOnRune.Heigth = 352.000000
+	__NoteShape__000001_NoteOnRune.Height = 352.000000
 	__NoteShape__000001_NoteOnRune.Matched = false
 
 	// Position values setup
@@ -512,5 +512,3 @@ the &quot;w:t&quot; nodes.
 	__Link__000000_RuneProperties.Middlevertice = __Vertice__000000_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_RuneProperties
 	__Link__000001_Text.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_AboutRuneAndText_in_middle_between_AboutRuneAndText_Rune_and_AboutRuneAndText_Text
 }
-
-

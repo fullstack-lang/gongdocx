@@ -355,7 +355,7 @@ func AboutTableInjection(stage *models.StageStruct) {
 	__GongStructShape__000000_AboutTable_Paragraph.ShowNbInstances = false
 	__GongStructShape__000000_AboutTable_Paragraph.NbInstances = 0
 	__GongStructShape__000000_AboutTable_Paragraph.Width = 240.000000
-	__GongStructShape__000000_AboutTable_Paragraph.Heigth = 78.000000
+	__GongStructShape__000000_AboutTable_Paragraph.Height = 78.000000
 	__GongStructShape__000000_AboutTable_Paragraph.IsSelected = false
 
 	// GongStructShape values setup
@@ -368,7 +368,7 @@ func AboutTableInjection(stage *models.StageStruct) {
 	__GongStructShape__000001_AboutTable_Table.ShowNbInstances = false
 	__GongStructShape__000001_AboutTable_Table.NbInstances = 0
 	__GongStructShape__000001_AboutTable_Table.Width = 240.000000
-	__GongStructShape__000001_AboutTable_Table.Heigth = 78.000000
+	__GongStructShape__000001_AboutTable_Table.Height = 78.000000
 	__GongStructShape__000001_AboutTable_Table.IsSelected = false
 
 	// GongStructShape values setup
@@ -381,7 +381,7 @@ func AboutTableInjection(stage *models.StageStruct) {
 	__GongStructShape__000002_AboutTable_TableColumn.ShowNbInstances = false
 	__GongStructShape__000002_AboutTable_TableColumn.NbInstances = 0
 	__GongStructShape__000002_AboutTable_TableColumn.Width = 240.000000
-	__GongStructShape__000002_AboutTable_TableColumn.Heigth = 78.000000
+	__GongStructShape__000002_AboutTable_TableColumn.Height = 78.000000
 	__GongStructShape__000002_AboutTable_TableColumn.IsSelected = false
 
 	// GongStructShape values setup
@@ -394,7 +394,7 @@ func AboutTableInjection(stage *models.StageStruct) {
 	__GongStructShape__000003_AboutTable_TableProperties.ShowNbInstances = false
 	__GongStructShape__000003_AboutTable_TableProperties.NbInstances = 0
 	__GongStructShape__000003_AboutTable_TableProperties.Width = 240.000000
-	__GongStructShape__000003_AboutTable_TableProperties.Heigth = 78.000000
+	__GongStructShape__000003_AboutTable_TableProperties.Height = 78.000000
 	__GongStructShape__000003_AboutTable_TableProperties.IsSelected = false
 
 	// GongStructShape values setup
@@ -407,7 +407,7 @@ func AboutTableInjection(stage *models.StageStruct) {
 	__GongStructShape__000004_AboutTable_TableRow.ShowNbInstances = false
 	__GongStructShape__000004_AboutTable_TableRow.NbInstances = 0
 	__GongStructShape__000004_AboutTable_TableRow.Width = 240.000000
-	__GongStructShape__000004_AboutTable_TableRow.Heigth = 78.000000
+	__GongStructShape__000004_AboutTable_TableRow.Height = 78.000000
 	__GongStructShape__000004_AboutTable_TableRow.IsSelected = false
 
 	// GongStructShape values setup
@@ -420,7 +420,7 @@ func AboutTableInjection(stage *models.StageStruct) {
 	__GongStructShape__000005_AboutTable_TableStyle.ShowNbInstances = false
 	__GongStructShape__000005_AboutTable_TableStyle.NbInstances = 0
 	__GongStructShape__000005_AboutTable_TableStyle.Width = 240.000000
-	__GongStructShape__000005_AboutTable_TableStyle.Heigth = 93.000000
+	__GongStructShape__000005_AboutTable_TableStyle.Height = 93.000000
 	__GongStructShape__000005_AboutTable_TableStyle.IsSelected = false
 
 	// Link values setup
@@ -584,7 +584,7 @@ to each element.
 	__NoteShape__000000_NoteOnColumn.X = 503.000000
 	__NoteShape__000000_NoteOnColumn.Y = 652.000000
 	__NoteShape__000000_NoteOnColumn.Width = 730.000000
-	__NoteShape__000000_NoteOnColumn.Heigth = 366.000000
+	__NoteShape__000000_NoteOnColumn.Height = 366.000000
 	__NoteShape__000000_NoteOnColumn.Matched = false
 
 	// NoteShape values setup
@@ -638,7 +638,7 @@ data structure or output format.
 	__NoteShape__000001_NoteOnTable.X = 798.000000
 	__NoteShape__000001_NoteOnTable.Y = 81.000000
 	__NoteShape__000001_NoteOnTable.Width = 608.000000
-	__NoteShape__000001_NoteOnTable.Heigth = 393.000000
+	__NoteShape__000001_NoteOnTable.Height = 393.000000
 	__NoteShape__000001_NoteOnTable.Matched = false
 
 	// Position values setup
@@ -729,5 +729,3 @@ data structure or output format.
 	__Link__000003_TableRows.Middlevertice = __Vertice__000001_Verticle_in_class_diagram_AboutTable_in_middle_between_AboutTable_Table_and_AboutTable_TableRow
 	__Link__000004_TableStyle.Middlevertice = __Vertice__000003_Verticle_in_class_diagram_AboutTable_in_middle_between_AboutTable_TableProperties_and_AboutTable_TableStyle
 }
-
-

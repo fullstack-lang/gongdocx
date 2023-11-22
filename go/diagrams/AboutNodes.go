@@ -268,7 +268,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000000_NewDiagram_1_Document.ShowNbInstances = true
 	__GongStructShape__000000_NewDiagram_1_Document.NbInstances = 1
 	__GongStructShape__000000_NewDiagram_1_Document.Width = 240.000000
-	__GongStructShape__000000_NewDiagram_1_Document.Heigth = 78.000000
+	__GongStructShape__000000_NewDiagram_1_Document.Height = 78.000000
 	__GongStructShape__000000_NewDiagram_1_Document.IsSelected = false
 
 	// GongStructShape values setup
@@ -281,7 +281,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000001_NewDiagram_1_Node.ShowNbInstances = true
 	__GongStructShape__000001_NewDiagram_1_Node.NbInstances = 110
 	__GongStructShape__000001_NewDiagram_1_Node.Width = 1199.000000
-	__GongStructShape__000001_NewDiagram_1_Node.Heigth = 63.000000
+	__GongStructShape__000001_NewDiagram_1_Node.Height = 63.000000
 	__GongStructShape__000001_NewDiagram_1_Node.IsSelected = false
 
 	// GongStructShape values setup
@@ -294,7 +294,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000002_NewDiagram_1_Paragraph.ShowNbInstances = true
 	__GongStructShape__000002_NewDiagram_1_Paragraph.NbInstances = 12
 	__GongStructShape__000002_NewDiagram_1_Paragraph.Width = 240.000000
-	__GongStructShape__000002_NewDiagram_1_Paragraph.Heigth = 78.000000
+	__GongStructShape__000002_NewDiagram_1_Paragraph.Height = 78.000000
 	__GongStructShape__000002_NewDiagram_1_Paragraph.IsSelected = false
 
 	// GongStructShape values setup
@@ -307,7 +307,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000003_NewDiagram_1_Rune.ShowNbInstances = true
 	__GongStructShape__000003_NewDiagram_1_Rune.NbInstances = 15
 	__GongStructShape__000003_NewDiagram_1_Rune.Width = 240.000000
-	__GongStructShape__000003_NewDiagram_1_Rune.Heigth = 78.000000
+	__GongStructShape__000003_NewDiagram_1_Rune.Height = 78.000000
 	__GongStructShape__000003_NewDiagram_1_Rune.IsSelected = false
 
 	// GongStructShape values setup
@@ -320,7 +320,7 @@ func NewDiagram_1Injection(stage *models.StageStruct) {
 	__GongStructShape__000004_NewDiagram_1_Text.ShowNbInstances = true
 	__GongStructShape__000004_NewDiagram_1_Text.NbInstances = 15
 	__GongStructShape__000004_NewDiagram_1_Text.Width = 240.000000
-	__GongStructShape__000004_NewDiagram_1_Text.Heigth = 78.000000
+	__GongStructShape__000004_NewDiagram_1_Text.Height = 78.000000
 	__GongStructShape__000004_NewDiagram_1_Text.IsSelected = false
 
 	// Link values setup
@@ -535,7 +535,7 @@ extract and store the text content.
 	__NoteShape__000000_NodeOnText.X = 701.000000
 	__NoteShape__000000_NodeOnText.Y = 868.000000
 	__NoteShape__000000_NodeOnText.Width = 670.000000
-	__NoteShape__000000_NodeOnText.Heigth = 178.000000
+	__NoteShape__000000_NodeOnText.Height = 178.000000
 	__NoteShape__000000_NodeOnText.Matched = false
 
 	// NoteShape values setup
@@ -596,7 +596,7 @@ different section of the overall document.
 	__NoteShape__000001_NoteOnDocument.X = 356.000000
 	__NoteShape__000001_NoteOnDocument.Y = 9.000000
 	__NoteShape__000001_NoteOnDocument.Width = 669.000000
-	__NoteShape__000001_NoteOnDocument.Heigth = 408.000000
+	__NoteShape__000001_NoteOnDocument.Height = 408.000000
 	__NoteShape__000001_NoteOnDocument.Matched = false
 
 	// NoteShape values setup
@@ -646,7 +646,7 @@ that paragraph.
 	__NoteShape__000002_NoteOnParagraph.X = 35.000000
 	__NoteShape__000002_NoteOnParagraph.Y = 880.000000
 	__NoteShape__000002_NoteOnParagraph.Width = 615.000000
-	__NoteShape__000002_NoteOnParagraph.Heigth = 315.000000
+	__NoteShape__000002_NoteOnParagraph.Height = 315.000000
 	__NoteShape__000002_NoteOnParagraph.Matched = false
 
 	// NoteShape values setup
@@ -698,7 +698,7 @@ the &quot;w:t&quot; nodes.
 	__NoteShape__000003_NoteOnRune.X = 685.000000
 	__NoteShape__000003_NoteOnRune.Y = 1068.000000
 	__NoteShape__000003_NoteOnRune.Width = 611.000000
-	__NoteShape__000003_NoteOnRune.Heigth = 342.000000
+	__NoteShape__000003_NoteOnRune.Height = 342.000000
 	__NoteShape__000003_NoteOnRune.Matched = false
 
 	// NoteShapeLink values setup

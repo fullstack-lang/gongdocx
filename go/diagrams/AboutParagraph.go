@@ -259,7 +259,7 @@ func AboutParagraphInjection(stage *models.StageStruct) {
 	__GongStructShape__000000_AboutParagraph_Paragraph.ShowNbInstances = true
 	__GongStructShape__000000_AboutParagraph_Paragraph.NbInstances = 9
 	__GongStructShape__000000_AboutParagraph_Paragraph.Width = 353.000000
-	__GongStructShape__000000_AboutParagraph_Paragraph.Heigth = 78.000000
+	__GongStructShape__000000_AboutParagraph_Paragraph.Height = 78.000000
 	__GongStructShape__000000_AboutParagraph_Paragraph.IsSelected = false
 
 	// GongStructShape values setup
@@ -272,7 +272,7 @@ func AboutParagraphInjection(stage *models.StageStruct) {
 	__GongStructShape__000001_AboutParagraph_ParagraphProperties.ShowNbInstances = true
 	__GongStructShape__000001_AboutParagraph_ParagraphProperties.NbInstances = 9
 	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Width = 353.000000
-	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Heigth = 78.000000
+	__GongStructShape__000001_AboutParagraph_ParagraphProperties.Height = 78.000000
 	__GongStructShape__000001_AboutParagraph_ParagraphProperties.IsSelected = false
 
 	// GongStructShape values setup
@@ -285,7 +285,7 @@ func AboutParagraphInjection(stage *models.StageStruct) {
 	__GongStructShape__000002_AboutParagraph_ParagraphStyle.ShowNbInstances = true
 	__GongStructShape__000002_AboutParagraph_ParagraphStyle.NbInstances = 2
 	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Width = 351.000000
-	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Heigth = 108.000000
+	__GongStructShape__000002_AboutParagraph_ParagraphStyle.Height = 108.000000
 	__GongStructShape__000002_AboutParagraph_ParagraphStyle.IsSelected = false
 
 	// Link values setup
@@ -384,7 +384,7 @@ format the paragraph appropriately in your data structure or output format.
 	__NoteShape__000000_NoteOnParagraphProperties.X = 585.000000
 	__NoteShape__000000_NoteOnParagraphProperties.Y = 66.000000
 	__NoteShape__000000_NoteOnParagraphProperties.Width = 666.000000
-	__NoteShape__000000_NoteOnParagraphProperties.Heigth = 302.000000
+	__NoteShape__000000_NoteOnParagraphProperties.Height = 302.000000
 	__NoteShape__000000_NoteOnParagraphProperties.Matched = false
 
 	// NoteShape values setup
@@ -441,7 +441,7 @@ to the paragraph.
 	__NoteShape__000001_NoteOnStyle.X = 585.000000
 	__NoteShape__000001_NoteOnStyle.Y = 409.000000
 	__NoteShape__000001_NoteOnStyle.Width = 668.000000
-	__NoteShape__000001_NoteOnStyle.Heigth = 368.000000
+	__NoteShape__000001_NoteOnStyle.Height = 368.000000
 	__NoteShape__000001_NoteOnStyle.Matched = false
 
 	// NoteShapeLink values setup
