@@ -239,6 +239,14 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CommitPhaseTwoInstance(bac
 		for _, paragraphAssocEnd := range tablecolumn.Paragraphs {
 			paragraphAssocEnd_DB :=
 				backRepo.BackRepoParagraph.GetParagraphDBFromParagraphPtr(paragraphAssocEnd)
+			
+			// the stage might be inconsistant, meaning that the paragraphAssocEnd_DB might
+			// be missing from the stage. In this case, the commit operation is robust
+			// An alternative would be to crash here to reveal the missing element.
+			if paragraphAssocEnd_DB == nil {
+				continue
+			}
+			
 			tablecolumnDB.TableColumnPointersEncoding.Paragraphs =
 				append(tablecolumnDB.TableColumnPointersEncoding.Paragraphs, int(paragraphAssocEnd_DB.ID))
 		}

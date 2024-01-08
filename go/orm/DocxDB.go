@@ -221,6 +221,14 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		for _, fileAssocEnd := range docx.Files {
 			fileAssocEnd_DB :=
 				backRepo.BackRepoFile.GetFileDBFromFilePtr(fileAssocEnd)
+			
+			// the stage might be inconsistant, meaning that the fileAssocEnd_DB might
+			// be missing from the stage. In this case, the commit operation is robust
+			// An alternative would be to crash here to reveal the missing element.
+			if fileAssocEnd_DB == nil {
+				continue
+			}
+			
 			docxDB.DocxPointersEncoding.Files =
 				append(docxDB.DocxPointersEncoding.Files, int(fileAssocEnd_DB.ID))
 		}

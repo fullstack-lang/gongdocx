@@ -72,6 +72,8 @@ type FormField_WOP struct {
 	Placeholder string
 	HasBespokeWidth bool
 	BespokeWidthPx int
+	HasBespokeHeight bool
+	BespokeHeightPx int
 }
 
 type FormFieldDate_WOP struct {
@@ -130,6 +132,8 @@ type FormGroup_WOP struct {
 	// insertion point
 	Name string
 	Label string
+	HasSuppressButton bool
+	HasSuppressButtonBeenPressed bool
 }
 
 type FormSortAssocButton_WOP struct {

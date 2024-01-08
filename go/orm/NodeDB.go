@@ -217,6 +217,14 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		for _, nodeAssocEnd := range node.Nodes {
 			nodeAssocEnd_DB :=
 				backRepo.BackRepoNode.GetNodeDBFromNodePtr(nodeAssocEnd)
+			
+			// the stage might be inconsistant, meaning that the nodeAssocEnd_DB might
+			// be missing from the stage. In this case, the commit operation is robust
+			// An alternative would be to crash here to reveal the missing element.
+			if nodeAssocEnd_DB == nil {
+				continue
+			}
+			
 			nodeDB.NodePointersEncoding.Nodes =
 				append(nodeDB.NodePointersEncoding.Nodes, int(nodeAssocEnd_DB.ID))
 		}

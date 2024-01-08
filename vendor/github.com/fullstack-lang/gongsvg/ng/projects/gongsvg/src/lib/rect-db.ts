@@ -2,6 +2,7 @@
 import { AnimateDB } from './animate-db'
 import { RectAnchoredTextDB } from './rectanchoredtext-db'
 import { RectAnchoredRectDB } from './rectanchoredrect-db'
+import { RectAnchoredPathDB } from './rectanchoredpath-db'
 
 // usefull for managing pointer ID values that can be nullable
 import { NullInt64 } from './null-int64'
@@ -36,6 +37,7 @@ export class RectDB {
 	HasRightHandle: boolean = false
 	CanHaveTopHandle: boolean = false
 	HasTopHandle: boolean = false
+	IsScalingProportionally: boolean = false
 	CanHaveBottomHandle: boolean = false
 	HasBottomHandle: boolean = false
 	CanMoveHorizontaly: boolean = false
@@ -45,6 +47,7 @@ export class RectDB {
 	Animations: Array<AnimateDB> = []
 	RectAnchoredTexts: Array<RectAnchoredTextDB> = []
 	RectAnchoredRects: Array<RectAnchoredRectDB> = []
+	RectAnchoredPaths: Array<RectAnchoredPathDB> = []
 
 	RectPointersEncoding: RectPointersEncoding = new RectPointersEncoding
 }
@@ -54,4 +57,5 @@ export class RectPointersEncoding {
 	Animations: number[] = []
 	RectAnchoredTexts: number[] = []
 	RectAnchoredRects: number[] = []
+	RectAnchoredPaths: number[] = []
 }

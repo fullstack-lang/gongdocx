@@ -239,6 +239,14 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseTwoInstance(backRepo 
 		for _, tablecolumnAssocEnd := range tablerow.TableColumns {
 			tablecolumnAssocEnd_DB :=
 				backRepo.BackRepoTableColumn.GetTableColumnDBFromTableColumnPtr(tablecolumnAssocEnd)
+			
+			// the stage might be inconsistant, meaning that the tablecolumnAssocEnd_DB might
+			// be missing from the stage. In this case, the commit operation is robust
+			// An alternative would be to crash here to reveal the missing element.
+			if tablecolumnAssocEnd_DB == nil {
+				continue
+			}
+			
 			tablerowDB.TableRowPointersEncoding.TableColumns =
 				append(tablerowDB.TableRowPointersEncoding.TableColumns, int(tablecolumnAssocEnd_DB.ID))
 		}

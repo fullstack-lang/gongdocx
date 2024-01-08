@@ -12,167 +12,205 @@ func FillUpFormFromGongstruct[T models.Gongstruct](instance *T, probe *Probe) {
 	formStage.Reset()
 	formStage.Commit()
 
+	FillUpNamedFormFromGongstruct[T](instance, probe, formStage, gongtable.FormGroupDefaultName.ToString())
+
+}
+
+func FillUpNamedFormFromGongstruct[T models.Gongstruct](instance *T, probe *Probe, formStage *gongtable.StageStruct, formName string) {
+
 	switch instancesTyped := any(instance).(type) {
 	// insertion point
 	case *models.Body:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Body Form",
-			OnSave: __gong__New__BodyFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Body Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__BodyFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.Document:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Document Form",
-			OnSave: __gong__New__DocumentFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Document Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__DocumentFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.Docx:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Docx Form",
-			OnSave: __gong__New__DocxFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Docx Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__DocxFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.File:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update File Form",
-			OnSave: __gong__New__FileFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "File Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__FileFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.Node:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Node Form",
-			OnSave: __gong__New__NodeFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Node Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__NodeFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.Paragraph:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Paragraph Form",
-			OnSave: __gong__New__ParagraphFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Paragraph Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__ParagraphFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.ParagraphProperties:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update ParagraphProperties Form",
-			OnSave: __gong__New__ParagraphPropertiesFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "ParagraphProperties Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__ParagraphPropertiesFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.ParagraphStyle:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update ParagraphStyle Form",
-			OnSave: __gong__New__ParagraphStyleFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "ParagraphStyle Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__ParagraphStyleFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.Rune:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Rune Form",
-			OnSave: __gong__New__RuneFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Rune Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__RuneFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.RuneProperties:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update RuneProperties Form",
-			OnSave: __gong__New__RunePropertiesFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "RuneProperties Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__RunePropertiesFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.Table:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Table Form",
-			OnSave: __gong__New__TableFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Table Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__TableFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.TableColumn:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update TableColumn Form",
-			OnSave: __gong__New__TableColumnFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "TableColumn Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__TableColumnFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.TableProperties:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update TableProperties Form",
-			OnSave: __gong__New__TablePropertiesFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "TableProperties Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__TablePropertiesFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.TableRow:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update TableRow Form",
-			OnSave: __gong__New__TableRowFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "TableRow Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__TableRowFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.TableStyle:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update TableStyle Form",
-			OnSave: __gong__New__TableStyleFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "TableStyle Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__TableStyleFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	case *models.Text:
 		formGroup := (&gongtable.FormGroup{
-			Name:  gongtable.FormGroupDefaultName.ToString(),
-			Label: "Update Text Form",
-			OnSave: __gong__New__TextFormCallback(
-				instancesTyped,
-				probe,
-			),
+			Name:  formName,
+			Label: "Text Form",
 		}).Stage(formStage)
+		formGroup.OnSave = __gong__New__TextFormCallback(
+			instancesTyped,
+			probe,
+			formGroup,
+		)
+		formGroup.HasSuppressButton = true
 		FillUpForm(instancesTyped, formGroup, probe)
 	default:
 		_ = instancesTyped

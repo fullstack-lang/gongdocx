@@ -75,6 +75,7 @@ type Link_WOP struct {
 	// insertion point
 	Name string
 	Type LinkType
+	IsBezierCurve bool
 	StartAnchorType AnchorType
 	EndAnchorType AnchorType
 	StartOrientation OrientationType
@@ -100,6 +101,8 @@ type LinkAnchoredText_WOP struct {
 	// insertion point
 	Name string
 	Content string
+	AutomaticLayout bool
+	LinkAnchorType LinkAnchorType
 	X_Offset float64
 	Y_Offset float64
 	FontWeight string
@@ -181,10 +184,29 @@ type Rect_WOP struct {
 	HasRightHandle bool
 	CanHaveTopHandle bool
 	HasTopHandle bool
+	IsScalingProportionally bool
 	CanHaveBottomHandle bool
 	HasBottomHandle bool
 	CanMoveHorizontaly bool
 	CanMoveVerticaly bool
+}
+
+type RectAnchoredPath_WOP struct {
+	// insertion point
+	Name string
+	Definition string
+	X_Offset float64
+	Y_Offset float64
+	RectAnchorType RectAnchorType
+	ScalePropotionnally bool
+	AppliedScaling float64
+	Color string
+	FillOpacity float64
+	Stroke string
+	StrokeWidth float64
+	StrokeDashArray string
+	StrokeDashArrayWhenSelected string
+	Transform string
 }
 
 type RectAnchoredRect_WOP struct {

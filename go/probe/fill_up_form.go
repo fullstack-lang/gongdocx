@@ -20,27 +20,31 @@ func FillUpForm[T models.Gongstruct](
 	// insertion point
 	case *models.Body:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationSliceToForm("Paragraphs", instanceWithInferedType, &instanceWithInferedType.Paragraphs, formGroup, probe)
 		AssociationSliceToForm("Tables", instanceWithInferedType, &instanceWithInferedType.Tables, formGroup, probe)
 		AssociationFieldToForm("LastParagraph", instanceWithInferedType.LastParagraph, formGroup, probe)
 
 	case *models.Document:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("File", instanceWithInferedType.File, formGroup, probe)
 		AssociationFieldToForm("Root", instanceWithInferedType.Root, formGroup, probe)
 		AssociationFieldToForm("Body", instanceWithInferedType.Body, formGroup, probe)
 
 	case *models.Docx:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationSliceToForm("Files", instanceWithInferedType, &instanceWithInferedType.Files, formGroup, probe)
 		AssociationFieldToForm("Document", instanceWithInferedType.Document, formGroup, probe)
 
 	case *models.File:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		{
 			var rf models.ReverseField
 			_ = rf
@@ -61,12 +65,13 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 
 	case *models.Node:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationSliceToForm("Nodes", instanceWithInferedType, &instanceWithInferedType.Nodes, formGroup, probe)
 		{
 			var rf models.ReverseField
@@ -88,17 +93,20 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 
 	case *models.Paragraph:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
 		AssociationFieldToForm("ParagraphProperties", instanceWithInferedType.ParagraphProperties, formGroup, probe)
 		AssociationSliceToForm("Runes", instanceWithInferedType, &instanceWithInferedType.Runes, formGroup, probe)
-		BasicFieldtoForm("Text", instanceWithInferedType.Text, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Text", instanceWithInferedType.Text, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Next", instanceWithInferedType.Next, formGroup, probe)
 		AssociationFieldToForm("Previous", instanceWithInferedType.Previous, formGroup, probe)
 		AssociationFieldToForm("EnclosingBody", instanceWithInferedType.EnclosingBody, formGroup, probe)
@@ -123,7 +131,7 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 		{
 			var rf models.ReverseField
@@ -145,27 +153,34 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 
 	case *models.ParagraphProperties:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("ParagraphStyle", instanceWithInferedType.ParagraphStyle, formGroup, probe)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
 
 	case *models.ParagraphStyle:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("ValAttr", instanceWithInferedType.ValAttr, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("ValAttr", instanceWithInferedType.ValAttr, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 
 	case *models.Rune:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
 		AssociationFieldToForm("Text", instanceWithInferedType.Text, formGroup, probe)
 		AssociationFieldToForm("RuneProperties", instanceWithInferedType.RuneProperties, formGroup, probe)
@@ -190,23 +205,30 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 
 	case *models.RuneProperties:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
-		BasicFieldtoForm("IsBold", instanceWithInferedType.IsBold, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("IsStrike", instanceWithInferedType.IsStrike, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("IsItalic", instanceWithInferedType.IsItalic, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("IsBold", instanceWithInferedType.IsBold, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("IsStrike", instanceWithInferedType.IsStrike, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("IsItalic", instanceWithInferedType.IsItalic, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 
 	case *models.Table:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("TableProperties", instanceWithInferedType.TableProperties, formGroup, probe)
 		AssociationSliceToForm("TableRows", instanceWithInferedType, &instanceWithInferedType.TableRows, formGroup, probe)
 		{
@@ -229,13 +251,15 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 
 	case *models.TableColumn:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
 		AssociationSliceToForm("Paragraphs", instanceWithInferedType, &instanceWithInferedType.Paragraphs, formGroup, probe)
 		{
@@ -258,20 +282,24 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 
 	case *models.TableProperties:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("TableStyle", instanceWithInferedType.TableStyle, formGroup, probe)
 
 	case *models.TableRow:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
 		AssociationSliceToForm("TableColumns", instanceWithInferedType, &instanceWithInferedType.TableColumns, formGroup, probe)
 		{
@@ -294,22 +322,28 @@ func FillUpForm[T models.Gongstruct](
 					instanceWithInferedType,
 					formGroup,
 					probe)
-			}	
+			}
 		}
 
 	case *models.TableStyle:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Val", instanceWithInferedType.Val, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Val", instanceWithInferedType.Val, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 
 	case *models.Text:
 		// insertion point
-		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup, false)
-		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("Name", instanceWithInferedType.Name, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
+		BasicFieldtoForm("Content", instanceWithInferedType.Content, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("Node", instanceWithInferedType.Node, formGroup, probe)
-		BasicFieldtoForm("PreserveWhiteSpace", instanceWithInferedType.PreserveWhiteSpace, instanceWithInferedType, probe.formStage, formGroup, false)
+		BasicFieldtoForm("PreserveWhiteSpace", instanceWithInferedType.PreserveWhiteSpace, instanceWithInferedType, probe.formStage, formGroup,
+			false, false, 0, false, 0)
 		AssociationFieldToForm("EnclosingRune", instanceWithInferedType.EnclosingRune, formGroup, probe)
 
 	default:

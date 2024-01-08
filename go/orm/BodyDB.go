@@ -224,6 +224,14 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		for _, paragraphAssocEnd := range body.Paragraphs {
 			paragraphAssocEnd_DB :=
 				backRepo.BackRepoParagraph.GetParagraphDBFromParagraphPtr(paragraphAssocEnd)
+			
+			// the stage might be inconsistant, meaning that the paragraphAssocEnd_DB might
+			// be missing from the stage. In this case, the commit operation is robust
+			// An alternative would be to crash here to reveal the missing element.
+			if paragraphAssocEnd_DB == nil {
+				continue
+			}
+			
 			bodyDB.BodyPointersEncoding.Paragraphs =
 				append(bodyDB.BodyPointersEncoding.Paragraphs, int(paragraphAssocEnd_DB.ID))
 		}
@@ -234,6 +242,14 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		for _, tableAssocEnd := range body.Tables {
 			tableAssocEnd_DB :=
 				backRepo.BackRepoTable.GetTableDBFromTablePtr(tableAssocEnd)
+			
+			// the stage might be inconsistant, meaning that the tableAssocEnd_DB might
+			// be missing from the stage. In this case, the commit operation is robust
+			// An alternative would be to crash here to reveal the missing element.
+			if tableAssocEnd_DB == nil {
+				continue
+			}
+			
 			bodyDB.BodyPointersEncoding.Tables =
 				append(bodyDB.BodyPointersEncoding.Tables, int(tableAssocEnd_DB.ID))
 		}

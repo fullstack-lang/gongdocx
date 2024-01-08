@@ -277,6 +277,14 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 		for _, runeAssocEnd := range paragraph.Runes {
 			runeAssocEnd_DB :=
 				backRepo.BackRepoRune.GetRuneDBFromRunePtr(runeAssocEnd)
+			
+			// the stage might be inconsistant, meaning that the runeAssocEnd_DB might
+			// be missing from the stage. In this case, the commit operation is robust
+			// An alternative would be to crash here to reveal the missing element.
+			if runeAssocEnd_DB == nil {
+				continue
+			}
+			
 			paragraphDB.ParagraphPointersEncoding.Runes =
 				append(paragraphDB.ParagraphPointersEncoding.Runes, int(runeAssocEnd_DB.ID))
 		}

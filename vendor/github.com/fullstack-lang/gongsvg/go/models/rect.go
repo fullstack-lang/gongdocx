@@ -22,6 +22,8 @@ type Rect struct {
 	CanHaveTopHandle bool
 	HasTopHandle     bool
 
+	IsScalingProportionally bool
+
 	CanHaveBottomHandle bool
 	HasBottomHandle     bool
 
@@ -30,6 +32,7 @@ type Rect struct {
 
 	RectAnchoredTexts []*RectAnchoredText
 	RectAnchoredRects []*RectAnchoredRect
+	RectAnchoredPaths []*RectAnchoredPath
 
 	Impl RectImplInterface
 }
