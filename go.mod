@@ -5,10 +5,10 @@ go 1.21.0
 toolchain go1.21.1
 
 require (
-	github.com/fullstack-lang/gong v0.0.0-20240115105909-f5b4ae9c3d16
-	github.com/fullstack-lang/gongdoc v0.0.0-20240115105910-fe7c6005ce3b
-	github.com/fullstack-lang/gongtable v0.0.0-20240115105911-760c55fc60af
-	github.com/fullstack-lang/gongtree v0.0.0-20240111093108-82d074816963
+	github.com/fullstack-lang/gong v0.0.0-20240119193124-df4673612207
+	github.com/fullstack-lang/gongdoc v0.0.0-20240119193542-bc4c69682c98
+	github.com/fullstack-lang/gongtable v0.0.0-20240116071922-e1b1151bc9e6
+	github.com/fullstack-lang/gongtree v0.0.0-20240116071923-14f8e843a4a7
 	github.com/fullstack-lang/maticons v0.0.0-20230823061653-70c364fbdd00
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/static v0.0.1
@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15
 	github.com/tealeg/xlsx/v3 v3.3.5
 	github.com/xuri/excelize/v2 v2.8.0
-	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3
+	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
 	gorm.io/gorm v1.25.5
 )
 
@@ -27,7 +27,7 @@ require (
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/frankban/quicktest v1.14.6 // indirect
-	github.com/fullstack-lang/gongsvg v0.0.0-20240113144424-f47922075b30 // indirect
+	github.com/fullstack-lang/gongsvg v0.0.0-20240119193254-6b7296f5a731 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
@@ -70,7 +70,7 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.40.2 // indirect
+	modernc.org/libc v1.40.5 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
