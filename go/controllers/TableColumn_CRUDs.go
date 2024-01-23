@@ -116,6 +116,7 @@ func (controller *Controller) GetTableColumns(c *gin.Context) {
 func (controller *Controller) PostTableColumn(c *gin.Context) {
 
 	mutexTableColumn.Lock()
+	defer mutexTableColumn.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostTableColumn(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, tablecolumnDB)
-
-	mutexTableColumn.Unlock()
 }
 
 // GetTableColumn
@@ -236,6 +235,7 @@ func (controller *Controller) GetTableColumn(c *gin.Context) {
 func (controller *Controller) UpdateTableColumn(c *gin.Context) {
 
 	mutexTableColumn.Lock()
+	defer mutexTableColumn.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateTableColumn(c *gin.Context) {
 
 	// return status OK with the marshalling of the the tablecolumnDB
 	c.JSON(http.StatusOK, tablecolumnDB)
-
-	mutexTableColumn.Unlock()
 }
 
 // DeleteTableColumn
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateTableColumn(c *gin.Context) {
 func (controller *Controller) DeleteTableColumn(c *gin.Context) {
 
 	mutexTableColumn.Lock()
+	defer mutexTableColumn.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteTableColumn(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexTableColumn.Unlock()
 }

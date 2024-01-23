@@ -116,6 +116,7 @@ func (controller *Controller) GetTableStyles(c *gin.Context) {
 func (controller *Controller) PostTableStyle(c *gin.Context) {
 
 	mutexTableStyle.Lock()
+	defer mutexTableStyle.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostTableStyle(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, tablestyleDB)
-
-	mutexTableStyle.Unlock()
 }
 
 // GetTableStyle
@@ -236,6 +235,7 @@ func (controller *Controller) GetTableStyle(c *gin.Context) {
 func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 
 	mutexTableStyle.Lock()
+	defer mutexTableStyle.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 
 	// return status OK with the marshalling of the the tablestyleDB
 	c.JSON(http.StatusOK, tablestyleDB)
-
-	mutexTableStyle.Unlock()
 }
 
 // DeleteTableStyle
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 func (controller *Controller) DeleteTableStyle(c *gin.Context) {
 
 	mutexTableStyle.Lock()
+	defer mutexTableStyle.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteTableStyle(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexTableStyle.Unlock()
 }

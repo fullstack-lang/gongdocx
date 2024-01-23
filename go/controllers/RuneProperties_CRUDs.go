@@ -116,6 +116,7 @@ func (controller *Controller) GetRunePropertiess(c *gin.Context) {
 func (controller *Controller) PostRuneProperties(c *gin.Context) {
 
 	mutexRuneProperties.Lock()
+	defer mutexRuneProperties.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostRuneProperties(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, runepropertiesDB)
-
-	mutexRuneProperties.Unlock()
 }
 
 // GetRuneProperties
@@ -236,6 +235,7 @@ func (controller *Controller) GetRuneProperties(c *gin.Context) {
 func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 
 	mutexRuneProperties.Lock()
+	defer mutexRuneProperties.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 
 	// return status OK with the marshalling of the the runepropertiesDB
 	c.JSON(http.StatusOK, runepropertiesDB)
-
-	mutexRuneProperties.Unlock()
 }
 
 // DeleteRuneProperties
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 func (controller *Controller) DeleteRuneProperties(c *gin.Context) {
 
 	mutexRuneProperties.Lock()
+	defer mutexRuneProperties.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteRuneProperties(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexRuneProperties.Unlock()
 }

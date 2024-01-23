@@ -116,6 +116,7 @@ func (controller *Controller) GetDocuments(c *gin.Context) {
 func (controller *Controller) PostDocument(c *gin.Context) {
 
 	mutexDocument.Lock()
+	defer mutexDocument.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostDocument(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, documentDB)
-
-	mutexDocument.Unlock()
 }
 
 // GetDocument
@@ -236,6 +235,7 @@ func (controller *Controller) GetDocument(c *gin.Context) {
 func (controller *Controller) UpdateDocument(c *gin.Context) {
 
 	mutexDocument.Lock()
+	defer mutexDocument.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateDocument(c *gin.Context) {
 
 	// return status OK with the marshalling of the the documentDB
 	c.JSON(http.StatusOK, documentDB)
-
-	mutexDocument.Unlock()
 }
 
 // DeleteDocument
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateDocument(c *gin.Context) {
 func (controller *Controller) DeleteDocument(c *gin.Context) {
 
 	mutexDocument.Lock()
+	defer mutexDocument.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteDocument(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexDocument.Unlock()
 }

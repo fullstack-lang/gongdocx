@@ -116,6 +116,7 @@ func (controller *Controller) GetFiles(c *gin.Context) {
 func (controller *Controller) PostFile(c *gin.Context) {
 
 	mutexFile.Lock()
+	defer mutexFile.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostFile(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, fileDB)
-
-	mutexFile.Unlock()
 }
 
 // GetFile
@@ -236,6 +235,7 @@ func (controller *Controller) GetFile(c *gin.Context) {
 func (controller *Controller) UpdateFile(c *gin.Context) {
 
 	mutexFile.Lock()
+	defer mutexFile.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 
 	// return status OK with the marshalling of the the fileDB
 	c.JSON(http.StatusOK, fileDB)
-
-	mutexFile.Unlock()
 }
 
 // DeleteFile
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 func (controller *Controller) DeleteFile(c *gin.Context) {
 
 	mutexFile.Lock()
+	defer mutexFile.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteFile(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexFile.Unlock()
 }

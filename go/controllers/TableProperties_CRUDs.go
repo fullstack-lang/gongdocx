@@ -116,6 +116,7 @@ func (controller *Controller) GetTablePropertiess(c *gin.Context) {
 func (controller *Controller) PostTableProperties(c *gin.Context) {
 
 	mutexTableProperties.Lock()
+	defer mutexTableProperties.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostTableProperties(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, tablepropertiesDB)
-
-	mutexTableProperties.Unlock()
 }
 
 // GetTableProperties
@@ -236,6 +235,7 @@ func (controller *Controller) GetTableProperties(c *gin.Context) {
 func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 
 	mutexTableProperties.Lock()
+	defer mutexTableProperties.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 
 	// return status OK with the marshalling of the the tablepropertiesDB
 	c.JSON(http.StatusOK, tablepropertiesDB)
-
-	mutexTableProperties.Unlock()
 }
 
 // DeleteTableProperties
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 func (controller *Controller) DeleteTableProperties(c *gin.Context) {
 
 	mutexTableProperties.Lock()
+	defer mutexTableProperties.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteTableProperties(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexTableProperties.Unlock()
 }

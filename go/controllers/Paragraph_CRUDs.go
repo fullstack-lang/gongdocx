@@ -116,6 +116,7 @@ func (controller *Controller) GetParagraphs(c *gin.Context) {
 func (controller *Controller) PostParagraph(c *gin.Context) {
 
 	mutexParagraph.Lock()
+	defer mutexParagraph.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostParagraph(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, paragraphDB)
-
-	mutexParagraph.Unlock()
 }
 
 // GetParagraph
@@ -236,6 +235,7 @@ func (controller *Controller) GetParagraph(c *gin.Context) {
 func (controller *Controller) UpdateParagraph(c *gin.Context) {
 
 	mutexParagraph.Lock()
+	defer mutexParagraph.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateParagraph(c *gin.Context) {
 
 	// return status OK with the marshalling of the the paragraphDB
 	c.JSON(http.StatusOK, paragraphDB)
-
-	mutexParagraph.Unlock()
 }
 
 // DeleteParagraph
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateParagraph(c *gin.Context) {
 func (controller *Controller) DeleteParagraph(c *gin.Context) {
 
 	mutexParagraph.Lock()
+	defer mutexParagraph.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteParagraph(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexParagraph.Unlock()
 }

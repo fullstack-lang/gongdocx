@@ -116,6 +116,7 @@ func (controller *Controller) GetParagraphStyles(c *gin.Context) {
 func (controller *Controller) PostParagraphStyle(c *gin.Context) {
 
 	mutexParagraphStyle.Lock()
+	defer mutexParagraphStyle.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostParagraphStyle(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, paragraphstyleDB)
-
-	mutexParagraphStyle.Unlock()
 }
 
 // GetParagraphStyle
@@ -236,6 +235,7 @@ func (controller *Controller) GetParagraphStyle(c *gin.Context) {
 func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 
 	mutexParagraphStyle.Lock()
+	defer mutexParagraphStyle.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 
 	// return status OK with the marshalling of the the paragraphstyleDB
 	c.JSON(http.StatusOK, paragraphstyleDB)
-
-	mutexParagraphStyle.Unlock()
 }
 
 // DeleteParagraphStyle
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 func (controller *Controller) DeleteParagraphStyle(c *gin.Context) {
 
 	mutexParagraphStyle.Lock()
+	defer mutexParagraphStyle.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteParagraphStyle(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexParagraphStyle.Unlock()
 }

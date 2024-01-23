@@ -116,6 +116,7 @@ func (controller *Controller) GetBodys(c *gin.Context) {
 func (controller *Controller) PostBody(c *gin.Context) {
 
 	mutexBody.Lock()
+	defer mutexBody.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -173,8 +174,6 @@ func (controller *Controller) PostBody(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, bodyDB)
-
-	mutexBody.Unlock()
 }
 
 // GetBody
@@ -236,6 +235,7 @@ func (controller *Controller) GetBody(c *gin.Context) {
 func (controller *Controller) UpdateBody(c *gin.Context) {
 
 	mutexBody.Lock()
+	defer mutexBody.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -310,8 +310,6 @@ func (controller *Controller) UpdateBody(c *gin.Context) {
 
 	// return status OK with the marshalling of the the bodyDB
 	c.JSON(http.StatusOK, bodyDB)
-
-	mutexBody.Unlock()
 }
 
 // DeleteBody
@@ -326,6 +324,7 @@ func (controller *Controller) UpdateBody(c *gin.Context) {
 func (controller *Controller) DeleteBody(c *gin.Context) {
 
 	mutexBody.Lock()
+	defer mutexBody.Unlock()
 
 	values := c.Request.URL.Query()
 	stackPath := ""
@@ -371,6 +370,4 @@ func (controller *Controller) DeleteBody(c *gin.Context) {
 	backRepo.IncrementPushFromFrontNb()
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
-
-	mutexBody.Unlock()
 }
