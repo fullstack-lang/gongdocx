@@ -5,10 +5,10 @@ go 1.21.0
 toolchain go1.21.1
 
 require (
-	github.com/fullstack-lang/gong v0.0.0-20240123072354-4d23e9bd0dc9
-	github.com/fullstack-lang/gongdoc v0.0.0-20240123072355-91c88a405847
-	github.com/fullstack-lang/gongtable v0.0.0-20240123072357-e856413912aa
-	github.com/fullstack-lang/gongtree v0.0.0-20240123072357-1be43648ba63
+	github.com/fullstack-lang/gong v0.0.0-20240127175449-d48dac74ff5f
+	github.com/fullstack-lang/gongdoc v0.0.0-20240127175548-e14d21f277fd
+	github.com/fullstack-lang/gongtable v0.0.0-20240127175549-6fea7a8bc9ff
+	github.com/fullstack-lang/gongtree v0.0.0-20240127175549-0b9c685be7d3
 	github.com/fullstack-lang/maticons v0.0.0-20230823061653-70c364fbdd00
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/static v0.0.1
@@ -18,7 +18,7 @@ require (
 	github.com/tealeg/xlsx/v3 v3.3.5
 	github.com/xuri/excelize/v2 v2.8.0
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
-	gorm.io/gorm v1.25.5
+	gorm.io/gorm v1.25.6
 )
 
 require (
@@ -27,7 +27,7 @@ require (
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/frankban/quicktest v1.14.6 // indirect
-	github.com/fullstack-lang/gongsvg v0.0.0-20240123072356-214ae3157251 // indirect
+	github.com/fullstack-lang/gongsvg v0.0.0-20240127175549-616185e1147c // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
@@ -37,14 +37,14 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/uuid v1.5.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/leodido/go-urn v1.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -54,7 +54,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
-	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/rivo/uniseg v0.4.5 // indirect
 	github.com/rogpeppe/fastuuid v1.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/shabbyrobe/xmlwriter v0.0.0-20230525083848-85336ec334fa // indirect
