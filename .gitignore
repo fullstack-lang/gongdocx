@@ -6,3 +6,5 @@ go/cmd/gongdocx/__debug_bin.exe
 go/cmd/gongdocx/gongdocx.exe
 go/cmd/gongdocx/*.xlsx
 go/cmd/gongdocx/__debug_bin*
+go/cmd/gongdocx/req sample/.DS_Store
+go/cmd/gongdocx/.DS_Store

@@ -212,8 +212,8 @@ func findFile(files []*zip.File, target string) *zip.File {
 	return nil
 }
 
-func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) error {
-	r, err := zip.OpenReader(arg)
+func docx2md(docx *Docx, gongdocx_stage *StageStruct, path string, embed bool) error {
+	r, err := zip.OpenReader(path)
 	if err != nil {
 		return err
 	}
@@ -292,6 +292,49 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, arg string, embed bool) er
 		return err
 	}
 	// fmt.Print(buf.String())
+
+	// Create a new ZIP archive in memory
+	newZipBuf := new(bytes.Buffer)
+	newZipWriter := zip.NewWriter(newZipBuf)
+
+	// Iterate through each file in the original ZIP
+	for _, f := range r.File {
+		zipFileReader, err := f.Open()
+		if err != nil {
+			return err
+		}
+
+		// If the current file is not the one to modify, copy it to the new ZIP
+
+		newFile, err := newZipWriter.Create(f.Name)
+		if err != nil {
+			zipFileReader.Close()
+			return err
+		}
+		_, err = io.Copy(newFile, zipFileReader)
+		if err != nil {
+			zipFileReader.Close()
+			return err
+		}
+
+		zipFileReader.Close()
+	}
+
+	// Close the new ZIP writer to finish writing the new ZIP file
+	if err := newZipWriter.Close(); err != nil {
+		return err
+	}
+
+	// Replace the original ZIP file with the new ZIP archive
+	// Trim the ".docx" extension from the filePath
+	baseNameWithoutExt := strings.TrimSuffix(path, ".docx")
+
+	// Append "copy" before the extension
+	newFilePath := baseNameWithoutExt + "-copy.docx"
+
+	if err := ioutil.WriteFile(newFilePath, newZipBuf.Bytes(), 0644); err != nil {
+		return err
+	}
 
 	return nil
 }

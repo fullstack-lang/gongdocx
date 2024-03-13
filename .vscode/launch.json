@@ -15,5 +15,15 @@
                 "samples/test.docx",
             ]
         },
+        {
+            "name": "go server sample.docx",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/go/cmd/gongdocx",
+            "args": [
+                "req sample/sample.docx",
+            ]
+        },
     ]
 }
