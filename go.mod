@@ -14,6 +14,7 @@ require (
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/glebarez/sqlite v1.10.0
+	github.com/gorilla/websocket v1.5.1
 	github.com/mattn/go-runewidth v0.0.15
 	github.com/tealeg/xlsx/v3 v3.3.5
 	github.com/xuri/excelize/v2 v2.8.0

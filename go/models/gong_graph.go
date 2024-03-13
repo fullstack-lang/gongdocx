@@ -174,7 +174,7 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 
 
 // StageBranch stages instance and apply StageBranch on all gongstruct instances that are
-// referenced by pointers or slices of pointers of the insance
+// referenced by pointers or slices of pointers of the instance
 //
 // the algorithm stops along the course of graph if a vertex is already staged
 func StageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
@@ -581,6 +581,502 @@ func (stage *StageStruct) StageBranchText(text *Text) {
 
 	//insertion point for the staging of instances referenced by slice of pointers
 
+}
+
+
+// CopyBranch stages instance and apply CopyBranch on all gongstruct instances that are
+// referenced by pointers or slices of pointers of the instance
+//
+// the algorithm stops along the course of graph if a vertex is already staged
+func CopyBranch[Type Gongstruct](from *Type) (to *Type) {
+
+	mapOrigCopy := make(map[any]any)
+	_ = mapOrigCopy
+	
+	switch fromT := any(from).(type) {
+	// insertion point for stage branch
+	case *Body:
+		toT := CopyBranchBody(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *Document:
+		toT := CopyBranchDocument(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *Docx:
+		toT := CopyBranchDocx(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *File:
+		toT := CopyBranchFile(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *Node:
+		toT := CopyBranchNode(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *Paragraph:
+		toT := CopyBranchParagraph(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *ParagraphProperties:
+		toT := CopyBranchParagraphProperties(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *ParagraphStyle:
+		toT := CopyBranchParagraphStyle(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *Rune:
+		toT := CopyBranchRune(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *RuneProperties:
+		toT := CopyBranchRuneProperties(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *Table:
+		toT := CopyBranchTable(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *TableColumn:
+		toT := CopyBranchTableColumn(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *TableProperties:
+		toT := CopyBranchTableProperties(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *TableRow:
+		toT := CopyBranchTableRow(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *TableStyle:
+		toT := CopyBranchTableStyle(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	case *Text:
+		toT := CopyBranchText(mapOrigCopy, fromT)
+		return any(toT).(*Type)
+
+	default:
+		_ = fromT // to espace compilation issue when model is empty
+	}
+	return
+}
+
+
+// insertion point for stage branch per struct
+func CopyBranchBody(mapOrigCopy map[any]any, bodyFrom *Body) (bodyTo  *Body){
+
+	// bodyFrom has already been copied
+	if _bodyTo, ok := mapOrigCopy[bodyFrom]; ok {
+		bodyTo = _bodyTo.(*Body)
+		return
+	}
+
+	bodyTo = new(Body)
+	mapOrigCopy[bodyFrom] = bodyTo
+	bodyFrom.CopyBasicFields(bodyTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if bodyFrom.LastParagraph != nil {
+		bodyTo.LastParagraph = CopyBranchParagraph(mapOrigCopy, bodyFrom.LastParagraph)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _paragraph := range bodyFrom.Paragraphs {
+		bodyTo.Paragraphs = append( bodyTo.Paragraphs, CopyBranchParagraph(mapOrigCopy, _paragraph))
+	}
+	for _, _table := range bodyFrom.Tables {
+		bodyTo.Tables = append( bodyTo.Tables, CopyBranchTable(mapOrigCopy, _table))
+	}
+
+	return
+}
+
+func CopyBranchDocument(mapOrigCopy map[any]any, documentFrom *Document) (documentTo  *Document){
+
+	// documentFrom has already been copied
+	if _documentTo, ok := mapOrigCopy[documentFrom]; ok {
+		documentTo = _documentTo.(*Document)
+		return
+	}
+
+	documentTo = new(Document)
+	mapOrigCopy[documentFrom] = documentTo
+	documentFrom.CopyBasicFields(documentTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if documentFrom.File != nil {
+		documentTo.File = CopyBranchFile(mapOrigCopy, documentFrom.File)
+	}
+	if documentFrom.Root != nil {
+		documentTo.Root = CopyBranchNode(mapOrigCopy, documentFrom.Root)
+	}
+	if documentFrom.Body != nil {
+		documentTo.Body = CopyBranchBody(mapOrigCopy, documentFrom.Body)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchDocx(mapOrigCopy map[any]any, docxFrom *Docx) (docxTo  *Docx){
+
+	// docxFrom has already been copied
+	if _docxTo, ok := mapOrigCopy[docxFrom]; ok {
+		docxTo = _docxTo.(*Docx)
+		return
+	}
+
+	docxTo = new(Docx)
+	mapOrigCopy[docxFrom] = docxTo
+	docxFrom.CopyBasicFields(docxTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if docxFrom.Document != nil {
+		docxTo.Document = CopyBranchDocument(mapOrigCopy, docxFrom.Document)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _file := range docxFrom.Files {
+		docxTo.Files = append( docxTo.Files, CopyBranchFile(mapOrigCopy, _file))
+	}
+
+	return
+}
+
+func CopyBranchFile(mapOrigCopy map[any]any, fileFrom *File) (fileTo  *File){
+
+	// fileFrom has already been copied
+	if _fileTo, ok := mapOrigCopy[fileFrom]; ok {
+		fileTo = _fileTo.(*File)
+		return
+	}
+
+	fileTo = new(File)
+	mapOrigCopy[fileFrom] = fileTo
+	fileFrom.CopyBasicFields(fileTo)
+
+	//insertion point for the staging of instances referenced by pointers
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchNode(mapOrigCopy map[any]any, nodeFrom *Node) (nodeTo  *Node){
+
+	// nodeFrom has already been copied
+	if _nodeTo, ok := mapOrigCopy[nodeFrom]; ok {
+		nodeTo = _nodeTo.(*Node)
+		return
+	}
+
+	nodeTo = new(Node)
+	mapOrigCopy[nodeFrom] = nodeTo
+	nodeFrom.CopyBasicFields(nodeTo)
+
+	//insertion point for the staging of instances referenced by pointers
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _node := range nodeFrom.Nodes {
+		nodeTo.Nodes = append( nodeTo.Nodes, CopyBranchNode(mapOrigCopy, _node))
+	}
+
+	return
+}
+
+func CopyBranchParagraph(mapOrigCopy map[any]any, paragraphFrom *Paragraph) (paragraphTo  *Paragraph){
+
+	// paragraphFrom has already been copied
+	if _paragraphTo, ok := mapOrigCopy[paragraphFrom]; ok {
+		paragraphTo = _paragraphTo.(*Paragraph)
+		return
+	}
+
+	paragraphTo = new(Paragraph)
+	mapOrigCopy[paragraphFrom] = paragraphTo
+	paragraphFrom.CopyBasicFields(paragraphTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if paragraphFrom.Node != nil {
+		paragraphTo.Node = CopyBranchNode(mapOrigCopy, paragraphFrom.Node)
+	}
+	if paragraphFrom.ParagraphProperties != nil {
+		paragraphTo.ParagraphProperties = CopyBranchParagraphProperties(mapOrigCopy, paragraphFrom.ParagraphProperties)
+	}
+	if paragraphFrom.Next != nil {
+		paragraphTo.Next = CopyBranchParagraph(mapOrigCopy, paragraphFrom.Next)
+	}
+	if paragraphFrom.Previous != nil {
+		paragraphTo.Previous = CopyBranchParagraph(mapOrigCopy, paragraphFrom.Previous)
+	}
+	if paragraphFrom.EnclosingBody != nil {
+		paragraphTo.EnclosingBody = CopyBranchBody(mapOrigCopy, paragraphFrom.EnclosingBody)
+	}
+	if paragraphFrom.EnclosingTableColumn != nil {
+		paragraphTo.EnclosingTableColumn = CopyBranchTableColumn(mapOrigCopy, paragraphFrom.EnclosingTableColumn)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _rune := range paragraphFrom.Runes {
+		paragraphTo.Runes = append( paragraphTo.Runes, CopyBranchRune(mapOrigCopy, _rune))
+	}
+
+	return
+}
+
+func CopyBranchParagraphProperties(mapOrigCopy map[any]any, paragraphpropertiesFrom *ParagraphProperties) (paragraphpropertiesTo  *ParagraphProperties){
+
+	// paragraphpropertiesFrom has already been copied
+	if _paragraphpropertiesTo, ok := mapOrigCopy[paragraphpropertiesFrom]; ok {
+		paragraphpropertiesTo = _paragraphpropertiesTo.(*ParagraphProperties)
+		return
+	}
+
+	paragraphpropertiesTo = new(ParagraphProperties)
+	mapOrigCopy[paragraphpropertiesFrom] = paragraphpropertiesTo
+	paragraphpropertiesFrom.CopyBasicFields(paragraphpropertiesTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if paragraphpropertiesFrom.ParagraphStyle != nil {
+		paragraphpropertiesTo.ParagraphStyle = CopyBranchParagraphStyle(mapOrigCopy, paragraphpropertiesFrom.ParagraphStyle)
+	}
+	if paragraphpropertiesFrom.Node != nil {
+		paragraphpropertiesTo.Node = CopyBranchNode(mapOrigCopy, paragraphpropertiesFrom.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchParagraphStyle(mapOrigCopy map[any]any, paragraphstyleFrom *ParagraphStyle) (paragraphstyleTo  *ParagraphStyle){
+
+	// paragraphstyleFrom has already been copied
+	if _paragraphstyleTo, ok := mapOrigCopy[paragraphstyleFrom]; ok {
+		paragraphstyleTo = _paragraphstyleTo.(*ParagraphStyle)
+		return
+	}
+
+	paragraphstyleTo = new(ParagraphStyle)
+	mapOrigCopy[paragraphstyleFrom] = paragraphstyleTo
+	paragraphstyleFrom.CopyBasicFields(paragraphstyleTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if paragraphstyleFrom.Node != nil {
+		paragraphstyleTo.Node = CopyBranchNode(mapOrigCopy, paragraphstyleFrom.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchRune(mapOrigCopy map[any]any, runeFrom *Rune) (runeTo  *Rune){
+
+	// runeFrom has already been copied
+	if _runeTo, ok := mapOrigCopy[runeFrom]; ok {
+		runeTo = _runeTo.(*Rune)
+		return
+	}
+
+	runeTo = new(Rune)
+	mapOrigCopy[runeFrom] = runeTo
+	runeFrom.CopyBasicFields(runeTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if runeFrom.Node != nil {
+		runeTo.Node = CopyBranchNode(mapOrigCopy, runeFrom.Node)
+	}
+	if runeFrom.Text != nil {
+		runeTo.Text = CopyBranchText(mapOrigCopy, runeFrom.Text)
+	}
+	if runeFrom.RuneProperties != nil {
+		runeTo.RuneProperties = CopyBranchRuneProperties(mapOrigCopy, runeFrom.RuneProperties)
+	}
+	if runeFrom.EnclosingParagraph != nil {
+		runeTo.EnclosingParagraph = CopyBranchParagraph(mapOrigCopy, runeFrom.EnclosingParagraph)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchRuneProperties(mapOrigCopy map[any]any, runepropertiesFrom *RuneProperties) (runepropertiesTo  *RuneProperties){
+
+	// runepropertiesFrom has already been copied
+	if _runepropertiesTo, ok := mapOrigCopy[runepropertiesFrom]; ok {
+		runepropertiesTo = _runepropertiesTo.(*RuneProperties)
+		return
+	}
+
+	runepropertiesTo = new(RuneProperties)
+	mapOrigCopy[runepropertiesFrom] = runepropertiesTo
+	runepropertiesFrom.CopyBasicFields(runepropertiesTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if runepropertiesFrom.Node != nil {
+		runepropertiesTo.Node = CopyBranchNode(mapOrigCopy, runepropertiesFrom.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchTable(mapOrigCopy map[any]any, tableFrom *Table) (tableTo  *Table){
+
+	// tableFrom has already been copied
+	if _tableTo, ok := mapOrigCopy[tableFrom]; ok {
+		tableTo = _tableTo.(*Table)
+		return
+	}
+
+	tableTo = new(Table)
+	mapOrigCopy[tableFrom] = tableTo
+	tableFrom.CopyBasicFields(tableTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tableFrom.Node != nil {
+		tableTo.Node = CopyBranchNode(mapOrigCopy, tableFrom.Node)
+	}
+	if tableFrom.TableProperties != nil {
+		tableTo.TableProperties = CopyBranchTableProperties(mapOrigCopy, tableFrom.TableProperties)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _tablerow := range tableFrom.TableRows {
+		tableTo.TableRows = append( tableTo.TableRows, CopyBranchTableRow(mapOrigCopy, _tablerow))
+	}
+
+	return
+}
+
+func CopyBranchTableColumn(mapOrigCopy map[any]any, tablecolumnFrom *TableColumn) (tablecolumnTo  *TableColumn){
+
+	// tablecolumnFrom has already been copied
+	if _tablecolumnTo, ok := mapOrigCopy[tablecolumnFrom]; ok {
+		tablecolumnTo = _tablecolumnTo.(*TableColumn)
+		return
+	}
+
+	tablecolumnTo = new(TableColumn)
+	mapOrigCopy[tablecolumnFrom] = tablecolumnTo
+	tablecolumnFrom.CopyBasicFields(tablecolumnTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablecolumnFrom.Node != nil {
+		tablecolumnTo.Node = CopyBranchNode(mapOrigCopy, tablecolumnFrom.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _paragraph := range tablecolumnFrom.Paragraphs {
+		tablecolumnTo.Paragraphs = append( tablecolumnTo.Paragraphs, CopyBranchParagraph(mapOrigCopy, _paragraph))
+	}
+
+	return
+}
+
+func CopyBranchTableProperties(mapOrigCopy map[any]any, tablepropertiesFrom *TableProperties) (tablepropertiesTo  *TableProperties){
+
+	// tablepropertiesFrom has already been copied
+	if _tablepropertiesTo, ok := mapOrigCopy[tablepropertiesFrom]; ok {
+		tablepropertiesTo = _tablepropertiesTo.(*TableProperties)
+		return
+	}
+
+	tablepropertiesTo = new(TableProperties)
+	mapOrigCopy[tablepropertiesFrom] = tablepropertiesTo
+	tablepropertiesFrom.CopyBasicFields(tablepropertiesTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablepropertiesFrom.Node != nil {
+		tablepropertiesTo.Node = CopyBranchNode(mapOrigCopy, tablepropertiesFrom.Node)
+	}
+	if tablepropertiesFrom.TableStyle != nil {
+		tablepropertiesTo.TableStyle = CopyBranchTableStyle(mapOrigCopy, tablepropertiesFrom.TableStyle)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchTableRow(mapOrigCopy map[any]any, tablerowFrom *TableRow) (tablerowTo  *TableRow){
+
+	// tablerowFrom has already been copied
+	if _tablerowTo, ok := mapOrigCopy[tablerowFrom]; ok {
+		tablerowTo = _tablerowTo.(*TableRow)
+		return
+	}
+
+	tablerowTo = new(TableRow)
+	mapOrigCopy[tablerowFrom] = tablerowTo
+	tablerowFrom.CopyBasicFields(tablerowTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablerowFrom.Node != nil {
+		tablerowTo.Node = CopyBranchNode(mapOrigCopy, tablerowFrom.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+	for _, _tablecolumn := range tablerowFrom.TableColumns {
+		tablerowTo.TableColumns = append( tablerowTo.TableColumns, CopyBranchTableColumn(mapOrigCopy, _tablecolumn))
+	}
+
+	return
+}
+
+func CopyBranchTableStyle(mapOrigCopy map[any]any, tablestyleFrom *TableStyle) (tablestyleTo  *TableStyle){
+
+	// tablestyleFrom has already been copied
+	if _tablestyleTo, ok := mapOrigCopy[tablestyleFrom]; ok {
+		tablestyleTo = _tablestyleTo.(*TableStyle)
+		return
+	}
+
+	tablestyleTo = new(TableStyle)
+	mapOrigCopy[tablestyleFrom] = tablestyleTo
+	tablestyleFrom.CopyBasicFields(tablestyleTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if tablestyleFrom.Node != nil {
+		tablestyleTo.Node = CopyBranchNode(mapOrigCopy, tablestyleFrom.Node)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
+}
+
+func CopyBranchText(mapOrigCopy map[any]any, textFrom *Text) (textTo  *Text){
+
+	// textFrom has already been copied
+	if _textTo, ok := mapOrigCopy[textFrom]; ok {
+		textTo = _textTo.(*Text)
+		return
+	}
+
+	textTo = new(Text)
+	mapOrigCopy[textFrom] = textTo
+	textFrom.CopyBasicFields(textTo)
+
+	//insertion point for the staging of instances referenced by pointers
+	if textFrom.Node != nil {
+		textTo.Node = CopyBranchNode(mapOrigCopy, textFrom.Node)
+	}
+	if textFrom.EnclosingRune != nil {
+		textTo.EnclosingRune = CopyBranchRune(mapOrigCopy, textFrom.EnclosingRune)
+	}
+
+	//insertion point for the staging of instances referenced by slice of pointers
+
+	return
 }
 
 
