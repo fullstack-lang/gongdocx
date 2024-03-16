@@ -38,6 +38,7 @@ type RuneAPI struct {
 	models.Rune_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	RunePointersEncoding RunePointersEncoding
 }
 
@@ -79,7 +80,9 @@ type RuneDB struct {
 
 	// Declation for basic field runeDB.Content
 	Content_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	RunePointersEncoding
 }
 

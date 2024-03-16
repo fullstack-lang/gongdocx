@@ -38,6 +38,7 @@ type ParagraphAPI struct {
 	models.Paragraph_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	ParagraphPointersEncoding ParagraphPointersEncoding
 }
 
@@ -93,7 +94,9 @@ type ParagraphDB struct {
 
 	// Declation for basic field paragraphDB.Text
 	Text_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	ParagraphPointersEncoding
 }
 

@@ -38,6 +38,7 @@ type RunePropertiesAPI struct {
 	models.RuneProperties_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	RunePropertiesPointersEncoding RunePropertiesPointersEncoding
 }
 
@@ -79,7 +80,9 @@ type RunePropertiesDB struct {
 
 	// Declation for basic field runepropertiesDB.Content
 	Content_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	RunePropertiesPointersEncoding
 }
 

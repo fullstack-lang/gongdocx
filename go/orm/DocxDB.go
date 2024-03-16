@@ -38,6 +38,7 @@ type DocxAPI struct {
 	models.Docx_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	DocxPointersEncoding DocxPointersEncoding
 }
 
@@ -67,7 +68,9 @@ type DocxDB struct {
 
 	// Declation for basic field docxDB.Name
 	Name_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	DocxPointersEncoding
 }
 

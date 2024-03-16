@@ -38,6 +38,7 @@ type DocumentAPI struct {
 	models.Document_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	DocumentPointersEncoding DocumentPointersEncoding
 }
 
@@ -72,7 +73,9 @@ type DocumentDB struct {
 
 	// Declation for basic field documentDB.Name
 	Name_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	DocumentPointersEncoding
 }
 

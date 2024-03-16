@@ -60,117 +60,117 @@ func IsStaged[Type Gongstruct](stage *StageStruct, instance *Type) (ok bool) {
 }
 
 // insertion point for stage per struct
-	func (stage *StageStruct) IsStagedBody(body *Body) (ok bool) {
+func (stage *StageStruct) IsStagedBody(body *Body) (ok bool) {
 
-		_, ok = stage.Bodys[body]
-	
-		return
-	}
+	_, ok = stage.Bodys[body]
 
-	func (stage *StageStruct) IsStagedDocument(document *Document) (ok bool) {
+	return
+}
 
-		_, ok = stage.Documents[document]
-	
-		return
-	}
+func (stage *StageStruct) IsStagedDocument(document *Document) (ok bool) {
 
-	func (stage *StageStruct) IsStagedDocx(docx *Docx) (ok bool) {
+	_, ok = stage.Documents[document]
 
-		_, ok = stage.Docxs[docx]
-	
-		return
-	}
+	return
+}
 
-	func (stage *StageStruct) IsStagedFile(file *File) (ok bool) {
+func (stage *StageStruct) IsStagedDocx(docx *Docx) (ok bool) {
 
-		_, ok = stage.Files[file]
-	
-		return
-	}
+	_, ok = stage.Docxs[docx]
 
-	func (stage *StageStruct) IsStagedNode(node *Node) (ok bool) {
+	return
+}
 
-		_, ok = stage.Nodes[node]
-	
-		return
-	}
+func (stage *StageStruct) IsStagedFile(file *File) (ok bool) {
 
-	func (stage *StageStruct) IsStagedParagraph(paragraph *Paragraph) (ok bool) {
+	_, ok = stage.Files[file]
 
-		_, ok = stage.Paragraphs[paragraph]
-	
-		return
-	}
+	return
+}
 
-	func (stage *StageStruct) IsStagedParagraphProperties(paragraphproperties *ParagraphProperties) (ok bool) {
+func (stage *StageStruct) IsStagedNode(node *Node) (ok bool) {
 
-		_, ok = stage.ParagraphPropertiess[paragraphproperties]
-	
-		return
-	}
+	_, ok = stage.Nodes[node]
 
-	func (stage *StageStruct) IsStagedParagraphStyle(paragraphstyle *ParagraphStyle) (ok bool) {
+	return
+}
 
-		_, ok = stage.ParagraphStyles[paragraphstyle]
-	
-		return
-	}
+func (stage *StageStruct) IsStagedParagraph(paragraph *Paragraph) (ok bool) {
 
-	func (stage *StageStruct) IsStagedRune(rune *Rune) (ok bool) {
+	_, ok = stage.Paragraphs[paragraph]
 
-		_, ok = stage.Runes[rune]
-	
-		return
-	}
+	return
+}
 
-	func (stage *StageStruct) IsStagedRuneProperties(runeproperties *RuneProperties) (ok bool) {
+func (stage *StageStruct) IsStagedParagraphProperties(paragraphproperties *ParagraphProperties) (ok bool) {
 
-		_, ok = stage.RunePropertiess[runeproperties]
-	
-		return
-	}
+	_, ok = stage.ParagraphPropertiess[paragraphproperties]
 
-	func (stage *StageStruct) IsStagedTable(table *Table) (ok bool) {
+	return
+}
 
-		_, ok = stage.Tables[table]
-	
-		return
-	}
+func (stage *StageStruct) IsStagedParagraphStyle(paragraphstyle *ParagraphStyle) (ok bool) {
 
-	func (stage *StageStruct) IsStagedTableColumn(tablecolumn *TableColumn) (ok bool) {
+	_, ok = stage.ParagraphStyles[paragraphstyle]
 
-		_, ok = stage.TableColumns[tablecolumn]
-	
-		return
-	}
+	return
+}
 
-	func (stage *StageStruct) IsStagedTableProperties(tableproperties *TableProperties) (ok bool) {
+func (stage *StageStruct) IsStagedRune(rune *Rune) (ok bool) {
 
-		_, ok = stage.TablePropertiess[tableproperties]
-	
-		return
-	}
+	_, ok = stage.Runes[rune]
 
-	func (stage *StageStruct) IsStagedTableRow(tablerow *TableRow) (ok bool) {
+	return
+}
 
-		_, ok = stage.TableRows[tablerow]
-	
-		return
-	}
+func (stage *StageStruct) IsStagedRuneProperties(runeproperties *RuneProperties) (ok bool) {
 
-	func (stage *StageStruct) IsStagedTableStyle(tablestyle *TableStyle) (ok bool) {
+	_, ok = stage.RunePropertiess[runeproperties]
 
-		_, ok = stage.TableStyles[tablestyle]
-	
-		return
-	}
+	return
+}
 
-	func (stage *StageStruct) IsStagedText(text *Text) (ok bool) {
+func (stage *StageStruct) IsStagedTable(table *Table) (ok bool) {
 
-		_, ok = stage.Texts[text]
-	
-		return
-	}
+	_, ok = stage.Tables[table]
+
+	return
+}
+
+func (stage *StageStruct) IsStagedTableColumn(tablecolumn *TableColumn) (ok bool) {
+
+	_, ok = stage.TableColumns[tablecolumn]
+
+	return
+}
+
+func (stage *StageStruct) IsStagedTableProperties(tableproperties *TableProperties) (ok bool) {
+
+	_, ok = stage.TablePropertiess[tableproperties]
+
+	return
+}
+
+func (stage *StageStruct) IsStagedTableRow(tablerow *TableRow) (ok bool) {
+
+	_, ok = stage.TableRows[tablerow]
+
+	return
+}
+
+func (stage *StageStruct) IsStagedTableStyle(tablestyle *TableStyle) (ok bool) {
+
+	_, ok = stage.TableStyles[tablestyle]
+
+	return
+}
+
+func (stage *StageStruct) IsStagedText(text *Text) (ok bool) {
+
+	_, ok = stage.Texts[text]
+
+	return
+}
 
 
 // StageBranch stages instance and apply StageBranch on all gongstruct instances that are
@@ -592,7 +592,7 @@ func CopyBranch[Type Gongstruct](from *Type) (to *Type) {
 
 	mapOrigCopy := make(map[any]any)
 	_ = mapOrigCopy
-	
+
 	switch fromT := any(from).(type) {
 	// insertion point for stage branch
 	case *Body:
@@ -664,7 +664,6 @@ func CopyBranch[Type Gongstruct](from *Type) (to *Type) {
 	}
 	return
 }
-
 
 // insertion point for stage branch per struct
 func CopyBranchBody(mapOrigCopy map[any]any, bodyFrom *Body) (bodyTo  *Body){

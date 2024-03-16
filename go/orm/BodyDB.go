@@ -38,6 +38,7 @@ type BodyAPI struct {
 	models.Body_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	BodyPointersEncoding BodyPointersEncoding
 }
 
@@ -70,7 +71,9 @@ type BodyDB struct {
 
 	// Declation for basic field bodyDB.Name
 	Name_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	BodyPointersEncoding
 }
 

@@ -38,6 +38,7 @@ type ParagraphStyleAPI struct {
 	models.ParagraphStyle_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	ParagraphStylePointersEncoding ParagraphStylePointersEncoding
 }
 
@@ -70,7 +71,9 @@ type ParagraphStyleDB struct {
 
 	// Declation for basic field paragraphstyleDB.ValAttr
 	ValAttr_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	ParagraphStylePointersEncoding
 }
 

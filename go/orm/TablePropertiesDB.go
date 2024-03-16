@@ -38,6 +38,7 @@ type TablePropertiesAPI struct {
 	models.TableProperties_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	TablePropertiesPointersEncoding TablePropertiesPointersEncoding
 }
 
@@ -71,7 +72,9 @@ type TablePropertiesDB struct {
 
 	// Declation for basic field tablepropertiesDB.Content
 	Content_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	TablePropertiesPointersEncoding
 }
 

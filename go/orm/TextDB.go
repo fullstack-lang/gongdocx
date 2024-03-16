@@ -38,6 +38,7 @@ type TextAPI struct {
 	models.Text_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	TextPointersEncoding TextPointersEncoding
 }
 
@@ -75,7 +76,9 @@ type TextDB struct {
 	// Declation for basic field textDB.PreserveWhiteSpace
 	// provide the sql storage for the boolan
 	PreserveWhiteSpace_Data sql.NullBool
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	TextPointersEncoding
 }
 

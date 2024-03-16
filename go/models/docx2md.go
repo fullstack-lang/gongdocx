@@ -304,17 +304,29 @@ func docx2md(docx *Docx, gongdocx_stage *StageStruct, path string, embed bool) e
 			return err
 		}
 
-		// If the current file is not the one to modify, copy it to the new ZIP
-
-		newFile, err := newZipWriter.Create(f.Name)
-		if err != nil {
-			zipFileReader.Close()
-			return err
-		}
-		_, err = io.Copy(newFile, zipFileReader)
-		if err != nil {
-			zipFileReader.Close()
-			return err
+		if f.Name != "word/document.xml" {
+			newFile, err := newZipWriter.Create(f.Name)
+			if err != nil {
+				zipFileReader.Close()
+				return err
+			}
+			_, err = io.Copy(newFile, zipFileReader)
+			if err != nil {
+				zipFileReader.Close()
+				return err
+			}
+		} else {
+			// If the current file is the one to modify, write the new content
+			newFile, err := newZipWriter.Create("word/document.xml")
+			if err != nil {
+				zipFileReader.Close()
+				return err
+			}
+			_, err = newFile.Write([]byte("Toto"))
+			if err != nil {
+				zipFileReader.Close()
+				return err
+			}
 		}
 
 		zipFileReader.Close()

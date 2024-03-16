@@ -38,6 +38,7 @@ type ParagraphPropertiesAPI struct {
 	models.ParagraphProperties_WOP
 
 	// encoding of pointers
+	// for API, it cannot be embedded
 	ParagraphPropertiesPointersEncoding ParagraphPropertiesPointersEncoding
 }
 
@@ -71,7 +72,9 @@ type ParagraphPropertiesDB struct {
 
 	// Declation for basic field paragraphpropertiesDB.Content
 	Content_Data sql.NullString
+	
 	// encoding of pointers
+	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	ParagraphPropertiesPointersEncoding
 }
 
