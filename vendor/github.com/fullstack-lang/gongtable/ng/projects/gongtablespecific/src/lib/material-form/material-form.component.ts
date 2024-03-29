@@ -67,41 +67,8 @@ export class MaterialFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.startAutoRefresh(500); // Refresh every 500 ms (half second)
 
-  }
-
-  ngOnDestroy(): void {
-    this.stopAutoRefresh();
-  }
-
-
-  stopAutoRefresh(): void {
-    if (this.commutNbFromBackSubscription) {
-      this.commutNbFromBackSubscription.unsubscribe();
-    }
-  }
-
-  startAutoRefresh(intervalMs: number): void {
-    this.commutNbFromBackSubscription = this.gongtableCommitNbFromBackService
-      .getCommitNbFromBack(intervalMs, this.DataStack)
-      .subscribe((commitNbFromBack: number) => {
-        // console.log("OutletComponent, last commit nb " + this.lastCommitNbFromBack + " new: " + commitNbFromBack)
-
-        if (this.lastCommitNbFromBack < commitNbFromBack) {
-          const d = new Date()
-          console.log("OutletComponent:", this.DataStack, d.toLocaleTimeString() + `.${d.getMilliseconds()}` +
-            ", last commit increased nb " + this.lastCommitNbFromBack + " new: " + commitNbFromBack)
-          this.lastCommitNbFromBack = commitNbFromBack
-          this.refresh()
-        }
-      }
-      )
-  }
-
-  refresh(): void {
-
-    this.gongtableFrontRepoService.pull(this.DataStack).subscribe(
+    this.gongtableFrontRepoService.connectToWebSocket(this.DataStack).subscribe(
       gongtablesFrontRepo => {
         this.gongtableFrontRepo = gongtablesFrontRepo
 
@@ -263,8 +230,8 @@ export class MaterialFormComponent implements OnInit {
             let formattedDate = dateObj.toISOString();
             let dateObject = new Date(formattedDate);
 
-            console.log(dateObject);
-            console.log(formFieldDate.Value);
+            console.log("input date", dateObject);
+            console.log("date before", formFieldDate.Value);
 
             // 2. Check if two dates are on the same day
             let inputDate = new Date(formFieldValue);
@@ -280,7 +247,7 @@ export class MaterialFormComponent implements OnInit {
 
             if (!isSameDay(inputDate, comparisonDate)) {
               formFieldDate.Value = dateObject;
-              promises.push(this.formFieldDateService.updateFront, this.DataStack)
+              promises.push(this.formFieldDateService.updateFront(formFieldDate, this.DataStack))
             }
 
           }
