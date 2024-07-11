@@ -172,7 +172,6 @@ func (stage *StageStruct) IsStagedText(text *Text) (ok bool) {
 	return
 }
 
-
 // StageBranch stages instance and apply StageBranch on all gongstruct instances that are
 // referenced by pointers or slices of pointers of the instance
 //
@@ -583,7 +582,6 @@ func (stage *StageStruct) StageBranchText(text *Text) {
 
 }
 
-
 // CopyBranch stages instance and apply CopyBranch on all gongstruct instances that are
 // referenced by pointers or slices of pointers of the instance
 //
@@ -666,7 +664,7 @@ func CopyBranch[Type Gongstruct](from *Type) (to *Type) {
 }
 
 // insertion point for stage branch per struct
-func CopyBranchBody(mapOrigCopy map[any]any, bodyFrom *Body) (bodyTo  *Body){
+func CopyBranchBody(mapOrigCopy map[any]any, bodyFrom *Body) (bodyTo *Body) {
 
 	// bodyFrom has already been copied
 	if _bodyTo, ok := mapOrigCopy[bodyFrom]; ok {
@@ -685,16 +683,16 @@ func CopyBranchBody(mapOrigCopy map[any]any, bodyFrom *Body) (bodyTo  *Body){
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _paragraph := range bodyFrom.Paragraphs {
-		bodyTo.Paragraphs = append( bodyTo.Paragraphs, CopyBranchParagraph(mapOrigCopy, _paragraph))
+		bodyTo.Paragraphs = append(bodyTo.Paragraphs, CopyBranchParagraph(mapOrigCopy, _paragraph))
 	}
 	for _, _table := range bodyFrom.Tables {
-		bodyTo.Tables = append( bodyTo.Tables, CopyBranchTable(mapOrigCopy, _table))
+		bodyTo.Tables = append(bodyTo.Tables, CopyBranchTable(mapOrigCopy, _table))
 	}
 
 	return
 }
 
-func CopyBranchDocument(mapOrigCopy map[any]any, documentFrom *Document) (documentTo  *Document){
+func CopyBranchDocument(mapOrigCopy map[any]any, documentFrom *Document) (documentTo *Document) {
 
 	// documentFrom has already been copied
 	if _documentTo, ok := mapOrigCopy[documentFrom]; ok {
@@ -722,7 +720,7 @@ func CopyBranchDocument(mapOrigCopy map[any]any, documentFrom *Document) (docume
 	return
 }
 
-func CopyBranchDocx(mapOrigCopy map[any]any, docxFrom *Docx) (docxTo  *Docx){
+func CopyBranchDocx(mapOrigCopy map[any]any, docxFrom *Docx) (docxTo *Docx) {
 
 	// docxFrom has already been copied
 	if _docxTo, ok := mapOrigCopy[docxFrom]; ok {
@@ -741,13 +739,13 @@ func CopyBranchDocx(mapOrigCopy map[any]any, docxFrom *Docx) (docxTo  *Docx){
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _file := range docxFrom.Files {
-		docxTo.Files = append( docxTo.Files, CopyBranchFile(mapOrigCopy, _file))
+		docxTo.Files = append(docxTo.Files, CopyBranchFile(mapOrigCopy, _file))
 	}
 
 	return
 }
 
-func CopyBranchFile(mapOrigCopy map[any]any, fileFrom *File) (fileTo  *File){
+func CopyBranchFile(mapOrigCopy map[any]any, fileFrom *File) (fileTo *File) {
 
 	// fileFrom has already been copied
 	if _fileTo, ok := mapOrigCopy[fileFrom]; ok {
@@ -766,7 +764,7 @@ func CopyBranchFile(mapOrigCopy map[any]any, fileFrom *File) (fileTo  *File){
 	return
 }
 
-func CopyBranchNode(mapOrigCopy map[any]any, nodeFrom *Node) (nodeTo  *Node){
+func CopyBranchNode(mapOrigCopy map[any]any, nodeFrom *Node) (nodeTo *Node) {
 
 	// nodeFrom has already been copied
 	if _nodeTo, ok := mapOrigCopy[nodeFrom]; ok {
@@ -782,13 +780,13 @@ func CopyBranchNode(mapOrigCopy map[any]any, nodeFrom *Node) (nodeTo  *Node){
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _node := range nodeFrom.Nodes {
-		nodeTo.Nodes = append( nodeTo.Nodes, CopyBranchNode(mapOrigCopy, _node))
+		nodeTo.Nodes = append(nodeTo.Nodes, CopyBranchNode(mapOrigCopy, _node))
 	}
 
 	return
 }
 
-func CopyBranchParagraph(mapOrigCopy map[any]any, paragraphFrom *Paragraph) (paragraphTo  *Paragraph){
+func CopyBranchParagraph(mapOrigCopy map[any]any, paragraphFrom *Paragraph) (paragraphTo *Paragraph) {
 
 	// paragraphFrom has already been copied
 	if _paragraphTo, ok := mapOrigCopy[paragraphFrom]; ok {
@@ -822,13 +820,13 @@ func CopyBranchParagraph(mapOrigCopy map[any]any, paragraphFrom *Paragraph) (par
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _rune := range paragraphFrom.Runes {
-		paragraphTo.Runes = append( paragraphTo.Runes, CopyBranchRune(mapOrigCopy, _rune))
+		paragraphTo.Runes = append(paragraphTo.Runes, CopyBranchRune(mapOrigCopy, _rune))
 	}
 
 	return
 }
 
-func CopyBranchParagraphProperties(mapOrigCopy map[any]any, paragraphpropertiesFrom *ParagraphProperties) (paragraphpropertiesTo  *ParagraphProperties){
+func CopyBranchParagraphProperties(mapOrigCopy map[any]any, paragraphpropertiesFrom *ParagraphProperties) (paragraphpropertiesTo *ParagraphProperties) {
 
 	// paragraphpropertiesFrom has already been copied
 	if _paragraphpropertiesTo, ok := mapOrigCopy[paragraphpropertiesFrom]; ok {
@@ -853,7 +851,7 @@ func CopyBranchParagraphProperties(mapOrigCopy map[any]any, paragraphpropertiesF
 	return
 }
 
-func CopyBranchParagraphStyle(mapOrigCopy map[any]any, paragraphstyleFrom *ParagraphStyle) (paragraphstyleTo  *ParagraphStyle){
+func CopyBranchParagraphStyle(mapOrigCopy map[any]any, paragraphstyleFrom *ParagraphStyle) (paragraphstyleTo *ParagraphStyle) {
 
 	// paragraphstyleFrom has already been copied
 	if _paragraphstyleTo, ok := mapOrigCopy[paragraphstyleFrom]; ok {
@@ -875,7 +873,7 @@ func CopyBranchParagraphStyle(mapOrigCopy map[any]any, paragraphstyleFrom *Parag
 	return
 }
 
-func CopyBranchRune(mapOrigCopy map[any]any, runeFrom *Rune) (runeTo  *Rune){
+func CopyBranchRune(mapOrigCopy map[any]any, runeFrom *Rune) (runeTo *Rune) {
 
 	// runeFrom has already been copied
 	if _runeTo, ok := mapOrigCopy[runeFrom]; ok {
@@ -906,7 +904,7 @@ func CopyBranchRune(mapOrigCopy map[any]any, runeFrom *Rune) (runeTo  *Rune){
 	return
 }
 
-func CopyBranchRuneProperties(mapOrigCopy map[any]any, runepropertiesFrom *RuneProperties) (runepropertiesTo  *RuneProperties){
+func CopyBranchRuneProperties(mapOrigCopy map[any]any, runepropertiesFrom *RuneProperties) (runepropertiesTo *RuneProperties) {
 
 	// runepropertiesFrom has already been copied
 	if _runepropertiesTo, ok := mapOrigCopy[runepropertiesFrom]; ok {
@@ -928,7 +926,7 @@ func CopyBranchRuneProperties(mapOrigCopy map[any]any, runepropertiesFrom *RuneP
 	return
 }
 
-func CopyBranchTable(mapOrigCopy map[any]any, tableFrom *Table) (tableTo  *Table){
+func CopyBranchTable(mapOrigCopy map[any]any, tableFrom *Table) (tableTo *Table) {
 
 	// tableFrom has already been copied
 	if _tableTo, ok := mapOrigCopy[tableFrom]; ok {
@@ -950,13 +948,13 @@ func CopyBranchTable(mapOrigCopy map[any]any, tableFrom *Table) (tableTo  *Table
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _tablerow := range tableFrom.TableRows {
-		tableTo.TableRows = append( tableTo.TableRows, CopyBranchTableRow(mapOrigCopy, _tablerow))
+		tableTo.TableRows = append(tableTo.TableRows, CopyBranchTableRow(mapOrigCopy, _tablerow))
 	}
 
 	return
 }
 
-func CopyBranchTableColumn(mapOrigCopy map[any]any, tablecolumnFrom *TableColumn) (tablecolumnTo  *TableColumn){
+func CopyBranchTableColumn(mapOrigCopy map[any]any, tablecolumnFrom *TableColumn) (tablecolumnTo *TableColumn) {
 
 	// tablecolumnFrom has already been copied
 	if _tablecolumnTo, ok := mapOrigCopy[tablecolumnFrom]; ok {
@@ -975,13 +973,13 @@ func CopyBranchTableColumn(mapOrigCopy map[any]any, tablecolumnFrom *TableColumn
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _paragraph := range tablecolumnFrom.Paragraphs {
-		tablecolumnTo.Paragraphs = append( tablecolumnTo.Paragraphs, CopyBranchParagraph(mapOrigCopy, _paragraph))
+		tablecolumnTo.Paragraphs = append(tablecolumnTo.Paragraphs, CopyBranchParagraph(mapOrigCopy, _paragraph))
 	}
 
 	return
 }
 
-func CopyBranchTableProperties(mapOrigCopy map[any]any, tablepropertiesFrom *TableProperties) (tablepropertiesTo  *TableProperties){
+func CopyBranchTableProperties(mapOrigCopy map[any]any, tablepropertiesFrom *TableProperties) (tablepropertiesTo *TableProperties) {
 
 	// tablepropertiesFrom has already been copied
 	if _tablepropertiesTo, ok := mapOrigCopy[tablepropertiesFrom]; ok {
@@ -1006,7 +1004,7 @@ func CopyBranchTableProperties(mapOrigCopy map[any]any, tablepropertiesFrom *Tab
 	return
 }
 
-func CopyBranchTableRow(mapOrigCopy map[any]any, tablerowFrom *TableRow) (tablerowTo  *TableRow){
+func CopyBranchTableRow(mapOrigCopy map[any]any, tablerowFrom *TableRow) (tablerowTo *TableRow) {
 
 	// tablerowFrom has already been copied
 	if _tablerowTo, ok := mapOrigCopy[tablerowFrom]; ok {
@@ -1025,13 +1023,13 @@ func CopyBranchTableRow(mapOrigCopy map[any]any, tablerowFrom *TableRow) (tabler
 
 	//insertion point for the staging of instances referenced by slice of pointers
 	for _, _tablecolumn := range tablerowFrom.TableColumns {
-		tablerowTo.TableColumns = append( tablerowTo.TableColumns, CopyBranchTableColumn(mapOrigCopy, _tablecolumn))
+		tablerowTo.TableColumns = append(tablerowTo.TableColumns, CopyBranchTableColumn(mapOrigCopy, _tablecolumn))
 	}
 
 	return
 }
 
-func CopyBranchTableStyle(mapOrigCopy map[any]any, tablestyleFrom *TableStyle) (tablestyleTo  *TableStyle){
+func CopyBranchTableStyle(mapOrigCopy map[any]any, tablestyleFrom *TableStyle) (tablestyleTo *TableStyle) {
 
 	// tablestyleFrom has already been copied
 	if _tablestyleTo, ok := mapOrigCopy[tablestyleFrom]; ok {
@@ -1053,7 +1051,7 @@ func CopyBranchTableStyle(mapOrigCopy map[any]any, tablestyleFrom *TableStyle) (
 	return
 }
 
-func CopyBranchText(mapOrigCopy map[any]any, textFrom *Text) (textTo  *Text){
+func CopyBranchText(mapOrigCopy map[any]any, textFrom *Text) (textTo *Text) {
 
 	// textFrom has already been copied
 	if _textTo, ok := mapOrigCopy[textFrom]; ok {
@@ -1077,7 +1075,6 @@ func CopyBranchText(mapOrigCopy map[any]any, textFrom *Text) (textTo  *Text){
 
 	return
 }
-
 
 // UnstageBranch stages instance and apply UnstageBranch on all gongstruct instances that are
 // referenced by pointers or slices of pointers of the insance
@@ -1144,7 +1141,7 @@ func UnstageBranch[Type Gongstruct](stage *StageStruct, instance *Type) {
 func (stage *StageStruct) UnstageBranchBody(body *Body) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, body) {
+	if !IsStaged(stage, body) {
 		return
 	}
 
@@ -1168,7 +1165,7 @@ func (stage *StageStruct) UnstageBranchBody(body *Body) {
 func (stage *StageStruct) UnstageBranchDocument(document *Document) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, document) {
+	if !IsStaged(stage, document) {
 		return
 	}
 
@@ -1192,7 +1189,7 @@ func (stage *StageStruct) UnstageBranchDocument(document *Document) {
 func (stage *StageStruct) UnstageBranchDocx(docx *Docx) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, docx) {
+	if !IsStaged(stage, docx) {
 		return
 	}
 
@@ -1213,7 +1210,7 @@ func (stage *StageStruct) UnstageBranchDocx(docx *Docx) {
 func (stage *StageStruct) UnstageBranchFile(file *File) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, file) {
+	if !IsStaged(stage, file) {
 		return
 	}
 
@@ -1228,7 +1225,7 @@ func (stage *StageStruct) UnstageBranchFile(file *File) {
 func (stage *StageStruct) UnstageBranchNode(node *Node) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, node) {
+	if !IsStaged(stage, node) {
 		return
 	}
 
@@ -1246,7 +1243,7 @@ func (stage *StageStruct) UnstageBranchNode(node *Node) {
 func (stage *StageStruct) UnstageBranchParagraph(paragraph *Paragraph) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, paragraph) {
+	if !IsStaged(stage, paragraph) {
 		return
 	}
 
@@ -1282,7 +1279,7 @@ func (stage *StageStruct) UnstageBranchParagraph(paragraph *Paragraph) {
 func (stage *StageStruct) UnstageBranchParagraphProperties(paragraphproperties *ParagraphProperties) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, paragraphproperties) {
+	if !IsStaged(stage, paragraphproperties) {
 		return
 	}
 
@@ -1303,7 +1300,7 @@ func (stage *StageStruct) UnstageBranchParagraphProperties(paragraphproperties *
 func (stage *StageStruct) UnstageBranchParagraphStyle(paragraphstyle *ParagraphStyle) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, paragraphstyle) {
+	if !IsStaged(stage, paragraphstyle) {
 		return
 	}
 
@@ -1321,7 +1318,7 @@ func (stage *StageStruct) UnstageBranchParagraphStyle(paragraphstyle *ParagraphS
 func (stage *StageStruct) UnstageBranchRune(rune *Rune) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, rune) {
+	if !IsStaged(stage, rune) {
 		return
 	}
 
@@ -1348,7 +1345,7 @@ func (stage *StageStruct) UnstageBranchRune(rune *Rune) {
 func (stage *StageStruct) UnstageBranchRuneProperties(runeproperties *RuneProperties) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, runeproperties) {
+	if !IsStaged(stage, runeproperties) {
 		return
 	}
 
@@ -1366,7 +1363,7 @@ func (stage *StageStruct) UnstageBranchRuneProperties(runeproperties *RuneProper
 func (stage *StageStruct) UnstageBranchTable(table *Table) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, table) {
+	if !IsStaged(stage, table) {
 		return
 	}
 
@@ -1390,7 +1387,7 @@ func (stage *StageStruct) UnstageBranchTable(table *Table) {
 func (stage *StageStruct) UnstageBranchTableColumn(tablecolumn *TableColumn) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, tablecolumn) {
+	if !IsStaged(stage, tablecolumn) {
 		return
 	}
 
@@ -1411,7 +1408,7 @@ func (stage *StageStruct) UnstageBranchTableColumn(tablecolumn *TableColumn) {
 func (stage *StageStruct) UnstageBranchTableProperties(tableproperties *TableProperties) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, tableproperties) {
+	if !IsStaged(stage, tableproperties) {
 		return
 	}
 
@@ -1432,7 +1429,7 @@ func (stage *StageStruct) UnstageBranchTableProperties(tableproperties *TablePro
 func (stage *StageStruct) UnstageBranchTableRow(tablerow *TableRow) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, tablerow) {
+	if !IsStaged(stage, tablerow) {
 		return
 	}
 
@@ -1453,7 +1450,7 @@ func (stage *StageStruct) UnstageBranchTableRow(tablerow *TableRow) {
 func (stage *StageStruct) UnstageBranchTableStyle(tablestyle *TableStyle) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, tablestyle) {
+	if !IsStaged(stage, tablestyle) {
 		return
 	}
 
@@ -1471,7 +1468,7 @@ func (stage *StageStruct) UnstageBranchTableStyle(tablestyle *TableStyle) {
 func (stage *StageStruct) UnstageBranchText(text *Text) {
 
 	// check if instance is already staged
-	if ! IsStaged(stage, text) {
+	if !IsStaged(stage, text) {
 		return
 	}
 
@@ -1488,4 +1485,3 @@ func (stage *StageStruct) UnstageBranchText(text *Text) {
 	//insertion point for the staging of instances referenced by slice of pointers
 
 }
-

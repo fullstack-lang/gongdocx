@@ -120,7 +120,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(animateOrdered[:], func(i, j int) bool {
 		return animateOrdered[i].Name < animateOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Animate"
+	if len(animateOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, animate := range animateOrdered {
 
 		id = generatesIdentifier("Animate", idx, animate.Name)
@@ -132,7 +134,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", animate.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Animate values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -176,7 +178,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(circleOrdered[:], func(i, j int) bool {
 		return circleOrdered[i].Name < circleOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Circle"
+	if len(circleOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, circle := range circleOrdered {
 
 		id = generatesIdentifier("Circle", idx, circle.Name)
@@ -188,7 +192,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", circle.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Circle values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -234,6 +238,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", circle.StrokeOpacity))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeWidth")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", circle.StrokeWidth))
 		initializerStatements += setValueField
@@ -268,7 +278,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(ellipseOrdered[:], func(i, j int) bool {
 		return ellipseOrdered[i].Name < ellipseOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Ellipse"
+	if len(ellipseOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, ellipse := range ellipseOrdered {
 
 		id = generatesIdentifier("Ellipse", idx, ellipse.Name)
@@ -280,7 +292,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", ellipse.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Ellipse values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -332,6 +344,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", ellipse.StrokeOpacity))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeWidth")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", ellipse.StrokeWidth))
 		initializerStatements += setValueField
@@ -366,7 +384,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(layerOrdered[:], func(i, j int) bool {
 		return layerOrdered[i].Name < layerOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Layer"
+	if len(layerOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, layer := range layerOrdered {
 
 		id = generatesIdentifier("Layer", idx, layer.Name)
@@ -378,7 +398,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", layer.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Layer values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -404,7 +424,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(lineOrdered[:], func(i, j int) bool {
 		return lineOrdered[i].Name < lineOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Line"
+	if len(lineOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, line := range lineOrdered {
 
 		id = generatesIdentifier("Line", idx, line.Name)
@@ -416,7 +438,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", line.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Line values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -468,6 +490,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", line.StrokeOpacity))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeWidth")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", line.StrokeWidth))
 		initializerStatements += setValueField
@@ -514,7 +542,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(linkOrdered[:], func(i, j int) bool {
 		return linkOrdered[i].Name < linkOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Link"
+	if len(linkOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, link := range linkOrdered {
 
 		id = generatesIdentifier("Link", idx, link.Name)
@@ -526,7 +556,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", link.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Link values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -648,6 +678,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", link.StrokeOpacity))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeWidth")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", link.StrokeWidth))
 		initializerStatements += setValueField
@@ -682,7 +718,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(linkanchoredtextOrdered[:], func(i, j int) bool {
 		return linkanchoredtextOrdered[i].Name < linkanchoredtextOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of LinkAnchoredText"
+	if len(linkanchoredtextOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, linkanchoredtext := range linkanchoredtextOrdered {
 
 		id = generatesIdentifier("LinkAnchoredText", idx, linkanchoredtext.Name)
@@ -694,7 +732,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", linkanchoredtext.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// LinkAnchoredText values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -742,6 +780,18 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "FontSize")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(linkanchoredtext.FontSize))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "LetterSpacing")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(linkanchoredtext.LetterSpacing))
+		initializerStatements += setValueField
+
+		setValueField = StringInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Color")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(linkanchoredtext.Color))
 		initializerStatements += setValueField
@@ -756,6 +806,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Stroke")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(linkanchoredtext.Stroke))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", linkanchoredtext.StrokeOpacity))
 		initializerStatements += setValueField
 
 		setValueField = NumberInitStatement
@@ -794,7 +850,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(pathOrdered[:], func(i, j int) bool {
 		return pathOrdered[i].Name < pathOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Path"
+	if len(pathOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, path := range pathOrdered {
 
 		id = generatesIdentifier("Path", idx, path.Name)
@@ -806,7 +864,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", path.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Path values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -836,6 +894,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Stroke")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(path.Stroke))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", path.StrokeOpacity))
 		initializerStatements += setValueField
 
 		setValueField = NumberInitStatement
@@ -874,7 +938,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(pointOrdered[:], func(i, j int) bool {
 		return pointOrdered[i].Name < pointOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Point"
+	if len(pointOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, point := range pointOrdered {
 
 		id = generatesIdentifier("Point", idx, point.Name)
@@ -886,7 +952,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", point.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Point values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -918,7 +984,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(polygoneOrdered[:], func(i, j int) bool {
 		return polygoneOrdered[i].Name < polygoneOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Polygone"
+	if len(polygoneOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, polygone := range polygoneOrdered {
 
 		id = generatesIdentifier("Polygone", idx, polygone.Name)
@@ -930,7 +998,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", polygone.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Polygone values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -960,6 +1028,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Stroke")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(polygone.Stroke))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", polygone.StrokeOpacity))
 		initializerStatements += setValueField
 
 		setValueField = NumberInitStatement
@@ -998,7 +1072,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(polylineOrdered[:], func(i, j int) bool {
 		return polylineOrdered[i].Name < polylineOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Polyline"
+	if len(polylineOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, polyline := range polylineOrdered {
 
 		id = generatesIdentifier("Polyline", idx, polyline.Name)
@@ -1010,7 +1086,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", polyline.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Polyline values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1040,6 +1116,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Stroke")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(polyline.Stroke))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", polyline.StrokeOpacity))
 		initializerStatements += setValueField
 
 		setValueField = NumberInitStatement
@@ -1078,7 +1160,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(rectOrdered[:], func(i, j int) bool {
 		return rectOrdered[i].Name < rectOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Rect"
+	if len(rectOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, rect := range rectOrdered {
 
 		id = generatesIdentifier("Rect", idx, rect.Name)
@@ -1090,7 +1174,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", rect.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Rect values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1144,6 +1228,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Stroke")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(rect.Stroke))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rect.StrokeOpacity))
 		initializerStatements += setValueField
 
 		setValueField = NumberInitStatement
@@ -1260,7 +1350,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(rectanchoredpathOrdered[:], func(i, j int) bool {
 		return rectanchoredpathOrdered[i].Name < rectanchoredpathOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of RectAnchoredPath"
+	if len(rectanchoredpathOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, rectanchoredpath := range rectanchoredpathOrdered {
 
 		id = generatesIdentifier("RectAnchoredPath", idx, rectanchoredpath.Name)
@@ -1272,7 +1364,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", rectanchoredpath.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// RectAnchoredPath values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1338,6 +1430,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rectanchoredpath.StrokeOpacity))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeWidth")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rectanchoredpath.StrokeWidth))
 		initializerStatements += setValueField
@@ -1372,7 +1470,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(rectanchoredrectOrdered[:], func(i, j int) bool {
 		return rectanchoredrectOrdered[i].Name < rectanchoredrectOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of RectAnchoredRect"
+	if len(rectanchoredrectOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, rectanchoredrect := range rectanchoredrectOrdered {
 
 		id = generatesIdentifier("RectAnchoredRect", idx, rectanchoredrect.Name)
@@ -1384,7 +1484,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", rectanchoredrect.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// RectAnchoredRect values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1474,6 +1574,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rectanchoredrect.StrokeOpacity))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeWidth")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rectanchoredrect.StrokeWidth))
 		initializerStatements += setValueField
@@ -1508,7 +1614,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(rectanchoredtextOrdered[:], func(i, j int) bool {
 		return rectanchoredtextOrdered[i].Name < rectanchoredtextOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of RectAnchoredText"
+	if len(rectanchoredtextOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, rectanchoredtext := range rectanchoredtextOrdered {
 
 		id = generatesIdentifier("RectAnchoredText", idx, rectanchoredtext.Name)
@@ -1520,7 +1628,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", rectanchoredtext.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// RectAnchoredText values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1594,6 +1702,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 
 		setValueField = NumberInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rectanchoredtext.StrokeOpacity))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeWidth")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rectanchoredtext.StrokeWidth))
 		initializerStatements += setValueField
@@ -1628,7 +1742,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(rectlinklinkOrdered[:], func(i, j int) bool {
 		return rectlinklinkOrdered[i].Name < rectlinklinkOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of RectLinkLink"
+	if len(rectlinklinkOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, rectlinklink := range rectlinklinkOrdered {
 
 		id = generatesIdentifier("RectLinkLink", idx, rectlinklink.Name)
@@ -1640,7 +1756,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", rectlinklink.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// RectLinkLink values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1670,6 +1786,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Stroke")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(rectlinklink.Stroke))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", rectlinklink.StrokeOpacity))
 		initializerStatements += setValueField
 
 		setValueField = NumberInitStatement
@@ -1708,7 +1830,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(svgOrdered[:], func(i, j int) bool {
 		return svgOrdered[i].Name < svgOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of SVG"
+	if len(svgOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, svg := range svgOrdered {
 
 		id = generatesIdentifier("SVG", idx, svg.Name)
@@ -1720,7 +1844,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", svg.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// SVG values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1754,7 +1878,9 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 	sort.Slice(textOrdered[:], func(i, j int) bool {
 		return textOrdered[i].Name < textOrdered[j].Name
 	})
-	identifiersDecl += "\n\n	// Declarations of staged instances of Text"
+	if len(textOrdered) > 0 {
+		identifiersDecl += "\n"
+	}
 	for idx, text := range textOrdered {
 
 		id = generatesIdentifier("Text", idx, text.Name)
@@ -1766,7 +1892,7 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		decl = strings.ReplaceAll(decl, "{{GeneratedFieldNameValue}}", text.Name)
 		identifiersDecl += decl
 
-		initializerStatements += "\n\n	// Text values setup"
+		initializerStatements += "\n"
 		// Initialisation of values
 		setValueField = StringInitStatement
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
@@ -1808,6 +1934,12 @@ func (stage *StageStruct) Marshall(file *os.File, modelsPackageName, packageName
 		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "Stroke")
 		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", string(text.Stroke))
+		initializerStatements += setValueField
+
+		setValueField = NumberInitStatement
+		setValueField = strings.ReplaceAll(setValueField, "{{Identifier}}", id)
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldName}}", "StrokeOpacity")
+		setValueField = strings.ReplaceAll(setValueField, "{{GeneratedFieldNameValue}}", fmt.Sprintf("%f", text.StrokeOpacity))
 		initializerStatements += setValueField
 
 		setValueField = NumberInitStatement

@@ -42,14 +42,14 @@
 		{
 			"label": "03 - ng build",
 			"type": "shell",
-			"command": "cd ng; ng build",
+			"command": "cd ng-github.com-fullstack-lang-gongdocx; ng build",
 			"group": "build",
 			"problemMatcher": []
 		},
 		{
 			"label": "04 - ng serve",
 			"type": "shell",
-			"command": "cd ng; ng serve",
+			"command": "cd ng-github.com-fullstack-lang-gongdocx; ng serve",
 			"group": "build",
 			"problemMatcher": []
 		},
