@@ -55,10 +55,10 @@ func (controller *Controller) GetParagraphStyles(c *gin.Context) {
 	// source slice
 	var paragraphstyleDBs []orm.ParagraphStyleDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetParagraphStyles", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostParagraphStyle(c *gin.Context) {
 	mutexParagraphStyle.Lock()
 	defer mutexParagraphStyle.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostParagraphStyles", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostParagraphStyle(c *gin.Context) {
 //	200: paragraphstyleDBResponse
 func (controller *Controller) GetParagraphStyle(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetParagraphStyle", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 	mutexParagraphStyle.Lock()
 	defer mutexParagraphStyle.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateParagraphStyle", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteParagraphStyle(c *gin.Context) {
 	mutexParagraphStyle.Lock()
 	defer mutexParagraphStyle.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteParagraphStyle", "GONG__StackPath", stackPath)

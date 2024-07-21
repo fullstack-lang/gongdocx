@@ -55,10 +55,10 @@ func (controller *Controller) GetTablePropertiess(c *gin.Context) {
 	// source slice
 	var tablepropertiesDBs []orm.TablePropertiesDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTablePropertiess", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostTableProperties(c *gin.Context) {
 	mutexTableProperties.Lock()
 	defer mutexTableProperties.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostTablePropertiess", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostTableProperties(c *gin.Context) {
 //	200: tablepropertiesDBResponse
 func (controller *Controller) GetTableProperties(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTableProperties", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 	mutexTableProperties.Lock()
 	defer mutexTableProperties.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateTableProperties", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteTableProperties(c *gin.Context) {
 	mutexTableProperties.Lock()
 	defer mutexTableProperties.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteTableProperties", "GONG__StackPath", stackPath)

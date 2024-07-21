@@ -55,10 +55,10 @@ func (controller *Controller) GetFiles(c *gin.Context) {
 	// source slice
 	var fileDBs []orm.FileDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetFiles", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostFile(c *gin.Context) {
 	mutexFile.Lock()
 	defer mutexFile.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostFiles", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostFile(c *gin.Context) {
 //	200: fileDBResponse
 func (controller *Controller) GetFile(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetFile", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 	mutexFile.Lock()
 	defer mutexFile.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateFile", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteFile(c *gin.Context) {
 	mutexFile.Lock()
 	defer mutexFile.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteFile", "GONG__StackPath", stackPath)

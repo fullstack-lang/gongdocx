@@ -55,10 +55,10 @@ func (controller *Controller) GetTableRows(c *gin.Context) {
 	// source slice
 	var tablerowDBs []orm.TableRowDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTableRows", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostTableRow(c *gin.Context) {
 	mutexTableRow.Lock()
 	defer mutexTableRow.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostTableRows", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostTableRow(c *gin.Context) {
 //	200: tablerowDBResponse
 func (controller *Controller) GetTableRow(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTableRow", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateTableRow(c *gin.Context) {
 	mutexTableRow.Lock()
 	defer mutexTableRow.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateTableRow", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteTableRow(c *gin.Context) {
 	mutexTableRow.Lock()
 	defer mutexTableRow.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteTableRow", "GONG__StackPath", stackPath)

@@ -55,10 +55,10 @@ func (controller *Controller) GetTableColumns(c *gin.Context) {
 	// source slice
 	var tablecolumnDBs []orm.TableColumnDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTableColumns", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostTableColumn(c *gin.Context) {
 	mutexTableColumn.Lock()
 	defer mutexTableColumn.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostTableColumns", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostTableColumn(c *gin.Context) {
 //	200: tablecolumnDBResponse
 func (controller *Controller) GetTableColumn(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTableColumn", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateTableColumn(c *gin.Context) {
 	mutexTableColumn.Lock()
 	defer mutexTableColumn.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateTableColumn", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteTableColumn(c *gin.Context) {
 	mutexTableColumn.Lock()
 	defer mutexTableColumn.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteTableColumn", "GONG__StackPath", stackPath)

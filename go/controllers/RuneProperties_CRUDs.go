@@ -55,10 +55,10 @@ func (controller *Controller) GetRunePropertiess(c *gin.Context) {
 	// source slice
 	var runepropertiesDBs []orm.RunePropertiesDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetRunePropertiess", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostRuneProperties(c *gin.Context) {
 	mutexRuneProperties.Lock()
 	defer mutexRuneProperties.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostRunePropertiess", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostRuneProperties(c *gin.Context) {
 //	200: runepropertiesDBResponse
 func (controller *Controller) GetRuneProperties(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetRuneProperties", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 	mutexRuneProperties.Lock()
 	defer mutexRuneProperties.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateRuneProperties", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteRuneProperties(c *gin.Context) {
 	mutexRuneProperties.Lock()
 	defer mutexRuneProperties.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteRuneProperties", "GONG__StackPath", stackPath)

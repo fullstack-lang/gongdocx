@@ -55,10 +55,10 @@ func (controller *Controller) GetTableStyles(c *gin.Context) {
 	// source slice
 	var tablestyleDBs []orm.TableStyleDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTableStyles", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostTableStyle(c *gin.Context) {
 	mutexTableStyle.Lock()
 	defer mutexTableStyle.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostTableStyles", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostTableStyle(c *gin.Context) {
 //	200: tablestyleDBResponse
 func (controller *Controller) GetTableStyle(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetTableStyle", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 	mutexTableStyle.Lock()
 	defer mutexTableStyle.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateTableStyle", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteTableStyle(c *gin.Context) {
 	mutexTableStyle.Lock()
 	defer mutexTableStyle.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteTableStyle", "GONG__StackPath", stackPath)

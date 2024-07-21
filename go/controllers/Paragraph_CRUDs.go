@@ -55,10 +55,10 @@ func (controller *Controller) GetParagraphs(c *gin.Context) {
 	// source slice
 	var paragraphDBs []orm.ParagraphDB
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetParagraphs", "GONG__StackPath", stackPath)
@@ -118,10 +118,10 @@ func (controller *Controller) PostParagraph(c *gin.Context) {
 	mutexParagraph.Lock()
 	defer mutexParagraph.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("PostParagraphs", "GONG__StackPath", stackPath)
@@ -188,10 +188,10 @@ func (controller *Controller) PostParagraph(c *gin.Context) {
 //	200: paragraphDBResponse
 func (controller *Controller) GetParagraph(c *gin.Context) {
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("GetParagraph", "GONG__StackPath", stackPath)
@@ -237,10 +237,10 @@ func (controller *Controller) UpdateParagraph(c *gin.Context) {
 	mutexParagraph.Lock()
 	defer mutexParagraph.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("UpdateParagraph", "GONG__StackPath", stackPath)
@@ -326,10 +326,10 @@ func (controller *Controller) DeleteParagraph(c *gin.Context) {
 	mutexParagraph.Lock()
 	defer mutexParagraph.Unlock()
 
-	values := c.Request.URL.Query()
+	_values := c.Request.URL.Query()
 	stackPath := ""
-	if len(values) == 1 {
-		value := values["GONG__StackPath"]
+	if len(_values) == 1 {
+		value := _values["GONG__StackPath"]
 		if len(value) == 1 {
 			stackPath = value[0]
 			// log.Println("DeleteParagraph", "GONG__StackPath", stackPath)
