@@ -5,10 +5,10 @@ go 1.21.0
 toolchain go1.21.1
 
 require (
-	github.com/fullstack-lang/gong v0.0.0-20240721214902-6db4653245d1
-	github.com/fullstack-lang/gongdoc v0.0.0-20240721215055-b071e8352e72
-	github.com/fullstack-lang/gongtable v0.0.0-20240714151129-84eee5cce152
-	github.com/fullstack-lang/gongtree v0.0.0-20240714150713-cdffb17883a5
+	github.com/fullstack-lang/gong v0.0.0-20240721220853-133b5b105d6b
+	github.com/fullstack-lang/gongdoc v0.0.0-20240721220905-1403f2b2d3cf
+	github.com/fullstack-lang/gongtable v0.0.0-20240721220959-8e8aff7b9336
+	github.com/fullstack-lang/gongtree v0.0.0-20240721221005-131c437db96a
 	github.com/fullstack-lang/maticons v0.0.0-20230823061653-70c364fbdd00
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-contrib/static v1.1.2
@@ -29,7 +29,7 @@ require (
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/frankban/quicktest v1.14.6 // indirect
-	github.com/fullstack-lang/gongsvg v0.0.0-20240624050825-79bef4e50896 // indirect
+	github.com/fullstack-lang/gongsvg v0.0.0-20240721220953-1ca9256b5f7f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
@@ -76,5 +76,5 @@ require (
 	modernc.org/libc v1.55.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
-	modernc.org/sqlite v1.30.2 // indirect
+	modernc.org/sqlite v1.31.1 // indirect
 )
