@@ -54,6 +54,7 @@ type StageStruct struct {
 
 	// insertion point for slice of pointers maps
 	Body_Paragraphs_reverseMap map[*Paragraph]*Body
+
 	Body_Tables_reverseMap map[*Table]*Body
 
 	OnAfterBodyCreateCallback OnAfterCreateInterface[Body]
@@ -65,7 +66,6 @@ type StageStruct struct {
 	Documents_mapString map[string]*Document
 
 	// insertion point for slice of pointers maps
-
 	OnAfterDocumentCreateCallback OnAfterCreateInterface[Document]
 	OnAfterDocumentUpdateCallback OnAfterUpdateInterface[Document]
 	OnAfterDocumentDeleteCallback OnAfterDeleteInterface[Document]
@@ -86,7 +86,6 @@ type StageStruct struct {
 	Files_mapString map[string]*File
 
 	// insertion point for slice of pointers maps
-
 	OnAfterFileCreateCallback OnAfterCreateInterface[File]
 	OnAfterFileUpdateCallback OnAfterUpdateInterface[File]
 	OnAfterFileDeleteCallback OnAfterDeleteInterface[File]
@@ -118,7 +117,6 @@ type StageStruct struct {
 	ParagraphPropertiess_mapString map[string]*ParagraphProperties
 
 	// insertion point for slice of pointers maps
-
 	OnAfterParagraphPropertiesCreateCallback OnAfterCreateInterface[ParagraphProperties]
 	OnAfterParagraphPropertiesUpdateCallback OnAfterUpdateInterface[ParagraphProperties]
 	OnAfterParagraphPropertiesDeleteCallback OnAfterDeleteInterface[ParagraphProperties]
@@ -128,7 +126,6 @@ type StageStruct struct {
 	ParagraphStyles_mapString map[string]*ParagraphStyle
 
 	// insertion point for slice of pointers maps
-
 	OnAfterParagraphStyleCreateCallback OnAfterCreateInterface[ParagraphStyle]
 	OnAfterParagraphStyleUpdateCallback OnAfterUpdateInterface[ParagraphStyle]
 	OnAfterParagraphStyleDeleteCallback OnAfterDeleteInterface[ParagraphStyle]
@@ -138,7 +135,6 @@ type StageStruct struct {
 	Runes_mapString map[string]*Rune
 
 	// insertion point for slice of pointers maps
-
 	OnAfterRuneCreateCallback OnAfterCreateInterface[Rune]
 	OnAfterRuneUpdateCallback OnAfterUpdateInterface[Rune]
 	OnAfterRuneDeleteCallback OnAfterDeleteInterface[Rune]
@@ -148,7 +144,6 @@ type StageStruct struct {
 	RunePropertiess_mapString map[string]*RuneProperties
 
 	// insertion point for slice of pointers maps
-
 	OnAfterRunePropertiesCreateCallback OnAfterCreateInterface[RuneProperties]
 	OnAfterRunePropertiesUpdateCallback OnAfterUpdateInterface[RuneProperties]
 	OnAfterRunePropertiesDeleteCallback OnAfterDeleteInterface[RuneProperties]
@@ -180,7 +175,6 @@ type StageStruct struct {
 	TablePropertiess_mapString map[string]*TableProperties
 
 	// insertion point for slice of pointers maps
-
 	OnAfterTablePropertiesCreateCallback OnAfterCreateInterface[TableProperties]
 	OnAfterTablePropertiesUpdateCallback OnAfterUpdateInterface[TableProperties]
 	OnAfterTablePropertiesDeleteCallback OnAfterDeleteInterface[TableProperties]
@@ -201,7 +195,6 @@ type StageStruct struct {
 	TableStyles_mapString map[string]*TableStyle
 
 	// insertion point for slice of pointers maps
-
 	OnAfterTableStyleCreateCallback OnAfterCreateInterface[TableStyle]
 	OnAfterTableStyleUpdateCallback OnAfterUpdateInterface[TableStyle]
 	OnAfterTableStyleDeleteCallback OnAfterDeleteInterface[TableStyle]
@@ -211,7 +204,6 @@ type StageStruct struct {
 	Texts_mapString map[string]*Text
 
 	// insertion point for slice of pointers maps
-
 	OnAfterTextCreateCallback OnAfterCreateInterface[Text]
 	OnAfterTextUpdateCallback OnAfterUpdateInterface[Text]
 	OnAfterTextDeleteCallback OnAfterDeleteInterface[Text]
@@ -1492,8 +1484,7 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - navigation between staged instances by going backward association links between gongstruct
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
-	// insertion point for generic types
-	Body | Document | Docx | File | Node | Paragraph | ParagraphProperties | ParagraphStyle | Rune | RuneProperties | Table | TableColumn | TableProperties | TableRow | TableStyle | Text
+
 }
 
 type GongtructBasicField interface {
@@ -1505,11 +1496,10 @@ type GongtructBasicField interface {
 // - navigation between staged instances by going backward association links between gongstruct
 // - full refactoring of Gongstruct identifiers / fields
 type PointerToGongstruct interface {
-	// insertion point for generic types
-	*Body | *Document | *Docx | *File | *Node | *Paragraph | *ParagraphProperties | *ParagraphStyle | *Rune | *RuneProperties | *Table | *TableColumn | *TableProperties | *TableRow | *TableStyle | *Text
 	GetName() string
 	CommitVoid(*StageStruct)
 	UnstageVoid(stage *StageStruct)
+	comparable
 }
 
 func CompareGongstructByName[T PointerToGongstruct](a, b T) int {
@@ -1533,47 +1523,11 @@ func GetGongstrucsSorted[T PointerToGongstruct](stage *StageStruct) (sortedSlice
 }
 
 type GongstructSet interface {
-	map[any]any |
-		// insertion point for generic types
-		map[*Body]any |
-		map[*Document]any |
-		map[*Docx]any |
-		map[*File]any |
-		map[*Node]any |
-		map[*Paragraph]any |
-		map[*ParagraphProperties]any |
-		map[*ParagraphStyle]any |
-		map[*Rune]any |
-		map[*RuneProperties]any |
-		map[*Table]any |
-		map[*TableColumn]any |
-		map[*TableProperties]any |
-		map[*TableRow]any |
-		map[*TableStyle]any |
-		map[*Text]any |
-		map[*any]any // because go does not support an extra "|" at the end of type specifications
+	map[any]any
 }
 
 type GongstructMapString interface {
-	map[any]any |
-		// insertion point for generic types
-		map[string]*Body |
-		map[string]*Document |
-		map[string]*Docx |
-		map[string]*File |
-		map[string]*Node |
-		map[string]*Paragraph |
-		map[string]*ParagraphProperties |
-		map[string]*ParagraphStyle |
-		map[string]*Rune |
-		map[string]*RuneProperties |
-		map[string]*Table |
-		map[string]*TableColumn |
-		map[string]*TableProperties |
-		map[string]*TableRow |
-		map[string]*TableStyle |
-		map[string]*Text |
-		map[*any]any // because go does not support an extra "|" at the end of type specifications
+	map[any]any
 }
 
 // GongGetSet returns the set staged GongstructType instances

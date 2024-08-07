@@ -6,9 +6,6 @@ import (
 )
 
 type GongstructDB interface {
-	// insertion point for generic types
-	// "int" is present to handle the case when no struct is present
-	int | BodyDB | DocumentDB | DocxDB | FileDB | NodeDB | ParagraphDB | ParagraphPropertiesDB | ParagraphStyleDB | RuneDB | RunePropertiesDB | TableDB | TableColumnDB | TablePropertiesDB | TableRowDB | TableStyleDB | TextDB
 }
 
 func GetInstanceDBFromInstance[T models.Gongstruct, T2 GongstructDB](

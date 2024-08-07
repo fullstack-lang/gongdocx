@@ -5,13 +5,12 @@ package models
 // end of insertion point for enum utility functions
 
 type GongstructEnumStringField interface {
-	string
 	Codes() []string
 	CodeValues() []string
+	ToString() string
 }
 
 type PointerToGongstructEnumStringField interface {
-	
 	FromCodeString(input string) (err error)
 }
 
