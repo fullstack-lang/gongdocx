@@ -1,6 +1,6 @@
 module github.com/fullstack-lang/gongdocx
 
-go 1.21.0
+go 1.23.1
 
 toolchain go1.21.1
 
