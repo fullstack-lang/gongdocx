@@ -3,6 +3,7 @@ package models
 import (
 	"go/ast"
 	"go/types"
+	"log"
 	"strings"
 )
 
@@ -85,12 +86,17 @@ func GenerateFieldParser(
 			switch embedType := field.Type.(type) {
 			case *ast.Ident:
 				// log.Println("processing embedded struct ", embedType.Name)
-				GenerateFieldParser((*map_Structname_fieldList)[embedType.Name],
-					owningGongstruct,
-					map_Structname_fieldList,
-					modelPkg,
-					embedType.Name,
-					"")
+				if _fieldList, ok := (*map_Structname_fieldList)[embedType.Name]; ok {
+					GenerateFieldParser(_fieldList,
+						owningGongstruct,
+						map_Structname_fieldList,
+						modelPkg,
+						embedType.Name,
+						"")
+				} else {
+					log.Fatalln("Unknown embedded type", embedType.Name)
+				}
+
 			default:
 			}
 			continue
