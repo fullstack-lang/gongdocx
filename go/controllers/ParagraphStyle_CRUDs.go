@@ -70,12 +70,12 @@ func (controller *Controller) GetParagraphStyles(c *gin.Context) {
 	}
 	db := backRepo.BackRepoParagraphStyle.GetDB()
 
-	query := db.Find(&paragraphstyleDBs)
-	if query.Error != nil {
+	_, err := db.Find(&paragraphstyleDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostParagraphStyle(c *gin.Context) {
 	paragraphstyleDB.ParagraphStylePointersEncoding = input.ParagraphStylePointersEncoding
 	paragraphstyleDB.CopyBasicFieldsFromParagraphStyle_WOP(&input.ParagraphStyle_WOP)
 
-	query := db.Create(&paragraphstyleDB)
-	if query.Error != nil {
+	_, err = db.Create(&paragraphstyleDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetParagraphStyle(c *gin.Context) {
 
 	// Get paragraphstyleDB in DB
 	var paragraphstyleDB orm.ParagraphStyleDB
-	if err := db.First(&paragraphstyleDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&paragraphstyleDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 	var paragraphstyleDB orm.ParagraphStyleDB
 
 	// fetch the paragraphstyle
-	query := db.First(&paragraphstyleDB, c.Param("id"))
+	_, err := db.First(&paragraphstyleDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 	paragraphstyleDB.CopyBasicFieldsFromParagraphStyle_WOP(&input.ParagraphStyle_WOP)
 	paragraphstyleDB.ParagraphStylePointersEncoding = input.ParagraphStylePointersEncoding
 
-	query = db.Model(&paragraphstyleDB).Updates(paragraphstyleDB)
-	if query.Error != nil {
+	db, _ = db.Model(&paragraphstyleDB)
+	_, err = db.Updates(paragraphstyleDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteParagraphStyle(c *gin.Context) {
 
 	// Get model if exist
 	var paragraphstyleDB orm.ParagraphStyleDB
-	if err := db.First(&paragraphstyleDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&paragraphstyleDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteParagraphStyle(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&paragraphstyleDB)
+	db.Unscoped()
+	db.Delete(&paragraphstyleDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	paragraphstyleDeleted := new(models.ParagraphStyle)

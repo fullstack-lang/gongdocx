@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -64,7 +65,7 @@ type NodeDB struct {
 
 	// Declation for basic field nodeDB.Name
 	Name_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	NodePointersEncoding
@@ -107,7 +108,7 @@ type BackRepoNodeStruct struct {
 	// stores Node according to their gorm ID
 	Map_NodeDBID_NodePtr map[uint]*models.Node
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -117,7 +118,7 @@ func (backRepoNode *BackRepoNodeStruct) GetStage() (stage *models.StageStruct) {
 	return
 }
 
-func (backRepoNode *BackRepoNodeStruct) GetDB() *gorm.DB {
+func (backRepoNode *BackRepoNodeStruct) GetDB() db.DBInterface {
 	return backRepoNode.db
 }
 
@@ -154,9 +155,10 @@ func (backRepoNode *BackRepoNodeStruct) CommitDeleteInstance(id uint) (Error err
 
 	// node is not staged anymore, remove nodeDB
 	nodeDB := backRepoNode.Map_NodeDBID_NodeDB[id]
-	query := backRepoNode.db.Unscoped().Delete(&nodeDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoNode.db.Unscoped()
+	_, err := db.Delete(&nodeDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -180,9 +182,9 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseOneInstance(node *models.Node
 	var nodeDB NodeDB
 	nodeDB.CopyBasicFieldsFromNode(node)
 
-	query := backRepoNode.db.Create(&nodeDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoNode.db.Create(&nodeDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -232,9 +234,9 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				append(nodeDB.NodePointersEncoding.Nodes, int(nodeAssocEnd_DB.ID))
 		}
 
-		query := backRepoNode.db.Save(&nodeDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoNode.db.Save(&nodeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -253,9 +255,9 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseTwoInstance(backRepo *BackRep
 func (backRepoNode *BackRepoNodeStruct) CheckoutPhaseOne() (Error error) {
 
 	nodeDBArray := make([]NodeDB, 0)
-	query := backRepoNode.db.Find(&nodeDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoNode.db.Find(&nodeDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -375,7 +377,7 @@ func (backRepo *BackRepoStruct) CheckoutNode(node *models.Node) {
 			var nodeDB NodeDB
 			nodeDB.ID = id
 
-			if err := backRepo.BackRepoNode.db.First(&nodeDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoNode.db.First(&nodeDB, id); err != nil {
 				log.Fatalln("CheckoutNode : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoNode.CheckoutPhaseOneInstance(&nodeDB)
@@ -522,9 +524,9 @@ func (backRepoNode *BackRepoNodeStruct) rowVisitorNode(row *xlsx.Row) error {
 
 		nodeDB_ID_atBackupTime := nodeDB.ID
 		nodeDB.ID = 0
-		query := backRepoNode.db.Create(nodeDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoNode.db.Create(nodeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoNode.Map_NodeDBID_NodeDB[nodeDB.ID] = nodeDB
 		BackRepoNodeid_atBckpTime_newID[nodeDB_ID_atBackupTime] = nodeDB.ID
@@ -559,9 +561,9 @@ func (backRepoNode *BackRepoNodeStruct) RestorePhaseOne(dirPath string) {
 
 		nodeDB_ID_atBackupTime := nodeDB.ID
 		nodeDB.ID = 0
-		query := backRepoNode.db.Create(nodeDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoNode.db.Create(nodeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoNode.Map_NodeDBID_NodeDB[nodeDB.ID] = nodeDB
 		BackRepoNodeid_atBckpTime_newID[nodeDB_ID_atBackupTime] = nodeDB.ID
@@ -583,9 +585,10 @@ func (backRepoNode *BackRepoNodeStruct) RestorePhaseTwo() {
 
 		// insertion point for reindexing pointers encoding
 		// update databse with new index encoding
-		query := backRepoNode.db.Model(nodeDB).Updates(*nodeDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoNode.db.Model(nodeDB)
+		_, err := db.Updates(*nodeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

@@ -70,12 +70,12 @@ func (controller *Controller) GetFiles(c *gin.Context) {
 	}
 	db := backRepo.BackRepoFile.GetDB()
 
-	query := db.Find(&fileDBs)
-	if query.Error != nil {
+	_, err := db.Find(&fileDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostFile(c *gin.Context) {
 	fileDB.FilePointersEncoding = input.FilePointersEncoding
 	fileDB.CopyBasicFieldsFromFile_WOP(&input.File_WOP)
 
-	query := db.Create(&fileDB)
-	if query.Error != nil {
+	_, err = db.Create(&fileDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetFile(c *gin.Context) {
 
 	// Get fileDB in DB
 	var fileDB orm.FileDB
-	if err := db.First(&fileDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&fileDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 	var fileDB orm.FileDB
 
 	// fetch the file
-	query := db.First(&fileDB, c.Param("id"))
+	_, err := db.First(&fileDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 	fileDB.CopyBasicFieldsFromFile_WOP(&input.File_WOP)
 	fileDB.FilePointersEncoding = input.FilePointersEncoding
 
-	query = db.Model(&fileDB).Updates(fileDB)
-	if query.Error != nil {
+	db, _ = db.Model(&fileDB)
+	_, err = db.Updates(fileDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteFile(c *gin.Context) {
 
 	// Get model if exist
 	var fileDB orm.FileDB
-	if err := db.First(&fileDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&fileDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteFile(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&fileDB)
+	db.Unscoped()
+	db.Delete(&fileDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	fileDeleted := new(models.File)

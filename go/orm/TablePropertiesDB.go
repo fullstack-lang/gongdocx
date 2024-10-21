@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -72,7 +73,7 @@ type TablePropertiesDB struct {
 
 	// Declation for basic field tablepropertiesDB.Content
 	Content_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	TablePropertiesPointersEncoding
@@ -118,7 +119,7 @@ type BackRepoTablePropertiesStruct struct {
 	// stores TableProperties according to their gorm ID
 	Map_TablePropertiesDBID_TablePropertiesPtr map[uint]*models.TableProperties
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -128,7 +129,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) GetStage() (stage 
 	return
 }
 
-func (backRepoTableProperties *BackRepoTablePropertiesStruct) GetDB() *gorm.DB {
+func (backRepoTableProperties *BackRepoTablePropertiesStruct) GetDB() db.DBInterface {
 	return backRepoTableProperties.db
 }
 
@@ -165,9 +166,10 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitDeleteInstan
 
 	// tableproperties is not staged anymore, remove tablepropertiesDB
 	tablepropertiesDB := backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[id]
-	query := backRepoTableProperties.db.Unscoped().Delete(&tablepropertiesDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoTableProperties.db.Unscoped()
+	_, err := db.Delete(&tablepropertiesDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -191,9 +193,9 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseOneInst
 	var tablepropertiesDB TablePropertiesDB
 	tablepropertiesDB.CopyBasicFieldsFromTableProperties(tableproperties)
 
-	query := backRepoTableProperties.db.Create(&tablepropertiesDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoTableProperties.db.Create(&tablepropertiesDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -249,9 +251,9 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseTwoInst
 			tablepropertiesDB.TableStyleID.Valid = true
 		}
 
-		query := backRepoTableProperties.db.Save(&tablepropertiesDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoTableProperties.db.Save(&tablepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -270,9 +272,9 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseTwoInst
 func (backRepoTableProperties *BackRepoTablePropertiesStruct) CheckoutPhaseOne() (Error error) {
 
 	tablepropertiesDBArray := make([]TablePropertiesDB, 0)
-	query := backRepoTableProperties.db.Find(&tablepropertiesDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoTableProperties.db.Find(&tablepropertiesDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -393,7 +395,7 @@ func (backRepo *BackRepoStruct) CheckoutTableProperties(tableproperties *models.
 			var tablepropertiesDB TablePropertiesDB
 			tablepropertiesDB.ID = id
 
-			if err := backRepo.BackRepoTableProperties.db.First(&tablepropertiesDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoTableProperties.db.First(&tablepropertiesDB, id); err != nil {
 				log.Fatalln("CheckoutTableProperties : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTableProperties.CheckoutPhaseOneInstance(&tablepropertiesDB)
@@ -552,9 +554,9 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) rowVisitorTablePro
 
 		tablepropertiesDB_ID_atBackupTime := tablepropertiesDB.ID
 		tablepropertiesDB.ID = 0
-		query := backRepoTableProperties.db.Create(tablepropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTableProperties.db.Create(tablepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[tablepropertiesDB.ID] = tablepropertiesDB
 		BackRepoTablePropertiesid_atBckpTime_newID[tablepropertiesDB_ID_atBackupTime] = tablepropertiesDB.ID
@@ -589,9 +591,9 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) RestorePhaseOne(di
 
 		tablepropertiesDB_ID_atBackupTime := tablepropertiesDB.ID
 		tablepropertiesDB.ID = 0
-		query := backRepoTableProperties.db.Create(tablepropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTableProperties.db.Create(tablepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[tablepropertiesDB.ID] = tablepropertiesDB
 		BackRepoTablePropertiesid_atBckpTime_newID[tablepropertiesDB_ID_atBackupTime] = tablepropertiesDB.ID
@@ -625,9 +627,10 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) RestorePhaseTwo() 
 		}
 
 		// update databse with new index encoding
-		query := backRepoTableProperties.db.Model(tablepropertiesDB).Updates(*tablepropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoTableProperties.db.Model(tablepropertiesDB)
+		_, err := db.Updates(*tablepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

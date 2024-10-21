@@ -70,12 +70,12 @@ func (controller *Controller) GetBodys(c *gin.Context) {
 	}
 	db := backRepo.BackRepoBody.GetDB()
 
-	query := db.Find(&bodyDBs)
-	if query.Error != nil {
+	_, err := db.Find(&bodyDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostBody(c *gin.Context) {
 	bodyDB.BodyPointersEncoding = input.BodyPointersEncoding
 	bodyDB.CopyBasicFieldsFromBody_WOP(&input.Body_WOP)
 
-	query := db.Create(&bodyDB)
-	if query.Error != nil {
+	_, err = db.Create(&bodyDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetBody(c *gin.Context) {
 
 	// Get bodyDB in DB
 	var bodyDB orm.BodyDB
-	if err := db.First(&bodyDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&bodyDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateBody(c *gin.Context) {
 	var bodyDB orm.BodyDB
 
 	// fetch the body
-	query := db.First(&bodyDB, c.Param("id"))
+	_, err := db.First(&bodyDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateBody(c *gin.Context) {
 	bodyDB.CopyBasicFieldsFromBody_WOP(&input.Body_WOP)
 	bodyDB.BodyPointersEncoding = input.BodyPointersEncoding
 
-	query = db.Model(&bodyDB).Updates(bodyDB)
-	if query.Error != nil {
+	db, _ = db.Model(&bodyDB)
+	_, err = db.Updates(bodyDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteBody(c *gin.Context) {
 
 	// Get model if exist
 	var bodyDB orm.BodyDB
-	if err := db.First(&bodyDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&bodyDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteBody(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&bodyDB)
+	db.Unscoped()
+	db.Delete(&bodyDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	bodyDeleted := new(models.Body)

@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -71,7 +72,7 @@ type BodyDB struct {
 
 	// Declation for basic field bodyDB.Name
 	Name_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	BodyPointersEncoding
@@ -114,7 +115,7 @@ type BackRepoBodyStruct struct {
 	// stores Body according to their gorm ID
 	Map_BodyDBID_BodyPtr map[uint]*models.Body
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -124,7 +125,7 @@ func (backRepoBody *BackRepoBodyStruct) GetStage() (stage *models.StageStruct) {
 	return
 }
 
-func (backRepoBody *BackRepoBodyStruct) GetDB() *gorm.DB {
+func (backRepoBody *BackRepoBodyStruct) GetDB() db.DBInterface {
 	return backRepoBody.db
 }
 
@@ -161,9 +162,10 @@ func (backRepoBody *BackRepoBodyStruct) CommitDeleteInstance(id uint) (Error err
 
 	// body is not staged anymore, remove bodyDB
 	bodyDB := backRepoBody.Map_BodyDBID_BodyDB[id]
-	query := backRepoBody.db.Unscoped().Delete(&bodyDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoBody.db.Unscoped()
+	_, err := db.Delete(&bodyDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -187,9 +189,9 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseOneInstance(body *models.Body
 	var bodyDB BodyDB
 	bodyDB.CopyBasicFieldsFromBody(body)
 
-	query := backRepoBody.db.Create(&bodyDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoBody.db.Create(&bodyDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -269,9 +271,9 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			bodyDB.LastParagraphID.Valid = true
 		}
 
-		query := backRepoBody.db.Save(&bodyDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoBody.db.Save(&bodyDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -290,9 +292,9 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 func (backRepoBody *BackRepoBodyStruct) CheckoutPhaseOne() (Error error) {
 
 	bodyDBArray := make([]BodyDB, 0)
-	query := backRepoBody.db.Find(&bodyDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoBody.db.Find(&bodyDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -426,7 +428,7 @@ func (backRepo *BackRepoStruct) CheckoutBody(body *models.Body) {
 			var bodyDB BodyDB
 			bodyDB.ID = id
 
-			if err := backRepo.BackRepoBody.db.First(&bodyDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoBody.db.First(&bodyDB, id); err != nil {
 				log.Fatalln("CheckoutBody : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoBody.CheckoutPhaseOneInstance(&bodyDB)
@@ -573,9 +575,9 @@ func (backRepoBody *BackRepoBodyStruct) rowVisitorBody(row *xlsx.Row) error {
 
 		bodyDB_ID_atBackupTime := bodyDB.ID
 		bodyDB.ID = 0
-		query := backRepoBody.db.Create(bodyDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoBody.db.Create(bodyDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoBody.Map_BodyDBID_BodyDB[bodyDB.ID] = bodyDB
 		BackRepoBodyid_atBckpTime_newID[bodyDB_ID_atBackupTime] = bodyDB.ID
@@ -610,9 +612,9 @@ func (backRepoBody *BackRepoBodyStruct) RestorePhaseOne(dirPath string) {
 
 		bodyDB_ID_atBackupTime := bodyDB.ID
 		bodyDB.ID = 0
-		query := backRepoBody.db.Create(bodyDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoBody.db.Create(bodyDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoBody.Map_BodyDBID_BodyDB[bodyDB.ID] = bodyDB
 		BackRepoBodyid_atBckpTime_newID[bodyDB_ID_atBackupTime] = bodyDB.ID
@@ -640,9 +642,10 @@ func (backRepoBody *BackRepoBodyStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoBody.db.Model(bodyDB).Updates(*bodyDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoBody.db.Model(bodyDB)
+		_, err := db.Updates(*bodyDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

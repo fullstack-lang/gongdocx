@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -61,7 +62,7 @@ type FileDB struct {
 
 	// Declation for basic field fileDB.Name
 	Name_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	FilePointersEncoding
@@ -104,7 +105,7 @@ type BackRepoFileStruct struct {
 	// stores File according to their gorm ID
 	Map_FileDBID_FilePtr map[uint]*models.File
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -114,7 +115,7 @@ func (backRepoFile *BackRepoFileStruct) GetStage() (stage *models.StageStruct) {
 	return
 }
 
-func (backRepoFile *BackRepoFileStruct) GetDB() *gorm.DB {
+func (backRepoFile *BackRepoFileStruct) GetDB() db.DBInterface {
 	return backRepoFile.db
 }
 
@@ -151,9 +152,10 @@ func (backRepoFile *BackRepoFileStruct) CommitDeleteInstance(id uint) (Error err
 
 	// file is not staged anymore, remove fileDB
 	fileDB := backRepoFile.Map_FileDBID_FileDB[id]
-	query := backRepoFile.db.Unscoped().Delete(&fileDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoFile.db.Unscoped()
+	_, err := db.Delete(&fileDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -177,9 +179,9 @@ func (backRepoFile *BackRepoFileStruct) CommitPhaseOneInstance(file *models.File
 	var fileDB FileDB
 	fileDB.CopyBasicFieldsFromFile(file)
 
-	query := backRepoFile.db.Create(&fileDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoFile.db.Create(&fileDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -211,9 +213,9 @@ func (backRepoFile *BackRepoFileStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		fileDB.CopyBasicFieldsFromFile(file)
 
 		// insertion point for translating pointers encodings into actual pointers
-		query := backRepoFile.db.Save(&fileDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoFile.db.Save(&fileDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -232,9 +234,9 @@ func (backRepoFile *BackRepoFileStruct) CommitPhaseTwoInstance(backRepo *BackRep
 func (backRepoFile *BackRepoFileStruct) CheckoutPhaseOne() (Error error) {
 
 	fileDBArray := make([]FileDB, 0)
-	query := backRepoFile.db.Find(&fileDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoFile.db.Find(&fileDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -345,7 +347,7 @@ func (backRepo *BackRepoStruct) CheckoutFile(file *models.File) {
 			var fileDB FileDB
 			fileDB.ID = id
 
-			if err := backRepo.BackRepoFile.db.First(&fileDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoFile.db.First(&fileDB, id); err != nil {
 				log.Fatalln("CheckoutFile : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoFile.CheckoutPhaseOneInstance(&fileDB)
@@ -492,9 +494,9 @@ func (backRepoFile *BackRepoFileStruct) rowVisitorFile(row *xlsx.Row) error {
 
 		fileDB_ID_atBackupTime := fileDB.ID
 		fileDB.ID = 0
-		query := backRepoFile.db.Create(fileDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoFile.db.Create(fileDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoFile.Map_FileDBID_FileDB[fileDB.ID] = fileDB
 		BackRepoFileid_atBckpTime_newID[fileDB_ID_atBackupTime] = fileDB.ID
@@ -529,9 +531,9 @@ func (backRepoFile *BackRepoFileStruct) RestorePhaseOne(dirPath string) {
 
 		fileDB_ID_atBackupTime := fileDB.ID
 		fileDB.ID = 0
-		query := backRepoFile.db.Create(fileDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoFile.db.Create(fileDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoFile.Map_FileDBID_FileDB[fileDB.ID] = fileDB
 		BackRepoFileid_atBckpTime_newID[fileDB_ID_atBackupTime] = fileDB.ID
@@ -553,9 +555,10 @@ func (backRepoFile *BackRepoFileStruct) RestorePhaseTwo() {
 
 		// insertion point for reindexing pointers encoding
 		// update databse with new index encoding
-		query := backRepoFile.db.Model(fileDB).Updates(*fileDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoFile.db.Model(fileDB)
+		_, err := db.Updates(*fileDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

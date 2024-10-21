@@ -70,12 +70,12 @@ func (controller *Controller) GetTableRows(c *gin.Context) {
 	}
 	db := backRepo.BackRepoTableRow.GetDB()
 
-	query := db.Find(&tablerowDBs)
-	if query.Error != nil {
+	_, err := db.Find(&tablerowDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostTableRow(c *gin.Context) {
 	tablerowDB.TableRowPointersEncoding = input.TableRowPointersEncoding
 	tablerowDB.CopyBasicFieldsFromTableRow_WOP(&input.TableRow_WOP)
 
-	query := db.Create(&tablerowDB)
-	if query.Error != nil {
+	_, err = db.Create(&tablerowDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetTableRow(c *gin.Context) {
 
 	// Get tablerowDB in DB
 	var tablerowDB orm.TableRowDB
-	if err := db.First(&tablerowDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablerowDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateTableRow(c *gin.Context) {
 	var tablerowDB orm.TableRowDB
 
 	// fetch the tablerow
-	query := db.First(&tablerowDB, c.Param("id"))
+	_, err := db.First(&tablerowDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateTableRow(c *gin.Context) {
 	tablerowDB.CopyBasicFieldsFromTableRow_WOP(&input.TableRow_WOP)
 	tablerowDB.TableRowPointersEncoding = input.TableRowPointersEncoding
 
-	query = db.Model(&tablerowDB).Updates(tablerowDB)
-	if query.Error != nil {
+	db, _ = db.Model(&tablerowDB)
+	_, err = db.Updates(tablerowDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteTableRow(c *gin.Context) {
 
 	// Get model if exist
 	var tablerowDB orm.TableRowDB
-	if err := db.First(&tablerowDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablerowDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteTableRow(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&tablerowDB)
+	db.Unscoped()
+	db.Delete(&tablerowDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	tablerowDeleted := new(models.TableRow)

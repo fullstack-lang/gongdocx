@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -71,7 +72,7 @@ type TableRowDB struct {
 
 	// Declation for basic field tablerowDB.Content
 	Content_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	TableRowPointersEncoding
@@ -117,7 +118,7 @@ type BackRepoTableRowStruct struct {
 	// stores TableRow according to their gorm ID
 	Map_TableRowDBID_TableRowPtr map[uint]*models.TableRow
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -127,7 +128,7 @@ func (backRepoTableRow *BackRepoTableRowStruct) GetStage() (stage *models.StageS
 	return
 }
 
-func (backRepoTableRow *BackRepoTableRowStruct) GetDB() *gorm.DB {
+func (backRepoTableRow *BackRepoTableRowStruct) GetDB() db.DBInterface {
 	return backRepoTableRow.db
 }
 
@@ -164,9 +165,10 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitDeleteInstance(id uint) (E
 
 	// tablerow is not staged anymore, remove tablerowDB
 	tablerowDB := backRepoTableRow.Map_TableRowDBID_TableRowDB[id]
-	query := backRepoTableRow.db.Unscoped().Delete(&tablerowDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoTableRow.db.Unscoped()
+	_, err := db.Delete(&tablerowDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -190,9 +192,9 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseOneInstance(tablerow 
 	var tablerowDB TableRowDB
 	tablerowDB.CopyBasicFieldsFromTableRow(tablerow)
 
-	query := backRepoTableRow.db.Create(&tablerowDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoTableRow.db.Create(&tablerowDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -254,9 +256,9 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseTwoInstance(backRepo 
 				append(tablerowDB.TableRowPointersEncoding.TableColumns, int(tablecolumnAssocEnd_DB.ID))
 		}
 
-		query := backRepoTableRow.db.Save(&tablerowDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoTableRow.db.Save(&tablerowDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -275,9 +277,9 @@ func (backRepoTableRow *BackRepoTableRowStruct) CommitPhaseTwoInstance(backRepo 
 func (backRepoTableRow *BackRepoTableRowStruct) CheckoutPhaseOne() (Error error) {
 
 	tablerowDBArray := make([]TableRowDB, 0)
-	query := backRepoTableRow.db.Find(&tablerowDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoTableRow.db.Find(&tablerowDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -402,7 +404,7 @@ func (backRepo *BackRepoStruct) CheckoutTableRow(tablerow *models.TableRow) {
 			var tablerowDB TableRowDB
 			tablerowDB.ID = id
 
-			if err := backRepo.BackRepoTableRow.db.First(&tablerowDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoTableRow.db.First(&tablerowDB, id); err != nil {
 				log.Fatalln("CheckoutTableRow : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTableRow.CheckoutPhaseOneInstance(&tablerowDB)
@@ -561,9 +563,9 @@ func (backRepoTableRow *BackRepoTableRowStruct) rowVisitorTableRow(row *xlsx.Row
 
 		tablerowDB_ID_atBackupTime := tablerowDB.ID
 		tablerowDB.ID = 0
-		query := backRepoTableRow.db.Create(tablerowDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTableRow.db.Create(tablerowDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTableRow.Map_TableRowDBID_TableRowDB[tablerowDB.ID] = tablerowDB
 		BackRepoTableRowid_atBckpTime_newID[tablerowDB_ID_atBackupTime] = tablerowDB.ID
@@ -598,9 +600,9 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestorePhaseOne(dirPath string) 
 
 		tablerowDB_ID_atBackupTime := tablerowDB.ID
 		tablerowDB.ID = 0
-		query := backRepoTableRow.db.Create(tablerowDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTableRow.db.Create(tablerowDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTableRow.Map_TableRowDBID_TableRowDB[tablerowDB.ID] = tablerowDB
 		BackRepoTableRowid_atBckpTime_newID[tablerowDB_ID_atBackupTime] = tablerowDB.ID
@@ -628,9 +630,10 @@ func (backRepoTableRow *BackRepoTableRowStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoTableRow.db.Model(tablerowDB).Updates(*tablerowDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoTableRow.db.Model(tablerowDB)
+		_, err := db.Updates(*tablerowDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

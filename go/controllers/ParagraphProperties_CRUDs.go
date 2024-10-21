@@ -70,12 +70,12 @@ func (controller *Controller) GetParagraphPropertiess(c *gin.Context) {
 	}
 	db := backRepo.BackRepoParagraphProperties.GetDB()
 
-	query := db.Find(&paragraphpropertiesDBs)
-	if query.Error != nil {
+	_, err := db.Find(&paragraphpropertiesDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostParagraphProperties(c *gin.Context) {
 	paragraphpropertiesDB.ParagraphPropertiesPointersEncoding = input.ParagraphPropertiesPointersEncoding
 	paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties_WOP(&input.ParagraphProperties_WOP)
 
-	query := db.Create(&paragraphpropertiesDB)
-	if query.Error != nil {
+	_, err = db.Create(&paragraphpropertiesDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetParagraphProperties(c *gin.Context) {
 
 	// Get paragraphpropertiesDB in DB
 	var paragraphpropertiesDB orm.ParagraphPropertiesDB
-	if err := db.First(&paragraphpropertiesDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&paragraphpropertiesDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateParagraphProperties(c *gin.Context) {
 	var paragraphpropertiesDB orm.ParagraphPropertiesDB
 
 	// fetch the paragraphproperties
-	query := db.First(&paragraphpropertiesDB, c.Param("id"))
+	_, err := db.First(&paragraphpropertiesDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateParagraphProperties(c *gin.Context) {
 	paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties_WOP(&input.ParagraphProperties_WOP)
 	paragraphpropertiesDB.ParagraphPropertiesPointersEncoding = input.ParagraphPropertiesPointersEncoding
 
-	query = db.Model(&paragraphpropertiesDB).Updates(paragraphpropertiesDB)
-	if query.Error != nil {
+	db, _ = db.Model(&paragraphpropertiesDB)
+	_, err = db.Updates(paragraphpropertiesDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteParagraphProperties(c *gin.Context) {
 
 	// Get model if exist
 	var paragraphpropertiesDB orm.ParagraphPropertiesDB
-	if err := db.First(&paragraphpropertiesDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&paragraphpropertiesDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteParagraphProperties(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&paragraphpropertiesDB)
+	db.Unscoped()
+	db.Delete(&paragraphpropertiesDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	paragraphpropertiesDeleted := new(models.ParagraphProperties)

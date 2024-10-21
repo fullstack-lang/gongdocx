@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -80,7 +81,7 @@ type RuneDB struct {
 
 	// Declation for basic field runeDB.Content
 	Content_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	RunePointersEncoding
@@ -126,7 +127,7 @@ type BackRepoRuneStruct struct {
 	// stores Rune according to their gorm ID
 	Map_RuneDBID_RunePtr map[uint]*models.Rune
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -136,7 +137,7 @@ func (backRepoRune *BackRepoRuneStruct) GetStage() (stage *models.StageStruct) {
 	return
 }
 
-func (backRepoRune *BackRepoRuneStruct) GetDB() *gorm.DB {
+func (backRepoRune *BackRepoRuneStruct) GetDB() db.DBInterface {
 	return backRepoRune.db
 }
 
@@ -173,9 +174,10 @@ func (backRepoRune *BackRepoRuneStruct) CommitDeleteInstance(id uint) (Error err
 
 	// rune is not staged anymore, remove runeDB
 	runeDB := backRepoRune.Map_RuneDBID_RuneDB[id]
-	query := backRepoRune.db.Unscoped().Delete(&runeDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoRune.db.Unscoped()
+	_, err := db.Delete(&runeDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -199,9 +201,9 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseOneInstance(rune *models.Rune
 	var runeDB RuneDB
 	runeDB.CopyBasicFieldsFromRune(rune)
 
-	query := backRepoRune.db.Create(&runeDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoRune.db.Create(&runeDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -281,9 +283,9 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			runeDB.EnclosingParagraphID.Valid = true
 		}
 
-		query := backRepoRune.db.Save(&runeDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoRune.db.Save(&runeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -302,9 +304,9 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 func (backRepoRune *BackRepoRuneStruct) CheckoutPhaseOne() (Error error) {
 
 	runeDBArray := make([]RuneDB, 0)
-	query := backRepoRune.db.Find(&runeDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoRune.db.Find(&runeDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -435,7 +437,7 @@ func (backRepo *BackRepoStruct) CheckoutRune(rune *models.Rune) {
 			var runeDB RuneDB
 			runeDB.ID = id
 
-			if err := backRepo.BackRepoRune.db.First(&runeDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoRune.db.First(&runeDB, id); err != nil {
 				log.Fatalln("CheckoutRune : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoRune.CheckoutPhaseOneInstance(&runeDB)
@@ -594,9 +596,9 @@ func (backRepoRune *BackRepoRuneStruct) rowVisitorRune(row *xlsx.Row) error {
 
 		runeDB_ID_atBackupTime := runeDB.ID
 		runeDB.ID = 0
-		query := backRepoRune.db.Create(runeDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoRune.db.Create(runeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoRune.Map_RuneDBID_RuneDB[runeDB.ID] = runeDB
 		BackRepoRuneid_atBckpTime_newID[runeDB_ID_atBackupTime] = runeDB.ID
@@ -631,9 +633,9 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseOne(dirPath string) {
 
 		runeDB_ID_atBackupTime := runeDB.ID
 		runeDB.ID = 0
-		query := backRepoRune.db.Create(runeDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoRune.db.Create(runeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoRune.Map_RuneDBID_RuneDB[runeDB.ID] = runeDB
 		BackRepoRuneid_atBckpTime_newID[runeDB_ID_atBackupTime] = runeDB.ID
@@ -679,9 +681,10 @@ func (backRepoRune *BackRepoRuneStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoRune.db.Model(runeDB).Updates(*runeDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoRune.db.Model(runeDB)
+		_, err := db.Updates(*runeDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

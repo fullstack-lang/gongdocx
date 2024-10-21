@@ -70,12 +70,12 @@ func (controller *Controller) GetTableColumns(c *gin.Context) {
 	}
 	db := backRepo.BackRepoTableColumn.GetDB()
 
-	query := db.Find(&tablecolumnDBs)
-	if query.Error != nil {
+	_, err := db.Find(&tablecolumnDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostTableColumn(c *gin.Context) {
 	tablecolumnDB.TableColumnPointersEncoding = input.TableColumnPointersEncoding
 	tablecolumnDB.CopyBasicFieldsFromTableColumn_WOP(&input.TableColumn_WOP)
 
-	query := db.Create(&tablecolumnDB)
-	if query.Error != nil {
+	_, err = db.Create(&tablecolumnDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetTableColumn(c *gin.Context) {
 
 	// Get tablecolumnDB in DB
 	var tablecolumnDB orm.TableColumnDB
-	if err := db.First(&tablecolumnDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablecolumnDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateTableColumn(c *gin.Context) {
 	var tablecolumnDB orm.TableColumnDB
 
 	// fetch the tablecolumn
-	query := db.First(&tablecolumnDB, c.Param("id"))
+	_, err := db.First(&tablecolumnDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateTableColumn(c *gin.Context) {
 	tablecolumnDB.CopyBasicFieldsFromTableColumn_WOP(&input.TableColumn_WOP)
 	tablecolumnDB.TableColumnPointersEncoding = input.TableColumnPointersEncoding
 
-	query = db.Model(&tablecolumnDB).Updates(tablecolumnDB)
-	if query.Error != nil {
+	db, _ = db.Model(&tablecolumnDB)
+	_, err = db.Updates(tablecolumnDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteTableColumn(c *gin.Context) {
 
 	// Get model if exist
 	var tablecolumnDB orm.TableColumnDB
-	if err := db.First(&tablecolumnDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablecolumnDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteTableColumn(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&tablecolumnDB)
+	db.Unscoped()
+	db.Delete(&tablecolumnDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	tablecolumnDeleted := new(models.TableColumn)

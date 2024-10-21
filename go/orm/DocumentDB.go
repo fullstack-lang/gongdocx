@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -73,7 +74,7 @@ type DocumentDB struct {
 
 	// Declation for basic field documentDB.Name
 	Name_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	DocumentPointersEncoding
@@ -116,7 +117,7 @@ type BackRepoDocumentStruct struct {
 	// stores Document according to their gorm ID
 	Map_DocumentDBID_DocumentPtr map[uint]*models.Document
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -126,7 +127,7 @@ func (backRepoDocument *BackRepoDocumentStruct) GetStage() (stage *models.StageS
 	return
 }
 
-func (backRepoDocument *BackRepoDocumentStruct) GetDB() *gorm.DB {
+func (backRepoDocument *BackRepoDocumentStruct) GetDB() db.DBInterface {
 	return backRepoDocument.db
 }
 
@@ -163,9 +164,10 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitDeleteInstance(id uint) (E
 
 	// document is not staged anymore, remove documentDB
 	documentDB := backRepoDocument.Map_DocumentDBID_DocumentDB[id]
-	query := backRepoDocument.db.Unscoped().Delete(&documentDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoDocument.db.Unscoped()
+	_, err := db.Delete(&documentDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -189,9 +191,9 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseOneInstance(document 
 	var documentDB DocumentDB
 	documentDB.CopyBasicFieldsFromDocument(document)
 
-	query := backRepoDocument.db.Create(&documentDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoDocument.db.Create(&documentDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -259,9 +261,9 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 			documentDB.BodyID.Valid = true
 		}
 
-		query := backRepoDocument.db.Save(&documentDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoDocument.db.Save(&documentDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -280,9 +282,9 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 func (backRepoDocument *BackRepoDocumentStruct) CheckoutPhaseOne() (Error error) {
 
 	documentDBArray := make([]DocumentDB, 0)
-	query := backRepoDocument.db.Find(&documentDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoDocument.db.Find(&documentDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -408,7 +410,7 @@ func (backRepo *BackRepoStruct) CheckoutDocument(document *models.Document) {
 			var documentDB DocumentDB
 			documentDB.ID = id
 
-			if err := backRepo.BackRepoDocument.db.First(&documentDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoDocument.db.First(&documentDB, id); err != nil {
 				log.Fatalln("CheckoutDocument : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoDocument.CheckoutPhaseOneInstance(&documentDB)
@@ -555,9 +557,9 @@ func (backRepoDocument *BackRepoDocumentStruct) rowVisitorDocument(row *xlsx.Row
 
 		documentDB_ID_atBackupTime := documentDB.ID
 		documentDB.ID = 0
-		query := backRepoDocument.db.Create(documentDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoDocument.db.Create(documentDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoDocument.Map_DocumentDBID_DocumentDB[documentDB.ID] = documentDB
 		BackRepoDocumentid_atBckpTime_newID[documentDB_ID_atBackupTime] = documentDB.ID
@@ -592,9 +594,9 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseOne(dirPath string) 
 
 		documentDB_ID_atBackupTime := documentDB.ID
 		documentDB.ID = 0
-		query := backRepoDocument.db.Create(documentDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoDocument.db.Create(documentDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoDocument.Map_DocumentDBID_DocumentDB[documentDB.ID] = documentDB
 		BackRepoDocumentid_atBckpTime_newID[documentDB_ID_atBackupTime] = documentDB.ID
@@ -634,9 +636,10 @@ func (backRepoDocument *BackRepoDocumentStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoDocument.db.Model(documentDB).Updates(*documentDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoDocument.db.Model(documentDB)
+		_, err := db.Updates(*documentDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -75,7 +76,7 @@ type TableDB struct {
 
 	// Declation for basic field tableDB.Content
 	Content_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	TablePointersEncoding
@@ -121,7 +122,7 @@ type BackRepoTableStruct struct {
 	// stores Table according to their gorm ID
 	Map_TableDBID_TablePtr map[uint]*models.Table
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -131,7 +132,7 @@ func (backRepoTable *BackRepoTableStruct) GetStage() (stage *models.StageStruct)
 	return
 }
 
-func (backRepoTable *BackRepoTableStruct) GetDB() *gorm.DB {
+func (backRepoTable *BackRepoTableStruct) GetDB() db.DBInterface {
 	return backRepoTable.db
 }
 
@@ -168,9 +169,10 @@ func (backRepoTable *BackRepoTableStruct) CommitDeleteInstance(id uint) (Error e
 
 	// table is not staged anymore, remove tableDB
 	tableDB := backRepoTable.Map_TableDBID_TableDB[id]
-	query := backRepoTable.db.Unscoped().Delete(&tableDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoTable.db.Unscoped()
+	_, err := db.Delete(&tableDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -194,9 +196,9 @@ func (backRepoTable *BackRepoTableStruct) CommitPhaseOneInstance(table *models.T
 	var tableDB TableDB
 	tableDB.CopyBasicFieldsFromTable(table)
 
-	query := backRepoTable.db.Create(&tableDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoTable.db.Create(&tableDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -270,9 +272,9 @@ func (backRepoTable *BackRepoTableStruct) CommitPhaseTwoInstance(backRepo *BackR
 				append(tableDB.TablePointersEncoding.TableRows, int(tablerowAssocEnd_DB.ID))
 		}
 
-		query := backRepoTable.db.Save(&tableDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoTable.db.Save(&tableDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -291,9 +293,9 @@ func (backRepoTable *BackRepoTableStruct) CommitPhaseTwoInstance(backRepo *BackR
 func (backRepoTable *BackRepoTableStruct) CheckoutPhaseOne() (Error error) {
 
 	tableDBArray := make([]TableDB, 0)
-	query := backRepoTable.db.Find(&tableDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoTable.db.Find(&tableDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -423,7 +425,7 @@ func (backRepo *BackRepoStruct) CheckoutTable(table *models.Table) {
 			var tableDB TableDB
 			tableDB.ID = id
 
-			if err := backRepo.BackRepoTable.db.First(&tableDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoTable.db.First(&tableDB, id); err != nil {
 				log.Fatalln("CheckoutTable : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTable.CheckoutPhaseOneInstance(&tableDB)
@@ -582,9 +584,9 @@ func (backRepoTable *BackRepoTableStruct) rowVisitorTable(row *xlsx.Row) error {
 
 		tableDB_ID_atBackupTime := tableDB.ID
 		tableDB.ID = 0
-		query := backRepoTable.db.Create(tableDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTable.db.Create(tableDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTable.Map_TableDBID_TableDB[tableDB.ID] = tableDB
 		BackRepoTableid_atBckpTime_newID[tableDB_ID_atBackupTime] = tableDB.ID
@@ -619,9 +621,9 @@ func (backRepoTable *BackRepoTableStruct) RestorePhaseOne(dirPath string) {
 
 		tableDB_ID_atBackupTime := tableDB.ID
 		tableDB.ID = 0
-		query := backRepoTable.db.Create(tableDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTable.db.Create(tableDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTable.Map_TableDBID_TableDB[tableDB.ID] = tableDB
 		BackRepoTableid_atBckpTime_newID[tableDB_ID_atBackupTime] = tableDB.ID
@@ -655,9 +657,10 @@ func (backRepoTable *BackRepoTableStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoTable.db.Model(tableDB).Updates(*tableDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoTable.db.Model(tableDB)
+		_, err := db.Updates(*tableDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

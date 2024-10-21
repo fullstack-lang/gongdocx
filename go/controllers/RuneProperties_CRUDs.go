@@ -70,12 +70,12 @@ func (controller *Controller) GetRunePropertiess(c *gin.Context) {
 	}
 	db := backRepo.BackRepoRuneProperties.GetDB()
 
-	query := db.Find(&runepropertiesDBs)
-	if query.Error != nil {
+	_, err := db.Find(&runepropertiesDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostRuneProperties(c *gin.Context) {
 	runepropertiesDB.RunePropertiesPointersEncoding = input.RunePropertiesPointersEncoding
 	runepropertiesDB.CopyBasicFieldsFromRuneProperties_WOP(&input.RuneProperties_WOP)
 
-	query := db.Create(&runepropertiesDB)
-	if query.Error != nil {
+	_, err = db.Create(&runepropertiesDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetRuneProperties(c *gin.Context) {
 
 	// Get runepropertiesDB in DB
 	var runepropertiesDB orm.RunePropertiesDB
-	if err := db.First(&runepropertiesDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&runepropertiesDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 	var runepropertiesDB orm.RunePropertiesDB
 
 	// fetch the runeproperties
-	query := db.First(&runepropertiesDB, c.Param("id"))
+	_, err := db.First(&runepropertiesDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateRuneProperties(c *gin.Context) {
 	runepropertiesDB.CopyBasicFieldsFromRuneProperties_WOP(&input.RuneProperties_WOP)
 	runepropertiesDB.RunePropertiesPointersEncoding = input.RunePropertiesPointersEncoding
 
-	query = db.Model(&runepropertiesDB).Updates(runepropertiesDB)
-	if query.Error != nil {
+	db, _ = db.Model(&runepropertiesDB)
+	_, err = db.Updates(runepropertiesDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteRuneProperties(c *gin.Context) {
 
 	// Get model if exist
 	var runepropertiesDB orm.RunePropertiesDB
-	if err := db.First(&runepropertiesDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&runepropertiesDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteRuneProperties(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&runepropertiesDB)
+	db.Unscoped()
+	db.Delete(&runepropertiesDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	runepropertiesDeleted := new(models.RuneProperties)

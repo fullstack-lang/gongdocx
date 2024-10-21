@@ -70,12 +70,12 @@ func (controller *Controller) GetTablePropertiess(c *gin.Context) {
 	}
 	db := backRepo.BackRepoTableProperties.GetDB()
 
-	query := db.Find(&tablepropertiesDBs)
-	if query.Error != nil {
+	_, err := db.Find(&tablepropertiesDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostTableProperties(c *gin.Context) {
 	tablepropertiesDB.TablePropertiesPointersEncoding = input.TablePropertiesPointersEncoding
 	tablepropertiesDB.CopyBasicFieldsFromTableProperties_WOP(&input.TableProperties_WOP)
 
-	query := db.Create(&tablepropertiesDB)
-	if query.Error != nil {
+	_, err = db.Create(&tablepropertiesDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetTableProperties(c *gin.Context) {
 
 	// Get tablepropertiesDB in DB
 	var tablepropertiesDB orm.TablePropertiesDB
-	if err := db.First(&tablepropertiesDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablepropertiesDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 	var tablepropertiesDB orm.TablePropertiesDB
 
 	// fetch the tableproperties
-	query := db.First(&tablepropertiesDB, c.Param("id"))
+	_, err := db.First(&tablepropertiesDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 	tablepropertiesDB.CopyBasicFieldsFromTableProperties_WOP(&input.TableProperties_WOP)
 	tablepropertiesDB.TablePropertiesPointersEncoding = input.TablePropertiesPointersEncoding
 
-	query = db.Model(&tablepropertiesDB).Updates(tablepropertiesDB)
-	if query.Error != nil {
+	db, _ = db.Model(&tablepropertiesDB)
+	_, err = db.Updates(tablepropertiesDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteTableProperties(c *gin.Context) {
 
 	// Get model if exist
 	var tablepropertiesDB orm.TablePropertiesDB
-	if err := db.First(&tablepropertiesDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablepropertiesDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteTableProperties(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&tablepropertiesDB)
+	db.Unscoped()
+	db.Delete(&tablepropertiesDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	tablepropertiesDeleted := new(models.TableProperties)

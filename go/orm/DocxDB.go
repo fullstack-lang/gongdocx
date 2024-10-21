@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -68,7 +69,7 @@ type DocxDB struct {
 
 	// Declation for basic field docxDB.Name
 	Name_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	DocxPointersEncoding
@@ -111,7 +112,7 @@ type BackRepoDocxStruct struct {
 	// stores Docx according to their gorm ID
 	Map_DocxDBID_DocxPtr map[uint]*models.Docx
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -121,7 +122,7 @@ func (backRepoDocx *BackRepoDocxStruct) GetStage() (stage *models.StageStruct) {
 	return
 }
 
-func (backRepoDocx *BackRepoDocxStruct) GetDB() *gorm.DB {
+func (backRepoDocx *BackRepoDocxStruct) GetDB() db.DBInterface {
 	return backRepoDocx.db
 }
 
@@ -158,9 +159,10 @@ func (backRepoDocx *BackRepoDocxStruct) CommitDeleteInstance(id uint) (Error err
 
 	// docx is not staged anymore, remove docxDB
 	docxDB := backRepoDocx.Map_DocxDBID_DocxDB[id]
-	query := backRepoDocx.db.Unscoped().Delete(&docxDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoDocx.db.Unscoped()
+	_, err := db.Delete(&docxDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -184,9 +186,9 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseOneInstance(docx *models.Docx
 	var docxDB DocxDB
 	docxDB.CopyBasicFieldsFromDocx(docx)
 
-	query := backRepoDocx.db.Create(&docxDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoDocx.db.Create(&docxDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -248,9 +250,9 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			docxDB.DocumentID.Valid = true
 		}
 
-		query := backRepoDocx.db.Save(&docxDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoDocx.db.Save(&docxDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -269,9 +271,9 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 func (backRepoDocx *BackRepoDocxStruct) CheckoutPhaseOne() (Error error) {
 
 	docxDBArray := make([]DocxDB, 0)
-	query := backRepoDocx.db.Find(&docxDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoDocx.db.Find(&docxDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -396,7 +398,7 @@ func (backRepo *BackRepoStruct) CheckoutDocx(docx *models.Docx) {
 			var docxDB DocxDB
 			docxDB.ID = id
 
-			if err := backRepo.BackRepoDocx.db.First(&docxDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoDocx.db.First(&docxDB, id); err != nil {
 				log.Fatalln("CheckoutDocx : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoDocx.CheckoutPhaseOneInstance(&docxDB)
@@ -543,9 +545,9 @@ func (backRepoDocx *BackRepoDocxStruct) rowVisitorDocx(row *xlsx.Row) error {
 
 		docxDB_ID_atBackupTime := docxDB.ID
 		docxDB.ID = 0
-		query := backRepoDocx.db.Create(docxDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoDocx.db.Create(docxDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoDocx.Map_DocxDBID_DocxDB[docxDB.ID] = docxDB
 		BackRepoDocxid_atBckpTime_newID[docxDB_ID_atBackupTime] = docxDB.ID
@@ -580,9 +582,9 @@ func (backRepoDocx *BackRepoDocxStruct) RestorePhaseOne(dirPath string) {
 
 		docxDB_ID_atBackupTime := docxDB.ID
 		docxDB.ID = 0
-		query := backRepoDocx.db.Create(docxDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoDocx.db.Create(docxDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoDocx.Map_DocxDBID_DocxDB[docxDB.ID] = docxDB
 		BackRepoDocxid_atBckpTime_newID[docxDB_ID_atBackupTime] = docxDB.ID
@@ -610,9 +612,10 @@ func (backRepoDocx *BackRepoDocxStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoDocx.db.Model(docxDB).Updates(*docxDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoDocx.db.Model(docxDB)
+		_, err := db.Updates(*docxDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

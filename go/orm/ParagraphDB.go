@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -94,7 +95,7 @@ type ParagraphDB struct {
 
 	// Declation for basic field paragraphDB.Text
 	Text_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	ParagraphPointersEncoding
@@ -143,7 +144,7 @@ type BackRepoParagraphStruct struct {
 	// stores Paragraph according to their gorm ID
 	Map_ParagraphDBID_ParagraphPtr map[uint]*models.Paragraph
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -153,7 +154,7 @@ func (backRepoParagraph *BackRepoParagraphStruct) GetStage() (stage *models.Stag
 	return
 }
 
-func (backRepoParagraph *BackRepoParagraphStruct) GetDB() *gorm.DB {
+func (backRepoParagraph *BackRepoParagraphStruct) GetDB() db.DBInterface {
 	return backRepoParagraph.db
 }
 
@@ -190,9 +191,10 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitDeleteInstance(id uint) 
 
 	// paragraph is not staged anymore, remove paragraphDB
 	paragraphDB := backRepoParagraph.Map_ParagraphDBID_ParagraphDB[id]
-	query := backRepoParagraph.db.Unscoped().Delete(&paragraphDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoParagraph.db.Unscoped()
+	_, err := db.Delete(&paragraphDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -216,9 +218,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseOneInstance(paragra
 	var paragraphDB ParagraphDB
 	paragraphDB.CopyBasicFieldsFromParagraph(paragraph)
 
-	query := backRepoParagraph.db.Create(&paragraphDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoParagraph.db.Create(&paragraphDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -340,9 +342,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 			paragraphDB.EnclosingTableColumnID.Valid = true
 		}
 
-		query := backRepoParagraph.db.Save(&paragraphDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoParagraph.db.Save(&paragraphDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -361,9 +363,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseOne() (Error error) {
 
 	paragraphDBArray := make([]ParagraphDB, 0)
-	query := backRepoParagraph.db.Find(&paragraphDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoParagraph.db.Find(&paragraphDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -513,7 +515,7 @@ func (backRepo *BackRepoStruct) CheckoutParagraph(paragraph *models.Paragraph) {
 			var paragraphDB ParagraphDB
 			paragraphDB.ID = id
 
-			if err := backRepo.BackRepoParagraph.db.First(&paragraphDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoParagraph.db.First(&paragraphDB, id); err != nil {
 				log.Fatalln("CheckoutParagraph : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoParagraph.CheckoutPhaseOneInstance(&paragraphDB)
@@ -684,9 +686,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) rowVisitorParagraph(row *xlsx.
 
 		paragraphDB_ID_atBackupTime := paragraphDB.ID
 		paragraphDB.ID = 0
-		query := backRepoParagraph.db.Create(paragraphDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoParagraph.db.Create(paragraphDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoParagraph.Map_ParagraphDBID_ParagraphDB[paragraphDB.ID] = paragraphDB
 		BackRepoParagraphid_atBckpTime_newID[paragraphDB_ID_atBackupTime] = paragraphDB.ID
@@ -721,9 +723,9 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseOne(dirPath string
 
 		paragraphDB_ID_atBackupTime := paragraphDB.ID
 		paragraphDB.ID = 0
-		query := backRepoParagraph.db.Create(paragraphDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoParagraph.db.Create(paragraphDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoParagraph.Map_ParagraphDBID_ParagraphDB[paragraphDB.ID] = paragraphDB
 		BackRepoParagraphid_atBckpTime_newID[paragraphDB_ID_atBackupTime] = paragraphDB.ID
@@ -781,9 +783,10 @@ func (backRepoParagraph *BackRepoParagraphStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoParagraph.db.Model(paragraphDB).Updates(*paragraphDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoParagraph.db.Model(paragraphDB)
+		_, err := db.Updates(*paragraphDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

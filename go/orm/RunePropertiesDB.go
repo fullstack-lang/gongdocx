@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -80,7 +81,7 @@ type RunePropertiesDB struct {
 
 	// Declation for basic field runepropertiesDB.Content
 	Content_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	RunePropertiesPointersEncoding
@@ -135,7 +136,7 @@ type BackRepoRunePropertiesStruct struct {
 	// stores RuneProperties according to their gorm ID
 	Map_RunePropertiesDBID_RunePropertiesPtr map[uint]*models.RuneProperties
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -145,7 +146,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) GetStage() (stage *m
 	return
 }
 
-func (backRepoRuneProperties *BackRepoRunePropertiesStruct) GetDB() *gorm.DB {
+func (backRepoRuneProperties *BackRepoRunePropertiesStruct) GetDB() db.DBInterface {
 	return backRepoRuneProperties.db
 }
 
@@ -182,9 +183,10 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitDeleteInstance
 
 	// runeproperties is not staged anymore, remove runepropertiesDB
 	runepropertiesDB := backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[id]
-	query := backRepoRuneProperties.db.Unscoped().Delete(&runepropertiesDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoRuneProperties.db.Unscoped()
+	_, err := db.Delete(&runepropertiesDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -208,9 +210,9 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitPhaseOneInstan
 	var runepropertiesDB RunePropertiesDB
 	runepropertiesDB.CopyBasicFieldsFromRuneProperties(runeproperties)
 
-	query := backRepoRuneProperties.db.Create(&runepropertiesDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoRuneProperties.db.Create(&runepropertiesDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -254,9 +256,9 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitPhaseTwoInstan
 			runepropertiesDB.NodeID.Valid = true
 		}
 
-		query := backRepoRuneProperties.db.Save(&runepropertiesDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoRuneProperties.db.Save(&runepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -275,9 +277,9 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitPhaseTwoInstan
 func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CheckoutPhaseOne() (Error error) {
 
 	runepropertiesDBArray := make([]RunePropertiesDB, 0)
-	query := backRepoRuneProperties.db.Find(&runepropertiesDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoRuneProperties.db.Find(&runepropertiesDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -393,7 +395,7 @@ func (backRepo *BackRepoStruct) CheckoutRuneProperties(runeproperties *models.Ru
 			var runepropertiesDB RunePropertiesDB
 			runepropertiesDB.ID = id
 
-			if err := backRepo.BackRepoRuneProperties.db.First(&runepropertiesDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoRuneProperties.db.First(&runepropertiesDB, id); err != nil {
 				log.Fatalln("CheckoutRuneProperties : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoRuneProperties.CheckoutPhaseOneInstance(&runepropertiesDB)
@@ -588,9 +590,9 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) rowVisitorRuneProper
 
 		runepropertiesDB_ID_atBackupTime := runepropertiesDB.ID
 		runepropertiesDB.ID = 0
-		query := backRepoRuneProperties.db.Create(runepropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoRuneProperties.db.Create(runepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[runepropertiesDB.ID] = runepropertiesDB
 		BackRepoRunePropertiesid_atBckpTime_newID[runepropertiesDB_ID_atBackupTime] = runepropertiesDB.ID
@@ -625,9 +627,9 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) RestorePhaseOne(dirP
 
 		runepropertiesDB_ID_atBackupTime := runepropertiesDB.ID
 		runepropertiesDB.ID = 0
-		query := backRepoRuneProperties.db.Create(runepropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoRuneProperties.db.Create(runepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[runepropertiesDB.ID] = runepropertiesDB
 		BackRepoRunePropertiesid_atBckpTime_newID[runepropertiesDB_ID_atBackupTime] = runepropertiesDB.ID
@@ -655,9 +657,10 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoRuneProperties.db.Model(runepropertiesDB).Updates(*runepropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoRuneProperties.db.Model(runepropertiesDB)
+		_, err := db.Updates(*runepropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

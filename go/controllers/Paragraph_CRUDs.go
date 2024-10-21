@@ -70,12 +70,12 @@ func (controller *Controller) GetParagraphs(c *gin.Context) {
 	}
 	db := backRepo.BackRepoParagraph.GetDB()
 
-	query := db.Find(&paragraphDBs)
-	if query.Error != nil {
+	_, err := db.Find(&paragraphDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostParagraph(c *gin.Context) {
 	paragraphDB.ParagraphPointersEncoding = input.ParagraphPointersEncoding
 	paragraphDB.CopyBasicFieldsFromParagraph_WOP(&input.Paragraph_WOP)
 
-	query := db.Create(&paragraphDB)
-	if query.Error != nil {
+	_, err = db.Create(&paragraphDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetParagraph(c *gin.Context) {
 
 	// Get paragraphDB in DB
 	var paragraphDB orm.ParagraphDB
-	if err := db.First(&paragraphDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&paragraphDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateParagraph(c *gin.Context) {
 	var paragraphDB orm.ParagraphDB
 
 	// fetch the paragraph
-	query := db.First(&paragraphDB, c.Param("id"))
+	_, err := db.First(&paragraphDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateParagraph(c *gin.Context) {
 	paragraphDB.CopyBasicFieldsFromParagraph_WOP(&input.Paragraph_WOP)
 	paragraphDB.ParagraphPointersEncoding = input.ParagraphPointersEncoding
 
-	query = db.Model(&paragraphDB).Updates(paragraphDB)
-	if query.Error != nil {
+	db, _ = db.Model(&paragraphDB)
+	_, err = db.Updates(paragraphDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteParagraph(c *gin.Context) {
 
 	// Get model if exist
 	var paragraphDB orm.ParagraphDB
-	if err := db.First(&paragraphDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&paragraphDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteParagraph(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&paragraphDB)
+	db.Unscoped()
+	db.Delete(&paragraphDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	paragraphDeleted := new(models.Paragraph)

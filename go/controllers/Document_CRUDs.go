@@ -70,12 +70,12 @@ func (controller *Controller) GetDocuments(c *gin.Context) {
 	}
 	db := backRepo.BackRepoDocument.GetDB()
 
-	query := db.Find(&documentDBs)
-	if query.Error != nil {
+	_, err := db.Find(&documentDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostDocument(c *gin.Context) {
 	documentDB.DocumentPointersEncoding = input.DocumentPointersEncoding
 	documentDB.CopyBasicFieldsFromDocument_WOP(&input.Document_WOP)
 
-	query := db.Create(&documentDB)
-	if query.Error != nil {
+	_, err = db.Create(&documentDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetDocument(c *gin.Context) {
 
 	// Get documentDB in DB
 	var documentDB orm.DocumentDB
-	if err := db.First(&documentDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&documentDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateDocument(c *gin.Context) {
 	var documentDB orm.DocumentDB
 
 	// fetch the document
-	query := db.First(&documentDB, c.Param("id"))
+	_, err := db.First(&documentDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateDocument(c *gin.Context) {
 	documentDB.CopyBasicFieldsFromDocument_WOP(&input.Document_WOP)
 	documentDB.DocumentPointersEncoding = input.DocumentPointersEncoding
 
-	query = db.Model(&documentDB).Updates(documentDB)
-	if query.Error != nil {
+	db, _ = db.Model(&documentDB)
+	_, err = db.Updates(documentDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteDocument(c *gin.Context) {
 
 	// Get model if exist
 	var documentDB orm.DocumentDB
-	if err := db.First(&documentDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&documentDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteDocument(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&documentDB)
+	db.Unscoped()
+	db.Delete(&documentDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	documentDeleted := new(models.Document)

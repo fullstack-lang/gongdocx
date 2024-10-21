@@ -70,12 +70,12 @@ func (controller *Controller) GetDocxs(c *gin.Context) {
 	}
 	db := backRepo.BackRepoDocx.GetDB()
 
-	query := db.Find(&docxDBs)
-	if query.Error != nil {
+	_, err := db.Find(&docxDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostDocx(c *gin.Context) {
 	docxDB.DocxPointersEncoding = input.DocxPointersEncoding
 	docxDB.CopyBasicFieldsFromDocx_WOP(&input.Docx_WOP)
 
-	query := db.Create(&docxDB)
-	if query.Error != nil {
+	_, err = db.Create(&docxDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetDocx(c *gin.Context) {
 
 	// Get docxDB in DB
 	var docxDB orm.DocxDB
-	if err := db.First(&docxDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&docxDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateDocx(c *gin.Context) {
 	var docxDB orm.DocxDB
 
 	// fetch the docx
-	query := db.First(&docxDB, c.Param("id"))
+	_, err := db.First(&docxDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateDocx(c *gin.Context) {
 	docxDB.CopyBasicFieldsFromDocx_WOP(&input.Docx_WOP)
 	docxDB.DocxPointersEncoding = input.DocxPointersEncoding
 
-	query = db.Model(&docxDB).Updates(docxDB)
-	if query.Error != nil {
+	db, _ = db.Model(&docxDB)
+	_, err = db.Updates(docxDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteDocx(c *gin.Context) {
 
 	// Get model if exist
 	var docxDB orm.DocxDB
-	if err := db.First(&docxDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&docxDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteDocx(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&docxDB)
+	db.Unscoped()
+	db.Delete(&docxDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	docxDeleted := new(models.Docx)

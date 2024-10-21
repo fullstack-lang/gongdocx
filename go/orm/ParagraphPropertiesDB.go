@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -72,7 +73,7 @@ type ParagraphPropertiesDB struct {
 
 	// Declation for basic field paragraphpropertiesDB.Content
 	Content_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	ParagraphPropertiesPointersEncoding
@@ -118,7 +119,7 @@ type BackRepoParagraphPropertiesStruct struct {
 	// stores ParagraphProperties according to their gorm ID
 	Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr map[uint]*models.ParagraphProperties
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -128,7 +129,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) GetStage()
 	return
 }
 
-func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) GetDB() *gorm.DB {
+func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) GetDB() db.DBInterface {
 	return backRepoParagraphProperties.db
 }
 
@@ -165,9 +166,10 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitDele
 
 	// paragraphproperties is not staged anymore, remove paragraphpropertiesDB
 	paragraphpropertiesDB := backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[id]
-	query := backRepoParagraphProperties.db.Unscoped().Delete(&paragraphpropertiesDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoParagraphProperties.db.Unscoped()
+	_, err := db.Delete(&paragraphpropertiesDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -191,9 +193,9 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 	var paragraphpropertiesDB ParagraphPropertiesDB
 	paragraphpropertiesDB.CopyBasicFieldsFromParagraphProperties(paragraphproperties)
 
-	query := backRepoParagraphProperties.db.Create(&paragraphpropertiesDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoParagraphProperties.db.Create(&paragraphpropertiesDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -249,9 +251,9 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 			paragraphpropertiesDB.NodeID.Valid = true
 		}
 
-		query := backRepoParagraphProperties.db.Save(&paragraphpropertiesDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoParagraphProperties.db.Save(&paragraphpropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -270,9 +272,9 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CheckoutPhaseOne() (Error error) {
 
 	paragraphpropertiesDBArray := make([]ParagraphPropertiesDB, 0)
-	query := backRepoParagraphProperties.db.Find(&paragraphpropertiesDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoParagraphProperties.db.Find(&paragraphpropertiesDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -393,7 +395,7 @@ func (backRepo *BackRepoStruct) CheckoutParagraphProperties(paragraphproperties 
 			var paragraphpropertiesDB ParagraphPropertiesDB
 			paragraphpropertiesDB.ID = id
 
-			if err := backRepo.BackRepoParagraphProperties.db.First(&paragraphpropertiesDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoParagraphProperties.db.First(&paragraphpropertiesDB, id); err != nil {
 				log.Fatalln("CheckoutParagraphProperties : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoParagraphProperties.CheckoutPhaseOneInstance(&paragraphpropertiesDB)
@@ -552,9 +554,9 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) rowVisitor
 
 		paragraphpropertiesDB_ID_atBackupTime := paragraphpropertiesDB.ID
 		paragraphpropertiesDB.ID = 0
-		query := backRepoParagraphProperties.db.Create(paragraphpropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoParagraphProperties.db.Create(paragraphpropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[paragraphpropertiesDB.ID] = paragraphpropertiesDB
 		BackRepoParagraphPropertiesid_atBckpTime_newID[paragraphpropertiesDB_ID_atBackupTime] = paragraphpropertiesDB.ID
@@ -589,9 +591,9 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestorePha
 
 		paragraphpropertiesDB_ID_atBackupTime := paragraphpropertiesDB.ID
 		paragraphpropertiesDB.ID = 0
-		query := backRepoParagraphProperties.db.Create(paragraphpropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoParagraphProperties.db.Create(paragraphpropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[paragraphpropertiesDB.ID] = paragraphpropertiesDB
 		BackRepoParagraphPropertiesid_atBckpTime_newID[paragraphpropertiesDB_ID_atBackupTime] = paragraphpropertiesDB.ID
@@ -625,9 +627,10 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) RestorePha
 		}
 
 		// update databse with new index encoding
-		query := backRepoParagraphProperties.db.Model(paragraphpropertiesDB).Updates(*paragraphpropertiesDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoParagraphProperties.db.Model(paragraphpropertiesDB)
+		_, err := db.Updates(*paragraphpropertiesDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

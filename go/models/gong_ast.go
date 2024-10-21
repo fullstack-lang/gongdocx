@@ -503,67 +503,99 @@ func UnmarshallGongstructStaging(stage *StageStruct, cmap *ast.CommentMap, assig
 									switch gongstructName {
 									// insertion point for identifiers
 									case "Body":
-										instanceBody := (&Body{Name: instanceName}).Stage(stage)
+										instanceBody := new(Body)
+										instanceBody.Name = instanceName
+										instanceBody.Stage(stage)
 										instance = any(instanceBody)
 										__gong__map_Body[identifier] = instanceBody
 									case "Document":
-										instanceDocument := (&Document{Name: instanceName}).Stage(stage)
+										instanceDocument := new(Document)
+										instanceDocument.Name = instanceName
+										instanceDocument.Stage(stage)
 										instance = any(instanceDocument)
 										__gong__map_Document[identifier] = instanceDocument
 									case "Docx":
-										instanceDocx := (&Docx{Name: instanceName}).Stage(stage)
+										instanceDocx := new(Docx)
+										instanceDocx.Name = instanceName
+										instanceDocx.Stage(stage)
 										instance = any(instanceDocx)
 										__gong__map_Docx[identifier] = instanceDocx
 									case "File":
-										instanceFile := (&File{Name: instanceName}).Stage(stage)
+										instanceFile := new(File)
+										instanceFile.Name = instanceName
+										instanceFile.Stage(stage)
 										instance = any(instanceFile)
 										__gong__map_File[identifier] = instanceFile
 									case "Node":
-										instanceNode := (&Node{Name: instanceName}).Stage(stage)
+										instanceNode := new(Node)
+										instanceNode.Name = instanceName
+										instanceNode.Stage(stage)
 										instance = any(instanceNode)
 										__gong__map_Node[identifier] = instanceNode
 									case "Paragraph":
-										instanceParagraph := (&Paragraph{Name: instanceName}).Stage(stage)
+										instanceParagraph := new(Paragraph)
+										instanceParagraph.Name = instanceName
+										instanceParagraph.Stage(stage)
 										instance = any(instanceParagraph)
 										__gong__map_Paragraph[identifier] = instanceParagraph
 									case "ParagraphProperties":
-										instanceParagraphProperties := (&ParagraphProperties{Name: instanceName}).Stage(stage)
+										instanceParagraphProperties := new(ParagraphProperties)
+										instanceParagraphProperties.Name = instanceName
+										instanceParagraphProperties.Stage(stage)
 										instance = any(instanceParagraphProperties)
 										__gong__map_ParagraphProperties[identifier] = instanceParagraphProperties
 									case "ParagraphStyle":
-										instanceParagraphStyle := (&ParagraphStyle{Name: instanceName}).Stage(stage)
+										instanceParagraphStyle := new(ParagraphStyle)
+										instanceParagraphStyle.Name = instanceName
+										instanceParagraphStyle.Stage(stage)
 										instance = any(instanceParagraphStyle)
 										__gong__map_ParagraphStyle[identifier] = instanceParagraphStyle
 									case "Rune":
-										instanceRune := (&Rune{Name: instanceName}).Stage(stage)
+										instanceRune := new(Rune)
+										instanceRune.Name = instanceName
+										instanceRune.Stage(stage)
 										instance = any(instanceRune)
 										__gong__map_Rune[identifier] = instanceRune
 									case "RuneProperties":
-										instanceRuneProperties := (&RuneProperties{Name: instanceName}).Stage(stage)
+										instanceRuneProperties := new(RuneProperties)
+										instanceRuneProperties.Name = instanceName
+										instanceRuneProperties.Stage(stage)
 										instance = any(instanceRuneProperties)
 										__gong__map_RuneProperties[identifier] = instanceRuneProperties
 									case "Table":
-										instanceTable := (&Table{Name: instanceName}).Stage(stage)
+										instanceTable := new(Table)
+										instanceTable.Name = instanceName
+										instanceTable.Stage(stage)
 										instance = any(instanceTable)
 										__gong__map_Table[identifier] = instanceTable
 									case "TableColumn":
-										instanceTableColumn := (&TableColumn{Name: instanceName}).Stage(stage)
+										instanceTableColumn := new(TableColumn)
+										instanceTableColumn.Name = instanceName
+										instanceTableColumn.Stage(stage)
 										instance = any(instanceTableColumn)
 										__gong__map_TableColumn[identifier] = instanceTableColumn
 									case "TableProperties":
-										instanceTableProperties := (&TableProperties{Name: instanceName}).Stage(stage)
+										instanceTableProperties := new(TableProperties)
+										instanceTableProperties.Name = instanceName
+										instanceTableProperties.Stage(stage)
 										instance = any(instanceTableProperties)
 										__gong__map_TableProperties[identifier] = instanceTableProperties
 									case "TableRow":
-										instanceTableRow := (&TableRow{Name: instanceName}).Stage(stage)
+										instanceTableRow := new(TableRow)
+										instanceTableRow.Name = instanceName
+										instanceTableRow.Stage(stage)
 										instance = any(instanceTableRow)
 										__gong__map_TableRow[identifier] = instanceTableRow
 									case "TableStyle":
-										instanceTableStyle := (&TableStyle{Name: instanceName}).Stage(stage)
+										instanceTableStyle := new(TableStyle)
+										instanceTableStyle.Name = instanceName
+										instanceTableStyle.Stage(stage)
 										instance = any(instanceTableStyle)
 										__gong__map_TableStyle[identifier] = instanceTableStyle
 									case "Text":
-										instanceText := (&Text{Name: instanceName}).Stage(stage)
+										instanceText := new(Text)
+										instanceText.Name = instanceName
+										instanceText.Stage(stage)
 										instance = any(instanceText)
 										__gong__map_Text[identifier] = instanceText
 									}

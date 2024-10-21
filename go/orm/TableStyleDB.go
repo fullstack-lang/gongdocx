@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -71,7 +72,7 @@ type TableStyleDB struct {
 
 	// Declation for basic field tablestyleDB.Val
 	Val_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	TableStylePointersEncoding
@@ -120,7 +121,7 @@ type BackRepoTableStyleStruct struct {
 	// stores TableStyle according to their gorm ID
 	Map_TableStyleDBID_TableStylePtr map[uint]*models.TableStyle
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -130,7 +131,7 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) GetStage() (stage *models.St
 	return
 }
 
-func (backRepoTableStyle *BackRepoTableStyleStruct) GetDB() *gorm.DB {
+func (backRepoTableStyle *BackRepoTableStyleStruct) GetDB() db.DBInterface {
 	return backRepoTableStyle.db
 }
 
@@ -167,9 +168,10 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CommitDeleteInstance(id uint
 
 	// tablestyle is not staged anymore, remove tablestyleDB
 	tablestyleDB := backRepoTableStyle.Map_TableStyleDBID_TableStyleDB[id]
-	query := backRepoTableStyle.db.Unscoped().Delete(&tablestyleDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoTableStyle.db.Unscoped()
+	_, err := db.Delete(&tablestyleDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -193,9 +195,9 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CommitPhaseOneInstance(table
 	var tablestyleDB TableStyleDB
 	tablestyleDB.CopyBasicFieldsFromTableStyle(tablestyle)
 
-	query := backRepoTableStyle.db.Create(&tablestyleDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoTableStyle.db.Create(&tablestyleDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -239,9 +241,9 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CommitPhaseTwoInstance(backR
 			tablestyleDB.NodeID.Valid = true
 		}
 
-		query := backRepoTableStyle.db.Save(&tablestyleDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoTableStyle.db.Save(&tablestyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -260,9 +262,9 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CommitPhaseTwoInstance(backR
 func (backRepoTableStyle *BackRepoTableStyleStruct) CheckoutPhaseOne() (Error error) {
 
 	tablestyleDBArray := make([]TableStyleDB, 0)
-	query := backRepoTableStyle.db.Find(&tablestyleDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoTableStyle.db.Find(&tablestyleDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -378,7 +380,7 @@ func (backRepo *BackRepoStruct) CheckoutTableStyle(tablestyle *models.TableStyle
 			var tablestyleDB TableStyleDB
 			tablestyleDB.ID = id
 
-			if err := backRepo.BackRepoTableStyle.db.First(&tablestyleDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoTableStyle.db.First(&tablestyleDB, id); err != nil {
 				log.Fatalln("CheckoutTableStyle : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoTableStyle.CheckoutPhaseOneInstance(&tablestyleDB)
@@ -549,9 +551,9 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) rowVisitorTableStyle(row *xl
 
 		tablestyleDB_ID_atBackupTime := tablestyleDB.ID
 		tablestyleDB.ID = 0
-		query := backRepoTableStyle.db.Create(tablestyleDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTableStyle.db.Create(tablestyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTableStyle.Map_TableStyleDBID_TableStyleDB[tablestyleDB.ID] = tablestyleDB
 		BackRepoTableStyleid_atBckpTime_newID[tablestyleDB_ID_atBackupTime] = tablestyleDB.ID
@@ -586,9 +588,9 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) RestorePhaseOne(dirPath stri
 
 		tablestyleDB_ID_atBackupTime := tablestyleDB.ID
 		tablestyleDB.ID = 0
-		query := backRepoTableStyle.db.Create(tablestyleDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoTableStyle.db.Create(tablestyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoTableStyle.Map_TableStyleDBID_TableStyleDB[tablestyleDB.ID] = tablestyleDB
 		BackRepoTableStyleid_atBckpTime_newID[tablestyleDB_ID_atBackupTime] = tablestyleDB.ID
@@ -616,9 +618,10 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoTableStyle.db.Model(tablestyleDB).Updates(*tablestyleDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoTableStyle.db.Model(tablestyleDB)
+		_, err := db.Updates(*tablestyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

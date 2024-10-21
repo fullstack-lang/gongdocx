@@ -70,12 +70,12 @@ func (controller *Controller) GetTableStyles(c *gin.Context) {
 	}
 	db := backRepo.BackRepoTableStyle.GetDB()
 
-	query := db.Find(&tablestyleDBs)
-	if query.Error != nil {
+	_, err := db.Find(&tablestyleDBs)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -151,12 +151,12 @@ func (controller *Controller) PostTableStyle(c *gin.Context) {
 	tablestyleDB.TableStylePointersEncoding = input.TableStylePointersEncoding
 	tablestyleDB.CopyBasicFieldsFromTableStyle_WOP(&input.TableStyle_WOP)
 
-	query := db.Create(&tablestyleDB)
-	if query.Error != nil {
+	_, err = db.Create(&tablestyleDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -205,7 +205,7 @@ func (controller *Controller) GetTableStyle(c *gin.Context) {
 
 	// Get tablestyleDB in DB
 	var tablestyleDB orm.TableStyleDB
-	if err := db.First(&tablestyleDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablestyleDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -264,13 +264,13 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 	var tablestyleDB orm.TableStyleDB
 
 	// fetch the tablestyle
-	query := db.First(&tablestyleDB, c.Param("id"))
+	_, err := db.First(&tablestyleDB, c.Param("id"))
 
-	if query.Error != nil {
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -279,12 +279,13 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 	tablestyleDB.CopyBasicFieldsFromTableStyle_WOP(&input.TableStyle_WOP)
 	tablestyleDB.TableStylePointersEncoding = input.TableStylePointersEncoding
 
-	query = db.Model(&tablestyleDB).Updates(tablestyleDB)
-	if query.Error != nil {
+	db, _ = db.Model(&tablestyleDB)
+	_, err = db.Updates(tablestyleDB)
+	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
-		returnError.Body.Message = query.Error.Error()
-		log.Println(query.Error.Error())
+		returnError.Body.Message = err.Error()
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, returnError.Body)
 		return
 	}
@@ -343,7 +344,7 @@ func (controller *Controller) DeleteTableStyle(c *gin.Context) {
 
 	// Get model if exist
 	var tablestyleDB orm.TableStyleDB
-	if err := db.First(&tablestyleDB, c.Param("id")).Error; err != nil {
+	if _, err := db.First(&tablestyleDB, c.Param("id")); err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
 		returnError.Body.Message = err.Error()
@@ -353,7 +354,8 @@ func (controller *Controller) DeleteTableStyle(c *gin.Context) {
 	}
 
 	// with gorm.Model field, default delete is a soft delete. Unscoped() force delete
-	db.Unscoped().Delete(&tablestyleDB)
+	db.Unscoped()
+	db.Delete(&tablestyleDB)
 
 	// get an instance (not staged) from DB instance, and call callback function
 	tablestyleDeleted := new(models.TableStyle)

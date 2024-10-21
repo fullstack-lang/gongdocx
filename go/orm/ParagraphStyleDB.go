@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
 )
 
@@ -71,7 +72,7 @@ type ParagraphStyleDB struct {
 
 	// Declation for basic field paragraphstyleDB.ValAttr
 	ValAttr_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	ParagraphStylePointersEncoding
@@ -120,7 +121,7 @@ type BackRepoParagraphStyleStruct struct {
 	// stores ParagraphStyle according to their gorm ID
 	Map_ParagraphStyleDBID_ParagraphStylePtr map[uint]*models.ParagraphStyle
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -130,7 +131,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) GetStage() (stage *m
 	return
 }
 
-func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) GetDB() *gorm.DB {
+func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) GetDB() db.DBInterface {
 	return backRepoParagraphStyle.db
 }
 
@@ -167,9 +168,10 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitDeleteInstance
 
 	// paragraphstyle is not staged anymore, remove paragraphstyleDB
 	paragraphstyleDB := backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[id]
-	query := backRepoParagraphStyle.db.Unscoped().Delete(&paragraphstyleDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoParagraphStyle.db.Unscoped()
+	_, err := db.Delete(&paragraphstyleDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -193,9 +195,9 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitPhaseOneInstan
 	var paragraphstyleDB ParagraphStyleDB
 	paragraphstyleDB.CopyBasicFieldsFromParagraphStyle(paragraphstyle)
 
-	query := backRepoParagraphStyle.db.Create(&paragraphstyleDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoParagraphStyle.db.Create(&paragraphstyleDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -239,9 +241,9 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitPhaseTwoInstan
 			paragraphstyleDB.NodeID.Valid = true
 		}
 
-		query := backRepoParagraphStyle.db.Save(&paragraphstyleDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoParagraphStyle.db.Save(&paragraphstyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -260,9 +262,9 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitPhaseTwoInstan
 func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CheckoutPhaseOne() (Error error) {
 
 	paragraphstyleDBArray := make([]ParagraphStyleDB, 0)
-	query := backRepoParagraphStyle.db.Find(&paragraphstyleDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoParagraphStyle.db.Find(&paragraphstyleDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -378,7 +380,7 @@ func (backRepo *BackRepoStruct) CheckoutParagraphStyle(paragraphstyle *models.Pa
 			var paragraphstyleDB ParagraphStyleDB
 			paragraphstyleDB.ID = id
 
-			if err := backRepo.BackRepoParagraphStyle.db.First(&paragraphstyleDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoParagraphStyle.db.First(&paragraphstyleDB, id); err != nil {
 				log.Fatalln("CheckoutParagraphStyle : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoParagraphStyle.CheckoutPhaseOneInstance(&paragraphstyleDB)
@@ -549,9 +551,9 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) rowVisitorParagraphS
 
 		paragraphstyleDB_ID_atBackupTime := paragraphstyleDB.ID
 		paragraphstyleDB.ID = 0
-		query := backRepoParagraphStyle.db.Create(paragraphstyleDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoParagraphStyle.db.Create(paragraphstyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[paragraphstyleDB.ID] = paragraphstyleDB
 		BackRepoParagraphStyleid_atBckpTime_newID[paragraphstyleDB_ID_atBackupTime] = paragraphstyleDB.ID
@@ -586,9 +588,9 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) RestorePhaseOne(dirP
 
 		paragraphstyleDB_ID_atBackupTime := paragraphstyleDB.ID
 		paragraphstyleDB.ID = 0
-		query := backRepoParagraphStyle.db.Create(paragraphstyleDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoParagraphStyle.db.Create(paragraphstyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[paragraphstyleDB.ID] = paragraphstyleDB
 		BackRepoParagraphStyleid_atBckpTime_newID[paragraphstyleDB_ID_atBackupTime] = paragraphstyleDB.ID
@@ -616,9 +618,10 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) RestorePhaseTwo() {
 		}
 
 		// update databse with new index encoding
-		query := backRepoParagraphStyle.db.Model(paragraphstyleDB).Updates(*paragraphstyleDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoParagraphStyle.db.Model(paragraphstyleDB)
+		_, err := db.Updates(*paragraphstyleDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 
