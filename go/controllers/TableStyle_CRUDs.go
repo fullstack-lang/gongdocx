@@ -280,7 +280,7 @@ func (controller *Controller) UpdateTableStyle(c *gin.Context) {
 	tablestyleDB.TableStylePointersEncoding = input.TableStylePointersEncoding
 
 	db, _ = db.Model(&tablestyleDB)
-	_, err = db.Updates(tablestyleDB)
+	_, err = db.Updates(&tablestyleDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

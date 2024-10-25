@@ -280,7 +280,7 @@ func (controller *Controller) UpdateDocument(c *gin.Context) {
 	documentDB.DocumentPointersEncoding = input.DocumentPointersEncoding
 
 	db, _ = db.Model(&documentDB)
-	_, err = db.Updates(documentDB)
+	_, err = db.Updates(&documentDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

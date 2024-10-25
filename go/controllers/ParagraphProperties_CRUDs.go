@@ -280,7 +280,7 @@ func (controller *Controller) UpdateParagraphProperties(c *gin.Context) {
 	paragraphpropertiesDB.ParagraphPropertiesPointersEncoding = input.ParagraphPropertiesPointersEncoding
 
 	db, _ = db.Model(&paragraphpropertiesDB)
-	_, err = db.Updates(paragraphpropertiesDB)
+	_, err = db.Updates(&paragraphpropertiesDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

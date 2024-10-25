@@ -280,7 +280,7 @@ func (controller *Controller) UpdateBody(c *gin.Context) {
 	bodyDB.BodyPointersEncoding = input.BodyPointersEncoding
 
 	db, _ = db.Model(&bodyDB)
-	_, err = db.Updates(bodyDB)
+	_, err = db.Updates(&bodyDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

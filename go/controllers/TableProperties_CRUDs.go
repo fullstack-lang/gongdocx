@@ -280,7 +280,7 @@ func (controller *Controller) UpdateTableProperties(c *gin.Context) {
 	tablepropertiesDB.TablePropertiesPointersEncoding = input.TablePropertiesPointersEncoding
 
 	db, _ = db.Model(&tablepropertiesDB)
-	_, err = db.Updates(tablepropertiesDB)
+	_, err = db.Updates(&tablepropertiesDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

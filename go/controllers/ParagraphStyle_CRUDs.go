@@ -280,7 +280,7 @@ func (controller *Controller) UpdateParagraphStyle(c *gin.Context) {
 	paragraphstyleDB.ParagraphStylePointersEncoding = input.ParagraphStylePointersEncoding
 
 	db, _ = db.Model(&paragraphstyleDB)
-	_, err = db.Updates(paragraphstyleDB)
+	_, err = db.Updates(&paragraphstyleDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

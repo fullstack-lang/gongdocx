@@ -280,7 +280,7 @@ func (controller *Controller) UpdateFile(c *gin.Context) {
 	fileDB.FilePointersEncoding = input.FilePointersEncoding
 
 	db, _ = db.Model(&fileDB)
-	_, err = db.Updates(fileDB)
+	_, err = db.Updates(&fileDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

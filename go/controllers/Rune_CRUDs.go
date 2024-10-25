@@ -280,7 +280,7 @@ func (controller *Controller) UpdateRune(c *gin.Context) {
 	runeDB.RunePointersEncoding = input.RunePointersEncoding
 
 	db, _ = db.Model(&runeDB)
-	_, err = db.Updates(runeDB)
+	_, err = db.Updates(&runeDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

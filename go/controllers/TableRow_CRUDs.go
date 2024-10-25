@@ -280,7 +280,7 @@ func (controller *Controller) UpdateTableRow(c *gin.Context) {
 	tablerowDB.TableRowPointersEncoding = input.TableRowPointersEncoding
 
 	db, _ = db.Model(&tablerowDB)
-	_, err = db.Updates(tablerowDB)
+	_, err = db.Updates(&tablerowDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest

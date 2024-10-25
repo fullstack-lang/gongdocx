@@ -280,7 +280,7 @@ func (controller *Controller) UpdateDocx(c *gin.Context) {
 	docxDB.DocxPointersEncoding = input.DocxPointersEncoding
 
 	db, _ = db.Model(&docxDB)
-	_, err = db.Updates(docxDB)
+	_, err = db.Updates(&docxDB)
 	if err != nil {
 		var returnError GenericError
 		returnError.Body.Code = http.StatusBadRequest
