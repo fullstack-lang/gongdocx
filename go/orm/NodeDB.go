@@ -156,7 +156,7 @@ func (backRepoNode *BackRepoNodeStruct) CommitDeleteInstance(id uint) (Error err
 	// node is not staged anymore, remove nodeDB
 	nodeDB := backRepoNode.Map_NodeDBID_NodeDB[id]
 	db, _ := backRepoNode.db.Unscoped()
-	_, err := db.Delete(&nodeDB)
+	_, err := db.Delete(nodeDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -234,7 +234,7 @@ func (backRepoNode *BackRepoNodeStruct) CommitPhaseTwoInstance(backRepo *BackRep
 				append(nodeDB.NodePointersEncoding.Nodes, int(nodeAssocEnd_DB.ID))
 		}
 
-		_, err := backRepoNode.db.Save(&nodeDB)
+		_, err := backRepoNode.db.Save(nodeDB)
 		if err != nil {
 			log.Fatal(err)
 		}

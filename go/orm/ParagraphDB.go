@@ -192,7 +192,7 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitDeleteInstance(id uint) 
 	// paragraph is not staged anymore, remove paragraphDB
 	paragraphDB := backRepoParagraph.Map_ParagraphDBID_ParagraphDB[id]
 	db, _ := backRepoParagraph.db.Unscoped()
-	_, err := db.Delete(&paragraphDB)
+	_, err := db.Delete(paragraphDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -342,7 +342,7 @@ func (backRepoParagraph *BackRepoParagraphStruct) CommitPhaseTwoInstance(backRep
 			paragraphDB.EnclosingTableColumnID.Valid = true
 		}
 
-		_, err := backRepoParagraph.db.Save(&paragraphDB)
+		_, err := backRepoParagraph.db.Save(paragraphDB)
 		if err != nil {
 			log.Fatal(err)
 		}

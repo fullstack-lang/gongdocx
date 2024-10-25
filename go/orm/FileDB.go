@@ -153,7 +153,7 @@ func (backRepoFile *BackRepoFileStruct) CommitDeleteInstance(id uint) (Error err
 	// file is not staged anymore, remove fileDB
 	fileDB := backRepoFile.Map_FileDBID_FileDB[id]
 	db, _ := backRepoFile.db.Unscoped()
-	_, err := db.Delete(&fileDB)
+	_, err := db.Delete(fileDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -213,7 +213,7 @@ func (backRepoFile *BackRepoFileStruct) CommitPhaseTwoInstance(backRepo *BackRep
 		fileDB.CopyBasicFieldsFromFile(file)
 
 		// insertion point for translating pointers encodings into actual pointers
-		_, err := backRepoFile.db.Save(&fileDB)
+		_, err := backRepoFile.db.Save(fileDB)
 		if err != nil {
 			log.Fatal(err)
 		}

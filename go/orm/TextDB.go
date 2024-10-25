@@ -174,7 +174,7 @@ func (backRepoText *BackRepoTextStruct) CommitDeleteInstance(id uint) (Error err
 	// text is not staged anymore, remove textDB
 	textDB := backRepoText.Map_TextDBID_TextDB[id]
 	db, _ := backRepoText.db.Unscoped()
-	_, err := db.Delete(&textDB)
+	_, err := db.Delete(textDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -258,7 +258,7 @@ func (backRepoText *BackRepoTextStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			textDB.EnclosingRuneID.Valid = true
 		}
 
-		_, err := backRepoText.db.Save(&textDB)
+		_, err := backRepoText.db.Save(textDB)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -10,8 +10,12 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/fullstack-lang/gongdocx/go/db"
 	"github.com/fullstack-lang/gongdocx/go/models"
+
+	/* THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm
 	"github.com/fullstack-lang/gongdocx/go/orm/dbgorm"
+	THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm */
 
 	"github.com/tealeg/xlsx/v3"
 )
@@ -64,7 +68,12 @@ type BackRepoStruct struct {
 
 func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepoStruct) {
 
-	dbWrapper := dbgorm.NewDBWrapper(filename, "github_com_fullstack_lang_gongdocx_go",
+	var db db.DBInterface
+
+	db = NewDBLite()
+
+	/* THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm
+	db = dbgorm.NewDBWrapper(filename, "github_com_fullstack_lang_gongdocx_go",
 		&BodyDB{},
 		&DocumentDB{},
 		&DocxDB{},
@@ -82,6 +91,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&TableStyleDB{},
 		&TextDB{},
 	)
+	THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm */
 
 	backRepo = new(BackRepoStruct)
 
@@ -91,7 +101,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_BodyDBID_BodyDB:  make(map[uint]*BodyDB, 0),
 		Map_BodyPtr_BodyDBID: make(map[*models.Body]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoDocument = BackRepoDocumentStruct{
@@ -99,7 +109,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_DocumentDBID_DocumentDB:  make(map[uint]*DocumentDB, 0),
 		Map_DocumentPtr_DocumentDBID: make(map[*models.Document]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoDocx = BackRepoDocxStruct{
@@ -107,7 +117,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_DocxDBID_DocxDB:  make(map[uint]*DocxDB, 0),
 		Map_DocxPtr_DocxDBID: make(map[*models.Docx]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoFile = BackRepoFileStruct{
@@ -115,7 +125,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_FileDBID_FileDB:  make(map[uint]*FileDB, 0),
 		Map_FilePtr_FileDBID: make(map[*models.File]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoNode = BackRepoNodeStruct{
@@ -123,7 +133,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_NodeDBID_NodeDB:  make(map[uint]*NodeDB, 0),
 		Map_NodePtr_NodeDBID: make(map[*models.Node]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoParagraph = BackRepoParagraphStruct{
@@ -131,7 +141,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_ParagraphDBID_ParagraphDB:  make(map[uint]*ParagraphDB, 0),
 		Map_ParagraphPtr_ParagraphDBID: make(map[*models.Paragraph]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoParagraphProperties = BackRepoParagraphPropertiesStruct{
@@ -139,7 +149,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_ParagraphPropertiesDBID_ParagraphPropertiesDB:  make(map[uint]*ParagraphPropertiesDB, 0),
 		Map_ParagraphPropertiesPtr_ParagraphPropertiesDBID: make(map[*models.ParagraphProperties]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoParagraphStyle = BackRepoParagraphStyleStruct{
@@ -147,7 +157,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_ParagraphStyleDBID_ParagraphStyleDB:  make(map[uint]*ParagraphStyleDB, 0),
 		Map_ParagraphStylePtr_ParagraphStyleDBID: make(map[*models.ParagraphStyle]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoRune = BackRepoRuneStruct{
@@ -155,7 +165,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_RuneDBID_RuneDB:  make(map[uint]*RuneDB, 0),
 		Map_RunePtr_RuneDBID: make(map[*models.Rune]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoRuneProperties = BackRepoRunePropertiesStruct{
@@ -163,7 +173,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_RunePropertiesDBID_RunePropertiesDB:  make(map[uint]*RunePropertiesDB, 0),
 		Map_RunePropertiesPtr_RunePropertiesDBID: make(map[*models.RuneProperties]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoTable = BackRepoTableStruct{
@@ -171,7 +181,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_TableDBID_TableDB:  make(map[uint]*TableDB, 0),
 		Map_TablePtr_TableDBID: make(map[*models.Table]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoTableColumn = BackRepoTableColumnStruct{
@@ -179,7 +189,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_TableColumnDBID_TableColumnDB:  make(map[uint]*TableColumnDB, 0),
 		Map_TableColumnPtr_TableColumnDBID: make(map[*models.TableColumn]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoTableProperties = BackRepoTablePropertiesStruct{
@@ -187,7 +197,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_TablePropertiesDBID_TablePropertiesDB:  make(map[uint]*TablePropertiesDB, 0),
 		Map_TablePropertiesPtr_TablePropertiesDBID: make(map[*models.TableProperties]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoTableRow = BackRepoTableRowStruct{
@@ -195,7 +205,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_TableRowDBID_TableRowDB:  make(map[uint]*TableRowDB, 0),
 		Map_TableRowPtr_TableRowDBID: make(map[*models.TableRow]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoTableStyle = BackRepoTableStyleStruct{
@@ -203,7 +213,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_TableStyleDBID_TableStyleDB:  make(map[uint]*TableStyleDB, 0),
 		Map_TableStylePtr_TableStyleDBID: make(map[*models.TableStyle]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 	backRepo.BackRepoText = BackRepoTextStruct{
@@ -211,7 +221,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		Map_TextDBID_TextDB:  make(map[uint]*TextDB, 0),
 		Map_TextPtr_TextDBID: make(map[*models.Text]uint, 0),
 
-		db:    dbWrapper,
+		db:    db,
 		stage: stage,
 	}
 

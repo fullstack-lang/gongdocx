@@ -163,7 +163,7 @@ func (backRepoBody *BackRepoBodyStruct) CommitDeleteInstance(id uint) (Error err
 	// body is not staged anymore, remove bodyDB
 	bodyDB := backRepoBody.Map_BodyDBID_BodyDB[id]
 	db, _ := backRepoBody.db.Unscoped()
-	_, err := db.Delete(&bodyDB)
+	_, err := db.Delete(bodyDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -271,7 +271,7 @@ func (backRepoBody *BackRepoBodyStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			bodyDB.LastParagraphID.Valid = true
 		}
 
-		_, err := backRepoBody.db.Save(&bodyDB)
+		_, err := backRepoBody.db.Save(bodyDB)
 		if err != nil {
 			log.Fatal(err)
 		}

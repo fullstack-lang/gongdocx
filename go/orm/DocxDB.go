@@ -160,7 +160,7 @@ func (backRepoDocx *BackRepoDocxStruct) CommitDeleteInstance(id uint) (Error err
 	// docx is not staged anymore, remove docxDB
 	docxDB := backRepoDocx.Map_DocxDBID_DocxDB[id]
 	db, _ := backRepoDocx.db.Unscoped()
-	_, err := db.Delete(&docxDB)
+	_, err := db.Delete(docxDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -250,7 +250,7 @@ func (backRepoDocx *BackRepoDocxStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			docxDB.DocumentID.Valid = true
 		}
 
-		_, err := backRepoDocx.db.Save(&docxDB)
+		_, err := backRepoDocx.db.Save(docxDB)
 		if err != nil {
 			log.Fatal(err)
 		}

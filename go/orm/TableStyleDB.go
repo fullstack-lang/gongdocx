@@ -169,7 +169,7 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CommitDeleteInstance(id uint
 	// tablestyle is not staged anymore, remove tablestyleDB
 	tablestyleDB := backRepoTableStyle.Map_TableStyleDBID_TableStyleDB[id]
 	db, _ := backRepoTableStyle.db.Unscoped()
-	_, err := db.Delete(&tablestyleDB)
+	_, err := db.Delete(tablestyleDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -241,7 +241,7 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CommitPhaseTwoInstance(backR
 			tablestyleDB.NodeID.Valid = true
 		}
 
-		_, err := backRepoTableStyle.db.Save(&tablestyleDB)
+		_, err := backRepoTableStyle.db.Save(tablestyleDB)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -166,7 +166,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CommitDeleteInstance(id ui
 	// tablecolumn is not staged anymore, remove tablecolumnDB
 	tablecolumnDB := backRepoTableColumn.Map_TableColumnDBID_TableColumnDB[id]
 	db, _ := backRepoTableColumn.db.Unscoped()
-	_, err := db.Delete(&tablecolumnDB)
+	_, err := db.Delete(tablecolumnDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -256,7 +256,7 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CommitPhaseTwoInstance(bac
 				append(tablecolumnDB.TableColumnPointersEncoding.Paragraphs, int(paragraphAssocEnd_DB.ID))
 		}
 
-		_, err := backRepoTableColumn.db.Save(&tablecolumnDB)
+		_, err := backRepoTableColumn.db.Save(tablecolumnDB)
 		if err != nil {
 			log.Fatal(err)
 		}

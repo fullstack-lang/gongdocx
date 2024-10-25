@@ -170,7 +170,7 @@ func (backRepoTable *BackRepoTableStruct) CommitDeleteInstance(id uint) (Error e
 	// table is not staged anymore, remove tableDB
 	tableDB := backRepoTable.Map_TableDBID_TableDB[id]
 	db, _ := backRepoTable.db.Unscoped()
-	_, err := db.Delete(&tableDB)
+	_, err := db.Delete(tableDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -272,7 +272,7 @@ func (backRepoTable *BackRepoTableStruct) CommitPhaseTwoInstance(backRepo *BackR
 				append(tableDB.TablePointersEncoding.TableRows, int(tablerowAssocEnd_DB.ID))
 		}
 
-		_, err := backRepoTable.db.Save(&tableDB)
+		_, err := backRepoTable.db.Save(tableDB)
 		if err != nil {
 			log.Fatal(err)
 		}

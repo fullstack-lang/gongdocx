@@ -167,7 +167,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitDele
 	// paragraphproperties is not staged anymore, remove paragraphpropertiesDB
 	paragraphpropertiesDB := backRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesDB[id]
 	db, _ := backRepoParagraphProperties.db.Unscoped()
-	_, err := db.Delete(&paragraphpropertiesDB)
+	_, err := db.Delete(paragraphpropertiesDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -251,7 +251,7 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CommitPhas
 			paragraphpropertiesDB.NodeID.Valid = true
 		}
 
-		_, err := backRepoParagraphProperties.db.Save(&paragraphpropertiesDB)
+		_, err := backRepoParagraphProperties.db.Save(paragraphpropertiesDB)
 		if err != nil {
 			log.Fatal(err)
 		}

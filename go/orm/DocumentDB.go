@@ -165,7 +165,7 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitDeleteInstance(id uint) (E
 	// document is not staged anymore, remove documentDB
 	documentDB := backRepoDocument.Map_DocumentDBID_DocumentDB[id]
 	db, _ := backRepoDocument.db.Unscoped()
-	_, err := db.Delete(&documentDB)
+	_, err := db.Delete(documentDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -261,7 +261,7 @@ func (backRepoDocument *BackRepoDocumentStruct) CommitPhaseTwoInstance(backRepo 
 			documentDB.BodyID.Valid = true
 		}
 
-		_, err := backRepoDocument.db.Save(&documentDB)
+		_, err := backRepoDocument.db.Save(documentDB)
 		if err != nil {
 			log.Fatal(err)
 		}

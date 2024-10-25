@@ -169,7 +169,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitDeleteInstance
 	// paragraphstyle is not staged anymore, remove paragraphstyleDB
 	paragraphstyleDB := backRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStyleDB[id]
 	db, _ := backRepoParagraphStyle.db.Unscoped()
-	_, err := db.Delete(&paragraphstyleDB)
+	_, err := db.Delete(paragraphstyleDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -241,7 +241,7 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CommitPhaseTwoInstan
 			paragraphstyleDB.NodeID.Valid = true
 		}
 
-		_, err := backRepoParagraphStyle.db.Save(&paragraphstyleDB)
+		_, err := backRepoParagraphStyle.db.Save(paragraphstyleDB)
 		if err != nil {
 			log.Fatal(err)
 		}

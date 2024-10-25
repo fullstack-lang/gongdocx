@@ -175,7 +175,7 @@ func (backRepoRune *BackRepoRuneStruct) CommitDeleteInstance(id uint) (Error err
 	// rune is not staged anymore, remove runeDB
 	runeDB := backRepoRune.Map_RuneDBID_RuneDB[id]
 	db, _ := backRepoRune.db.Unscoped()
-	_, err := db.Delete(&runeDB)
+	_, err := db.Delete(runeDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -283,7 +283,7 @@ func (backRepoRune *BackRepoRuneStruct) CommitPhaseTwoInstance(backRepo *BackRep
 			runeDB.EnclosingParagraphID.Valid = true
 		}
 
-		_, err := backRepoRune.db.Save(&runeDB)
+		_, err := backRepoRune.db.Save(runeDB)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -167,7 +167,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitDeleteInstan
 	// tableproperties is not staged anymore, remove tablepropertiesDB
 	tablepropertiesDB := backRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesDB[id]
 	db, _ := backRepoTableProperties.db.Unscoped()
-	_, err := db.Delete(&tablepropertiesDB)
+	_, err := db.Delete(tablepropertiesDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -251,7 +251,7 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CommitPhaseTwoInst
 			tablepropertiesDB.TableStyleID.Valid = true
 		}
 
-		_, err := backRepoTableProperties.db.Save(&tablepropertiesDB)
+		_, err := backRepoTableProperties.db.Save(tablepropertiesDB)
 		if err != nil {
 			log.Fatal(err)
 		}

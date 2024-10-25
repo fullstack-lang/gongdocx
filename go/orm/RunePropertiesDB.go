@@ -184,7 +184,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitDeleteInstance
 	// runeproperties is not staged anymore, remove runepropertiesDB
 	runepropertiesDB := backRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesDB[id]
 	db, _ := backRepoRuneProperties.db.Unscoped()
-	_, err := db.Delete(&runepropertiesDB)
+	_, err := db.Delete(runepropertiesDB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -256,7 +256,7 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CommitPhaseTwoInstan
 			runepropertiesDB.NodeID.Valid = true
 		}
 
-		_, err := backRepoRuneProperties.db.Save(&runepropertiesDB)
+		_, err := backRepoRuneProperties.db.Save(runepropertiesDB)
 		if err != nil {
 			log.Fatal(err)
 		}
