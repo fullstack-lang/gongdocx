@@ -345,97 +345,97 @@ func (db *DBLite) Updates(instanceDB any) (db.DBInterface, error) {
 		if existing, ok := db.bodyDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Body github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *DocumentDB:
 		if existing, ok := db.documentDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Document github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *DocxDB:
 		if existing, ok := db.docxDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Docx github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *FileDB:
 		if existing, ok := db.fileDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db File github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *NodeDB:
 		if existing, ok := db.nodeDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Node github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *ParagraphDB:
 		if existing, ok := db.paragraphDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Paragraph github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *ParagraphPropertiesDB:
 		if existing, ok := db.paragraphpropertiesDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db ParagraphProperties github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *ParagraphStyleDB:
 		if existing, ok := db.paragraphstyleDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db ParagraphStyle github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *RuneDB:
 		if existing, ok := db.runeDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Rune github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *RunePropertiesDB:
 		if existing, ok := db.runepropertiesDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db RuneProperties github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *TableDB:
 		if existing, ok := db.tableDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Table github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *TableColumnDB:
 		if existing, ok := db.tablecolumnDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db TableColumn github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *TablePropertiesDB:
 		if existing, ok := db.tablepropertiesDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db TableProperties github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *TableRowDB:
 		if existing, ok := db.tablerowDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db TableRow github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *TableStyleDB:
 		if existing, ok := db.tablestyleDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db TableStyle github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	case *TextDB:
 		if existing, ok := db.textDBs[v.ID]; ok {
 			*existing = *v
 		} else {
-			return nil, errors.New("github.com/fullstack-lang/gongdocx/go, record not found")
+			return nil, errors.New("db Text github.com/fullstack-lang/gongdocx/go, record not found")
 		}
 	default:
 		return nil, errors.New("github.com/fullstack-lang/gongdocx/go, unsupported type in Updates")
@@ -452,104 +452,104 @@ func (db *DBLite) Find(instanceDBs any) (db.DBInterface, error) {
 	switch ptr := instanceDBs.(type) {
 	// insertion point find
 	case *[]BodyDB:
-        *ptr = make([]BodyDB, 0, len(db.bodyDBs))
-        for _, v := range db.bodyDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]BodyDB, 0, len(db.bodyDBs))
+		for _, v := range db.bodyDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]DocumentDB:
-        *ptr = make([]DocumentDB, 0, len(db.documentDBs))
-        for _, v := range db.documentDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]DocumentDB, 0, len(db.documentDBs))
+		for _, v := range db.documentDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]DocxDB:
-        *ptr = make([]DocxDB, 0, len(db.docxDBs))
-        for _, v := range db.docxDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]DocxDB, 0, len(db.docxDBs))
+		for _, v := range db.docxDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]FileDB:
-        *ptr = make([]FileDB, 0, len(db.fileDBs))
-        for _, v := range db.fileDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]FileDB, 0, len(db.fileDBs))
+		for _, v := range db.fileDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]NodeDB:
-        *ptr = make([]NodeDB, 0, len(db.nodeDBs))
-        for _, v := range db.nodeDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]NodeDB, 0, len(db.nodeDBs))
+		for _, v := range db.nodeDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]ParagraphDB:
-        *ptr = make([]ParagraphDB, 0, len(db.paragraphDBs))
-        for _, v := range db.paragraphDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]ParagraphDB, 0, len(db.paragraphDBs))
+		for _, v := range db.paragraphDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]ParagraphPropertiesDB:
-        *ptr = make([]ParagraphPropertiesDB, 0, len(db.paragraphpropertiesDBs))
-        for _, v := range db.paragraphpropertiesDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]ParagraphPropertiesDB, 0, len(db.paragraphpropertiesDBs))
+		for _, v := range db.paragraphpropertiesDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]ParagraphStyleDB:
-        *ptr = make([]ParagraphStyleDB, 0, len(db.paragraphstyleDBs))
-        for _, v := range db.paragraphstyleDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]ParagraphStyleDB, 0, len(db.paragraphstyleDBs))
+		for _, v := range db.paragraphstyleDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]RuneDB:
-        *ptr = make([]RuneDB, 0, len(db.runeDBs))
-        for _, v := range db.runeDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]RuneDB, 0, len(db.runeDBs))
+		for _, v := range db.runeDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]RunePropertiesDB:
-        *ptr = make([]RunePropertiesDB, 0, len(db.runepropertiesDBs))
-        for _, v := range db.runepropertiesDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]RunePropertiesDB, 0, len(db.runepropertiesDBs))
+		for _, v := range db.runepropertiesDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]TableDB:
-        *ptr = make([]TableDB, 0, len(db.tableDBs))
-        for _, v := range db.tableDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]TableDB, 0, len(db.tableDBs))
+		for _, v := range db.tableDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]TableColumnDB:
-        *ptr = make([]TableColumnDB, 0, len(db.tablecolumnDBs))
-        for _, v := range db.tablecolumnDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]TableColumnDB, 0, len(db.tablecolumnDBs))
+		for _, v := range db.tablecolumnDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]TablePropertiesDB:
-        *ptr = make([]TablePropertiesDB, 0, len(db.tablepropertiesDBs))
-        for _, v := range db.tablepropertiesDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]TablePropertiesDB, 0, len(db.tablepropertiesDBs))
+		for _, v := range db.tablepropertiesDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]TableRowDB:
-        *ptr = make([]TableRowDB, 0, len(db.tablerowDBs))
-        for _, v := range db.tablerowDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]TableRowDB, 0, len(db.tablerowDBs))
+		for _, v := range db.tablerowDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]TableStyleDB:
-        *ptr = make([]TableStyleDB, 0, len(db.tablestyleDBs))
-        for _, v := range db.tablestyleDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
+		*ptr = make([]TableStyleDB, 0, len(db.tablestyleDBs))
+		for _, v := range db.tablestyleDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
 	case *[]TextDB:
-        *ptr = make([]TextDB, 0, len(db.textDBs))
-        for _, v := range db.textDBs {
-            *ptr = append(*ptr, *v)
-        }
-        return db, nil
-    default:
-        return nil, errors.New("github.com/fullstack-lang/gongdocx/go, Find: unsupported type")
-    }
+		*ptr = make([]TextDB, 0, len(db.textDBs))
+		for _, v := range db.textDBs {
+			*ptr = append(*ptr, *v)
+		}
+		return db, nil
+	default:
+		return nil, errors.New("github.com/fullstack-lang/gongdocx/go, Find: unsupported type")
+	}
 }
 
 // First retrieves the first record of a type from the database
@@ -577,131 +577,163 @@ func (db *DBLite) First(instanceDB any, conds ...any) (db.DBInterface, error) {
 	case *BodyDB:
 		tmp, ok := db.bodyDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Body Unkown entry %d", i))
+		}
+
 		bodyDB, _ := instanceDB.(*BodyDB)
 		*bodyDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *DocumentDB:
 		tmp, ok := db.documentDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Document Unkown entry %d", i))
+		}
+
 		documentDB, _ := instanceDB.(*DocumentDB)
 		*documentDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *DocxDB:
 		tmp, ok := db.docxDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Docx Unkown entry %d", i))
+		}
+
 		docxDB, _ := instanceDB.(*DocxDB)
 		*docxDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *FileDB:
 		tmp, ok := db.fileDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First File Unkown entry %d", i))
+		}
+
 		fileDB, _ := instanceDB.(*FileDB)
 		*fileDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *NodeDB:
 		tmp, ok := db.nodeDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Node Unkown entry %d", i))
+		}
+
 		nodeDB, _ := instanceDB.(*NodeDB)
 		*nodeDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *ParagraphDB:
 		tmp, ok := db.paragraphDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Paragraph Unkown entry %d", i))
+		}
+
 		paragraphDB, _ := instanceDB.(*ParagraphDB)
 		*paragraphDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *ParagraphPropertiesDB:
 		tmp, ok := db.paragraphpropertiesDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First ParagraphProperties Unkown entry %d", i))
+		}
+
 		paragraphpropertiesDB, _ := instanceDB.(*ParagraphPropertiesDB)
 		*paragraphpropertiesDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *ParagraphStyleDB:
 		tmp, ok := db.paragraphstyleDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First ParagraphStyle Unkown entry %d", i))
+		}
+
 		paragraphstyleDB, _ := instanceDB.(*ParagraphStyleDB)
 		*paragraphstyleDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *RuneDB:
 		tmp, ok := db.runeDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Rune Unkown entry %d", i))
+		}
+
 		runeDB, _ := instanceDB.(*RuneDB)
 		*runeDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *RunePropertiesDB:
 		tmp, ok := db.runepropertiesDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First RuneProperties Unkown entry %d", i))
+		}
+
 		runepropertiesDB, _ := instanceDB.(*RunePropertiesDB)
 		*runepropertiesDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *TableDB:
 		tmp, ok := db.tableDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Table Unkown entry %d", i))
+		}
+
 		tableDB, _ := instanceDB.(*TableDB)
 		*tableDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *TableColumnDB:
 		tmp, ok := db.tablecolumnDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First TableColumn Unkown entry %d", i))
+		}
+
 		tablecolumnDB, _ := instanceDB.(*TableColumnDB)
 		*tablecolumnDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *TablePropertiesDB:
 		tmp, ok := db.tablepropertiesDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First TableProperties Unkown entry %d", i))
+		}
+
 		tablepropertiesDB, _ := instanceDB.(*TablePropertiesDB)
 		*tablepropertiesDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *TableRowDB:
 		tmp, ok := db.tablerowDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First TableRow Unkown entry %d", i))
+		}
+
 		tablerowDB, _ := instanceDB.(*TableRowDB)
 		*tablerowDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *TableStyleDB:
 		tmp, ok := db.tablestyleDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First TableStyle Unkown entry %d", i))
+		}
+
 		tablestyleDB, _ := instanceDB.(*TableStyleDB)
 		*tablestyleDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	case *TextDB:
 		tmp, ok := db.textDBs[uint(i)]
 
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("db.First Text Unkown entry %d", i))
+		}
+
 		textDB, _ := instanceDB.(*TextDB)
 		*textDB = *tmp
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("Unkown entry %d", i))
-		}
+		
 	default:
 		return nil, errors.New("github.com/fullstack-lang/gongdocx/go, Unkown type")
 	}
