@@ -4,19 +4,21 @@ package orm
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sync"
 
+	"github.com/fullstack-lang/gongdoc/go/db"
 	"github.com/fullstack-lang/gongdoc/go/models"
 
-	"github.com/tealeg/xlsx/v3"
+	/* THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm
+	"github.com/fullstack-lang/gongdoc/go/orm/dbgorm"
+	THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm */
 
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
+	"github.com/tealeg/xlsx/v3"
 )
 
 // BackRepoStruct supports callback functions
@@ -61,33 +63,12 @@ type BackRepoStruct struct {
 
 func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepoStruct) {
 
-	// adjust naming strategy to the stack
-	gormConfig := &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "github_com_fullstack_lang_gong_test_go_", // table name prefix
-		},
-	}
-	db, err := gorm.Open(sqlite.Open(filename), gormConfig)
+	var db db.DBInterface
 
-	// since testsim is a multi threaded application. It is important to set up
-	// only one open connexion at a time
-	dbDB_inMemory, err := db.DB()
-	if err != nil {
-		panic("cannot access DB of db" + err.Error())
-	}
-	// it is mandatory to allow parallel access, otherwise, bizarre errors occurs
-	dbDB_inMemory.SetMaxOpenConns(1)
+	db = NewDBLite()
 
-	if err != nil {
-		panic("Failed to connect to database!")
-	}
-
-	// adjust naming strategy to the stack
-	db.Config.NamingStrategy = &schema.NamingStrategy{
-		TablePrefix: "github_com_fullstack_lang_gong_test_go_", // table name prefix
-	}
-
-	err = db.AutoMigrate( // insertion point for reference to structs
+	/* THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm
+	db = dbgorm.NewDBWrapper(filename, "github_com_fullstack_lang_gongdoc_go",
 		&ClassdiagramDB{},
 		&DiagramPackageDB{},
 		&FieldDB{},
@@ -102,11 +83,7 @@ func NewBackRepo(stage *models.StageStruct, filename string) (backRepo *BackRepo
 		&UmlscDB{},
 		&VerticeDB{},
 	)
-
-	if err != nil {
-		msg := err.Error()
-		panic("problem with migration " + msg + " on package github.com/fullstack-lang/gong/test/go")
-	}
+	THIS IS REMOVED BY GONG COMPILER IF TARGET IS gorm */
 
 	backRepo = new(BackRepoStruct)
 
@@ -245,7 +222,7 @@ func (backRepo *BackRepoStruct) IncrementCommitFromBackNb() uint {
 	backRepo.CommitFromBackNb = backRepo.CommitFromBackNb + 1
 
 	backRepo.broadcastNbCommitToBack()
-	
+
 	return backRepo.CommitFromBackNb
 }
 
@@ -470,30 +447,48 @@ func (backRepo *BackRepoStruct) RestoreXL(stage *models.StageStruct, dirPath str
 	backRepo.stage.Commit()
 }
 
-func (backRepoStruct *BackRepoStruct) SubscribeToCommitNb() <-chan int {
+func (backRepoStruct *BackRepoStruct) SubscribeToCommitNb(ctx context.Context) <-chan int {
+	ch := make(chan int)
+
+	backRepoStruct.rwMutex.Lock()
+	backRepoStruct.subscribers = append(backRepoStruct.subscribers, ch)
+	backRepoStruct.rwMutex.Unlock()
+
+	// Goroutine to remove subscriber when context is done
+	go func() {
+		<-ctx.Done()
+		backRepoStruct.unsubscribe(ch)
+	}()
+	return ch
+}
+
+// unsubscribe removes a subscriber's channel from the subscribers slice.
+func (backRepoStruct *BackRepoStruct) unsubscribe(ch chan int) {
 	backRepoStruct.rwMutex.Lock()
 	defer backRepoStruct.rwMutex.Unlock()
-
-	ch := make(chan int)
-	backRepoStruct.subscribers = append(backRepoStruct.subscribers, ch)
-	return ch
+	for i, subscriber := range backRepoStruct.subscribers {
+		if subscriber == ch {
+			backRepoStruct.subscribers =
+				append(backRepoStruct.subscribers[:i],
+					backRepoStruct.subscribers[i+1:]...)
+			close(ch) // Close the channel to signal completion
+			break
+		}
+	}
 }
 
 func (backRepoStruct *BackRepoStruct) broadcastNbCommitToBack() {
 	backRepoStruct.rwMutex.RLock()
-	defer backRepoStruct.rwMutex.RUnlock()
+	subscribers := make([]chan int, len(backRepoStruct.subscribers))
+	copy(subscribers, backRepoStruct.subscribers)
+	backRepoStruct.rwMutex.RUnlock()
 
-	activeChannels := make([]chan int, 0)
-
-	for _, ch := range backRepoStruct.subscribers {
+	for _, ch := range subscribers {
 		select {
 		case ch <- int(backRepoStruct.CommitFromBackNb):
-			activeChannels = append(activeChannels, ch)
+			// Successfully sent commit from back
 		default:
-			// Assume channel is no longer active; don't add to activeChannels
-			log.Println("Channel no longer active")
-			close(ch)
+			// Subscriber is not ready to receive; skip to avoid blocking
 		}
 	}
-	backRepoStruct.subscribers = activeChannels
 }

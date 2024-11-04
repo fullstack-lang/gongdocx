@@ -8,8 +8,6 @@ import (
 	"math"
 	"slices"
 	"time"
-
-	"golang.org/x/exp/maps"
 )
 
 func __Gong__Abs(x int) int {
@@ -1170,7 +1168,6 @@ func (stage *StageStruct) Unstage() { // insertion point for array nil
 // - navigation between staged instances by going backward association links between gongstruct
 // - full refactoring of Gongstruct identifiers / fields
 type Gongstruct interface {
-
 }
 
 type GongtructBasicField interface {
@@ -1194,7 +1191,9 @@ func CompareGongstructByName[T PointerToGongstruct](a, b T) int {
 
 func SortGongstructSetByName[T PointerToGongstruct](set map[T]any) (sortedSlice []T) {
 
-	sortedSlice = maps.Keys(set)
+	for key := range set {
+		sortedSlice = append(sortedSlice, key)
+	}
 	slices.SortFunc(sortedSlice, CompareGongstructByName)
 
 	return
@@ -1836,7 +1835,7 @@ func GetFields[Type Gongstruct]() (res []string) {
 	case MetaReference:
 		res = []string{"Name"}
 	case ModelPkg:
-		res = []string{"Name", "PkgPath", "PathToGoSubDirectory", "OrmPkgGenPath", "ControllersPkgGenPath", "FullstackPkgGenPath", "StackPkgGenPath", "StaticPkgGenPath", "ProbePkgGenPath", "NgWorkspacePath", "NgWorkspaceName", "NgDataLibrarySourceCodeDirectory", "NgSpecificLibrarySourceCodeDirectory", "MaterialLibDatamodelTargetPath"}
+		res = []string{"Name", "PkgPath", "PathToGoSubDirectory", "OrmPkgGenPath", "DbOrmPkgGenPath", "DbLiteOrmPkgGenPath", "DbPkgGenPath", "ControllersPkgGenPath", "FullstackPkgGenPath", "StackPkgGenPath", "StaticPkgGenPath", "ProbePkgGenPath", "NgWorkspacePath", "NgWorkspaceName", "NgDataLibrarySourceCodeDirectory", "NgSpecificLibrarySourceCodeDirectory", "MaterialLibDatamodelTargetPath"}
 	case PointerToGongStructField:
 		res = []string{"Name", "GongStruct", "Index", "CompositeStructName", "IsType"}
 	case SliceOfPointerToGongStructField:
@@ -1946,7 +1945,7 @@ func GetFieldsFromPointer[Type PointerToGongstruct]() (res []string) {
 	case *MetaReference:
 		res = []string{"Name"}
 	case *ModelPkg:
-		res = []string{"Name", "PkgPath", "PathToGoSubDirectory", "OrmPkgGenPath", "ControllersPkgGenPath", "FullstackPkgGenPath", "StackPkgGenPath", "StaticPkgGenPath", "ProbePkgGenPath", "NgWorkspacePath", "NgWorkspaceName", "NgDataLibrarySourceCodeDirectory", "NgSpecificLibrarySourceCodeDirectory", "MaterialLibDatamodelTargetPath"}
+		res = []string{"Name", "PkgPath", "PathToGoSubDirectory", "OrmPkgGenPath", "DbOrmPkgGenPath", "DbLiteOrmPkgGenPath", "DbPkgGenPath", "ControllersPkgGenPath", "FullstackPkgGenPath", "StackPkgGenPath", "StaticPkgGenPath", "ProbePkgGenPath", "NgWorkspacePath", "NgWorkspaceName", "NgDataLibrarySourceCodeDirectory", "NgSpecificLibrarySourceCodeDirectory", "MaterialLibDatamodelTargetPath"}
 	case *PointerToGongStructField:
 		res = []string{"Name", "GongStruct", "Index", "CompositeStructName", "IsType"}
 	case *SliceOfPointerToGongStructField:
@@ -2120,6 +2119,12 @@ func GetFieldStringValueFromPointer[Type PointerToGongstruct](instance Type, fie
 			res = inferedInstance.PathToGoSubDirectory
 		case "OrmPkgGenPath":
 			res = inferedInstance.OrmPkgGenPath
+		case "DbOrmPkgGenPath":
+			res = inferedInstance.DbOrmPkgGenPath
+		case "DbLiteOrmPkgGenPath":
+			res = inferedInstance.DbLiteOrmPkgGenPath
+		case "DbPkgGenPath":
+			res = inferedInstance.DbPkgGenPath
 		case "ControllersPkgGenPath":
 			res = inferedInstance.ControllersPkgGenPath
 		case "FullstackPkgGenPath":
@@ -2342,6 +2347,12 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 			res = inferedInstance.PathToGoSubDirectory
 		case "OrmPkgGenPath":
 			res = inferedInstance.OrmPkgGenPath
+		case "DbOrmPkgGenPath":
+			res = inferedInstance.DbOrmPkgGenPath
+		case "DbLiteOrmPkgGenPath":
+			res = inferedInstance.DbLiteOrmPkgGenPath
+		case "DbPkgGenPath":
+			res = inferedInstance.DbPkgGenPath
 		case "ControllersPkgGenPath":
 			res = inferedInstance.ControllersPkgGenPath
 		case "FullstackPkgGenPath":

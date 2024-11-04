@@ -17,6 +17,7 @@ import (
 
 	"github.com/tealeg/xlsx/v3"
 
+	"github.com/fullstack-lang/gong/go/db"
 	"github.com/fullstack-lang/gong/go/models"
 )
 
@@ -71,6 +72,15 @@ type ModelPkgDB struct {
 	// Declation for basic field modelpkgDB.OrmPkgGenPath
 	OrmPkgGenPath_Data sql.NullString
 
+	// Declation for basic field modelpkgDB.DbOrmPkgGenPath
+	DbOrmPkgGenPath_Data sql.NullString
+
+	// Declation for basic field modelpkgDB.DbLiteOrmPkgGenPath
+	DbLiteOrmPkgGenPath_Data sql.NullString
+
+	// Declation for basic field modelpkgDB.DbPkgGenPath
+	DbPkgGenPath_Data sql.NullString
+
 	// Declation for basic field modelpkgDB.ControllersPkgGenPath
 	ControllersPkgGenPath_Data sql.NullString
 
@@ -100,7 +110,7 @@ type ModelPkgDB struct {
 
 	// Declation for basic field modelpkgDB.MaterialLibDatamodelTargetPath
 	MaterialLibDatamodelTargetPath_Data sql.NullString
-	
+
 	// encoding of pointers
 	// for GORM serialization, it is necessary to embed to Pointer Encoding declaration
 	ModelPkgPointersEncoding
@@ -131,25 +141,31 @@ type ModelPkgWOP struct {
 
 	OrmPkgGenPath string `xlsx:"4"`
 
-	ControllersPkgGenPath string `xlsx:"5"`
+	DbOrmPkgGenPath string `xlsx:"5"`
 
-	FullstackPkgGenPath string `xlsx:"6"`
+	DbLiteOrmPkgGenPath string `xlsx:"6"`
 
-	StackPkgGenPath string `xlsx:"7"`
+	DbPkgGenPath string `xlsx:"7"`
 
-	StaticPkgGenPath string `xlsx:"8"`
+	ControllersPkgGenPath string `xlsx:"8"`
 
-	ProbePkgGenPath string `xlsx:"9"`
+	FullstackPkgGenPath string `xlsx:"9"`
 
-	NgWorkspacePath string `xlsx:"10"`
+	StackPkgGenPath string `xlsx:"10"`
 
-	NgWorkspaceName string `xlsx:"11"`
+	StaticPkgGenPath string `xlsx:"11"`
 
-	NgDataLibrarySourceCodeDirectory string `xlsx:"12"`
+	ProbePkgGenPath string `xlsx:"12"`
 
-	NgSpecificLibrarySourceCodeDirectory string `xlsx:"13"`
+	NgWorkspacePath string `xlsx:"13"`
 
-	MaterialLibDatamodelTargetPath string `xlsx:"14"`
+	NgWorkspaceName string `xlsx:"14"`
+
+	NgDataLibrarySourceCodeDirectory string `xlsx:"15"`
+
+	NgSpecificLibrarySourceCodeDirectory string `xlsx:"16"`
+
+	MaterialLibDatamodelTargetPath string `xlsx:"17"`
 	// insertion for WOP pointer fields
 }
 
@@ -160,6 +176,9 @@ var ModelPkg_Fields = []string{
 	"PkgPath",
 	"PathToGoSubDirectory",
 	"OrmPkgGenPath",
+	"DbOrmPkgGenPath",
+	"DbLiteOrmPkgGenPath",
+	"DbPkgGenPath",
 	"ControllersPkgGenPath",
 	"FullstackPkgGenPath",
 	"StackPkgGenPath",
@@ -182,7 +201,7 @@ type BackRepoModelPkgStruct struct {
 	// stores ModelPkg according to their gorm ID
 	Map_ModelPkgDBID_ModelPkgPtr map[uint]*models.ModelPkg
 
-	db *gorm.DB
+	db db.DBInterface
 
 	stage *models.StageStruct
 }
@@ -192,7 +211,7 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) GetStage() (stage *models.StageS
 	return
 }
 
-func (backRepoModelPkg *BackRepoModelPkgStruct) GetDB() *gorm.DB {
+func (backRepoModelPkg *BackRepoModelPkgStruct) GetDB() db.DBInterface {
 	return backRepoModelPkg.db
 }
 
@@ -229,9 +248,10 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) CommitDeleteInstance(id uint) (E
 
 	// modelpkg is not staged anymore, remove modelpkgDB
 	modelpkgDB := backRepoModelPkg.Map_ModelPkgDBID_ModelPkgDB[id]
-	query := backRepoModelPkg.db.Unscoped().Delete(&modelpkgDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	db, _ := backRepoModelPkg.db.Unscoped()
+	_, err := db.Delete(modelpkgDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -255,9 +275,9 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) CommitPhaseOneInstance(modelpkg 
 	var modelpkgDB ModelPkgDB
 	modelpkgDB.CopyBasicFieldsFromModelPkg(modelpkg)
 
-	query := backRepoModelPkg.db.Create(&modelpkgDB)
-	if query.Error != nil {
-		log.Fatal(query.Error)
+	_, err := backRepoModelPkg.db.Create(&modelpkgDB)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// update stores
@@ -289,9 +309,9 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) CommitPhaseTwoInstance(backRepo 
 		modelpkgDB.CopyBasicFieldsFromModelPkg(modelpkg)
 
 		// insertion point for translating pointers encodings into actual pointers
-		query := backRepoModelPkg.db.Save(&modelpkgDB)
-		if query.Error != nil {
-			log.Fatalln(query.Error)
+		_, err := backRepoModelPkg.db.Save(modelpkgDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 	} else {
@@ -310,9 +330,9 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) CommitPhaseTwoInstance(backRepo 
 func (backRepoModelPkg *BackRepoModelPkgStruct) CheckoutPhaseOne() (Error error) {
 
 	modelpkgDBArray := make([]ModelPkgDB, 0)
-	query := backRepoModelPkg.db.Find(&modelpkgDBArray)
-	if query.Error != nil {
-		return query.Error
+	_, err := backRepoModelPkg.db.Find(&modelpkgDBArray)
+	if err != nil {
+		return err
 	}
 
 	// list of instances to be removed
@@ -423,7 +443,7 @@ func (backRepo *BackRepoStruct) CheckoutModelPkg(modelpkg *models.ModelPkg) {
 			var modelpkgDB ModelPkgDB
 			modelpkgDB.ID = id
 
-			if err := backRepo.BackRepoModelPkg.db.First(&modelpkgDB, id).Error; err != nil {
+			if _, err := backRepo.BackRepoModelPkg.db.First(&modelpkgDB, id); err != nil {
 				log.Fatalln("CheckoutModelPkg : Problem with getting object with id:", id)
 			}
 			backRepo.BackRepoModelPkg.CheckoutPhaseOneInstance(&modelpkgDB)
@@ -447,6 +467,15 @@ func (modelpkgDB *ModelPkgDB) CopyBasicFieldsFromModelPkg(modelpkg *models.Model
 
 	modelpkgDB.OrmPkgGenPath_Data.String = modelpkg.OrmPkgGenPath
 	modelpkgDB.OrmPkgGenPath_Data.Valid = true
+
+	modelpkgDB.DbOrmPkgGenPath_Data.String = modelpkg.DbOrmPkgGenPath
+	modelpkgDB.DbOrmPkgGenPath_Data.Valid = true
+
+	modelpkgDB.DbLiteOrmPkgGenPath_Data.String = modelpkg.DbLiteOrmPkgGenPath
+	modelpkgDB.DbLiteOrmPkgGenPath_Data.Valid = true
+
+	modelpkgDB.DbPkgGenPath_Data.String = modelpkg.DbPkgGenPath
+	modelpkgDB.DbPkgGenPath_Data.Valid = true
 
 	modelpkgDB.ControllersPkgGenPath_Data.String = modelpkg.ControllersPkgGenPath
 	modelpkgDB.ControllersPkgGenPath_Data.Valid = true
@@ -495,6 +524,15 @@ func (modelpkgDB *ModelPkgDB) CopyBasicFieldsFromModelPkg_WOP(modelpkg *models.M
 	modelpkgDB.OrmPkgGenPath_Data.String = modelpkg.OrmPkgGenPath
 	modelpkgDB.OrmPkgGenPath_Data.Valid = true
 
+	modelpkgDB.DbOrmPkgGenPath_Data.String = modelpkg.DbOrmPkgGenPath
+	modelpkgDB.DbOrmPkgGenPath_Data.Valid = true
+
+	modelpkgDB.DbLiteOrmPkgGenPath_Data.String = modelpkg.DbLiteOrmPkgGenPath
+	modelpkgDB.DbLiteOrmPkgGenPath_Data.Valid = true
+
+	modelpkgDB.DbPkgGenPath_Data.String = modelpkg.DbPkgGenPath
+	modelpkgDB.DbPkgGenPath_Data.Valid = true
+
 	modelpkgDB.ControllersPkgGenPath_Data.String = modelpkg.ControllersPkgGenPath
 	modelpkgDB.ControllersPkgGenPath_Data.Valid = true
 
@@ -542,6 +580,15 @@ func (modelpkgDB *ModelPkgDB) CopyBasicFieldsFromModelPkgWOP(modelpkg *ModelPkgW
 	modelpkgDB.OrmPkgGenPath_Data.String = modelpkg.OrmPkgGenPath
 	modelpkgDB.OrmPkgGenPath_Data.Valid = true
 
+	modelpkgDB.DbOrmPkgGenPath_Data.String = modelpkg.DbOrmPkgGenPath
+	modelpkgDB.DbOrmPkgGenPath_Data.Valid = true
+
+	modelpkgDB.DbLiteOrmPkgGenPath_Data.String = modelpkg.DbLiteOrmPkgGenPath
+	modelpkgDB.DbLiteOrmPkgGenPath_Data.Valid = true
+
+	modelpkgDB.DbPkgGenPath_Data.String = modelpkg.DbPkgGenPath
+	modelpkgDB.DbPkgGenPath_Data.Valid = true
+
 	modelpkgDB.ControllersPkgGenPath_Data.String = modelpkg.ControllersPkgGenPath
 	modelpkgDB.ControllersPkgGenPath_Data.Valid = true
 
@@ -580,6 +627,9 @@ func (modelpkgDB *ModelPkgDB) CopyBasicFieldsToModelPkg(modelpkg *models.ModelPk
 	modelpkg.PkgPath = modelpkgDB.PkgPath_Data.String
 	modelpkg.PathToGoSubDirectory = modelpkgDB.PathToGoSubDirectory_Data.String
 	modelpkg.OrmPkgGenPath = modelpkgDB.OrmPkgGenPath_Data.String
+	modelpkg.DbOrmPkgGenPath = modelpkgDB.DbOrmPkgGenPath_Data.String
+	modelpkg.DbLiteOrmPkgGenPath = modelpkgDB.DbLiteOrmPkgGenPath_Data.String
+	modelpkg.DbPkgGenPath = modelpkgDB.DbPkgGenPath_Data.String
 	modelpkg.ControllersPkgGenPath = modelpkgDB.ControllersPkgGenPath_Data.String
 	modelpkg.FullstackPkgGenPath = modelpkgDB.FullstackPkgGenPath_Data.String
 	modelpkg.StackPkgGenPath = modelpkgDB.StackPkgGenPath_Data.String
@@ -599,6 +649,9 @@ func (modelpkgDB *ModelPkgDB) CopyBasicFieldsToModelPkg_WOP(modelpkg *models.Mod
 	modelpkg.PkgPath = modelpkgDB.PkgPath_Data.String
 	modelpkg.PathToGoSubDirectory = modelpkgDB.PathToGoSubDirectory_Data.String
 	modelpkg.OrmPkgGenPath = modelpkgDB.OrmPkgGenPath_Data.String
+	modelpkg.DbOrmPkgGenPath = modelpkgDB.DbOrmPkgGenPath_Data.String
+	modelpkg.DbLiteOrmPkgGenPath = modelpkgDB.DbLiteOrmPkgGenPath_Data.String
+	modelpkg.DbPkgGenPath = modelpkgDB.DbPkgGenPath_Data.String
 	modelpkg.ControllersPkgGenPath = modelpkgDB.ControllersPkgGenPath_Data.String
 	modelpkg.FullstackPkgGenPath = modelpkgDB.FullstackPkgGenPath_Data.String
 	modelpkg.StackPkgGenPath = modelpkgDB.StackPkgGenPath_Data.String
@@ -619,6 +672,9 @@ func (modelpkgDB *ModelPkgDB) CopyBasicFieldsToModelPkgWOP(modelpkg *ModelPkgWOP
 	modelpkg.PkgPath = modelpkgDB.PkgPath_Data.String
 	modelpkg.PathToGoSubDirectory = modelpkgDB.PathToGoSubDirectory_Data.String
 	modelpkg.OrmPkgGenPath = modelpkgDB.OrmPkgGenPath_Data.String
+	modelpkg.DbOrmPkgGenPath = modelpkgDB.DbOrmPkgGenPath_Data.String
+	modelpkg.DbLiteOrmPkgGenPath = modelpkgDB.DbLiteOrmPkgGenPath_Data.String
+	modelpkg.DbPkgGenPath = modelpkgDB.DbPkgGenPath_Data.String
 	modelpkg.ControllersPkgGenPath = modelpkgDB.ControllersPkgGenPath_Data.String
 	modelpkg.FullstackPkgGenPath = modelpkgDB.FullstackPkgGenPath_Data.String
 	modelpkg.StackPkgGenPath = modelpkgDB.StackPkgGenPath_Data.String
@@ -726,9 +782,9 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) rowVisitorModelPkg(row *xlsx.Row
 
 		modelpkgDB_ID_atBackupTime := modelpkgDB.ID
 		modelpkgDB.ID = 0
-		query := backRepoModelPkg.db.Create(modelpkgDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoModelPkg.db.Create(modelpkgDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoModelPkg.Map_ModelPkgDBID_ModelPkgDB[modelpkgDB.ID] = modelpkgDB
 		BackRepoModelPkgid_atBckpTime_newID[modelpkgDB_ID_atBackupTime] = modelpkgDB.ID
@@ -763,9 +819,9 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) RestorePhaseOne(dirPath string) 
 
 		modelpkgDB_ID_atBackupTime := modelpkgDB.ID
 		modelpkgDB.ID = 0
-		query := backRepoModelPkg.db.Create(modelpkgDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		_, err := backRepoModelPkg.db.Create(modelpkgDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 		backRepoModelPkg.Map_ModelPkgDBID_ModelPkgDB[modelpkgDB.ID] = modelpkgDB
 		BackRepoModelPkgid_atBckpTime_newID[modelpkgDB_ID_atBackupTime] = modelpkgDB.ID
@@ -787,9 +843,10 @@ func (backRepoModelPkg *BackRepoModelPkgStruct) RestorePhaseTwo() {
 
 		// insertion point for reindexing pointers encoding
 		// update databse with new index encoding
-		query := backRepoModelPkg.db.Model(modelpkgDB).Updates(*modelpkgDB)
-		if query.Error != nil {
-			log.Fatal(query.Error)
+		db, _ := backRepoModelPkg.db.Model(modelpkgDB)
+		_, err := db.Updates(*modelpkgDB)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 

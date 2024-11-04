@@ -22,6 +22,15 @@ type ModelPkg struct {
 	// OrmPkgGenPath is target path for orm package, for instance "/tmp/libraryorm"
 	OrmPkgGenPath string
 
+	// DbOrmPkgGenPath is target path for orm package, for instance "/tmp/libraryorm/db"
+	DbOrmPkgGenPath string
+
+	// DbOrmPkgGenPath is target path for orm package, for instance "/tmp/libraryorm/db"
+	DbLiteOrmPkgGenPath string
+
+	// DbPkgGenPath is target path for orm package, for instance "/tmp/libraryorm/db"
+	DbPkgGenPath string
+
 	// ControllersPkgGenPath is target path for controllers package
 	ControllersPkgGenPath string
 
