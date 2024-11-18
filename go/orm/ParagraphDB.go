@@ -455,16 +455,44 @@ func (backRepoParagraph *BackRepoParagraphStruct) CheckoutPhaseTwoInstance(backR
 func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragraph *models.Paragraph) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	paragraph.Node = nil
-	if paragraphDB.NodeID.Int64 != 0 {
-		paragraph.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := paragraphDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraph.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraph.Node == nil || paragraph.Node != tmp {
+				paragraph.Node = tmp
+			}
+		} else {
+			paragraph.Node = nil
+		}
 	}
-	// ParagraphProperties field
-	paragraph.ParagraphProperties = nil
-	if paragraphDB.ParagraphPropertiesID.Int64 != 0 {
-		paragraph.ParagraphProperties = backRepo.BackRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr[uint(paragraphDB.ParagraphPropertiesID.Int64)]
+	
+	// ParagraphProperties field	
+	{
+		id := paragraphDB.ParagraphPropertiesID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraph.ParagraphProperties, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraph.ParagraphProperties == nil || paragraph.ParagraphProperties != tmp {
+				paragraph.ParagraphProperties = tmp
+			}
+		} else {
+			paragraph.ParagraphProperties = nil
+		}
 	}
+	
 	// This loop redeem paragraph.Runes in the stage from the encode in the back repo
 	// It parses all RuneDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance
@@ -474,26 +502,82 @@ func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragra
 		paragraph.Runes = append(paragraph.Runes, backRepo.BackRepoRune.Map_RuneDBID_RunePtr[uint(_Runeid)])
 	}
 
-	// Next field
-	paragraph.Next = nil
-	if paragraphDB.NextID.Int64 != 0 {
-		paragraph.Next = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(paragraphDB.NextID.Int64)]
+	// Next field	
+	{
+		id := paragraphDB.NextID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraph.Next, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraph.Next == nil || paragraph.Next != tmp {
+				paragraph.Next = tmp
+			}
+		} else {
+			paragraph.Next = nil
+		}
 	}
-	// Previous field
-	paragraph.Previous = nil
-	if paragraphDB.PreviousID.Int64 != 0 {
-		paragraph.Previous = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(paragraphDB.PreviousID.Int64)]
+	
+	// Previous field	
+	{
+		id := paragraphDB.PreviousID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraph.Previous, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraph.Previous == nil || paragraph.Previous != tmp {
+				paragraph.Previous = tmp
+			}
+		} else {
+			paragraph.Previous = nil
+		}
 	}
-	// EnclosingBody field
-	paragraph.EnclosingBody = nil
-	if paragraphDB.EnclosingBodyID.Int64 != 0 {
-		paragraph.EnclosingBody = backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(paragraphDB.EnclosingBodyID.Int64)]
+	
+	// EnclosingBody field	
+	{
+		id := paragraphDB.EnclosingBodyID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraph.EnclosingBody, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraph.EnclosingBody == nil || paragraph.EnclosingBody != tmp {
+				paragraph.EnclosingBody = tmp
+			}
+		} else {
+			paragraph.EnclosingBody = nil
+		}
 	}
-	// EnclosingTableColumn field
-	paragraph.EnclosingTableColumn = nil
-	if paragraphDB.EnclosingTableColumnID.Int64 != 0 {
-		paragraph.EnclosingTableColumn = backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnPtr[uint(paragraphDB.EnclosingTableColumnID.Int64)]
+	
+	// EnclosingTableColumn field	
+	{
+		id := paragraphDB.EnclosingTableColumnID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraph.EnclosingTableColumn, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraph.EnclosingTableColumn == nil || paragraph.EnclosingTableColumn != tmp {
+				paragraph.EnclosingTableColumn = tmp
+			}
+		} else {
+			paragraph.EnclosingTableColumn = nil
+		}
 	}
+	
 	return
 }
 

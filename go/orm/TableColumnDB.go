@@ -369,11 +369,25 @@ func (backRepoTableColumn *BackRepoTableColumnStruct) CheckoutPhaseTwoInstance(b
 func (tablecolumnDB *TableColumnDB) DecodePointers(backRepo *BackRepoStruct, tablecolumn *models.TableColumn) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	tablecolumn.Node = nil
-	if tablecolumnDB.NodeID.Int64 != 0 {
-		tablecolumn.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablecolumnDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := tablecolumnDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: tablecolumn.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if tablecolumn.Node == nil || tablecolumn.Node != tmp {
+				tablecolumn.Node = tmp
+			}
+		} else {
+			tablecolumn.Node = nil
+		}
 	}
+	
 	// This loop redeem tablecolumn.Paragraphs in the stage from the encode in the back repo
 	// It parses all ParagraphDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance

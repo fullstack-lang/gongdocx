@@ -364,16 +364,44 @@ func (backRepoParagraphProperties *BackRepoParagraphPropertiesStruct) CheckoutPh
 func (paragraphpropertiesDB *ParagraphPropertiesDB) DecodePointers(backRepo *BackRepoStruct, paragraphproperties *models.ParagraphProperties) {
 
 	// insertion point for checkout of pointer encoding
-	// ParagraphStyle field
-	paragraphproperties.ParagraphStyle = nil
-	if paragraphpropertiesDB.ParagraphStyleID.Int64 != 0 {
-		paragraphproperties.ParagraphStyle = backRepo.BackRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStylePtr[uint(paragraphpropertiesDB.ParagraphStyleID.Int64)]
+	// ParagraphStyle field	
+	{
+		id := paragraphpropertiesDB.ParagraphStyleID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoParagraphStyle.Map_ParagraphStyleDBID_ParagraphStylePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraphproperties.ParagraphStyle, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraphproperties.ParagraphStyle == nil || paragraphproperties.ParagraphStyle != tmp {
+				paragraphproperties.ParagraphStyle = tmp
+			}
+		} else {
+			paragraphproperties.ParagraphStyle = nil
+		}
 	}
-	// Node field
-	paragraphproperties.Node = nil
-	if paragraphpropertiesDB.NodeID.Int64 != 0 {
-		paragraphproperties.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphpropertiesDB.NodeID.Int64)]
+	
+	// Node field	
+	{
+		id := paragraphpropertiesDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraphproperties.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraphproperties.Node == nil || paragraphproperties.Node != tmp {
+				paragraphproperties.Node = tmp
+			}
+		} else {
+			paragraphproperties.Node = nil
+		}
 	}
+	
 	return
 }
 

@@ -371,16 +371,44 @@ func (backRepoText *BackRepoTextStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 func (textDB *TextDB) DecodePointers(backRepo *BackRepoStruct, text *models.Text) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	text.Node = nil
-	if textDB.NodeID.Int64 != 0 {
-		text.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(textDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := textDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: text.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if text.Node == nil || text.Node != tmp {
+				text.Node = tmp
+			}
+		} else {
+			text.Node = nil
+		}
 	}
-	// EnclosingRune field
-	text.EnclosingRune = nil
-	if textDB.EnclosingRuneID.Int64 != 0 {
-		text.EnclosingRune = backRepo.BackRepoRune.Map_RuneDBID_RunePtr[uint(textDB.EnclosingRuneID.Int64)]
+	
+	// EnclosingRune field	
+	{
+		id := textDB.EnclosingRuneID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoRune.Map_RuneDBID_RunePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: text.EnclosingRune, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if text.EnclosingRune == nil || text.EnclosingRune != tmp {
+				text.EnclosingRune = tmp
+			}
+		} else {
+			text.EnclosingRune = nil
+		}
 	}
+	
 	return
 }
 

@@ -354,11 +354,25 @@ func (backRepoParagraphStyle *BackRepoParagraphStyleStruct) CheckoutPhaseTwoInst
 func (paragraphstyleDB *ParagraphStyleDB) DecodePointers(backRepo *BackRepoStruct, paragraphstyle *models.ParagraphStyle) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	paragraphstyle.Node = nil
-	if paragraphstyleDB.NodeID.Int64 != 0 {
-		paragraphstyle.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(paragraphstyleDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := paragraphstyleDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: paragraphstyle.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if paragraphstyle.Node == nil || paragraphstyle.Node != tmp {
+				paragraphstyle.Node = tmp
+			}
+		} else {
+			paragraphstyle.Node = nil
+		}
 	}
+	
 	return
 }
 

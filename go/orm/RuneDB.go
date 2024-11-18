@@ -396,26 +396,82 @@ func (backRepoRune *BackRepoRuneStruct) CheckoutPhaseTwoInstance(backRepo *BackR
 func (runeDB *RuneDB) DecodePointers(backRepo *BackRepoStruct, rune *models.Rune) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	rune.Node = nil
-	if runeDB.NodeID.Int64 != 0 {
-		rune.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(runeDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := runeDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: rune.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if rune.Node == nil || rune.Node != tmp {
+				rune.Node = tmp
+			}
+		} else {
+			rune.Node = nil
+		}
 	}
-	// Text field
-	rune.Text = nil
-	if runeDB.TextID.Int64 != 0 {
-		rune.Text = backRepo.BackRepoText.Map_TextDBID_TextPtr[uint(runeDB.TextID.Int64)]
+	
+	// Text field	
+	{
+		id := runeDB.TextID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoText.Map_TextDBID_TextPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: rune.Text, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if rune.Text == nil || rune.Text != tmp {
+				rune.Text = tmp
+			}
+		} else {
+			rune.Text = nil
+		}
 	}
-	// RuneProperties field
-	rune.RuneProperties = nil
-	if runeDB.RunePropertiesID.Int64 != 0 {
-		rune.RuneProperties = backRepo.BackRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[uint(runeDB.RunePropertiesID.Int64)]
+	
+	// RuneProperties field	
+	{
+		id := runeDB.RunePropertiesID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: rune.RuneProperties, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if rune.RuneProperties == nil || rune.RuneProperties != tmp {
+				rune.RuneProperties = tmp
+			}
+		} else {
+			rune.RuneProperties = nil
+		}
 	}
-	// EnclosingParagraph field
-	rune.EnclosingParagraph = nil
-	if runeDB.EnclosingParagraphID.Int64 != 0 {
-		rune.EnclosingParagraph = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(runeDB.EnclosingParagraphID.Int64)]
+	
+	// EnclosingParagraph field	
+	{
+		id := runeDB.EnclosingParagraphID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: rune.EnclosingParagraph, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if rune.EnclosingParagraph == nil || rune.EnclosingParagraph != tmp {
+				rune.EnclosingParagraph = tmp
+			}
+		} else {
+			rune.EnclosingParagraph = nil
+		}
 	}
+	
 	return
 }
 

@@ -372,11 +372,25 @@ func (docxDB *DocxDB) DecodePointers(backRepo *BackRepoStruct, docx *models.Docx
 		docx.Files = append(docx.Files, backRepo.BackRepoFile.Map_FileDBID_FilePtr[uint(_Fileid)])
 	}
 
-	// Document field
-	docx.Document = nil
-	if docxDB.DocumentID.Int64 != 0 {
-		docx.Document = backRepo.BackRepoDocument.Map_DocumentDBID_DocumentPtr[uint(docxDB.DocumentID.Int64)]
+	// Document field	
+	{
+		id := docxDB.DocumentID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoDocument.Map_DocumentDBID_DocumentPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: docx.Document, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if docx.Document == nil || docx.Document != tmp {
+				docx.Document = tmp
+			}
+		} else {
+			docx.Document = nil
+		}
 	}
+	
 	return
 }
 

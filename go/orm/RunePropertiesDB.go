@@ -369,11 +369,25 @@ func (backRepoRuneProperties *BackRepoRunePropertiesStruct) CheckoutPhaseTwoInst
 func (runepropertiesDB *RunePropertiesDB) DecodePointers(backRepo *BackRepoStruct, runeproperties *models.RuneProperties) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	runeproperties.Node = nil
-	if runepropertiesDB.NodeID.Int64 != 0 {
-		runeproperties.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(runepropertiesDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := runepropertiesDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: runeproperties.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if runeproperties.Node == nil || runeproperties.Node != tmp {
+				runeproperties.Node = tmp
+			}
+		} else {
+			runeproperties.Node = nil
+		}
 	}
+	
 	return
 }
 

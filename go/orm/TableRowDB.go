@@ -369,11 +369,25 @@ func (backRepoTableRow *BackRepoTableRowStruct) CheckoutPhaseTwoInstance(backRep
 func (tablerowDB *TableRowDB) DecodePointers(backRepo *BackRepoStruct, tablerow *models.TableRow) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	tablerow.Node = nil
-	if tablerowDB.NodeID.Int64 != 0 {
-		tablerow.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablerowDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := tablerowDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: tablerow.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if tablerow.Node == nil || tablerow.Node != tmp {
+				tablerow.Node = tmp
+			}
+		} else {
+			tablerow.Node = nil
+		}
 	}
+	
 	// This loop redeem tablerow.TableColumns in the stage from the encode in the back repo
 	// It parses all TableColumnDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance

@@ -374,21 +374,63 @@ func (backRepoDocument *BackRepoDocumentStruct) CheckoutPhaseTwoInstance(backRep
 func (documentDB *DocumentDB) DecodePointers(backRepo *BackRepoStruct, document *models.Document) {
 
 	// insertion point for checkout of pointer encoding
-	// File field
-	document.File = nil
-	if documentDB.FileID.Int64 != 0 {
-		document.File = backRepo.BackRepoFile.Map_FileDBID_FilePtr[uint(documentDB.FileID.Int64)]
+	// File field	
+	{
+		id := documentDB.FileID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoFile.Map_FileDBID_FilePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: document.File, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if document.File == nil || document.File != tmp {
+				document.File = tmp
+			}
+		} else {
+			document.File = nil
+		}
 	}
-	// Root field
-	document.Root = nil
-	if documentDB.RootID.Int64 != 0 {
-		document.Root = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(documentDB.RootID.Int64)]
+	
+	// Root field	
+	{
+		id := documentDB.RootID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: document.Root, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if document.Root == nil || document.Root != tmp {
+				document.Root = tmp
+			}
+		} else {
+			document.Root = nil
+		}
 	}
-	// Body field
-	document.Body = nil
-	if documentDB.BodyID.Int64 != 0 {
-		document.Body = backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(documentDB.BodyID.Int64)]
+	
+	// Body field	
+	{
+		id := documentDB.BodyID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: document.Body, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if document.Body == nil || document.Body != tmp {
+				document.Body = tmp
+			}
+		} else {
+			document.Body = nil
+		}
 	}
+	
 	return
 }
 

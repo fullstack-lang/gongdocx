@@ -385,16 +385,44 @@ func (backRepoTable *BackRepoTableStruct) CheckoutPhaseTwoInstance(backRepo *Bac
 func (tableDB *TableDB) DecodePointers(backRepo *BackRepoStruct, table *models.Table) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	table.Node = nil
-	if tableDB.NodeID.Int64 != 0 {
-		table.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tableDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := tableDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: table.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if table.Node == nil || table.Node != tmp {
+				table.Node = tmp
+			}
+		} else {
+			table.Node = nil
+		}
 	}
-	// TableProperties field
-	table.TableProperties = nil
-	if tableDB.TablePropertiesID.Int64 != 0 {
-		table.TableProperties = backRepo.BackRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesPtr[uint(tableDB.TablePropertiesID.Int64)]
+	
+	// TableProperties field	
+	{
+		id := tableDB.TablePropertiesID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoTableProperties.Map_TablePropertiesDBID_TablePropertiesPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: table.TableProperties, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if table.TableProperties == nil || table.TableProperties != tmp {
+				table.TableProperties = tmp
+			}
+		} else {
+			table.TableProperties = nil
+		}
 	}
+	
 	// This loop redeem table.TableRows in the stage from the encode in the back repo
 	// It parses all TableRowDB in the back repo and if the reverse pointer encoding matches the back repo ID
 	// it appends the stage instance

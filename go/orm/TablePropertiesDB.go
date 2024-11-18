@@ -364,16 +364,44 @@ func (backRepoTableProperties *BackRepoTablePropertiesStruct) CheckoutPhaseTwoIn
 func (tablepropertiesDB *TablePropertiesDB) DecodePointers(backRepo *BackRepoStruct, tableproperties *models.TableProperties) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	tableproperties.Node = nil
-	if tablepropertiesDB.NodeID.Int64 != 0 {
-		tableproperties.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablepropertiesDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := tablepropertiesDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: tableproperties.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if tableproperties.Node == nil || tableproperties.Node != tmp {
+				tableproperties.Node = tmp
+			}
+		} else {
+			tableproperties.Node = nil
+		}
 	}
-	// TableStyle field
-	tableproperties.TableStyle = nil
-	if tablepropertiesDB.TableStyleID.Int64 != 0 {
-		tableproperties.TableStyle = backRepo.BackRepoTableStyle.Map_TableStyleDBID_TableStylePtr[uint(tablepropertiesDB.TableStyleID.Int64)]
+	
+	// TableStyle field	
+	{
+		id := tablepropertiesDB.TableStyleID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoTableStyle.Map_TableStyleDBID_TableStylePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: tableproperties.TableStyle, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if tableproperties.TableStyle == nil || tableproperties.TableStyle != tmp {
+				tableproperties.TableStyle = tmp
+			}
+		} else {
+			tableproperties.TableStyle = nil
+		}
 	}
+	
 	return
 }
 

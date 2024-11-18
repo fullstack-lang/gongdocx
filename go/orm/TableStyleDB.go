@@ -354,11 +354,25 @@ func (backRepoTableStyle *BackRepoTableStyleStruct) CheckoutPhaseTwoInstance(bac
 func (tablestyleDB *TableStyleDB) DecodePointers(backRepo *BackRepoStruct, tablestyle *models.TableStyle) {
 
 	// insertion point for checkout of pointer encoding
-	// Node field
-	tablestyle.Node = nil
-	if tablestyleDB.NodeID.Int64 != 0 {
-		tablestyle.Node = backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(tablestyleDB.NodeID.Int64)]
+	// Node field	
+	{
+		id := tablestyleDB.NodeID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: tablestyle.Node, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if tablestyle.Node == nil || tablestyle.Node != tmp {
+				tablestyle.Node = tmp
+			}
+		} else {
+			tablestyle.Node = nil
+		}
 	}
+	
 	return
 }
 

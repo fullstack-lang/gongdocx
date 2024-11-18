@@ -402,11 +402,25 @@ func (bodyDB *BodyDB) DecodePointers(backRepo *BackRepoStruct, body *models.Body
 		body.Tables = append(body.Tables, backRepo.BackRepoTable.Map_TableDBID_TablePtr[uint(_Tableid)])
 	}
 
-	// LastParagraph field
-	body.LastParagraph = nil
-	if bodyDB.LastParagraphID.Int64 != 0 {
-		body.LastParagraph = backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(bodyDB.LastParagraphID.Int64)]
+	// LastParagraph field	
+	{
+		id := bodyDB.LastParagraphID.Int64
+		if id != 0 {
+			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
+
+			if !ok {
+				log.Fatalln("DecodePointers: body.LastParagraph, unknown pointer id", id)
+			}
+
+			// updates only if field has changed
+			if body.LastParagraph == nil || body.LastParagraph != tmp {
+				body.LastParagraph = tmp
+			}
+		} else {
+			body.LastParagraph = nil
+		}
 	}
+	
 	return
 }
 
