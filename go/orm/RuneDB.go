@@ -402,13 +402,15 @@ func (runeDB *RuneDB) DecodePointers(backRepo *BackRepoStruct, rune *models.Rune
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: rune.Node, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if rune.Node == nil || rune.Node != tmp {
-				rune.Node = tmp
+				log.Println("DecodePointers: rune.Node, unknown pointer id", id)
+				rune.Node = nil
+			} else {
+				// updates only if field has changed
+				if rune.Node == nil || rune.Node != tmp {
+					rune.Node = tmp
+				}
 			}
 		} else {
 			rune.Node = nil
@@ -421,13 +423,15 @@ func (runeDB *RuneDB) DecodePointers(backRepo *BackRepoStruct, rune *models.Rune
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoText.Map_TextDBID_TextPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: rune.Text, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if rune.Text == nil || rune.Text != tmp {
-				rune.Text = tmp
+				log.Println("DecodePointers: rune.Text, unknown pointer id", id)
+				rune.Text = nil
+			} else {
+				// updates only if field has changed
+				if rune.Text == nil || rune.Text != tmp {
+					rune.Text = tmp
+				}
 			}
 		} else {
 			rune.Text = nil
@@ -440,13 +444,15 @@ func (runeDB *RuneDB) DecodePointers(backRepo *BackRepoStruct, rune *models.Rune
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoRuneProperties.Map_RunePropertiesDBID_RunePropertiesPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: rune.RuneProperties, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if rune.RuneProperties == nil || rune.RuneProperties != tmp {
-				rune.RuneProperties = tmp
+				log.Println("DecodePointers: rune.RuneProperties, unknown pointer id", id)
+				rune.RuneProperties = nil
+			} else {
+				// updates only if field has changed
+				if rune.RuneProperties == nil || rune.RuneProperties != tmp {
+					rune.RuneProperties = tmp
+				}
 			}
 		} else {
 			rune.RuneProperties = nil
@@ -459,13 +465,15 @@ func (runeDB *RuneDB) DecodePointers(backRepo *BackRepoStruct, rune *models.Rune
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: rune.EnclosingParagraph, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if rune.EnclosingParagraph == nil || rune.EnclosingParagraph != tmp {
-				rune.EnclosingParagraph = tmp
+				log.Println("DecodePointers: rune.EnclosingParagraph, unknown pointer id", id)
+				rune.EnclosingParagraph = nil
+			} else {
+				// updates only if field has changed
+				if rune.EnclosingParagraph == nil || rune.EnclosingParagraph != tmp {
+					rune.EnclosingParagraph = tmp
+				}
 			}
 		} else {
 			rune.EnclosingParagraph = nil

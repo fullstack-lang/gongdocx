@@ -377,13 +377,15 @@ func (textDB *TextDB) DecodePointers(backRepo *BackRepoStruct, text *models.Text
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: text.Node, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if text.Node == nil || text.Node != tmp {
-				text.Node = tmp
+				log.Println("DecodePointers: text.Node, unknown pointer id", id)
+				text.Node = nil
+			} else {
+				// updates only if field has changed
+				if text.Node == nil || text.Node != tmp {
+					text.Node = tmp
+				}
 			}
 		} else {
 			text.Node = nil
@@ -396,13 +398,15 @@ func (textDB *TextDB) DecodePointers(backRepo *BackRepoStruct, text *models.Text
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoRune.Map_RuneDBID_RunePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: text.EnclosingRune, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if text.EnclosingRune == nil || text.EnclosingRune != tmp {
-				text.EnclosingRune = tmp
+				log.Println("DecodePointers: text.EnclosingRune, unknown pointer id", id)
+				text.EnclosingRune = nil
+			} else {
+				// updates only if field has changed
+				if text.EnclosingRune == nil || text.EnclosingRune != tmp {
+					text.EnclosingRune = tmp
+				}
 			}
 		} else {
 			text.EnclosingRune = nil

@@ -360,13 +360,15 @@ func (tablestyleDB *TableStyleDB) DecodePointers(backRepo *BackRepoStruct, table
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: tablestyle.Node, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if tablestyle.Node == nil || tablestyle.Node != tmp {
-				tablestyle.Node = tmp
+				log.Println("DecodePointers: tablestyle.Node, unknown pointer id", id)
+				tablestyle.Node = nil
+			} else {
+				// updates only if field has changed
+				if tablestyle.Node == nil || tablestyle.Node != tmp {
+					tablestyle.Node = tmp
+				}
 			}
 		} else {
 			tablestyle.Node = nil

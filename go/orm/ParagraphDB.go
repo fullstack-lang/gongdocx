@@ -461,13 +461,15 @@ func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragra
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: paragraph.Node, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if paragraph.Node == nil || paragraph.Node != tmp {
-				paragraph.Node = tmp
+				log.Println("DecodePointers: paragraph.Node, unknown pointer id", id)
+				paragraph.Node = nil
+			} else {
+				// updates only if field has changed
+				if paragraph.Node == nil || paragraph.Node != tmp {
+					paragraph.Node = tmp
+				}
 			}
 		} else {
 			paragraph.Node = nil
@@ -480,13 +482,15 @@ func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragra
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoParagraphProperties.Map_ParagraphPropertiesDBID_ParagraphPropertiesPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: paragraph.ParagraphProperties, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if paragraph.ParagraphProperties == nil || paragraph.ParagraphProperties != tmp {
-				paragraph.ParagraphProperties = tmp
+				log.Println("DecodePointers: paragraph.ParagraphProperties, unknown pointer id", id)
+				paragraph.ParagraphProperties = nil
+			} else {
+				// updates only if field has changed
+				if paragraph.ParagraphProperties == nil || paragraph.ParagraphProperties != tmp {
+					paragraph.ParagraphProperties = tmp
+				}
 			}
 		} else {
 			paragraph.ParagraphProperties = nil
@@ -508,13 +512,15 @@ func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragra
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: paragraph.Next, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if paragraph.Next == nil || paragraph.Next != tmp {
-				paragraph.Next = tmp
+				log.Println("DecodePointers: paragraph.Next, unknown pointer id", id)
+				paragraph.Next = nil
+			} else {
+				// updates only if field has changed
+				if paragraph.Next == nil || paragraph.Next != tmp {
+					paragraph.Next = tmp
+				}
 			}
 		} else {
 			paragraph.Next = nil
@@ -527,13 +533,15 @@ func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragra
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: paragraph.Previous, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if paragraph.Previous == nil || paragraph.Previous != tmp {
-				paragraph.Previous = tmp
+				log.Println("DecodePointers: paragraph.Previous, unknown pointer id", id)
+				paragraph.Previous = nil
+			} else {
+				// updates only if field has changed
+				if paragraph.Previous == nil || paragraph.Previous != tmp {
+					paragraph.Previous = tmp
+				}
 			}
 		} else {
 			paragraph.Previous = nil
@@ -546,13 +554,15 @@ func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragra
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: paragraph.EnclosingBody, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if paragraph.EnclosingBody == nil || paragraph.EnclosingBody != tmp {
-				paragraph.EnclosingBody = tmp
+				log.Println("DecodePointers: paragraph.EnclosingBody, unknown pointer id", id)
+				paragraph.EnclosingBody = nil
+			} else {
+				// updates only if field has changed
+				if paragraph.EnclosingBody == nil || paragraph.EnclosingBody != tmp {
+					paragraph.EnclosingBody = tmp
+				}
 			}
 		} else {
 			paragraph.EnclosingBody = nil
@@ -565,13 +575,15 @@ func (paragraphDB *ParagraphDB) DecodePointers(backRepo *BackRepoStruct, paragra
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoTableColumn.Map_TableColumnDBID_TableColumnPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: paragraph.EnclosingTableColumn, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if paragraph.EnclosingTableColumn == nil || paragraph.EnclosingTableColumn != tmp {
-				paragraph.EnclosingTableColumn = tmp
+				log.Println("DecodePointers: paragraph.EnclosingTableColumn, unknown pointer id", id)
+				paragraph.EnclosingTableColumn = nil
+			} else {
+				// updates only if field has changed
+				if paragraph.EnclosingTableColumn == nil || paragraph.EnclosingTableColumn != tmp {
+					paragraph.EnclosingTableColumn = tmp
+				}
 			}
 		} else {
 			paragraph.EnclosingTableColumn = nil

@@ -375,13 +375,15 @@ func (tablerowDB *TableRowDB) DecodePointers(backRepo *BackRepoStruct, tablerow 
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: tablerow.Node, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if tablerow.Node == nil || tablerow.Node != tmp {
-				tablerow.Node = tmp
+				log.Println("DecodePointers: tablerow.Node, unknown pointer id", id)
+				tablerow.Node = nil
+			} else {
+				// updates only if field has changed
+				if tablerow.Node == nil || tablerow.Node != tmp {
+					tablerow.Node = tmp
+				}
 			}
 		} else {
 			tablerow.Node = nil

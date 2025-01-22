@@ -370,13 +370,15 @@ func (tablepropertiesDB *TablePropertiesDB) DecodePointers(backRepo *BackRepoStr
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: tableproperties.Node, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if tableproperties.Node == nil || tableproperties.Node != tmp {
-				tableproperties.Node = tmp
+				log.Println("DecodePointers: tableproperties.Node, unknown pointer id", id)
+				tableproperties.Node = nil
+			} else {
+				// updates only if field has changed
+				if tableproperties.Node == nil || tableproperties.Node != tmp {
+					tableproperties.Node = tmp
+				}
 			}
 		} else {
 			tableproperties.Node = nil
@@ -389,13 +391,15 @@ func (tablepropertiesDB *TablePropertiesDB) DecodePointers(backRepo *BackRepoStr
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoTableStyle.Map_TableStyleDBID_TableStylePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: tableproperties.TableStyle, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if tableproperties.TableStyle == nil || tableproperties.TableStyle != tmp {
-				tableproperties.TableStyle = tmp
+				log.Println("DecodePointers: tableproperties.TableStyle, unknown pointer id", id)
+				tableproperties.TableStyle = nil
+			} else {
+				// updates only if field has changed
+				if tableproperties.TableStyle == nil || tableproperties.TableStyle != tmp {
+					tableproperties.TableStyle = tmp
+				}
 			}
 		} else {
 			tableproperties.TableStyle = nil

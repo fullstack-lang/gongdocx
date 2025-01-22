@@ -375,13 +375,15 @@ func (runepropertiesDB *RunePropertiesDB) DecodePointers(backRepo *BackRepoStruc
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: runeproperties.Node, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if runeproperties.Node == nil || runeproperties.Node != tmp {
-				runeproperties.Node = tmp
+				log.Println("DecodePointers: runeproperties.Node, unknown pointer id", id)
+				runeproperties.Node = nil
+			} else {
+				// updates only if field has changed
+				if runeproperties.Node == nil || runeproperties.Node != tmp {
+					runeproperties.Node = tmp
+				}
 			}
 		} else {
 			runeproperties.Node = nil

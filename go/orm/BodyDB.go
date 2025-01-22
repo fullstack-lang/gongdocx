@@ -408,13 +408,15 @@ func (bodyDB *BodyDB) DecodePointers(backRepo *BackRepoStruct, body *models.Body
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoParagraph.Map_ParagraphDBID_ParagraphPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: body.LastParagraph, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if body.LastParagraph == nil || body.LastParagraph != tmp {
-				body.LastParagraph = tmp
+				log.Println("DecodePointers: body.LastParagraph, unknown pointer id", id)
+				body.LastParagraph = nil
+			} else {
+				// updates only if field has changed
+				if body.LastParagraph == nil || body.LastParagraph != tmp {
+					body.LastParagraph = tmp
+				}
 			}
 		} else {
 			body.LastParagraph = nil

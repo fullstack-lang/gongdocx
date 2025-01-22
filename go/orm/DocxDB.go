@@ -378,13 +378,15 @@ func (docxDB *DocxDB) DecodePointers(backRepo *BackRepoStruct, docx *models.Docx
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoDocument.Map_DocumentDBID_DocumentPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: docx.Document, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if docx.Document == nil || docx.Document != tmp {
-				docx.Document = tmp
+				log.Println("DecodePointers: docx.Document, unknown pointer id", id)
+				docx.Document = nil
+			} else {
+				// updates only if field has changed
+				if docx.Document == nil || docx.Document != tmp {
+					docx.Document = tmp
+				}
 			}
 		} else {
 			docx.Document = nil

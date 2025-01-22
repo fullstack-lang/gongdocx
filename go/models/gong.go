@@ -2896,7 +2896,40 @@ func GetFieldsFromPointer[Type PointerToGongstruct]() (res []string) {
 	return
 }
 
-func GetFieldStringValueFromPointer[Type PointerToGongstruct](instance Type, fieldName string) (res string) {
+type GongFieldValueType string
+
+const (
+	GongFieldValueTypeInt     GongFieldValueType = "GongFieldValueTypeInt"
+	GongFieldValueTypeFloat   GongFieldValueType = "GongFieldValueTypeFloat"
+	GongFieldValueTypeBool    GongFieldValueType = "GongFieldValueTypeBool"
+	GongFieldValueTypeOthers  GongFieldValueType = "GongFieldValueTypeOthers"
+)
+
+type GongFieldValue struct {
+	valueString string
+	GongFieldValueType
+	valueInt   int
+	valueFloat float64
+	valueBool  bool
+}
+
+func (gongValueField *GongFieldValue) GetValueString() string {
+	return gongValueField.valueString
+}
+
+func (gongValueField *GongFieldValue) GetValueInt() int {
+	return gongValueField.valueInt
+}
+	
+func (gongValueField *GongFieldValue) GetValueFloat() float64 {
+	return gongValueField.valueFloat
+}
+	
+func (gongValueField *GongFieldValue) GetValueBool() bool {
+	return gongValueField.valueBool
+}
+
+func GetFieldStringValueFromPointer(instance any, fieldName string) (res GongFieldValue) {
 
 	switch inferedInstance := any(instance).(type) {
 	// insertion point for generic get gongstruct field value
@@ -2904,300 +2937,308 @@ func GetFieldStringValueFromPointer[Type PointerToGongstruct](instance Type, fie
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Paragraphs":
 			for idx, __instance__ := range inferedInstance.Paragraphs {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "Tables":
 			for idx, __instance__ := range inferedInstance.Tables {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "LastParagraph":
 			if inferedInstance.LastParagraph != nil {
-				res = inferedInstance.LastParagraph.Name
+				res.valueString = inferedInstance.LastParagraph.Name
 			}
 		}
 	case *Document:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "File":
 			if inferedInstance.File != nil {
-				res = inferedInstance.File.Name
+				res.valueString = inferedInstance.File.Name
 			}
 		case "Root":
 			if inferedInstance.Root != nil {
-				res = inferedInstance.Root.Name
+				res.valueString = inferedInstance.Root.Name
 			}
 		case "Body":
 			if inferedInstance.Body != nil {
-				res = inferedInstance.Body.Name
+				res.valueString = inferedInstance.Body.Name
 			}
 		}
 	case *Docx:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Files":
 			for idx, __instance__ := range inferedInstance.Files {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "Document":
 			if inferedInstance.Document != nil {
-				res = inferedInstance.Document.Name
+				res.valueString = inferedInstance.Document.Name
 			}
 		}
 	case *File:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		}
 	case *Node:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Nodes":
 			for idx, __instance__ := range inferedInstance.Nodes {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case *Paragraph:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "ParagraphProperties":
 			if inferedInstance.ParagraphProperties != nil {
-				res = inferedInstance.ParagraphProperties.Name
+				res.valueString = inferedInstance.ParagraphProperties.Name
 			}
 		case "Runes":
 			for idx, __instance__ := range inferedInstance.Runes {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "Text":
-			res = inferedInstance.Text
+			res.valueString = inferedInstance.Text
 		case "Next":
 			if inferedInstance.Next != nil {
-				res = inferedInstance.Next.Name
+				res.valueString = inferedInstance.Next.Name
 			}
 		case "Previous":
 			if inferedInstance.Previous != nil {
-				res = inferedInstance.Previous.Name
+				res.valueString = inferedInstance.Previous.Name
 			}
 		case "EnclosingBody":
 			if inferedInstance.EnclosingBody != nil {
-				res = inferedInstance.EnclosingBody.Name
+				res.valueString = inferedInstance.EnclosingBody.Name
 			}
 		case "EnclosingTableColumn":
 			if inferedInstance.EnclosingTableColumn != nil {
-				res = inferedInstance.EnclosingTableColumn.Name
+				res.valueString = inferedInstance.EnclosingTableColumn.Name
 			}
 		}
 	case *ParagraphProperties:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "ParagraphStyle":
 			if inferedInstance.ParagraphStyle != nil {
-				res = inferedInstance.ParagraphStyle.Name
+				res.valueString = inferedInstance.ParagraphStyle.Name
 			}
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		}
 	case *ParagraphStyle:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "ValAttr":
-			res = inferedInstance.ValAttr
+			res.valueString = inferedInstance.ValAttr
 		}
 	case *Rune:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Text":
 			if inferedInstance.Text != nil {
-				res = inferedInstance.Text.Name
+				res.valueString = inferedInstance.Text.Name
 			}
 		case "RuneProperties":
 			if inferedInstance.RuneProperties != nil {
-				res = inferedInstance.RuneProperties.Name
+				res.valueString = inferedInstance.RuneProperties.Name
 			}
 		case "EnclosingParagraph":
 			if inferedInstance.EnclosingParagraph != nil {
-				res = inferedInstance.EnclosingParagraph.Name
+				res.valueString = inferedInstance.EnclosingParagraph.Name
 			}
 		}
 	case *RuneProperties:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "IsBold":
-			res = fmt.Sprintf("%t", inferedInstance.IsBold)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.IsBold)
+			res.valueBool = inferedInstance.IsBold
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "IsStrike":
-			res = fmt.Sprintf("%t", inferedInstance.IsStrike)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.IsStrike)
+			res.valueBool = inferedInstance.IsStrike
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "IsItalic":
-			res = fmt.Sprintf("%t", inferedInstance.IsItalic)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.IsItalic)
+			res.valueBool = inferedInstance.IsItalic
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		}
 	case *Table:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "TableProperties":
 			if inferedInstance.TableProperties != nil {
-				res = inferedInstance.TableProperties.Name
+				res.valueString = inferedInstance.TableProperties.Name
 			}
 		case "TableRows":
 			for idx, __instance__ := range inferedInstance.TableRows {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case *TableColumn:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Paragraphs":
 			for idx, __instance__ := range inferedInstance.Paragraphs {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case *TableProperties:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "TableStyle":
 			if inferedInstance.TableStyle != nil {
-				res = inferedInstance.TableStyle.Name
+				res.valueString = inferedInstance.TableStyle.Name
 			}
 		}
 	case *TableRow:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "TableColumns":
 			for idx, __instance__ := range inferedInstance.TableColumns {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case *TableStyle:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Val":
-			res = inferedInstance.Val
+			res.valueString = inferedInstance.Val
 		}
 	case *Text:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "PreserveWhiteSpace":
-			res = fmt.Sprintf("%t", inferedInstance.PreserveWhiteSpace)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.PreserveWhiteSpace)
+			res.valueBool = inferedInstance.PreserveWhiteSpace
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "EnclosingRune":
 			if inferedInstance.EnclosingRune != nil {
-				res = inferedInstance.EnclosingRune.Name
+				res.valueString = inferedInstance.EnclosingRune.Name
 			}
 		}
 	default:
@@ -3206,7 +3247,7 @@ func GetFieldStringValueFromPointer[Type PointerToGongstruct](instance Type, fie
 	return
 }
 
-func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res string) {
+func GetFieldStringValue(instance any, fieldName string) (res GongFieldValue) {
 
 	switch inferedInstance := any(instance).(type) {
 	// insertion point for generic get gongstruct field value
@@ -3214,300 +3255,308 @@ func GetFieldStringValue[Type Gongstruct](instance Type, fieldName string) (res 
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Paragraphs":
 			for idx, __instance__ := range inferedInstance.Paragraphs {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "Tables":
 			for idx, __instance__ := range inferedInstance.Tables {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "LastParagraph":
 			if inferedInstance.LastParagraph != nil {
-				res = inferedInstance.LastParagraph.Name
+				res.valueString = inferedInstance.LastParagraph.Name
 			}
 		}
 	case Document:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "File":
 			if inferedInstance.File != nil {
-				res = inferedInstance.File.Name
+				res.valueString = inferedInstance.File.Name
 			}
 		case "Root":
 			if inferedInstance.Root != nil {
-				res = inferedInstance.Root.Name
+				res.valueString = inferedInstance.Root.Name
 			}
 		case "Body":
 			if inferedInstance.Body != nil {
-				res = inferedInstance.Body.Name
+				res.valueString = inferedInstance.Body.Name
 			}
 		}
 	case Docx:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Files":
 			for idx, __instance__ := range inferedInstance.Files {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "Document":
 			if inferedInstance.Document != nil {
-				res = inferedInstance.Document.Name
+				res.valueString = inferedInstance.Document.Name
 			}
 		}
 	case File:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		}
 	case Node:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Nodes":
 			for idx, __instance__ := range inferedInstance.Nodes {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case Paragraph:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "ParagraphProperties":
 			if inferedInstance.ParagraphProperties != nil {
-				res = inferedInstance.ParagraphProperties.Name
+				res.valueString = inferedInstance.ParagraphProperties.Name
 			}
 		case "Runes":
 			for idx, __instance__ := range inferedInstance.Runes {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		case "Text":
-			res = inferedInstance.Text
+			res.valueString = inferedInstance.Text
 		case "Next":
 			if inferedInstance.Next != nil {
-				res = inferedInstance.Next.Name
+				res.valueString = inferedInstance.Next.Name
 			}
 		case "Previous":
 			if inferedInstance.Previous != nil {
-				res = inferedInstance.Previous.Name
+				res.valueString = inferedInstance.Previous.Name
 			}
 		case "EnclosingBody":
 			if inferedInstance.EnclosingBody != nil {
-				res = inferedInstance.EnclosingBody.Name
+				res.valueString = inferedInstance.EnclosingBody.Name
 			}
 		case "EnclosingTableColumn":
 			if inferedInstance.EnclosingTableColumn != nil {
-				res = inferedInstance.EnclosingTableColumn.Name
+				res.valueString = inferedInstance.EnclosingTableColumn.Name
 			}
 		}
 	case ParagraphProperties:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "ParagraphStyle":
 			if inferedInstance.ParagraphStyle != nil {
-				res = inferedInstance.ParagraphStyle.Name
+				res.valueString = inferedInstance.ParagraphStyle.Name
 			}
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		}
 	case ParagraphStyle:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "ValAttr":
-			res = inferedInstance.ValAttr
+			res.valueString = inferedInstance.ValAttr
 		}
 	case Rune:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Text":
 			if inferedInstance.Text != nil {
-				res = inferedInstance.Text.Name
+				res.valueString = inferedInstance.Text.Name
 			}
 		case "RuneProperties":
 			if inferedInstance.RuneProperties != nil {
-				res = inferedInstance.RuneProperties.Name
+				res.valueString = inferedInstance.RuneProperties.Name
 			}
 		case "EnclosingParagraph":
 			if inferedInstance.EnclosingParagraph != nil {
-				res = inferedInstance.EnclosingParagraph.Name
+				res.valueString = inferedInstance.EnclosingParagraph.Name
 			}
 		}
 	case RuneProperties:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "IsBold":
-			res = fmt.Sprintf("%t", inferedInstance.IsBold)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.IsBold)
+			res.valueBool = inferedInstance.IsBold
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "IsStrike":
-			res = fmt.Sprintf("%t", inferedInstance.IsStrike)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.IsStrike)
+			res.valueBool = inferedInstance.IsStrike
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "IsItalic":
-			res = fmt.Sprintf("%t", inferedInstance.IsItalic)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.IsItalic)
+			res.valueBool = inferedInstance.IsItalic
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		}
 	case Table:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "TableProperties":
 			if inferedInstance.TableProperties != nil {
-				res = inferedInstance.TableProperties.Name
+				res.valueString = inferedInstance.TableProperties.Name
 			}
 		case "TableRows":
 			for idx, __instance__ := range inferedInstance.TableRows {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case TableColumn:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Paragraphs":
 			for idx, __instance__ := range inferedInstance.Paragraphs {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case TableProperties:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "TableStyle":
 			if inferedInstance.TableStyle != nil {
-				res = inferedInstance.TableStyle.Name
+				res.valueString = inferedInstance.TableStyle.Name
 			}
 		}
 	case TableRow:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "TableColumns":
 			for idx, __instance__ := range inferedInstance.TableColumns {
 				if idx > 0 {
-					res += "\n"
+					res.valueString += "\n"
 				}
-				res += __instance__.Name
+				res.valueString += __instance__.Name
 			}
 		}
 	case TableStyle:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Val":
-			res = inferedInstance.Val
+			res.valueString = inferedInstance.Val
 		}
 	case Text:
 		switch fieldName {
 		// string value of fields
 		case "Name":
-			res = inferedInstance.Name
+			res.valueString = inferedInstance.Name
 		case "Content":
-			res = inferedInstance.Content
+			res.valueString = inferedInstance.Content
 		case "Node":
 			if inferedInstance.Node != nil {
-				res = inferedInstance.Node.Name
+				res.valueString = inferedInstance.Node.Name
 			}
 		case "PreserveWhiteSpace":
-			res = fmt.Sprintf("%t", inferedInstance.PreserveWhiteSpace)
+			res.valueString = fmt.Sprintf("%t", inferedInstance.PreserveWhiteSpace)
+			res.valueBool = inferedInstance.PreserveWhiteSpace
+			res.GongFieldValueType = GongFieldValueTypeBool
 		case "EnclosingRune":
 			if inferedInstance.EnclosingRune != nil {
-				res = inferedInstance.EnclosingRune.Name
+				res.valueString = inferedInstance.EnclosingRune.Name
 			}
 		}
 	default:

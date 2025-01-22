@@ -380,13 +380,15 @@ func (documentDB *DocumentDB) DecodePointers(backRepo *BackRepoStruct, document 
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoFile.Map_FileDBID_FilePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: document.File, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if document.File == nil || document.File != tmp {
-				document.File = tmp
+				log.Println("DecodePointers: document.File, unknown pointer id", id)
+				document.File = nil
+			} else {
+				// updates only if field has changed
+				if document.File == nil || document.File != tmp {
+					document.File = tmp
+				}
 			}
 		} else {
 			document.File = nil
@@ -399,13 +401,15 @@ func (documentDB *DocumentDB) DecodePointers(backRepo *BackRepoStruct, document 
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoNode.Map_NodeDBID_NodePtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: document.Root, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if document.Root == nil || document.Root != tmp {
-				document.Root = tmp
+				log.Println("DecodePointers: document.Root, unknown pointer id", id)
+				document.Root = nil
+			} else {
+				// updates only if field has changed
+				if document.Root == nil || document.Root != tmp {
+					document.Root = tmp
+				}
 			}
 		} else {
 			document.Root = nil
@@ -418,13 +422,15 @@ func (documentDB *DocumentDB) DecodePointers(backRepo *BackRepoStruct, document 
 		if id != 0 {
 			tmp, ok := backRepo.BackRepoBody.Map_BodyDBID_BodyPtr[uint(id)]
 
+			// if the pointer id is unknown, it is not a problem, maybe the target was removed from the front
 			if !ok {
-				log.Fatalln("DecodePointers: document.Body, unknown pointer id", id)
-			}
-
-			// updates only if field has changed
-			if document.Body == nil || document.Body != tmp {
-				document.Body = tmp
+				log.Println("DecodePointers: document.Body, unknown pointer id", id)
+				document.Body = nil
+			} else {
+				// updates only if field has changed
+				if document.Body == nil || document.Body != tmp {
+					document.Body = tmp
+				}
 			}
 		} else {
 			document.Body = nil
